@@ -60,10 +60,10 @@ final class InfrastructureConfigurationTest extends TestCase
         $this->assertSame('pgsql', DB::connection()->getDriverName());
     }
 
-    public function test_only_framework_and_approved_phase_one_and_two_migrations_exist(): void
+    public function test_only_framework_and_approved_phase_one_through_three_migrations_exist(): void
     {
-        // Migration Phase 2 adds candidate, company, and partnership schema
-        // only. Every later business phase remains absent at this checkpoint.
+        // Phase 3 adds only the approved vacancy foundation. Every later
+        // business phase remains absent at this checkpoint.
         $migrations = collect(glob(database_path('migrations/*.php')))
             ->map(fn (string $path) => basename($path))
             ->values();
@@ -97,6 +97,14 @@ final class InfrastructureConfigurationTest extends TestCase
             '2026_08_24_000211_create_company_documents_table.php',
             '2026_08_24_000212_create_company_verification_reviews_table.php',
             '2026_08_24_000213_create_partnerships_table.php',
+            '2026_08_24_000300_create_vacancies_table.php',
+            '2026_08_24_000301_create_vacancy_versions_table.php',
+            '2026_08_24_000302_create_vacancy_requirements_table.php',
+            '2026_08_24_000303_create_vacancy_documents_table.php',
+            '2026_08_24_000304_create_vacancy_screening_questions_table.php',
+            '2026_08_24_000305_create_vacancy_moderation_reviews_table.php',
+            '2026_08_24_000306_create_recruitment_stages_table.php',
+            '2026_08_24_000307_create_candidate_saved_vacancies_table.php',
         ];
 
         $this->assertSame($expected, $migrations->all());

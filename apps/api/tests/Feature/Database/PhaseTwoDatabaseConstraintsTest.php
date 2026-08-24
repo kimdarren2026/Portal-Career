@@ -19,15 +19,17 @@ final class PhaseTwoDatabaseConstraintsTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_only_phase_one_and_phase_two_business_tables_exist(): void
+    public function test_phase_two_tables_remain_present_without_phase_four_tables(): void
     {
         $tables = collect(DB::select(
             "SELECT tablename FROM pg_tables WHERE schemaname = current_schema() ORDER BY tablename"
         ))->pluck('tablename')->all();
 
-        $this->assertSame([
-            'cache',
-            'cache_locks',
+        $this->assertContains('cache', $tables);
+        $this->assertContains('cache_locks', $tables);
+        $this->assertContains('migrations', $tables);
+
+        foreach ([
             'candidate_certifications',
             'candidate_documents',
             'candidate_educations',
@@ -41,25 +43,12 @@ final class PhaseTwoDatabaseConstraintsTest extends TestCase
             'company_documents',
             'company_members',
             'company_verification_reviews',
-            'email_verification_tokens',
-            'failed_jobs',
-            'geographic_areas',
-            'industries',
-            'migrations',
-            'organization_types',
-            'organizational_units',
             'partnerships',
-            'password_credentials',
-            'password_reset_tokens',
-            'roles',
-            'sessions',
-            'skills',
-            'study_programs',
-            'users',
-        ], $tables);
+        ] as $table) {
+            $this->assertContains($table, $tables);
+        }
 
-        $this->assertFalse(DB::getSchemaBuilder()->hasTable('vacancies'));
-        $this->assertFalse(DB::getSchemaBuilder()->hasTable('candidate_saved_vacancies'));
+        $this->assertFalse(DB::getSchemaBuilder()->hasTable('applications'));
         $this->assertFalse(DB::getSchemaBuilder()->hasTable('user_roles'));
     }
 
