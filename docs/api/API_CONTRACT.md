@@ -786,6 +786,12 @@ Returns exactly:
 
 ## Part III — Candidate Profile and Documents
 
+> **Reconciled against BRD v1.1 / FSD v1.1 (`CANDIDATE_CONTRACT_CONFLICT`, resolved).** FR-CAN-003 fixes the *capabilities* of the candidate profile — identity, contact, domicile, education, experience, organizations, certifications, skills, work preferences, professional links, primary CV — and FR-CAN-005 fixes private documents with MIME and size validation. **Every one of those remains MVP and is specified below.**
+>
+> What the business documents do **not** fix is three controlled vocabularies (work preference values, education level, candidate document type), the exact profile-completion formula, and the exact document MIME allowlist and size ceiling. `DATABASE_SCHEMA.md` §"Complete enum inventory" already records the first three as `varchar` with a `CHECK` **added once the vocabulary is approved**. This contract previously asserted those vocabularies were settled; that over-specification has been removed rather than resolved by invention. See Part X items 7–9.
+>
+> **No candidate operation, field, or route was removed.** Candidate core — profile, education, experience, organizations, certifications, skills, links, preferences, ownership, and `/me` candidate context — is implementable now. Only document **upload** waits on an approved MIME/size policy, and only **automatic** completion recomputation is deferred.
+
 ### GET /api/v1/candidate/profile
 
 **Surface:** `VERSIONED_API`
@@ -800,7 +806,7 @@ Returns exactly:
 
 **Validation:** None.
 
-**Business Rules:** Returns profile attributes, work preferences, normalized and free-text geography, `current_candidate_type`, `profile_completed_at`, and a summary of verification state. Sub-collections are returned as counts plus links, or inline when `?include=educations,work_experiences,organizations,certifications,links,skills` names them (allow-listed values only).
+**Business Rules:** Returns profile attributes, work preferences, normalized and free-text geography, `current_candidate_type`, `profile_completed_at`, and a summary of verification state. **`profile_completed_at` may be `null`** — it is returned as stored and is not computed on read (Part X item 8). Sub-collections are returned as counts plus links, or inline when `?include=educations,work_experiences,organizations,certifications,links,skills` names them (allow-listed values only).
 
 **Success Response:** `200 OK`.
 
@@ -832,12 +838,12 @@ Returns exactly:
 
 **Request (all optional, partial update):** `headline`, `phone`, `summary`, `province_geographic_area_id`, `city_geographic_area_id`, `province`, `city`, `preferred_employment_type`, `preferred_workplace_mode`, `preferred_location_note`, `open_to_opportunities`.
 
-**Validation:** Enum membership for preference fields; geography references must exist and be `active`; free-text geography accepted only as a fallback where no master area matches.
+**Validation:** Preference fields — `preferred_employment_type`, `preferred_workplace_mode` — are validated for **type, length, and structural validity only**. **No closed vocabulary is approved for them** (`DATABASE_SCHEMA.md`: `varchar`, `CHECK` pending; Part X item 7), so this contract asserts no enum membership and names no candidate values. Geography references must exist and be `active`; free-text geography accepted only as a fallback where no master area matches.
 
 **Business Rules:**
 - **`current_candidate_type` is not editable here.** Changing candidate category is a distinct, audited action because it interacts with eligibility and role synchronization (INV-028). Contract deferred — see the note at the end of Part III.
 - Work preferences are availability signals only and are **never** an input to ranking or scoring. No ranking exists anywhere in this API.
-- Recomputes `profile_completed_at` when the required set becomes complete.
+- **`profile_completed_at` is not recomputed here — DEFERRED POLICY.** FR-CAN-003 requires candidates to complete a profile but defines **no** global completion formula and no exact required-field set, so none is invented. The column stays in the frozen schema and **may remain `null` indefinitely**; profile and collection CRUD function normally regardless (Part X item 8). Automatic computation is specified only once completion criteria are approved.
 
 **Success Response:** `200 OK`, updated profile.
 
@@ -897,7 +903,7 @@ Returns exactly:
 Clients must therefore read the collection, edit the whole set, and send it back. That is exactly what the profile form already does.
 
 **Validation:**
-- **Every row is validated before anything is written.** Row-level rules per collection: dates ordered where both present; `is_current = true` requires a null `end_date`; `education_level` enum; `study_program_id` active or `study_program_name` free-text fallback; certification `expires_at` after `issued_at`; certification `document_id` owned by this candidate; `link_type` enum, allowed URL scheme, unique `url` within the candidate; `skill_id` active, no duplicate `skill_id`.
+- **Every row is validated before anything is written.** Row-level rules per collection: dates ordered where both present; `is_current = true` requires a null `end_date`; `education_level` **type/length and structural validity only — no closed level vocabulary is approved** (`DATABASE_SCHEMA.md`: `varchar`, `CHECK` pending; Part X item 7), so no level codes are fixed by this contract; `study_program_id` active or `study_program_name` free-text fallback; certification `expires_at` after `issued_at`; certification `document_id` owned by this candidate; `link_type` enum, allowed URL scheme, unique `url` within the candidate; `skill_id` active, no duplicate `skill_id`.
 - Collection-level: no duplicate `id`; every supplied `id` belongs to this candidate and this collection; bounded array length.
 
 **Business Rules:**
@@ -1008,12 +1014,12 @@ Clients must therefore read the collection, edit the whole set, and send it back
 
 **Authorization:** `OWN`.
 
-**Request:** `multipart/form-data` — `file` (required), `document_type` (required, enum), `display_name` (optional; defaults to a sanitized client filename).
+**Request:** `multipart/form-data` — `file` (required), `document_type` (**required**; free-form `varchar` — see Validation), `display_name` (optional; defaults to a sanitized client filename).
 
 **Validation:**
-- Size ceiling enforced at both reverse proxy and application. Configurable; the numeric limit is not fixed by business documents.
-- Extension allow-list **and inspected content type**. The client-declared `Content-Type` and the filename extension are advisory only and are never trusted (`SECURITY_ARCHITECTURE.md` §5).
-- `document_type` within the dictionary enum.
+- **MIME validation and size validation are both MANDATORY — FR-CAN-005 requires them explicitly and neither may be dropped.** The client-declared `Content-Type` and the filename extension are advisory only and are never trusted; the **inspected** content type governs (`SECURITY_ARCHITECTURE.md` §5). The size ceiling is enforced at **both** reverse proxy and application.
+- **The exact MIME allowlist, the exact maximum size, and whether either varies by `document_type` are NOT defined by BRD/FSD and are NOT invented here** — `CANDIDATE_DOCUMENT_UPLOAD_POLICY_REQUIRED` (Part X item 9). **This upload operation is BLOCKED pending that policy.** The block is confined to upload: candidate profile and every profile sub-collection are unaffected and proceed now.
+- `document_type` present, and valid for **type and length only**. **No complete document-type vocabulary is approved** (`DATABASE_SCHEMA.md`: `varchar`, `CHECK` pending; Part X item 7). A controlled vocabulary can be added later without changing this operation, its route, or the candidate-document feature.
 
 **Business Rules:**
 - The object is stored under a **generated storage key**; the client filename is retained as display metadata only, so there is no path-traversal surface.
@@ -1051,7 +1057,7 @@ Clients must therefore read the collection, edit the whole set, and send it back
 
 **Request:** `display_name`, `document_type` — both optional.
 
-**Validation:** Enum membership; name length.
+**Validation:** `document_type` type/length and structural validity — **no approved vocabulary to check membership against** (Part X item 7); `display_name` length.
 
 **Business Rules:** **The stored file is never replaced through this route.** Replacing content would silently alter what a recruiter already reviewed; a new version is a new upload. Existing `application_documents` snapshots are unaffected by a metadata change (INV-032).
 
@@ -3367,6 +3373,9 @@ Nothing below is resolved by this document. Each affects a specific field or rul
 | 4 | **Recruiter domain / subdomain** | Affects cookie scope, CORS posture, and CSP, **not any URI or payload in this contract**. Same-origin is the default; a separate domain would require a cross-origin review before production DNS/TLS |
 | 5 | **WhatsApp notification phase** | **No WhatsApp channel, provider, template, adapter, or delivery field appears anywhere.** Notification endpoints cover in-app and email only |
 | 6 | **First recruiter default role / minimum active Company Admin** | `POST /companies` does **not** assign a default `company_role`. `MEMBER_LAST_ADMIN` is reserved and **not enforced** by the member-revoke route |
+| 7 | **Candidate controlled vocabularies** — work preference values, education level, candidate document type | `PATCH /candidate/profile`, `PUT /candidate/{collection}`, `POST` and `PATCH /candidate/documents` validate these fields for **type, length, and structural validity only**. `DATABASE_SCHEMA.md` holds all three as `varchar` with the `CHECK` **pending approval**; no values are invented here. **The fields and their features remain MVP** — approving a vocabulary later adds a `CHECK` and a membership rule, and changes no route, payload shape, or capability |
+| 8 | **Profile completion criteria** — `DEFERRED POLICY` | FR-CAN-003 requires a completed profile but fixes **no** completion formula or required-field set. `candidate_profiles.profile_completed_at` **stays in the frozen schema**, is returned as stored, and **may remain `null`**. It is **not** automatically recomputed by any operation in this contract. Candidate profile and collection CRUD are **not blocked** by this |
+| 9 | **Candidate document upload policy** — `CANDIDATE_DOCUMENT_UPLOAD_POLICY_REQUIRED` | FR-CAN-005 **requires** MIME and size validation, so neither control may be removed; the exact **allowlist**, the exact **maximum size**, and any **per-document-type variation** are undefined by BRD/FSD. `POST /candidate/documents` is therefore **blocked pending policy approval**. The block is scoped to upload alone — profile, sub-collections, document listing, metadata update, delete, and download contracts are unaffected |
 
 **Human-decision items carried from the ERD:**
 
