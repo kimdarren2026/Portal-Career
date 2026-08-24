@@ -7,18 +7,18 @@ namespace Tests\Feature\Database;
 use Closure;
 use Illuminate\Database\Connection;
 use Illuminate\Database\QueryException;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Tests\Concerns\RefreshesDatabaseWithMigrationOwner;
 use Tests\TestCase;
 
 /**
  * Final PostgreSQL-only verification for the deferred Phase-7 integrity layer.
- * These tests use direct writes and a separate runtime role so application code
- * cannot conceal a missing physical guarantee.
+ * These tests use direct writes through the configured runtime role so
+ * application code cannot conceal a missing physical guarantee.
  */
 final class PhaseSevenDatabaseConstraintsTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshesDatabaseWithMigrationOwner;
 
     private int $sequence = 0;
 
@@ -219,12 +219,14 @@ final class PhaseSevenDatabaseConstraintsTest extends TestCase
             )->allowed);
         }
 
-        // The test connection is the migration/schema owner. A zero-row write
+        // The separate migration/schema-owner connection retains maintenance
+        // capability. A zero-row write
         // proves it retains maintenance capability without changing evidence.
-        $this->assertSame('portal_karir', DB::selectOne('SELECT current_user')->current_user);
+        $owner = $this->migrationConnection();
+        $this->assertSame('portal_karir', $owner->selectOne('SELECT current_user')->current_user);
         foreach ($tables as $table => $column) {
-            DB::statement("UPDATE {$table} SET {$column} = {$column} WHERE FALSE");
-            DB::statement("DELETE FROM {$table} WHERE FALSE");
+            $owner->statement("UPDATE {$table} SET {$column} = {$column} WHERE FALSE");
+            $owner->statement("DELETE FROM {$table} WHERE FALSE");
         }
     }
 
@@ -235,10 +237,9 @@ final class PhaseSevenDatabaseConstraintsTest extends TestCase
 
     private function applicationConnection(): Connection
     {
-        config(['database.connections.append_only_application' => array_replace(
-            config('database.connections.pgsql'),
-            ['username' => 'portal_karir_app']
-        )]);
+        $runtimeConnection = config('database.default');
+
+        config(['database.connections.append_only_application' => config("database.connections.{$runtimeConnection}")]);
         DB::purge('append_only_application');
 
         return DB::connection('append_only_application');

@@ -1,12 +1,9 @@
 # infra/env — Environment Configuration Templates
 
-**Status: reserved and empty.**
-
-This directory will hold `.env.example` — a template listing every required environment variable
-with **placeholder** values and a short comment explaining each one.
-
-It has deliberately not been created yet: no application code exists, so no environment variable
-has been defined. Inventing variables now would guess at a stack that has not been chosen.
+Application environment variable names and safe placeholders live in
+`apps/api/.env.example`. Deployment-only database role bootstrap variables are
+documented in `../deployment/README.md`; they must come from the platform
+secret manager and must not be copied into the Laravel runtime environment.
 
 ## Rules
 

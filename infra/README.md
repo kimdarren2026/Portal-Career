@@ -1,12 +1,13 @@
 # infra — Infrastructure & Deployment
 
-**Status: reserved and empty. No infrastructure has been defined.**
+**Status:** the deployment layer contains the PostgreSQL runtime-role bootstrap
+artifact. Provider-specific deployment manifests remain intentionally absent.
 
 | Path | Purpose |
 | --- | --- |
 | `docker/` | Container definitions and compose files for local and deployed environments. |
-| `deployment/` | Deployment manifests, pipeline definitions, environment topology. |
-| `env/` | Environment variable **templates** only. |
+| `deployment/` | Deployment manifests, pipeline definitions, environment topology, and runtime database-role provisioning. |
+| `env/` | Pointers to environment variable **templates** only. |
 
 ## Secrets policy — non-negotiable
 
@@ -17,9 +18,10 @@
 - database passwords
 - private tokens, signing keys, and certificates
 
-Only a committed `env/.env.example` containing **placeholder** values is permitted. It will be
-created once the required environment variables are actually defined — it does not exist yet
-because no application code exists to require any variable.
+Only committed environment examples containing **placeholder** values are
+permitted. The Laravel example is `apps/api/.env.example`; deployment-only
+runtime-role bootstrap variables are documented under `deployment/` and are
+always sourced from a secret manager or an untracked local environment.
 
 Real values belong in a secret manager or in untracked local files. `.gitignore` at the repository
 root already excludes `.env` and `.env.*` while allowing `.env.example`.

@@ -6,8 +6,8 @@ namespace Tests\Feature\Database;
 
 use Closure;
 use Illuminate\Database\QueryException;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Tests\Concerns\RefreshesDatabaseWithMigrationOwner;
 use Tests\TestCase;
 
 /**
@@ -16,7 +16,7 @@ use Tests\TestCase;
  */
 final class PhaseSixDatabaseConstraintsTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshesDatabaseWithMigrationOwner;
 
     private int $sequence = 0;
 

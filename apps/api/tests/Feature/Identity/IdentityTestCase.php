@@ -10,17 +10,17 @@ use App\Domains\Identity\Enums\UserStatus;
 use App\Domains\Identity\Models\Role;
 use App\Domains\Identity\Models\User;
 use App\Domains\Identity\Models\UserRole;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Concerns\RefreshesDatabaseWithMigrationOwner;
 use Tests\TestCase;
 
 /**
  * Shared fixtures for Identity tests. Every test runs against real PostgreSQL
- * (RefreshDatabase), never SQLite — the schema depends on partial unique
+ * (with an owner-only migration connection), never SQLite — the schema depends on partial unique
  * indexes and CHECK constraints SQLite does not share.
  */
 abstract class IdentityTestCase extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshesDatabaseWithMigrationOwner;
 
     protected int $sequence = 0;
 

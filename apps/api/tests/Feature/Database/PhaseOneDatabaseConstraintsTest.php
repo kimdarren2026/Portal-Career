@@ -7,8 +7,8 @@ namespace Tests\Feature\Database;
 use Closure;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Database\QueryException;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Tests\Concerns\RefreshesDatabaseWithMigrationOwner;
 use Tests\TestCase;
 
 /**
@@ -17,7 +17,7 @@ use Tests\TestCase;
  */
 final class PhaseOneDatabaseConstraintsTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshesDatabaseWithMigrationOwner;
 
     public function test_phase_one_tables_remain_present_with_phase_seven_user_roles(): void
     {
