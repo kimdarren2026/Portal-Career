@@ -61,8 +61,9 @@ Session cookies are chosen over browser-stored tokens for the web surface delibe
 
 | Control | Applied to |
 | --- | --- |
-| Per-IP and per-account rate limits | Login, registration, reset request, resend verification, all public write actions |
-| Temporary account lock after repeated failures (FSD §10.1) | Time-boxed, self-clearing, auditable; never a permanent lock an attacker can trigger against a real user |
+| Per-IP and per-identity rate limits | Login, registration, reset request, resend verification, verify email, reset password, all public write actions. **Exact thresholds and windows: `API_CONTRACT.md` §11.1**, which is authoritative. Both limiters must be satisfied; tripping either returns `429` with `Retry-After` |
+| Temporary account lock after repeated failures (FSD §10.1) | **8 credential failures in a rolling 15 minutes → a 15-minute lock** (`API_CONTRACT.md` §11.6). Time-boxed, self-clearing, auditable; never a permanent lock an attacker can trigger against a real user. Held in Redis runtime state — **`users.status` is never written by a lock**, and no table exists for it. Cleared on successful authentication |
+| Abuse-control accounting is enumeration-safe | Counters are keyed on a normalized identity-derived value **even when no account exists**, so limiter and lock behaviour cannot reveal whether an address is registered (`API_CONTRACT.md` §11.3) |
 | Generic failure messages | Never distinguish "unknown account" from "wrong password" |
 | Idle and absolute session lifetime | Shorter for administrative roles than for candidates |
 | Suspend / disable | `users.status = SUSPENDED / DISABLED` terminates active sessions and revokes API tokens immediately — status is re-checked on every request, not only at login |

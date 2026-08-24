@@ -107,6 +107,8 @@ This mapping is a documented reading of an FSD table explicitly labelled as exam
 | `AUTH_PASSWORD_POLICY` | 422 | Password fails FR-AUTH-006 policy |
 | `AUTH_CURRENT_PASSWORD_INVALID` | 422 | Password change supplied the wrong current password |
 
+> **The two `429`s are distinct and neither may be duplicated.** `RATE_LIMITED` means a request limiter in `API_CONTRACT.md` §11.1 was exceeded; `AUTH_ACCOUNT_LOCKED` means the temporary credential-failure lock in §11.6 is active. Both **require** `Retry-After` (§11.5), and when several controls block one request the **longest** applicable value is returned. `AUTH_ACCOUNT_LOCKED` is the **only** lock code — do not introduce a second, competing one, and do not signal a temporary lock through `AUTH_ACCOUNT_SUSPENDED` or `AUTH_ACCOUNT_DISABLED`, which denote durable `users.status` values.
+
 > **Account-enumeration note.** `AUTH_EMAIL_ALREADY_REGISTERED` is defined because FSD §9.2 names it, but **registration, forgot-password, and resend-verification never return it**. All three return `202` with an identical body whether or not the address exists, and the differentiated outcome is delivered by email. Returning it would let an attacker enumerate registered candidates and recruiters, which FSD §9.3 forbids. It remains available for authenticated self-service flows where the actor already knows the address is theirs.
 
 ---

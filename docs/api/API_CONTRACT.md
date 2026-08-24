@@ -204,12 +204,91 @@ Every rule marked *Business Rules* below is enforced server-side regardless of w
 | `Idempotency-Key` | Request | See §7 |
 | `If-Match` | Request | Optimistic concurrency |
 | `X-Request-Id` | Both | Correlation ID; generated if absent, echoed always, stored in `audit_logs.correlation_id` |
-| `Retry-After` | Response | With `429` and `AUTH_ACCOUNT_LOCKED` |
+| `Retry-After` | Response | **Required** on every `429` — both `RATE_LIMITED` and `AUTH_ACCOUNT_LOCKED`. Longest applicable value when several controls block at once (§11.5) |
 | `X-Robots-Tag: noindex` | Response | All authenticated and document routes |
 
-#### 11. Rate Limiting
+#### 11. Abuse Control — Rate Limiting and Temporary Login Lock
 
-Stricter limits on unauthenticated and credential-adjacent endpoints (FSD §7.6, §10.1): registration, login, forgot-password, resend-verification, verify-email, reset-password, external-apply start, and all public reads. Per-actor limits elsewhere. Exceeding returns `429 RATE_LIMITED`.
+Stricter limits apply to unauthenticated and credential-adjacent endpoints (FSD §7.6, §10.1); per-actor limits apply elsewhere. Exceeding a limiter returns `429 RATE_LIMITED` with `Retry-After`.
+
+**This section is the authoritative source of the numbers.** FSD FR-AUTH-004 and FR-AUTH-006 require rate limiting and a temporary lock without quantifying either; the thresholds below resolve `AUTH_RATE_LIMIT_POLICY_REQUIRED` and `AUTH_LOGIN_LOCK_POLICY_REQUIRED` for MVP. Each value is a documented policy decision, not an implementation detail — changing one is a contract change.
+
+##### 11.1 Authentication limiter matrix
+
+| Operation | IP limiter | Identity / token limiter | Limiter key subject |
+| --- | --- | --- | --- |
+| `POST /auth/register/candidate` | **5 / 30 min** | **3 / 60 min** | `email_normalized` |
+| `POST /auth/register/recruiter` | **5 / 30 min** | **3 / 60 min** | `email_normalized` |
+| `POST /auth/login` | **20 / 5 min** | **10 / 15 min** | `email_normalized` |
+| `POST /auth/resend-verification` | **10 / 15 min** | **3 / 15 min** | `email_normalized` |
+| `POST /auth/verify-email` | **20 / 10 min** | **10 / 10 min** | token digest |
+| `POST /auth/forgot-password` | **20 / 15 min** | **5 / 15 min** | `email_normalized` |
+| `POST /auth/reset-password` | **20 / 15 min** | **5 / 15 min** | token digest |
+
+**The two registration endpoints share one IP limiter namespace.** Candidate and recruiter registration count against the *same* per-IP bucket, so alternating between the two endpoints cannot double the allowance. Their identity buckets are likewise shared, keyed on `email_normalized`.
+
+##### 11.2 Both limiters must be satisfied
+
+Where an IP limiter and an identity or token limiter both apply, a request must satisfy **both**. Tripping **either** is sufficient for `429`. The limits are **conjunctive, never additive** — an IP allowance of 20 does not grant 20 attempts against a single identity that is itself capped at 10.
+
+##### 11.3 Anti-enumeration — mandatory
+
+**Attempt and failure accounting operates on a normalized identity-derived key even when no account exists.** An unknown address is counted exactly as a known one, in the same namespace, against the same thresholds.
+
+A caller must not be able to infer account existence from abuse-control behaviour — not from whether a limiter or lock eventually activates, and not from response shape or timing. Unknown identities participate in equivalent accounting. Password verification continues to follow the safe-comparison behaviour required by `SECURITY_ARCHITECTURE.md` §1, so a request naming a non-existent account performs comparable work to one naming a real account. This complements, and never weakens, the identical-response rule for registration, forgot-password, and resend-verification (`ERROR_CODES.md` §4).
+
+##### 11.4 Limiter key privacy
+
+**A raw email address, verification token, or password reset token must never appear in a rate-limit key name.** Limiter state lives outside PostgreSQL, so a raw key would place a credential-bearing or personally identifying value into a store that the database's access controls do not cover, and into any tooling that can enumerate keys.
+
+Keys are built from a deterministic digest of the normalized identifier or token:
+
+```
+auth:<operation>:ip:<ip>
+auth:<operation>:identity:<digest of email_normalized>
+auth:<operation>:token:<digest of raw token>
+```
+
+The digest algorithm and namespace prefix are implementation choices; **the prohibition on raw values is contractual.** This extends `SECURITY_ARCHITECTURE.md` §7 "Never logged or audited" from logs and audit payloads to runtime limiter keys.
+
+##### 11.5 `Retry-After` is mandatory on every abuse-control 429
+
+| Response | `Retry-After` value |
+| --- | --- |
+| `RATE_LIMITED` | Seconds until the applicable limiter admits another attempt |
+| `AUTH_ACCOUNT_LOCKED` | Seconds until the temporary lock expires |
+
+**When more than one limiter or lock blocks the same request, return the longest applicable `Retry-After`.** A client honouring a shorter value would retry early and trip a still-active control.
+
+##### 11.6 Temporary login lock
+
+Credential failures are tracked **by normalized identity**, independently of the `POST /auth/login` limiters in §11.1.
+
+| Property | Policy |
+| --- | --- |
+| Threshold | **8 failed credential attempts** |
+| Observation window | **Rolling 15 minutes** |
+| Lock duration | **15 minutes** |
+| Response | `AUTH_ACCOUNT_LOCKED`, HTTP `429`, `Retry-After` required |
+| Storage | Runtime state only — see §11.7 |
+| Expiry | Self-clearing; **never permanent** |
+| On success | Failure counter **and** any active lock are cleared |
+
+The lock is time-boxed and self-clearing by design. A permanent or administratively-sticky lock would hand an attacker a denial-of-service primitive against a real user's account (`SECURITY_ARCHITECTURE.md` §1).
+
+**What counts as a credential failure.** Increment the counter **only** for a failed credential authentication — a wrong password, or an unknown normalized identity (§11.3).
+
+**Do not increment** when the credentials were correct and the request was refused on account state: `PENDING_EMAIL_VERIFICATION`, `SUSPENDED`, or `DISABLED`. Those are authorization outcomes, not password failures. Counting them would let repeated requests against a suspended or disabled account extend an existing lock indefinitely, and would blur an account-state signal into a credential signal.
+
+##### 11.7 Storage — runtime only
+
+Rate-limit counters, credential-failure counters, and temporary lock state are held in **Redis runtime state** (`DEPLOYMENT_ARCHITECTURE.md`). They are deliberately **not persisted**:
+
+- no table is created for them, and no PostgreSQL schema change is implied;
+- `users.status` is **not** written by a temporary lock — it remains the durable account-state field (`PENDING_EMAIL_VERIFICATION`, `ACTIVE`, `SUSPENDED`, `DISABLED`) and never records a transient throttle;
+- state expires on its own; losing it fails **open** for availability, the accepted trade-off for a control that must never become permanent.
+
+Lock activation is auditable as a login event (`SECURITY_ARCHITECTURE.md` §7) — auditing the *event* is not the same as persisting the *state*.
 
 #### 12. Audit and Outbox Notation
 
@@ -239,7 +318,7 @@ Most endpoints have their own `###` section. Five families of structurally ident
 
 **Authentication:** None (public).
 
-**Authorization:** Public. Rate-limited per IP.
+**Authorization:** Public. Abuse-controlled: **5 / 30 min per IP** and **3 / 60 min per `email_normalized`** (§11.1). The per-IP bucket is **shared with recruiter registration** — alternating between the two endpoints does not raise the allowance.
 
 **Request:**
 
@@ -300,7 +379,7 @@ Most endpoints have their own `###` section. Five families of structurally ident
 
 **Authentication:** None (public).
 
-**Authorization:** Public. Rate-limited per IP.
+**Authorization:** Public. Abuse-controlled: **5 / 30 min per IP** and **3 / 60 min per `email_normalized`** (§11.1). The per-IP bucket is **shared with candidate registration**.
 
 **Request:** `name`, `email`, `password`, `password_confirmation`, `accepted_terms` — as above, without `candidate_type`.
 
@@ -347,7 +426,7 @@ Most endpoints have their own `###` section. Five families of structurally ident
 
 **Authentication:** None — the token is the credential.
 
-**Authorization:** Public. Rate-limited per IP and per token.
+**Authorization:** Public. Abuse-controlled: **20 / 10 min per IP** and **10 / 10 min per token** (§11.1). The limiter is keyed on a **digest** of the token, never the raw token (§11.4).
 
 **Request:** `token` (string, required — the raw value from the emailed link).
 
@@ -393,7 +472,7 @@ Most endpoints have their own `###` section. Five families of structurally ident
 
 **Authentication:** None.
 
-**Authorization:** Public. Strictly rate-limited per IP and per address.
+**Authorization:** Public. Abuse-controlled: **10 / 15 min per IP** and **3 / 15 min per `email_normalized`** (§11.1). Unknown addresses are counted identically (§11.3).
 
 **Request:** `email` (string, required).
 
@@ -414,7 +493,7 @@ Most endpoints have their own `###` section. Five families of structurally ident
 
 **Notification / Outbox:** Verification email.
 
-**Idempotency:** Not required; rate limiting is the control.
+**Idempotency:** Not required; the §11.1 limiters are the control.
 
 **Concurrency:** Not significant.
 
@@ -438,7 +517,7 @@ Most endpoints have their own `###` section. Five families of structurally ident
 
 **Authentication:** None.
 
-**Authorization:** Public. Rate-limited per IP and per account.
+**Authorization:** Public. Abuse-controlled: **20 / 5 min per IP** and **10 / 15 min per `email_normalized`** (§11.1), plus the temporary login lock in §11.6.
 
 **Request:** `email`, `password`, optional `remember` (boolean), optional `device_name` (string — required to mint a token on the `/api/v1` surface).
 
@@ -447,7 +526,10 @@ Most endpoints have their own `###` section. Five families of structurally ident
 **Business Rules:**
 - Compares against `password_credentials.password_hash` using the adaptive hash.
 - **Failure is indistinguishable** between unknown account and wrong password — always `AUTH_INVALID_CREDENTIALS`.
-- Repeated failures trigger a **temporary, self-clearing** account lock (FSD §10.1) returning `AUTH_ACCOUNT_LOCKED` with `Retry-After`. The lock is never permanent, or an attacker could deny service to a real user.
+- **8 failed credential attempts within a rolling 15 minutes** trigger a **temporary, self-clearing 15-minute** lock (FSD §10.1; §11.6) returning `AUTH_ACCOUNT_LOCKED` with `Retry-After`. The lock is never permanent, or an attacker could deny service to a real user. It is runtime state only — `users.status` is never written by a lock (§11.7).
+- The failure counter increments **only** on a credential failure — wrong password, or unknown identity. It does **not** increment when the credentials were correct and the request was refused on account state (`PENDING_EMAIL_VERIFICATION`, `SUSPENDED`, `DISABLED`), so requests against a suspended account cannot extend an existing lock indefinitely (§11.6).
+- Failures against an **unknown** address are counted on the same identity-derived key as a known one, so limiter and lock behaviour never reveal whether an account exists (§11.3).
+- **Successful authentication clears** the identity credential-failure counter and any active temporary lock.
 - Blocked when `users.status` is SUSPENDED or DISABLED — checked at every request, not only at login (`SECURITY_ARCHITECTURE.md` §1).
 - Email verification is **not** required to sign in; it is required to act (`AUTH_EMAIL_NOT_VERIFIED` at the point of action).
 - Web surface: session regenerated on login to defeat fixation. API surface: a Sanctum token is minted with abilities scoped to the actor's roles.
@@ -456,7 +538,7 @@ Most endpoints have their own `###` section. Five families of structurally ident
 
 **Error Codes:** `AUTH_INVALID_CREDENTIALS` (422) · `AUTH_ACCOUNT_SUSPENDED` (403) · `AUTH_ACCOUNT_DISABLED` (403) · `AUTH_ACCOUNT_LOCKED` (429) · `RATE_LIMITED` (429).
 
-**Side Effects:** Session or token created; failure counter updated.
+**Side Effects:** Session or token created. On failure the identity credential-failure counter is incremented; on success that counter and any active temporary lock are cleared (§11.6).
 
 **Audit:** `login_success` or `login_failure`, with IP and device metadata **only where policy permits** (H-4, unresolved). Never the password.
 
@@ -528,7 +610,7 @@ Most endpoints have their own `###` section. Five families of structurally ident
 
 **Authentication:** None.
 
-**Authorization:** Public. Strictly rate-limited.
+**Authorization:** Public. Abuse-controlled: **20 / 15 min per IP** and **5 / 15 min per `email_normalized`** (§11.1). Unknown addresses are counted identically, so limiter behaviour cannot be used to enumerate accounts (§11.3); the outward response stays enumeration-resistant.
 
 **Request:** `email` (string, required).
 
@@ -573,7 +655,7 @@ Most endpoints have their own `###` section. Five families of structurally ident
 
 **Authentication:** None — the token is the credential.
 
-**Authorization:** Public. Rate-limited.
+**Authorization:** Public. Abuse-controlled: **20 / 15 min per IP** and **5 / 15 min per token** (§11.1). The limiter is keyed on a **digest** of the token, never the raw token (§11.4).
 
 **Request:** `token`, `password`, `password_confirmation`.
 
