@@ -19,7 +19,7 @@ final class PhaseTwoDatabaseConstraintsTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_phase_two_tables_remain_present_without_phase_four_tables(): void
+    public function test_phase_two_tables_remain_present_without_phase_five_tables(): void
     {
         $tables = collect(DB::select(
             "SELECT tablename FROM pg_tables WHERE schemaname = current_schema() ORDER BY tablename"
@@ -48,7 +48,7 @@ final class PhaseTwoDatabaseConstraintsTest extends TestCase
             $this->assertContains($table, $tables);
         }
 
-        $this->assertFalse(DB::getSchemaBuilder()->hasTable('applications'));
+        $this->assertFalse(DB::getSchemaBuilder()->hasTable('notifications'));
         $this->assertFalse(DB::getSchemaBuilder()->hasTable('user_roles'));
     }
 

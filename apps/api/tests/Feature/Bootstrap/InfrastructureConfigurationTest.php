@@ -60,9 +60,9 @@ final class InfrastructureConfigurationTest extends TestCase
         $this->assertSame('pgsql', DB::connection()->getDriverName());
     }
 
-    public function test_only_framework_and_approved_phase_one_through_three_migrations_exist(): void
+    public function test_only_framework_and_approved_phase_one_through_four_migrations_exist(): void
     {
-        // Phase 3 adds only the approved vacancy foundation. Every later
+        // Phase 4 adds only the approved recruitment foundation. Every later
         // business phase remains absent at this checkpoint.
         $migrations = collect(glob(database_path('migrations/*.php')))
             ->map(fn (string $path) => basename($path))
@@ -105,6 +105,19 @@ final class InfrastructureConfigurationTest extends TestCase
             '2026_08_24_000305_create_vacancy_moderation_reviews_table.php',
             '2026_08_24_000306_create_recruitment_stages_table.php',
             '2026_08_24_000307_create_candidate_saved_vacancies_table.php',
+            '2026_08_24_000400_create_applications_table.php',
+            '2026_08_24_000401_create_application_status_histories_table.php',
+            '2026_08_24_000402_create_application_documents_table.php',
+            '2026_08_24_000403_create_application_screening_answers_table.php',
+            '2026_08_24_000404_create_selection_stage_assignments_table.php',
+            '2026_08_24_000405_create_selection_schedules_table.php',
+            '2026_08_24_000406_create_selection_schedule_histories_table.php',
+            '2026_08_24_000407_create_evaluations_table.php',
+            '2026_08_24_000408_create_evaluation_items_table.php',
+            '2026_08_24_000409_create_offers_table.php',
+            '2026_08_24_000410_create_external_apply_events_table.php',
+            '2026_08_24_000411_create_consents_table.php',
+            '2026_08_24_000412_create_recruitment_outcomes_table.php',
         ];
 
         $this->assertSame($expected, $migrations->all());
