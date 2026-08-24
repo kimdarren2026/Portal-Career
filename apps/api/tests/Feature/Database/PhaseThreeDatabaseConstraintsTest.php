@@ -21,7 +21,7 @@ final class PhaseThreeDatabaseConstraintsTest extends TestCase
 
     private int $sequence = 0;
 
-    public function test_phase_three_tables_remain_present_without_phase_five_tables(): void
+    public function test_phase_three_tables_remain_present_without_phase_six_tables(): void
     {
         $tables = collect(DB::select(
             "SELECT tablename FROM pg_tables WHERE schemaname = current_schema() ORDER BY tablename"
@@ -58,7 +58,8 @@ final class PhaseThreeDatabaseConstraintsTest extends TestCase
             $this->assertContains($table, $tables);
         }
 
-        $this->assertFalse(DB::getSchemaBuilder()->hasTable('notifications'));
+        $this->assertFalse(DB::getSchemaBuilder()->hasTable('idempotency_keys'));
+        $this->assertFalse(DB::getSchemaBuilder()->hasTable('export_jobs'));
         $this->assertFalse(DB::getSchemaBuilder()->hasTable('user_roles'));
     }
 

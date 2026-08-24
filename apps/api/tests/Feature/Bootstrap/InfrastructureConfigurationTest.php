@@ -60,9 +60,9 @@ final class InfrastructureConfigurationTest extends TestCase
         $this->assertSame('pgsql', DB::connection()->getDriverName());
     }
 
-    public function test_only_framework_and_approved_phase_one_through_four_migrations_exist(): void
+    public function test_only_framework_and_approved_phase_one_through_five_migrations_exist(): void
     {
-        // Phase 4 adds only the approved recruitment foundation. Every later
+        // Phase 5 adds only communication, audit, and configuration data. Every later
         // business phase remains absent at this checkpoint.
         $migrations = collect(glob(database_path('migrations/*.php')))
             ->map(fn (string $path) => basename($path))
@@ -118,6 +118,11 @@ final class InfrastructureConfigurationTest extends TestCase
             '2026_08_24_000410_create_external_apply_events_table.php',
             '2026_08_24_000411_create_consents_table.php',
             '2026_08_24_000412_create_recruitment_outcomes_table.php',
+            '2026_08_24_000500_create_notifications_table.php',
+            '2026_08_24_000501_create_email_outbox_table.php',
+            '2026_08_24_000502_create_audit_logs_table.php',
+            '2026_08_24_000503_create_smtp_configurations_table.php',
+            '2026_08_24_000504_add_consent_foreign_key_to_external_apply_events_table.php',
         ];
 
         $this->assertSame($expected, $migrations->all());

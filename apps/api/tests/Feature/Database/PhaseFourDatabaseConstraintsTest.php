@@ -20,13 +20,15 @@ final class PhaseFourDatabaseConstraintsTest extends TestCase
 
     private int $sequence = 0;
 
-    public function test_only_phase_one_through_four_business_tables_exist(): void
+    public function test_phase_four_tables_remain_present_without_phase_six_tables(): void
     {
         $tables = collect(DB::select(
             "SELECT tablename FROM pg_tables WHERE schemaname = current_schema() ORDER BY tablename"
         ))->pluck('tablename')->all();
 
-        $this->assertCount(51, $tables);
+        $this->assertContains('cache', $tables);
+        $this->assertContains('cache_locks', $tables);
+        $this->assertContains('migrations', $tables);
         foreach ([
             'applications', 'application_status_histories', 'application_documents',
             'application_screening_answers', 'selection_stage_assignments',
@@ -37,7 +39,8 @@ final class PhaseFourDatabaseConstraintsTest extends TestCase
             $this->assertContains($table, $tables);
         }
 
-        $this->assertFalse(DB::getSchemaBuilder()->hasTable('notifications'));
+        $this->assertFalse(DB::getSchemaBuilder()->hasTable('idempotency_keys'));
+        $this->assertFalse(DB::getSchemaBuilder()->hasTable('export_jobs'));
         $this->assertFalse(DB::getSchemaBuilder()->hasTable('user_roles'));
     }
 
@@ -89,7 +92,9 @@ final class PhaseFourDatabaseConstraintsTest extends TestCase
              ORDER BY con.contype"
         ))->map(fn (object $row): string => "{$row->type}:{$row->count}")->all();
 
-        $this->assertSame(['c:17', 'f:37', 'p:13', 'u:3'], $counts);
+        // Phase 5 completes the one deferred external-apply consent FK without
+        // changing any Phase-4 table definition or same-row constraint.
+        $this->assertSame(['c:17', 'f:38', 'p:13', 'u:3'], $counts);
 
         $names = collect(DB::select(
             "SELECT con.conname
@@ -352,18 +357,24 @@ final class PhaseFourDatabaseConstraintsTest extends TestCase
         );
     }
 
-    public function test_external_apply_events_remain_independent_and_defer_the_consent_foreign_key(): void
+    public function test_external_apply_events_remain_independent_after_phase_five_completes_the_consent_foreign_key(): void
     {
-        $candidateProfileId = $this->candidateProfile($this->user('external-event-candidate'));
+        $candidateUserId = $this->user('external-event-candidate');
+        $candidateProfileId = $this->candidateProfile($candidateUserId);
         $creatorId = $this->user('external-event-creator');
         $externalVacancyId = $this->vacancy($creatorId, 'EXTERNAL_ATS');
-        $eventId = $this->externalApplyEvent($candidateProfileId, $externalVacancyId, ['consent_id' => 999999]);
+        $consentId = $this->consent($candidateUserId);
+        $eventId = $this->externalApplyEvent($candidateProfileId, $externalVacancyId, ['consent_id' => $consentId]);
 
         $this->assertSame($externalVacancyId, (int) DB::table('external_apply_events')->where('id', $eventId)->value('vacancy_id'));
+        $this->assertSame($consentId, (int) DB::table('external_apply_events')->where('id', $eventId)->value('consent_id'));
         $this->assertConstraintViolation('23514', 'chk_external_apply_events_event_type', fn () =>
             $this->externalApplyEvent($candidateProfileId, $externalVacancyId, ['event_type' => 'EXTERNAL_APPLY_CONFIRMED'])
         );
-        $this->assertSame(0, (int) DB::selectOne(
+        $this->assertConstraintViolation('23503', 'fk_external_apply_events_consent_id', fn () =>
+            $this->externalApplyEvent($candidateProfileId, $externalVacancyId, ['consent_id' => 999999])
+        );
+        $this->assertSame(1, (int) DB::selectOne(
             "SELECT COUNT(*)::int AS count
              FROM pg_constraint
              WHERE conname = 'fk_external_apply_events_consent_id'"
