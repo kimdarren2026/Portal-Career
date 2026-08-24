@@ -108,13 +108,13 @@ Legend for **Destination**:
 | `daftar_recruiter_portal_karir_kampus_1` | `archive/stitch-iterations/recruiter/daftar-recruiter/iteration-1/` | recruiter | Recruiter account registration |
 | `daftar_recruiter_portal_karir_kampus_2` | `archive/stitch-iterations/recruiter/daftar-recruiter/iteration-2/` | recruiter | Recruiter account registration |
 | `lengkapi_profil_perusahaan_portal_karir_kampus` | `design/stitch/recruiter/lengkapi-profil-perusahaan/` | recruiter | Multi-step company profile completion form |
-| `verifikasi_menunggu_portal_karir_kampus` | `design/stitch/recruiter/verifikasi-menunggu/` | recruiter | Company verification pending state |
-| `dashboard_recruiter_menunggu_verifikasi_portal_karir_kampus` | `design/stitch/recruiter/dashboard-menunggu-verifikasi/` | recruiter | Recruiter dashboard - awaiting verification |
-| `dashboard_recruiter_terverifikasi_portal_karir_kampus` | `design/stitch/recruiter/dashboard-terverifikasi/` | recruiter | Recruiter dashboard - verified |
+| `verifikasi_menunggu_portal_karir_kampus` | `design/stitch/recruiter/verifikasi-menunggu/` | recruiter | NON-CANONICAL ITERATION — pending-verification alternative |
+| `dashboard_recruiter_menunggu_verifikasi_portal_karir_kampus` | `design/stitch/recruiter/dashboard-menunggu-verifikasi/` | recruiter | Canonical Recruiter dashboard — pending verification |
+| `dashboard_recruiter_terverifikasi_portal_karir_kampus` | `design/stitch/recruiter/dashboard-terverifikasi/` | recruiter | Canonical Recruiter dashboard — verified |
 | `dashboard_recruiter_perlu_perbaikan_portal_karir_kampus` | `design/stitch/recruiter/dashboard-perlu-perbaikan/` | recruiter | Recruiter dashboard - revision required |
-| `dashboard_recruiter_ditangguhkan_portal_karir_kampus` | `design/stitch/recruiter/dashboard-ditangguhkan/` | recruiter | Recruiter dashboard - access suspended |
-| `dashboard_recruiter_penangguhan_portal_karir_kampus` | `design/stitch/recruiter/dashboard-penangguhan/` | recruiter | Recruiter dashboard - suspension notice (same page title as dashboard-ditangguhkan) |
-| `dashboard_recruiter_portal_karir_kampus` | `design/stitch/recruiter/dashboard-recruiter/` | recruiter | Recruiter dashboard - generic/base variant |
+| `dashboard_recruiter_ditangguhkan_portal_karir_kampus` | `design/stitch/recruiter/dashboard-ditangguhkan/` | recruiter | Canonical Recruiter dashboard — suspended |
+| `dashboard_recruiter_penangguhan_portal_karir_kampus` | `design/stitch/recruiter/dashboard-penangguhan/` | recruiter | NON-CANONICAL ITERATION — suspension alternative |
+| `dashboard_recruiter_portal_karir_kampus` | `design/stitch/recruiter/dashboard-recruiter/` | recruiter | NON-CANONICAL ITERATION — verified-dashboard alternative |
 | `revisi_lowongan_portal_karir_kampus_1` | `archive/stitch-iterations/recruiter/revisi-lowongan/iteration-1/` | recruiter | Vacancy revision requested by Career Center |
 | `revisi_lowongan_portal_karir_kampus_2` | `archive/stitch-iterations/recruiter/revisi-lowongan/iteration-2/` | recruiter | Vacancy revision requested by Career Center |
 | `dashboard_career_center_portal_karir_kampus_1` | `archive/stitch-iterations/career-center/dashboard-career-center/iteration-1/` | career-center | Career Center admin console dashboard |
@@ -177,7 +177,7 @@ The original organization correctly preserved every ambiguous export. A later BR
 | candidate | lamar-lowongan-pertanyaan-seleksi | CANONICAL — FINAL STITCH REDESIGN | design/stitch/candidate/lamar-lowongan-pertanyaan-seleksi/ |
 | candidate | lamaran-saya | CANONICAL — FINAL STITCH REDESIGN | design/stitch/candidate/lamaran-saya/ |
 | candidate | verifikasi-email | CANONICAL — FINAL STITCH REDESIGN | design/stitch/candidate/verifikasi-email/ |
-| candidate | verifikasi-alumni | CANONICAL — FINAL STITCH REDESIGN | design/stitch/candidate/verifikasi-alumni/ |
+| candidate | verifikasi-alumni | NON-CANONICAL ITERATION — POLICY BLOCKED pending verification-submission decision | design/stitch/candidate/verifikasi-alumni/ |
 | career-center | dashboard-career-center | CANONICAL — FINAL STITCH REDESIGN | design/stitch/career-center/dashboard-career-center/ |
 | career-center | tinjau-lowongan | CANONICAL — FINAL STITCH REDESIGN | design/stitch/career-center/tinjau-lowongan/ |
 
@@ -186,6 +186,19 @@ The original organization correctly preserved every ambiguous export. A later BR
 The seven Final Stitch Redesign screens supersede the former human-review and no-suitable-version entries. Their 21 legacy iteration directories (42 files) were removed after redesign validation; no unrelated archive directory was changed.
 
 See design/stitch/CANONICAL_SELECTION_REPORT.md for per-iteration scoring and rationale.
+
+### Canonical navigation decisions — FSD §4
+
+The following decisions supersede visual similarity when duplicate Stitch destinations
+represent the same state. They preserve the non-canonical artifacts as reversible
+iterations; they do not imply that a route or capability exists.
+
+| State | Canonical reference | Non-canonical iteration | Constraint |
+| --- | --- | --- | --- |
+| Recruiter — VERIFIED | `design/stitch/recruiter/dashboard-terverifikasi/` | `design/stitch/recruiter/dashboard-recruiter/` | Uses the FSD §4.3 twelve-item Recruiter navigation. |
+| Recruiter — pending verification | `design/stitch/recruiter/dashboard-menunggu-verifikasi/` | `design/stitch/recruiter/verifikasi-menunggu/` | Company-state gating remains visible. |
+| Recruiter — suspended | `design/stitch/recruiter/dashboard-ditangguhkan/` | `design/stitch/recruiter/dashboard-penangguhan/` | Recruiter identity; reduced actions are allowed. |
+| Candidate — alumni verification status | `design/stitch/candidate/verifikasi-status-alumni/` | `design/stitch/candidate/verifikasi-alumni/` | Read status only; verification submission is POLICY BLOCKED. |
 
 ---
 
@@ -283,7 +296,7 @@ export folder. They are listed for gap tracking only — nothing was invented to
 
 | Screens | Note |
 | --- | --- |
-| `recruiter/dashboard-ditangguhkan` and `recruiter/dashboard-penangguhan` | Different folder names and different file content, but the **same page title** (`Akses Perusahaan Ditangguhkan - Career Center`). Both kept; confirm whether these are one screen or two distinct states. |
-| `recruiter/dashboard-recruiter` and `recruiter/dashboard-terverifikasi` | Both titled `Recruiter Dashboard - Portal Karir Kampus`. Both kept; confirm whether `dashboard-recruiter` is a generic base or a duplicate of the verified state. |
-| `candidate/verifikasi-alumni` and `candidate/verifikasi-status-alumni` | Two separately-named Stitch groups (2 iterations each) that appear to cover the same alumni-verification function. Kept separate; confirm whether they merge into one screen. |
+| `recruiter/dashboard-ditangguhkan` and `recruiter/dashboard-penangguhan` | `dashboard-ditangguhkan` is canonical for the suspended state; `dashboard-penangguhan` is a NON-CANONICAL ITERATION. Both are preserved. |
+| `recruiter/dashboard-recruiter` and `recruiter/dashboard-terverifikasi` | `dashboard-terverifikasi` is canonical for the verified state; `dashboard-recruiter` is a NON-CANONICAL ITERATION. Both are preserved. |
+| `candidate/verifikasi-alumni` and `candidate/verifikasi-status-alumni` | `verifikasi-status-alumni` is canonical while submission remains unresolved; `verifikasi-alumni` is a NON-CANONICAL ITERATION and POLICY BLOCKED. |
 | `public/detail-lowongan`, `public/detail-lowongan-external-apply`, `public/konfirmasi-external-apply` | All three share the title `Detail Lowongan - Portal Karir Kampus`. Kept separate because file contents differ; confirm the intended state split. |

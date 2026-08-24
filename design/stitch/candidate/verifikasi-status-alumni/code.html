@@ -105,78 +105,59 @@
     </script>
 </head>
 <body class="bg-background text-on-background min-h-screen flex flex-col font-body-md antialiased">
-<!-- TopNavBar -->
-<header class="bg-surface dark:bg-surface-dim text-primary dark:text-primary-fixed font-body-md text-body-md w-full h-16 sticky top-0 z-40 border-b border-outline-variant dark:border-outline flat no shadows flex items-center justify-between px-margin-desktop w-full max-w-container-max mx-auto">
-<div class="flex items-center gap-4">
-<span class="font-headline-md text-headline-md font-bold text-deep-navy dark:text-primary-fixed">CareerPortal</span>
-</div>
-<nav class="hidden md:flex gap-6 h-full items-center">
-<!-- Active state navigation items omitted for this transactional page -->
-<a class="text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-low transition-colors cursor-pointer active:opacity-80 px-4 py-2 rounded-md" href="#">Bantuan</a>
+<!-- Candidate navigation, per FSD §4.2. -->
+<header class="bg-surface dark:bg-surface-dim text-primary dark:text-primary-fixed font-body-md text-body-md w-full sticky top-0 z-40 border-b border-outline-variant dark:border-outline flex items-center justify-between gap-4 px-margin-mobile md:px-margin-desktop py-3">
+<span class="font-title-lg text-title-lg font-bold text-deep-navy dark:text-primary-fixed whitespace-nowrap">Portal Karir Kampus</span>
+<nav class="hidden xl:flex flex-wrap justify-center gap-3 items-center text-sm">
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="text-primary font-bold" href="#">Profil Saya</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">CV &amp; Dokumen</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Cari Lowongan</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Lamaran Saya</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Jadwal Seleksi</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Lowongan Tersimpan</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Notifikasi</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Pengaturan Akun</a>
 </nav>
-<div class="flex items-center gap-4">
-<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-colors cursor-pointer active:opacity-80">
-<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
-</button>
-<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-colors cursor-pointer active:opacity-80">
-<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
-</button>
-<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-highest cursor-pointer active:opacity-80 border border-outline-variant">
-<img alt="User Profile Avatar" class="w-full h-full object-cover" data-alt="A professional headshot of a young university student in corporate attire, soft lighting, neutral background, realistic, light mode aesthetic, corporate modern style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkVSJgFrPsGrFaIpaQoUj9JMCfNBltssvK_nKZkRpTQUwDgcUHrOF9QRkW7iO3bKMV7GTGJU-Kf_FlriQ8HytHsz1KxU1OqCG4jZpL3krtdsmnCs-aplLnG9faBh-MptOAqP9XxeMI9yaAQLfsS9X5RCz7ZxQG8GwCsWm6KvkVA5uIQdQ3dBLBCF2R3MCknKsSSlxrcZUkbx47wnavSR9CjZplSwByZM-JkYpYGmIzCFpy156wn8_A3Q"/>
-</div>
-</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">Kandidat</span>
 </header>
-<!-- Main Content Area (No Sidebar for transactional/focus page) -->
+<!-- Main content is intentionally read-only while verification submission is policy blocked. -->
 <main class="flex-grow flex flex-col items-center justify-center py-12 px-margin-mobile md:px-margin-desktop w-full max-w-container-max mx-auto">
 <div class="w-full max-w-3xl grid grid-cols-1 md:grid-cols-5 gap-8">
-<!-- Left Column: Verification Form -->
+<!-- Left Column: Verification Status -->
 <div class="md:col-span-3 bg-surface rounded-xl border border-outline-variant p-8 shadow-sm">
 <div class="mb-8">
 <div class="inline-flex items-center gap-2 px-3 py-1 bg-surface-container-high rounded-full border border-outline-variant mb-4">
 <span class="w-2 h-2 rounded-full bg-outline"></span>
 <span class="font-label-sm text-label-sm text-on-surface-variant">Status: Belum Diverifikasi</span>
 </div>
-<h1 class="font-headline-lg text-headline-lg text-deep-navy mb-2">Verifikasi Status Alumni</h1>
-<p class="font-body-md text-body-md text-on-surface-variant">Memastikan status alumni Anda sesuai dengan data resmi kampus.</p>
+<h1 class="font-headline-lg text-headline-lg text-deep-navy mb-2">Status Verifikasi Alumni</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Lihat status verifikasi yang telah tercatat untuk profil Anda.</p>
 </div>
-<form class="space-y-6">
-<div>
-<label class="block font-label-md text-label-md text-on-surface mb-2" for="nim">Nomor Induk Mahasiswa (NIM)</label>
-<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md text-on-surface-variant cursor-not-allowed" disabled="" id="nim" type="text" value="12345678"/>
-<p class="mt-1 font-label-sm text-label-sm text-outline">NIM tidak dapat diubah.</p>
+<div class="space-y-4">
+<div class="rounded-lg border border-outline-variant bg-surface-container-low p-4">
+<p class="font-label-sm text-label-sm text-on-surface-variant">Jenis verifikasi</p>
+<p class="font-title-lg text-title-lg text-on-surface mt-1">Alumni</p>
 </div>
-<div>
-<label class="block font-label-md text-label-md text-on-surface mb-2" for="prodi">Program Studi</label>
-<input class="w-full bg-surface border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary rounded-lg px-4 py-3 font-body-md text-body-md text-on-surface transition-colors" id="prodi" type="text" value="S1 Teknik Informatika"/>
+<div class="rounded-lg border border-outline-variant bg-surface-container-low p-4">
+<p class="font-label-sm text-label-sm text-on-surface-variant">Status saat ini</p>
+<p class="font-title-lg text-title-lg text-on-surface mt-1">Belum ada pengajuan</p>
 </div>
-<div>
-<label class="block font-label-md text-label-md text-on-surface mb-2" for="tahun">Tahun Lulus</label>
-<select class="w-full bg-surface border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary rounded-lg px-4 py-3 font-body-md text-body-md text-on-surface transition-colors" id="tahun">
-<option selected="" value="2026">2026</option>
-<option value="2025">2025</option>
-<option value="2024">2024</option>
-</select>
+<p class="font-body-md text-body-md text-on-surface-variant">Pengajuan verifikasi belum tersedia sampai keputusan kebijakan dan sumber integrasi alumni disetujui.</p>
 </div>
-<div class="pt-4">
-<button class="w-full bg-primary hover:bg-primary-container text-white font-label-md text-label-md py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-sm" type="button">
-<span class="material-symbols-outlined text-[20px]" data-icon="verified">verified</span>
-                            Verifikasi Sekarang
-                        </button>
-</div>
-</form>
 </div>
 <!-- Right Column: Benefits Sidebar -->
 <div class="md:col-span-2 space-y-6">
 <div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-6 relative overflow-hidden">
-<h2 class="font-title-lg text-title-lg text-deep-navy mb-6 relative z-10">Tujuan Verifikasi</h2>
+<h2 class="font-title-lg text-title-lg text-deep-navy mb-6 relative z-10">Informasi Status</h2>
 <ul class="space-y-5 relative z-10">
 <li class="flex items-start gap-4">
 <div class="w-10 h-10 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center flex-shrink-0">
 <span class="material-symbols-outlined" data-icon="fact_check">fact_check</span>
 </div>
 <div>
-<h3 class="font-label-md text-label-md text-on-surface mb-1">Validasi Data</h3>
-<p class="font-label-sm text-label-sm text-on-surface-variant">Memastikan data yang Anda masukkan sesuai dengan sistem informasi akademik.</p>
+<h3 class="font-label-md text-label-md text-on-surface mb-1">Baca Status</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Status yang tampil berasal dari catatan verifikasi yang tersedia.</p>
 </div>
 </li>
 <li class="flex items-start gap-4">
@@ -184,8 +165,8 @@
 <span class="material-symbols-outlined" data-icon="school">school</span>
 </div>
 <div>
-<h3 class="font-label-md text-label-md text-on-surface mb-1">Status Kelulusan</h3>
-<p class="font-label-sm text-label-sm text-on-surface-variant">Mengonfirmasi bahwa Anda telah resmi menyelesaikan studi di universitas.</p>
+<h3 class="font-label-md text-label-md text-on-surface mb-1">Tidak Ada Aksi Pengajuan</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Layar ini tidak menyediakan pengajuan atau perubahan data verifikasi.</p>
 </div>
 </li>
 <li class="flex items-start gap-4">
@@ -193,15 +174,15 @@
 <span class="material-symbols-outlined" data-icon="security">security</span>
 </div>
 <div>
-<h3 class="font-label-md text-label-md text-on-surface mb-1">Keamanan Platform</h3>
-<p class="font-label-sm text-label-sm text-on-surface-variant">Menjaga integritas komunitas alumni dari akun yang tidak valid.</p>
+<h3 class="font-label-md text-label-md text-on-surface mb-1">Kebijakan Masih Terbuka</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Sumber dan alur integrasi verifikasi alumni masih menunggu keputusan.</p>
 </div>
 </li>
 </ul>
 </div>
 <div class="bg-surface-container-low rounded-xl p-6 flex items-start gap-4 border border-surface-container-highest">
 <span class="material-symbols-outlined text-on-surface-variant mt-1" data-icon="info">info</span>
-<p class="font-label-sm text-label-sm text-on-surface-variant">Proses verifikasi biasanya memakan waktu 1-2 hari kerja untuk mencocokkan data Anda dengan database akademik pusat.</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Saat fitur pengajuan disetujui, kebijakan dan batasannya akan ditetapkan terlebih dahulu.</p>
 </div>
 </div>
 </div>
@@ -209,8 +190,8 @@
 <!-- Footer -->
 <footer class="bg-surface-container-lowest dark:bg-surface-dim text-on-surface-variant dark:text-on-surface font-label-sm text-label-sm w-full py-8 mt-auto border-t border-outline-variant flat no shadows flex flex-col md:flex-row justify-between items-center px-margin-desktop max-w-container-max mx-auto gap-4">
 <div class="flex items-center gap-2">
-<span class="font-label-md text-label-md font-bold text-deep-navy dark:text-primary-fixed">CareerPortal</span>
-<span class="text-on-surface-variant">© 2024 Career Services Center. All Rights Reserved.</span>
+<span class="font-label-md text-label-md font-bold text-deep-navy dark:text-primary-fixed">Portal Karir Kampus</span>
+<span class="text-on-surface-variant">© 2026 Portal Karir Kampus. Seluruh hak cipta dilindungi.</span>
 </div>
 <div class="flex flex-wrap items-center justify-center gap-6">
 <a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Kebijakan Privasi</a>

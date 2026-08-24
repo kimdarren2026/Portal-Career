@@ -104,7 +104,13 @@
 </head>
 <body class="bg-background text-on-background antialiased min-h-screen flex flex-col">
 <!-- TopNavBar -->
-<header class="bg-surface dark:bg-inverse-surface border-b border-outline-variant dark:border-outline shadow-sm dark:shadow-none sticky top-0 z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop w-full max-w-container-max mx-auto h-20"><div class="flex items-center gap-4"><span class="text-title-lg font-title-lg font-bold text-primary dark:text-primary-fixed">Portal Karir Kampus</span></div><nav class="hidden md:flex gap-8 items-center h-full"><a class="text-on-surface-variant dark:text-surface-variant font-medium hover:text-secondary dark:hover:text-secondary-fixed-dim transition-colors duration-200 h-full flex items-center" href="#">Lowongan</a><a class="text-on-surface-variant dark:text-surface-variant font-medium hover:text-secondary dark:hover:text-secondary-fixed-dim transition-colors duration-200 h-full flex items-center" href="#">Karier di Kampus</a><a class="text-on-surface-variant dark:text-surface-variant font-medium hover:text-secondary dark:hover:text-secondary-fixed-dim transition-colors duration-200 h-full flex items-center" href="#">Karier untuk Alumni</a><a class="text-on-surface-variant dark:text-surface-variant font-medium hover:text-secondary dark:hover:text-secondary-fixed-dim transition-colors duration-200 h-full flex items-center" href="#">Panduan</a></nav><div class="flex items-center gap-4"><div class="flex items-center gap-3 cursor-pointer"><div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed font-bold">BS</div><div class="hidden md:block text-right"><div class="text-label-md font-label-md text-on-surface">Budi Santoso</div><div class="text-label-sm font-label-sm text-on-surface-variant">Mahasiswa</div></div><span class="material-symbols-outlined text-on-surface-variant">expand_more</span></div></div></header>
+<header class="bg-surface dark:bg-inverse-surface border-b border-outline-variant dark:border-outline shadow-sm sticky top-0 z-50 flex items-center justify-between gap-4 px-margin-mobile md:px-margin-desktop py-3 w-full">
+<span class="text-title-lg font-title-lg font-bold text-primary dark:text-primary-fixed whitespace-nowrap">Portal Karir Kampus</span>
+<nav class="hidden xl:flex flex-wrap justify-center gap-3 items-center text-sm">
+<a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">Dashboard</a><a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">Profil Saya</a><a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">CV &amp; Dokumen</a><a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">Cari Lowongan</a><a class="text-secondary font-bold" href="#">Lamaran Saya</a><a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">Jadwal Seleksi</a><a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">Lowongan Tersimpan</a><a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">Notifikasi</a><a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">Pengaturan Akun</a>
+</nav>
+<span class="text-label-sm font-label-sm text-on-surface-variant whitespace-nowrap">Kandidat</span>
+</header>
 <main class="flex-grow w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-12 flex gap-gutter">
 <!-- Sidebar (Simulated for Context) -->
 <aside class="hidden lg:block w-[280px] shrink-0">
@@ -115,7 +121,7 @@
                 </div>
 <div class="flex items-center gap-3 py-3 px-4 rounded-lg text-white/80 hover:bg-white/5 hover:text-white font-label-md text-label-md cursor-pointer transition-colors">
 <span class="material-symbols-outlined" data-icon="bookmark">bookmark</span>
-                    Tersimpan
+                    Lowongan Tersimpan
                 </div>
 </div>
 </aside>

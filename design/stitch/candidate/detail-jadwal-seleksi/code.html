@@ -106,22 +106,13 @@
     </style>
 </head>
 <body class="bg-background text-on-background min-h-screen flex flex-col">
-<!-- TopNavBar (Shared Component) -->
-<nav class="bg-surface border-b border-outline-variant shadow-sm sticky top-0 z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop w-full max-w-container-max mx-auto h-20">
-<div class="flex items-center gap-6">
-<a class="text-title-lg font-title-lg font-bold text-primary" href="#">Portal Karir Kampus</a>
-<div class="hidden md:flex gap-4">
-<a class="text-on-surface-variant font-medium text-label-md hover:text-secondary transition-colors duration-200" href="#">Lowongan</a>
-<a class="text-on-surface-variant font-medium text-label-md hover:text-secondary transition-colors duration-200" href="#">Karier di Kampus</a>
-<a class="text-on-surface-variant font-medium text-label-md hover:text-secondary transition-colors duration-200" href="#">Karier untuk Alumni</a>
-<a class="text-on-surface-variant font-medium text-label-md hover:text-secondary transition-colors duration-200" href="#">Panduan</a>
+<!-- Candidate navigation, per FSD §4.2. -->
+<nav class="bg-surface border-b border-outline-variant shadow-sm sticky top-0 z-50 flex justify-between items-center gap-4 px-margin-mobile md:px-margin-desktop py-3 w-full">
+<a class="text-title-lg font-title-lg font-bold text-primary whitespace-nowrap" href="#">Portal Karir Kampus</a>
+<div class="hidden xl:flex flex-wrap justify-center gap-3 items-center text-sm">
+<a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">Dashboard</a><a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">Profil Saya</a><a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">CV &amp; Dokumen</a><a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">Cari Lowongan</a><a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">Lamaran Saya</a><a class="text-secondary font-bold" href="#">Jadwal Seleksi</a><a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">Lowongan Tersimpan</a><a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">Notifikasi</a><a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">Pengaturan Akun</a>
 </div>
-</div>
-<div class="hidden md:flex items-center gap-4"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold">BS</div><div class="flex flex-col"><span class="text-label-md font-bold text-on-surface">Budi Santoso</span><span class="text-xs text-on-surface-variant">Mahasiswa</span></div></div></div>
-<!-- Mobile Menu Button (Placeholder) -->
-<button class="md:hidden text-on-surface">
-<span class="material-symbols-outlined">menu</span>
-</button>
+<span class="text-label-sm text-on-surface-variant whitespace-nowrap">Kandidat</span>
 </nav>
 <!-- Main Content Canvas -->
 <main class="flex-grow w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-8 md:py-12">
