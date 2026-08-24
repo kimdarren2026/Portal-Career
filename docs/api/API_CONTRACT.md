@@ -5,6 +5,7 @@
 **Baselines (frozen):** BRD v1.1 · FSD v1.1 · Stitch canonical baseline · Logical model **1.1-C2** · Architecture **ADR-001 to ADR-017**
 **Revision:** Final semantic correction pass, 24 August 2026 — Career Center vacancy-authoring ruling, company legal-document supersede rule, candidate collection sync, and the VERSIONED_API / INERTIA_WEB surface split.
 **Amendment:** Auth HTTP surface, 24 August 2026 — SPEC-DOC-05 accepted. The ten authentication and session operations are reclassified to `INERTIA_WEB` for MVP browser authentication (Laravel session guard + CSRF). Their `/api/v1` bearer-token twins remain reserved. SPEC-DOC-06 resolved. **No business rule changed.**
+**Amendment:** Candidate Core HTTP surface, 24 August 2026 — SPEC-DOC-07 accepted. The twenty-one Candidate Core operations — profile read and update, the six profile sub-collections, candidate verification request and its paired read, and the five candidate document operations — are reclassified to `INERTIA_WEB` for the MVP browser Candidate portal (Laravel session guard + CSRF, `OWN` authorization, verified-email gate). Their `/api/v1` bearer-token twins remain reserved. `GET /api/v1/candidate/saved-vacancies` is excluded and stays with the vacancy-discovery phase. **No business rule changed, and no implementation block is lifted.**
 **Companions:** `API_ENDPOINTS.md` (versioned inventory) · `INERTIA_ACTIONS.md` (internal inventory) · `ERROR_CODES.md` · `AUTHORIZATION_MATRIX.md` · `API_SIZE_REVIEW.md` (historical)
 
 **This document is authoritative for behaviour on both surfaces.** Every operation carries a **Surface** classification — `VERSIONED_API` or `INERTIA_WEB` — which governs *where it is routed and whether it carries a compatibility promise*, never *how it behaves*. Both surfaces call the same Actions, Form Requests, Policies, and invariants. **No business rule is ever implemented twice.**
@@ -32,7 +33,7 @@ This contract is written so that implementation requires **no invention of busin
 
 | Surface | Auth | Notes |
 | --- | --- | --- |
-| **Web (Inertia)** | Laravel session cookie + CSRF | The five portals **and all MVP browser authentication**. Every operation is specified in this document; the route inventory is `INERTIA_ACTIONS.md` |
+| **Web (Inertia)** | Laravel session cookie + CSRF | The five portals, **all MVP browser authentication**, and **the MVP Candidate Core operations**. Every operation is specified in this document; the route inventory is `INERTIA_ACTIONS.md` |
 | **`/api/v1`** | Sanctum bearer token | **Reserved for future non-browser clients and inactive at MVP** (ADR-001, ADR-005). Route inventory: `API_ENDPOINTS.md` |
 
 Both surfaces share Actions, Form Requests, Policies, and invariants. **No rule is implemented twice.** Where this contract states a business rule, it holds identically on either surface.
@@ -55,7 +56,9 @@ Every operation below is classified on exactly one surface.
 
 **The split is about consumers, not capability.** An operation is `VERSIONED_API` when a consumer outside our deploy cycle plausibly depends on it — a search engine, or a future first-party client. Everything else is `INERTIA_WEB`: still fully specified here, still Policy-enforced, still audited, but free to evolve with the application because its only consumer ships with it.
 
-**Phase-1 versioned surface = public reads + authentication + the complete candidate capability set.** That boundary is chosen because it is a *coherent whole* rather than an arbitrary slice: the candidate portal is the only channel with a plausible near-term second client, and a half-versioned candidate API — able to log in but not to apply — would be worse than either extreme. Back-office operations (recruiter, Career Center, Kepegawaian, Selector, Auditor, Super Admin) have no plausible non-web consumer and are `INERTIA_WEB` at MVP.
+**The reserved versioned surface is candidate-facing: public reads, authentication, and the complete candidate capability set.** That boundary is chosen because it is a *coherent whole* rather than an arbitrary slice: the candidate portal is the only channel with a plausible near-term second client, and a half-versioned candidate API — able to log in but not to apply — would be worse than either extreme. Back-office operations (recruiter, Career Center, Kepegawaian, Selector, Auditor, Super Admin) have no plausible non-web consumer and are `INERTIA_WEB` at MVP.
+
+**Reserved is not active, and what an MVP browser calls is `INERTIA_WEB`.** `/api/v1` is inactive at MVP, so every operation an MVP browser portal actually depends on is routed on the session-guard surface: authentication and session by SPEC-DOC-05, Candidate Core by SPEC-DOC-07. Neither amendment shrinks the boundary above — each keeps its `/api/v1` twin reserved as a promotion target — but for MVP those twins are inventoried in `INERTIA_ACTIONS.md` against their active browser routes rather than in `API_ENDPOINTS.md`. The versioned inventory holds the remainder: public reads, and the candidate-facing operations belonging to later phases.
 
 Promoting an `INERTIA_WEB` operation to `VERSIONED_API` later is additive and requires no behavioural change — only a route, a token guard, and a compatibility commitment.
 
@@ -293,6 +296,18 @@ Lock activation is auditable as a login event (`SECURITY_ARCHITECTURE.md` §7) �
 #### 12. Audit and Outbox Notation
 
 Each contract states its **Audit** consequence (a row in `audit_logs`, FR-AUD-001) and its **Notification / Outbox** consequence (`notifications` rows, `email_outbox` rows, FR-NOTIF-002). Both are written **inside** the business transaction; the queue job is dispatched **after commit** (INV-015). "None" means exactly that.
+
+##### The MVP browser Candidate portal is `INERTIA_WEB` (SPEC-DOC-07, accepted)
+
+Candidate Core was originally classified `VERSIONED_API` throughout. That left the MVP browser Candidate portal with **no legal HTTP surface**: `API_ENDPOINTS.md` freezes `/api/v1` as reserved for future non-browser clients and inactive at MVP, and `INERTIA_ACTIONS.md` carried no equivalent Candidate operations. The contradiction is resolved the same way browser authentication was (SPEC-DOC-05) — by classifying the operations onto the surface the approved architecture already designates for browser portals, **not** by activating `/api/v1` and **not** by inventing undocumented routes.
+
+**Twenty-one Candidate Core operations** are therefore `INERTIA_WEB`: profile read and update, the six profile sub-collections (read and atomic synchronize each), candidate verification request **and its paired read**, and the five candidate document operations. The paired read `GET /candidate/verifications` is documented inside the verification contract rather than under its own heading, which is why an operation count taken from `###` headings alone reports twenty; the inventory count is twenty-one. Their active browser paths are the contract URIs with the `/api/v1` prefix removed. Session guard, `OWN` authorization, the verified-email gate, and CSRF on mutations apply; **no bearer token, no Sanctum activation, and no `personal_access_tokens`.**
+
+`GET /candidate/saved-vacancies` is **deliberately excluded** — it belongs to the later vacancy-discovery phase and is reconciled with that phase, not this one.
+
+**Surface classification is not implementation authorization.** Two of the twenty-one carry an explicit implementation block that this amendment does not lift: `POST /candidate/verifications` (verification business decision, Part X item 1) and `POST /candidate/documents` (`CANDIDATE_DOCUMENT_UPLOAD_POLICY_REQUIRED`, Part X item 9).
+
+---
 
 #### 13. Contract Grouping Convention
 
@@ -794,7 +809,18 @@ Returns exactly:
 
 ### GET /api/v1/candidate/profile
 
-**Surface:** `VERSIONED_API`
+**Surface:** `INERTIA_WEB`  ·  **MVP browser route:** `GET /candidate/profile`
+
+> **Reclassified for the MVP browser Candidate portal (SPEC-DOC-07, accepted).** The
+> Candidate portal is a browser portal, so this operation is served over the **Laravel
+> session guard with CSRF protection on mutations**, per ADR-005 and
+> `SECURITY_ARCHITECTURE.md` §1 — not a Sanctum bearer token. The heading above remains the
+> canonical operation identifier and is the reserved `/api/v1` twin for when the versioned
+> API is explicitly activated for a non-browser client; a future adapter calls the same
+> Candidate domain Actions and Queries, so promotion is additive and requires no behavioural
+> change. Authorization (`OWN`), the verified-email gate, field semantics, validation,
+> collection sync behaviour, pending vocabularies, error codes, side effects, and audit below
+> are unchanged and apply identically on either surface.
 
 **Purpose:** Read the authenticated candidate's own profile (FR-CAN-003).
 
@@ -828,7 +854,18 @@ Returns exactly:
 
 ### PATCH /api/v1/candidate/profile
 
-**Surface:** `VERSIONED_API`
+**Surface:** `INERTIA_WEB`  ·  **MVP browser route:** `PATCH /candidate/profile`
+
+> **Reclassified for the MVP browser Candidate portal (SPEC-DOC-07, accepted).** The
+> Candidate portal is a browser portal, so this operation is served over the **Laravel
+> session guard with CSRF protection on mutations**, per ADR-005 and
+> `SECURITY_ARCHITECTURE.md` §1 — not a Sanctum bearer token. The heading above remains the
+> canonical operation identifier and is the reserved `/api/v1` twin for when the versioned
+> API is explicitly activated for a non-browser client; a future adapter calls the same
+> Candidate domain Actions and Queries, so promotion is additive and requires no behavioural
+> change. Authorization (`OWN`), the verified-email gate, field semantics, validation,
+> collection sync behaviour, pending vocabularies, error codes, side effects, and audit below
+> are unchanged and apply identically on either surface.
 
 **Purpose:** Update own profile attributes and work preferences.
 
@@ -867,7 +904,18 @@ Returns exactly:
 
 *(Grouped contract — covers six candidate-owned repeatable profile collections.)*
 
-**Surface:** `VERSIONED_API`
+**Surface:** `INERTIA_WEB`  ·  **MVP browser route:** `PUT /candidate/{collection}`
+
+> **Reclassified for the MVP browser Candidate portal (SPEC-DOC-07, accepted).** The
+> Candidate portal is a browser portal, so this operation is served over the **Laravel
+> session guard with CSRF protection on mutations**, per ADR-005 and
+> `SECURITY_ARCHITECTURE.md` §1 — not a Sanctum bearer token. The heading above remains the
+> canonical operation identifier and is the reserved `/api/v1` twin for when the versioned
+> API is explicitly activated for a non-browser client; a future adapter calls the same
+> Candidate domain Actions and Queries, so promotion is additive and requires no behavioural
+> change. Authorization (`OWN`), the verified-email gate, field semantics, validation,
+> collection sync behaviour, pending vocabularies, error codes, side effects, and audit below
+> are unchanged and apply identically on either surface.
 
 **Covered URIs:**
 
@@ -934,7 +982,26 @@ Clients must therefore read the collection, edit the whole set, and send it back
 
 ### POST /api/v1/candidate/verifications
 
-**Surface:** `VERSIONED_API`
+**Surface:** `INERTIA_WEB`  ·  **MVP browser route:** `POST /candidate/verifications`
+
+> **Reclassified for the MVP browser Candidate portal (SPEC-DOC-07, accepted).** The
+> Candidate portal is a browser portal, so this operation is served over the **Laravel
+> session guard with CSRF protection on mutations**, per ADR-005 and
+> `SECURITY_ARCHITECTURE.md` §1 — not a Sanctum bearer token. The heading above remains the
+> canonical operation identifier and is the reserved `/api/v1` twin for when the versioned
+> API is explicitly activated for a non-browser client; a future adapter calls the same
+> Candidate domain Actions and Queries, so promotion is additive and requires no behavioural
+> change. Authorization (`OWN`), the verified-email gate, field semantics, validation,
+> collection sync behaviour, pending vocabularies, error codes, side effects, and audit below
+> are unchanged and apply identically on either surface.
+
+> **IMPLEMENTATION BLOCKED — CANDIDATE VERIFICATION BUSINESS DECISION REQUIRED.**
+> Reclassifying the HTTP surface does **not** authorize implementation. Part X item 1 leaves
+> the alumni verification integration source unresolved, and with it which of
+> `student_number`, `program_study_id`, `graduation_year` are mandatory. The verification
+> source, required payload fields, matching rules, and any automatic transition to `VERIFIED`
+> are **not invented here** and remain blocked until explicitly approved. The route and its
+> surface are settled; the business rules are not.
 
 **Purpose:** Request alumni or final-year-student verification (FR-CAN-004).
 
@@ -972,7 +1039,18 @@ Clients must therefore read the collection, edit the whole set, and send it back
 
 ### GET /api/v1/candidate/documents
 
-**Surface:** `VERSIONED_API`
+**Surface:** `INERTIA_WEB`  ·  **MVP browser route:** `GET /candidate/documents`
+
+> **Reclassified for the MVP browser Candidate portal (SPEC-DOC-07, accepted).** The
+> Candidate portal is a browser portal, so this operation is served over the **Laravel
+> session guard with CSRF protection on mutations**, per ADR-005 and
+> `SECURITY_ARCHITECTURE.md` §1 — not a Sanctum bearer token. The heading above remains the
+> canonical operation identifier and is the reserved `/api/v1` twin for when the versioned
+> API is explicitly activated for a non-browser client; a future adapter calls the same
+> Candidate domain Actions and Queries, so promotion is additive and requires no behavioural
+> change. Authorization (`OWN`), the verified-email gate, field semantics, validation,
+> collection sync behaviour, pending vocabularies, error codes, side effects, and audit below
+> are unchanged and apply identically on either surface.
 
 **Purpose:** List the candidate's own private documents (FR-CAN-005).
 
@@ -1006,7 +1084,25 @@ Clients must therefore read the collection, edit the whole set, and send it back
 
 ### POST /api/v1/candidate/documents
 
-**Surface:** `VERSIONED_API`
+**Surface:** `INERTIA_WEB`  ·  **MVP browser route:** `POST /candidate/documents`
+
+> **Reclassified for the MVP browser Candidate portal (SPEC-DOC-07, accepted).** The
+> Candidate portal is a browser portal, so this operation is served over the **Laravel
+> session guard with CSRF protection on mutations**, per ADR-005 and
+> `SECURITY_ARCHITECTURE.md` §1 — not a Sanctum bearer token. The heading above remains the
+> canonical operation identifier and is the reserved `/api/v1` twin for when the versioned
+> API is explicitly activated for a non-browser client; a future adapter calls the same
+> Candidate domain Actions and Queries, so promotion is additive and requires no behavioural
+> change. Authorization (`OWN`), the verified-email gate, field semantics, validation,
+> collection sync behaviour, pending vocabularies, error codes, side effects, and audit below
+> are unchanged and apply identically on either surface.
+
+> **IMPLEMENTATION BLOCKED — `CANDIDATE_DOCUMENT_UPLOAD_POLICY_REQUIRED`.**
+> Reclassifying the HTTP surface does **not** unblock this operation. FR-CAN-005 requires MIME
+> and size validation and neither may be dropped, but the exact MIME allowlist, the exact
+> maximum file size, and any per-`document_type` variation remain unapproved (Part X item 9).
+> No values are invented here. Candidate profile, every profile sub-collection, and the other
+> document operations are unaffected and proceed now.
 
 **Purpose:** Upload a private candidate document.
 
@@ -1047,7 +1143,18 @@ Clients must therefore read the collection, edit the whole set, and send it back
 
 ### PATCH /api/v1/candidate/documents/{document}
 
-**Surface:** `VERSIONED_API`
+**Surface:** `INERTIA_WEB`  ·  **MVP browser route:** `PATCH /candidate/documents/{document}`
+
+> **Reclassified for the MVP browser Candidate portal (SPEC-DOC-07, accepted).** The
+> Candidate portal is a browser portal, so this operation is served over the **Laravel
+> session guard with CSRF protection on mutations**, per ADR-005 and
+> `SECURITY_ARCHITECTURE.md` §1 — not a Sanctum bearer token. The heading above remains the
+> canonical operation identifier and is the reserved `/api/v1` twin for when the versioned
+> API is explicitly activated for a non-browser client; a future adapter calls the same
+> Candidate domain Actions and Queries, so promotion is additive and requires no behavioural
+> change. Authorization (`OWN`), the verified-email gate, field semantics, validation,
+> collection sync behaviour, pending vocabularies, error codes, side effects, and audit below
+> are unchanged and apply identically on either surface.
 
 **Purpose:** Update document metadata (display name, type).
 
@@ -1081,7 +1188,18 @@ Clients must therefore read the collection, edit the whole set, and send it back
 
 ### DELETE /api/v1/candidate/documents/{document}
 
-**Surface:** `VERSIONED_API`
+**Surface:** `INERTIA_WEB`  ·  **MVP browser route:** `DELETE /candidate/documents/{document}`
+
+> **Reclassified for the MVP browser Candidate portal (SPEC-DOC-07, accepted).** The
+> Candidate portal is a browser portal, so this operation is served over the **Laravel
+> session guard with CSRF protection on mutations**, per ADR-005 and
+> `SECURITY_ARCHITECTURE.md` §1 — not a Sanctum bearer token. The heading above remains the
+> canonical operation identifier and is the reserved `/api/v1` twin for when the versioned
+> API is explicitly activated for a non-browser client; a future adapter calls the same
+> Candidate domain Actions and Queries, so promotion is additive and requires no behavioural
+> change. Authorization (`OWN`), the verified-email gate, field semantics, validation,
+> collection sync behaviour, pending vocabularies, error codes, side effects, and audit below
+> are unchanged and apply identically on either surface.
 
 **Purpose:** Archive a private document.
 
@@ -1118,7 +1236,18 @@ Clients must therefore read the collection, edit the whole set, and send it back
 
 ### GET /api/v1/candidate/documents/{document}/download
 
-**Surface:** `VERSIONED_API`
+**Surface:** `INERTIA_WEB`  ·  **MVP browser route:** `GET /candidate/documents/{document}/download`
+
+> **Reclassified for the MVP browser Candidate portal (SPEC-DOC-07, accepted).** The
+> Candidate portal is a browser portal, so this operation is served over the **Laravel
+> session guard with CSRF protection on mutations**, per ADR-005 and
+> `SECURITY_ARCHITECTURE.md` §1 — not a Sanctum bearer token. The heading above remains the
+> canonical operation identifier and is the reserved `/api/v1` twin for when the versioned
+> API is explicitly activated for a non-browser client; a future adapter calls the same
+> Candidate domain Actions and Queries, so promotion is additive and requires no behavioural
+> change. Authorization (`OWN`), the verified-email gate, field semantics, validation,
+> collection sync behaviour, pending vocabularies, error codes, side effects, and audit below
+> are unchanged and apply identically on either surface.
 
 **Purpose:** Authorized download of the candidate's own document.
 

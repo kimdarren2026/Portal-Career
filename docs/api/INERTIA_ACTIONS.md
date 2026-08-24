@@ -1,7 +1,7 @@
 # Inertia Web Action Index — Internal Application Surface
 
 **Status:** Proposed — awaiting approval
-**Date:** 24 August 2026 · **Amended:** auth HTTP surface (SPEC-DOC-05 accepted)
+**Date:** 24 August 2026 · **Amended:** Candidate Core HTTP surface (SPEC-DOC-07 accepted)
 **Generated from:** `API_CONTRACT.md` — verified programmatically in both directions.
 
 **This file lists only `INERTIA_WEB` operations.** These are internal Laravel + Inertia application routes:
@@ -10,17 +10,19 @@
 - **not** part of the public backward-compatibility promise — free to change with the application;
 - **they delegate to the same Actions, Form Requests, and Policies as the versioned surface, and must never duplicate business logic.**
 
-> **Browser authentication lives here (SPEC-DOC-05, accepted).** The ten authentication and session operations use the **Laravel session guard** with CSRF protection over same-origin, non-versioned routes — not Sanctum bearer tokens. Their `/api/v1` twins remain reserved in `API_ENDPOINTS.md` for future non-browser clients. `personal_access_tokens` is not required for MVP browser authentication.
+> **Browser authentication lives here (SPEC-DOC-05, accepted).** The ten authentication and session operations use the **Laravel session guard** with CSRF protection over same-origin, non-versioned routes — not Sanctum bearer tokens. `personal_access_tokens` is not required for MVP browser authentication.
+
+> **Candidate Core lives here (SPEC-DOC-07, accepted).** Twenty-one Candidate Core operations — profile read and update, the six profile sub-collections, candidate verification request and its paired read, and the five candidate document operations — are served over the same session guard, with `OWN` authorization, the verified-email gate, and CSRF on mutations. Their `/api/v1` twins stay reserved in `API_ENDPOINTS.md`. **Surface classification is not implementation authorization:** `POST /candidate/verifications` remains blocked on the verification business decision (`API_CONTRACT.md` Part X item 1) and `POST /candidate/documents` on `CANDIDATE_DOCUMENT_UPLOAD_POLICY_REQUIRED` (Part X item 9). `/candidate/saved-vacancies` and `/candidate/external-apply-events` belong to later phases and are **not** reclassified.
 
 Routes are shown **without** the `/api/v1` prefix, which is what distinguishes them at the routing layer. Their **behaviour — validation, invariants, transitions, error codes, audit, outbox, idempotency, and concurrency — is defined by `API_CONTRACT.md` exactly as for versioned endpoints.** Idempotency and concurrency requirements are not relaxed here.
 
-**Page-delivery `GET` routes are deliberately absent.** Routes such as `/login`, `/register`, `/forgot-password`, `/reset-password/{token}` and `/verify-email/{token}` render an Inertia page and change nothing; they are UI plumbing, not contract operations (`API_CONTRACT.md` Part I §2b).
+**Page-delivery `GET` routes are deliberately absent.** Routes such as `/login`, `/register`, `/forgot-password`, `/reset-password/{token}`, `/verify-email/{token}`, and the Candidate portal's own profile and onboarding pages render an Inertia page and change nothing; they are UI plumbing, not contract operations (`API_CONTRACT.md` Part I §2b).
 
 Any of these may later be promoted to `VERSIONED_API`. Promotion is additive — a route, a token guard, and a compatibility commitment — and requires no behavioural change.
 
 | Total INERTIA_WEB operations |
 | --- |
-| **101** |
+| **122** |
 
 ## Authentication & Session
 
@@ -41,6 +43,37 @@ Any of these may later be promoted to `VERSIONED_API`. Promotion is additive —
 | Authentication & Session | `GET` | `/me` | GET /api/v1/me | PUBLIC / self |
 | Authentication & Session | `PUT` | `/me/password` | PUT /api/v1/me/password | PUBLIC / self |
 
+## Candidate Profile
+
+| Domain | Method | Route | Purpose / Contract Section | Primary Role |
+| --- | --- | --- | --- | --- |
+| Candidate Profile | `GET` | `/candidate/certifications` | PUT /api/v1/candidate/{collection} *(grouped)* | CANDIDATE (OWN) |
+| Candidate Profile | `PUT` | `/candidate/certifications` | PUT /api/v1/candidate/{collection} *(grouped)* | CANDIDATE (OWN) |
+| Candidate Profile | `GET` | `/candidate/educations` | PUT /api/v1/candidate/{collection} *(grouped)* | CANDIDATE (OWN) |
+| Candidate Profile | `PUT` | `/candidate/educations` | PUT /api/v1/candidate/{collection} *(grouped)* | CANDIDATE (OWN) |
+| Candidate Profile | `GET` | `/candidate/links` | PUT /api/v1/candidate/{collection} *(grouped)* | CANDIDATE (OWN) |
+| Candidate Profile | `PUT` | `/candidate/links` | PUT /api/v1/candidate/{collection} *(grouped)* | CANDIDATE (OWN) |
+| Candidate Profile | `GET` | `/candidate/organizations` | PUT /api/v1/candidate/{collection} *(grouped)* | CANDIDATE (OWN) |
+| Candidate Profile | `PUT` | `/candidate/organizations` | PUT /api/v1/candidate/{collection} *(grouped)* | CANDIDATE (OWN) |
+| Candidate Profile | `GET` | `/candidate/profile` | GET /api/v1/candidate/profile | CANDIDATE (OWN) |
+| Candidate Profile | `PATCH` | `/candidate/profile` | PATCH /api/v1/candidate/profile | CANDIDATE (OWN) |
+| Candidate Profile | `GET` | `/candidate/skills` | PUT /api/v1/candidate/{collection} *(grouped)* | CANDIDATE (OWN) |
+| Candidate Profile | `PUT` | `/candidate/skills` | PUT /api/v1/candidate/{collection} *(grouped)* | CANDIDATE (OWN) |
+| Candidate Profile | `GET` | `/candidate/verifications` | POST /api/v1/candidate/verifications *(grouped)* | CANDIDATE (OWN) |
+| Candidate Profile | `POST` | `/candidate/verifications` | POST /api/v1/candidate/verifications | CANDIDATE (OWN) |
+| Candidate Profile | `GET` | `/candidate/work-experiences` | PUT /api/v1/candidate/{collection} *(grouped)* | CANDIDATE (OWN) |
+| Candidate Profile | `PUT` | `/candidate/work-experiences` | PUT /api/v1/candidate/{collection} *(grouped)* | CANDIDATE (OWN) |
+
+## Candidate Documents
+
+| Domain | Method | Route | Purpose / Contract Section | Primary Role |
+| --- | --- | --- | --- | --- |
+| Candidate Documents | `GET` | `/candidate/documents` | GET /api/v1/candidate/documents | CANDIDATE (OWN) |
+| Candidate Documents | `POST` | `/candidate/documents` | POST /api/v1/candidate/documents | CANDIDATE (OWN) |
+| Candidate Documents | `PATCH` | `/candidate/documents/{document}` | PATCH /api/v1/candidate/documents/{document} | CANDIDATE (OWN) |
+| Candidate Documents | `DELETE` | `/candidate/documents/{document}` | DELETE /api/v1/candidate/documents/{document} | CANDIDATE (OWN) |
+| Candidate Documents | `GET` | `/candidate/documents/{document}/download` | GET /api/v1/candidate/documents/{document}/download | CANDIDATE (OWN) |
+
 ## Company
 
 | Domain | Method | Route | Purpose / Contract Section | Primary Role |
@@ -50,9 +83,9 @@ Any of these may later be promoted to `VERSIONED_API`. Promotion is additive —
 | Company | `PATCH` | `/companies/{company}` | PATCH /api/v1/companies/{company} | COMPANY_SCOPE |
 | Company | `GET` | `/companies/{company}/documents` | POST /api/v1/companies/{company}/documents *(grouped)* | COMPANY_SCOPE |
 | Company | `POST` | `/companies/{company}/documents` | POST /api/v1/companies/{company}/documents | COMPANY_SCOPE |
-| Company | `DELETE` | `/companies/{company}/documents/{document}` | POST /api/v1/companies/{company}/documents *(grouped)* | COMPANY_SCOPE |
+| Company | `DELETE` | `/companies/{company}/documents/{document}` | DELETE /api/v1/companies/{company}/documents/{document} | COMPANY_SCOPE |
 | Company | `GET` | `/companies/{company}/documents/{document}/download` | POST /api/v1/companies/{company}/documents *(grouped)* | COMPANY_SCOPE |
-| Company | `POST` | `/companies/{company}/documents/{document}/supersede` | POST /api/v1/companies/{company}/documents *(grouped)* | COMPANY_SCOPE |
+| Company | `POST` | `/companies/{company}/documents/{document}/supersede` | POST /api/v1/companies/{company}/documents/{document}/supersede | COMPANY_SCOPE |
 | Company | `POST` | `/companies/{company}/reject` | POST /api/v1/companies/{company}/reject | COMPANY_SCOPE |
 | Company | `POST` | `/companies/{company}/request-revision` | POST /api/v1/companies/{company}/request-revision | COMPANY_SCOPE |
 | Company | `POST` | `/companies/{company}/restore` | POST /api/v1/companies/{company}/restore | COMPANY_SCOPE |
@@ -205,6 +238,8 @@ Any of these may later be promoted to `VERSIONED_API`. Promotion is additive —
 | Domain | Operations |
 | --- | --- |
 | Authentication & Session | 14 |
+| Candidate Profile | 16 |
+| Candidate Documents | 5 |
 | Company | 16 |
 | Career Center Verification | 1 |
 | Partnership | 6 |
@@ -219,4 +254,4 @@ Any of these may later be promoted to `VERSIONED_API`. Promotion is additive —
 | Reporting | 8 |
 | Audit | 1 |
 | Administration | 6 |
-| **Total** | **101** |
+| **Total** | **122** |

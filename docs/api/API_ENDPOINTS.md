@@ -1,54 +1,28 @@
 # API Endpoint Index — Versioned `/api/v1` Surface
 
 **Status:** Proposed — awaiting approval
-**Date:** 24 August 2026 · **Amended:** auth HTTP surface (SPEC-DOC-05 accepted)
+**Date:** 24 August 2026 · **Amended:** Candidate Core HTTP surface (SPEC-DOC-07 accepted)
 **Generated from:** `API_CONTRACT.md` — verified programmatically in both directions.
 
 **This file lists only `VERSIONED_API` operations.** These live under `/api/v1`, authenticate with a Sanctum bearer token, use the approved response and error envelope, and **carry an explicit backward-compatibility commitment**.
 
 > **This surface is RESERVED AND INACTIVE at MVP.** No `/api/v1` route is registered, Sanctum token issuance is not activated, and `personal_access_tokens` is deliberately absent (`DATABASE_SCHEMA.md` §23). The inventory below is the specification for when a genuine non-browser client appears; activation is additive and requires no behavioural change.
 
-> **Authentication is not on this surface at MVP.** The ten authentication and session operations were reclassified to `INERTIA_WEB` by the accepted amendment SPEC-DOC-05: browsers authenticate with the Laravel session guard and CSRF, per ADR-005 and `SECURITY_ARCHITECTURE.md` §1. Their `/api/v1` bearer-token twins remain reserved here as a future promotion target and are inventoried in `INERTIA_ACTIONS.md` for MVP.
+> **Neither authentication nor Candidate Core is on this surface at MVP.** Browser authentication moved to `INERTIA_WEB` under SPEC-DOC-05, and the twenty-one Candidate Core operations followed under SPEC-DOC-07 — both because the MVP portals are browsers using the Laravel session guard with CSRF (ADR-005, `SECURITY_ARCHITECTURE.md` §1). Their `/api/v1` twins remain reserved here as future promotion targets; a future adapter calls the same domain Actions and Queries. For MVP they are inventoried in `INERTIA_ACTIONS.md`.
 
 Internal application operations are inventoried in `INERTIA_ACTIONS.md`. Behaviour for **both** surfaces is defined by `API_CONTRACT.md`; the split governs routing, authentication, and compatibility — never business rules.
 
-Two headings in the contract are grouped-contract placeholders, not routable URIs (`PUT /api/v1/candidate/{collection}`, `GET /api/v1/reports/{report}`); the concrete URIs they cover are listed here instead.
+Two headings in the contract are grouped-contract placeholders, not routable URIs (`PUT /api/v1/candidate/{collection}`, `GET /api/v1/reports/{report}`); the concrete URIs they cover are listed with their governing section.
 
 | Total VERSIONED_API operations |
 | --- |
-| **47** |
+| **26** |
 
 ## Candidate Profile
 
 | Domain | Method | URI | Purpose / Contract Section | Primary Role |
 | --- | --- | --- | --- | --- |
-| Candidate Profile | `GET` | `/api/v1/candidate/certifications` | PUT /api/v1/candidate/{collection} *(grouped)* | CANDIDATE (OWN) |
-| Candidate Profile | `PUT` | `/api/v1/candidate/certifications` | PUT /api/v1/candidate/{collection} *(grouped)* | CANDIDATE (OWN) |
-| Candidate Profile | `GET` | `/api/v1/candidate/educations` | PUT /api/v1/candidate/{collection} *(grouped)* | CANDIDATE (OWN) |
-| Candidate Profile | `PUT` | `/api/v1/candidate/educations` | PUT /api/v1/candidate/{collection} *(grouped)* | CANDIDATE (OWN) |
 | Candidate Profile | `GET` | `/api/v1/candidate/external-apply-events` | POST /api/v1/external-apply-events/{event}/confirm *(grouped)* | CANDIDATE (OWN) |
-| Candidate Profile | `GET` | `/api/v1/candidate/links` | PUT /api/v1/candidate/{collection} *(grouped)* | CANDIDATE (OWN) |
-| Candidate Profile | `PUT` | `/api/v1/candidate/links` | PUT /api/v1/candidate/{collection} *(grouped)* | CANDIDATE (OWN) |
-| Candidate Profile | `GET` | `/api/v1/candidate/organizations` | PUT /api/v1/candidate/{collection} *(grouped)* | CANDIDATE (OWN) |
-| Candidate Profile | `PUT` | `/api/v1/candidate/organizations` | PUT /api/v1/candidate/{collection} *(grouped)* | CANDIDATE (OWN) |
-| Candidate Profile | `GET` | `/api/v1/candidate/profile` | GET /api/v1/candidate/profile | CANDIDATE (OWN) |
-| Candidate Profile | `PATCH` | `/api/v1/candidate/profile` | PATCH /api/v1/candidate/profile | CANDIDATE (OWN) |
-| Candidate Profile | `GET` | `/api/v1/candidate/skills` | PUT /api/v1/candidate/{collection} *(grouped)* | CANDIDATE (OWN) |
-| Candidate Profile | `PUT` | `/api/v1/candidate/skills` | PUT /api/v1/candidate/{collection} *(grouped)* | CANDIDATE (OWN) |
-| Candidate Profile | `GET` | `/api/v1/candidate/verifications` | POST /api/v1/candidate/verifications *(grouped)* | CANDIDATE (OWN) |
-| Candidate Profile | `POST` | `/api/v1/candidate/verifications` | POST /api/v1/candidate/verifications | CANDIDATE (OWN) |
-| Candidate Profile | `GET` | `/api/v1/candidate/work-experiences` | PUT /api/v1/candidate/{collection} *(grouped)* | CANDIDATE (OWN) |
-| Candidate Profile | `PUT` | `/api/v1/candidate/work-experiences` | PUT /api/v1/candidate/{collection} *(grouped)* | CANDIDATE (OWN) |
-
-## Candidate Documents
-
-| Domain | Method | URI | Purpose / Contract Section | Primary Role |
-| --- | --- | --- | --- | --- |
-| Candidate Documents | `GET` | `/api/v1/candidate/documents` | GET /api/v1/candidate/documents | CANDIDATE (OWN) |
-| Candidate Documents | `POST` | `/api/v1/candidate/documents` | POST /api/v1/candidate/documents | CANDIDATE (OWN) |
-| Candidate Documents | `PATCH` | `/api/v1/candidate/documents/{document}` | PATCH /api/v1/candidate/documents/{document} | CANDIDATE (OWN) |
-| Candidate Documents | `DELETE` | `/api/v1/candidate/documents/{document}` | DELETE /api/v1/candidate/documents/{document} | CANDIDATE (OWN) |
-| Candidate Documents | `GET` | `/api/v1/candidate/documents/{document}/download` | GET /api/v1/candidate/documents/{document}/download | CANDIDATE (OWN) |
 
 ## Saved Vacancies
 
@@ -71,7 +45,7 @@ Two headings in the contract are grouped-contract placeholders, not routable URI
 
 | Domain | Method | URI | Purpose / Contract Section | Primary Role |
 | --- | --- | --- | --- | --- |
-| Application | `GET` | `/api/v1/application-documents/{applicationDocument}/download` | GET /api/v1/candidate/documents/{document}/download *(grouped)* | OWN / COMPANY_SCOPE / CAMPUS_SCOPE / ASSIGNED_STAGE |
+| Application | `GET` | `/api/v1/application-documents/{applicationDocument}/download` | GET /api/v1/application-documents/{applicationDocument}/download | OWN / COMPANY_SCOPE / CAMPUS_SCOPE / ASSIGNED_STAGE |
 | Application | `GET` | `/api/v1/applications` | GET /api/v1/applications | OWN / COMPANY_SCOPE / CAMPUS_SCOPE / ASSIGNED_STAGE |
 | Application | `GET` | `/api/v1/applications/{application}` | GET /api/v1/applications/{application} | OWN / COMPANY_SCOPE / CAMPUS_SCOPE / ASSIGNED_STAGE |
 | Application | `GET` | `/api/v1/applications/{application}/documents` | GET /api/v1/applications/{application} *(grouped)* | OWN / COMPANY_SCOPE / CAMPUS_SCOPE / ASSIGNED_STAGE |
@@ -116,8 +90,7 @@ Two headings in the contract are grouped-contract placeholders, not routable URI
 
 | Domain | Operations |
 | --- | --- |
-| Candidate Profile | 17 |
-| Candidate Documents | 5 |
+| Candidate Profile | 1 |
 | Saved Vacancies | 3 |
 | Public | 4 |
 | Application | 8 |
@@ -125,7 +98,7 @@ Two headings in the contract are grouped-contract placeholders, not routable URI
 | Selection Schedule | 3 |
 | Offering | 2 |
 | Notifications | 3 |
-| **Total** | **47** |
+| **Total** | **26** |
 
 ---
 
