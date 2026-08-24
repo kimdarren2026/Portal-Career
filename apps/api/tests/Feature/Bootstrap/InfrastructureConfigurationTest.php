@@ -60,11 +60,10 @@ final class InfrastructureConfigurationTest extends TestCase
         $this->assertSame('pgsql', DB::connection()->getDriverName());
     }
 
-    public function test_only_framework_and_phase_one_migrations_exist(): void
+    public function test_only_framework_and_approved_phase_one_and_two_migrations_exist(): void
     {
-        // MIGRATION_PLAN.md Phase 1 is the only approved business migration
-        // scope at this checkpoint. The plan calls it "10 tables", but its
-        // final numbered row intentionally contains two token tables.
+        // Migration Phase 2 adds candidate, company, and partnership schema
+        // only. Every later business phase remains absent at this checkpoint.
         $migrations = collect(glob(database_path('migrations/*.php')))
             ->map(fn (string $path) => basename($path))
             ->values();
@@ -84,6 +83,20 @@ final class InfrastructureConfigurationTest extends TestCase
             '2026_08_24_000108_create_password_credentials_table.php',
             '2026_08_24_000109_create_email_verification_tokens_table.php',
             '2026_08_24_000110_create_password_reset_tokens_table.php',
+            '2026_08_24_000200_create_candidate_profiles_table.php',
+            '2026_08_24_000201_create_candidate_verifications_table.php',
+            '2026_08_24_000202_create_candidate_documents_table.php',
+            '2026_08_24_000203_create_candidate_educations_table.php',
+            '2026_08_24_000204_create_candidate_work_experiences_table.php',
+            '2026_08_24_000205_create_candidate_organizations_table.php',
+            '2026_08_24_000206_create_candidate_skills_table.php',
+            '2026_08_24_000207_create_candidate_certifications_table.php',
+            '2026_08_24_000208_create_candidate_links_table.php',
+            '2026_08_24_000209_create_companies_table.php',
+            '2026_08_24_000210_create_company_members_table.php',
+            '2026_08_24_000211_create_company_documents_table.php',
+            '2026_08_24_000212_create_company_verification_reviews_table.php',
+            '2026_08_24_000213_create_partnerships_table.php',
         ];
 
         $this->assertSame($expected, $migrations->all());
