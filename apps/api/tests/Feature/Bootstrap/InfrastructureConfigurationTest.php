@@ -60,10 +60,11 @@ final class InfrastructureConfigurationTest extends TestCase
         $this->assertSame('pgsql', DB::connection()->getDriverName());
     }
 
-    public function test_no_business_migration_exists_yet(): void
+    public function test_only_framework_and_phase_one_migrations_exist(): void
     {
-        // This phase creates framework infrastructure tables only. The 51
-        // business tables belong to MIGRATION_PLAN.md Phases 1-5.
+        // MIGRATION_PLAN.md Phase 1 is the only approved business migration
+        // scope at this checkpoint. The plan calls it "10 tables", but its
+        // final numbered row intentionally contains two token tables.
         $migrations = collect(glob(database_path('migrations/*.php')))
             ->map(fn (string $path) => basename($path))
             ->values();
@@ -72,6 +73,17 @@ final class InfrastructureConfigurationTest extends TestCase
             '0001_01_01_000000_create_sessions_table.php',
             '0001_01_01_000001_create_cache_table.php',
             '0001_01_01_000002_create_failed_jobs_table.php',
+            '2026_08_24_000100_create_geographic_areas_table.php',
+            '2026_08_24_000101_create_organizational_units_table.php',
+            '2026_08_24_000102_create_industries_table.php',
+            '2026_08_24_000103_create_organization_types_table.php',
+            '2026_08_24_000104_create_skills_table.php',
+            '2026_08_24_000105_create_study_programs_table.php',
+            '2026_08_24_000106_create_roles_table.php',
+            '2026_08_24_000107_create_users_table.php',
+            '2026_08_24_000108_create_password_credentials_table.php',
+            '2026_08_24_000109_create_email_verification_tokens_table.php',
+            '2026_08_24_000110_create_password_reset_tokens_table.php',
         ];
 
         $this->assertSame($expected, $migrations->all());
@@ -87,15 +99,19 @@ final class InfrastructureConfigurationTest extends TestCase
         }
     }
 
-    public function test_laravel_default_business_tables_are_not_scaffolded(): void
+    public function test_identity_uses_the_frozen_business_shape_not_laravel_defaults(): void
     {
-        // `users` and `password_reset_tokens` are BUSINESS tables owned by logical
-        // model 1.1-C3. Laravel's password_reset_tokens shape would collide with
-        // the business table and satisfy neither INV-021 nor the model (ADR-011).
-        foreach (glob(database_path('migrations/*.php')) as $path) {
-            $contents = (string) file_get_contents($path);
-            $this->assertStringNotContainsString("Schema::create('users'", $contents);
-            $this->assertStringNotContainsString("Schema::create('password_reset_tokens'", $contents);
-        }
+        // Laravel's stock token table has an email primary key. The frozen
+        // business table is user-owned and records use/revocation state
+        // (ADR-011, INV-021).
+        $migration = (string) file_get_contents(
+            database_path('migrations/2026_08_24_000110_create_password_reset_tokens_table.php')
+        );
+
+        $this->assertStringContainsString("Schema::create('password_reset_tokens'", $migration);
+        $this->assertStringContainsString('$table->bigInteger(\'user_id\')', $migration);
+        $this->assertStringContainsString('$table->timestampTz(\'used_at\')->nullable()', $migration);
+        $this->assertStringContainsString('$table->timestampTz(\'revoked_at\')->nullable()', $migration);
+        $this->assertStringNotContainsString('$table->string(\'email\')', $migration);
     }
 }
