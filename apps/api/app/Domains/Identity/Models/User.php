@@ -7,6 +7,7 @@ namespace App\Domains\Identity\Models;
 use App\Domains\Identity\Enums\RoleCode;
 use App\Domains\Identity\Enums\UserStatus;
 use App\Domains\Identity\Support\EmailNormalizer;
+use App\Domains\Candidate\Models\CandidateProfile;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -130,6 +131,12 @@ class User extends Model implements AuthenticatableContract
     public function passwordCredential(): HasOne
     {
         return $this->hasOne(PasswordCredential::class);
+    }
+
+    /** The candidate shell, when this identity was registered as a candidate. */
+    public function candidateProfile(): HasOne
+    {
+        return $this->hasOne(CandidateProfile::class);
     }
 
     public function emailVerificationTokens(): HasMany

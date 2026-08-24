@@ -1,7 +1,12 @@
 <?php
 
+use App\Domains\Candidate\Support\CandidateCollectionRegistry;
 use App\Http\Controllers\Auth\AuthenticationController;
 use App\Http\Controllers\Auth\AuthPageController;
+use App\Http\Controllers\Web\CandidateCollectionController;
+use App\Http\Controllers\Web\CandidateDocumentController;
+use App\Http\Controllers\Web\CandidatePageController;
+use App\Http\Controllers\Web\CandidateProfileController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -55,4 +60,40 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
     Route::post('/auth/logout', [AuthenticationController::class, 'logout'])->name('auth.logout');
     Route::get('/me', [AuthenticationController::class, 'me'])->name('auth.me');
     Route::put('/me/password', [AuthenticationController::class, 'changePassword'])->name('auth.password.update');
+});
+
+/*
+| Candidate Core — INERTIA_WEB (SPEC-DOC-07, accepted)
+|
+| Session guard + CSRF, OWN authorization, verified-email gate on every mutation.
+| Two inventoried operations are deliberately NOT routed because API_CONTRACT.md
+| blocks their implementation, and a route that guesses their rules would be an
+| invention rather than a contract:
+|   - POST /candidate/verifications  (verification business decision, Part X item 1)
+|   - POST /candidate/documents      (CANDIDATE_DOCUMENT_UPLOAD_POLICY_REQUIRED, item 9)
+*/
+Route::middleware(['auth', 'account.status'])->prefix('candidate')->name('candidate.')->group(function (): void {
+    $collections = implode('|', CandidateCollectionRegistry::slugs());
+
+    Route::get('/profile', [CandidateProfileController::class, 'show'])->name('profile.show');
+    Route::get('/profile/edit', [CandidatePageController::class, 'profile'])->name('profile.page');
+    Route::get('/verifications', [CandidateProfileController::class, 'verifications'])->name('verifications.index');
+
+    Route::get('/documents', [CandidateDocumentController::class, 'index'])->name('documents.index');
+    Route::get('/documents/{document}/download', [CandidateDocumentController::class, 'download'])
+        ->name('documents.download');
+
+    // Reads stay available to an unverified account; writes do not.
+    Route::get('/{collection}', [CandidateCollectionController::class, 'index'])
+        ->where('collection', $collections)->name('collections.index');
+
+    Route::middleware('verified.email')->group(function () use ($collections): void {
+        Route::patch('/profile', [CandidateProfileController::class, 'update'])->name('profile.update');
+        Route::put('/{collection}', [CandidateCollectionController::class, 'sync'])
+            ->where('collection', $collections)->name('collections.sync');
+        Route::patch('/documents/{document}', [CandidateDocumentController::class, 'update'])
+            ->name('documents.update');
+        Route::delete('/documents/{document}', [CandidateDocumentController::class, 'destroy'])
+            ->name('documents.destroy');
+    });
 });
