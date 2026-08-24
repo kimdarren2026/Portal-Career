@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Pusat Notifikasi - Career Portal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "inverse-surface": "#2d3133",
+                      "primary-container": "#1a365d",
+                      "surface-container-highest": "#e0e3e5",
+                      "secondary-container": "#66affe",
+                      "on-tertiary-fixed-variant": "#5f4100",
+                      "surface-bright": "#f7fafc",
+                      "surface-tint": "#455f88",
+                      "on-background": "#181c1e",
+                      "surface-container": "#ebeef0",
+                      "on-error-container": "#93000a",
+                      "surface-container-lowest": "#ffffff",
+                      "outline-variant": "#c4c6cf",
+                      "secondary-fixed": "#d2e4ff",
+                      "on-secondary-fixed-variant": "#00497e",
+                      "on-tertiary-fixed": "#271900",
+                      "inverse-primary": "#adc7f7",
+                      "on-secondary-fixed": "#001d37",
+                      "secondary-fixed-dim": "#9fcaff",
+                      "surface-container-high": "#e5e9eb",
+                      "on-primary-container": "#86a0cd",
+                      "on-surface": "#181c1e",
+                      "on-error": "#ffffff",
+                      "success": "#38a169",
+                      "primary-fixed-dim": "#adc7f7",
+                      "on-secondary-container": "#004172",
+                      "background": "#f7fafc",
+                      "tertiary-container": "#493100",
+                      "on-surface-variant": "#43474e",
+                      "tertiary-fixed": "#ffdeaa",
+                      "surface-dim": "#d7dadc",
+                      "primary": "#002045",
+                      "surface-container-low": "#f1f4f6",
+                      "inverse-on-surface": "#eef1f3",
+                      "primary-fixed": "#d6e3ff",
+                      "on-tertiary": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "outline": "#74777f",
+                      "on-secondary": "#ffffff",
+                      "error": "#E11B22",
+                      "secondary": "#0061a5",
+                      "surface": "#ffffff",
+                      "tertiary": "#2d1d00",
+                      "tertiary-fixed-dim": "#f8bc4b",
+                      "on-tertiary-container": "#cb9524",
+                      "deep-navy": "#1B2D4F",
+                      "on-primary-fixed": "#001b3c",
+                      "on-primary-fixed-variant": "#2d476f",
+                      "on-primary": "#ffffff",
+                      "surface-variant": "#e0e3e5"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-mobile": "16px",
+                      "container-max": "1280px",
+                      "base": "4px",
+                      "margin-desktop": "48px",
+                      "gutter": "24px"
+              },
+              "fontFamily": {
+                      "headline-lg-mobile": ["Inter"],
+                      "headline-lg": ["Inter"],
+                      "title-lg": ["Inter"],
+                      "display-lg": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "body-md": ["Inter"],
+                      "label-md": ["Inter"],
+                      "headline-md": ["Inter"],
+                      "label-sm": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                      "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}]
+              }
+            }
+          }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex">
+<!-- SideNavBar -->
+<aside class="hidden md:flex flex-col h-full py-6 w-[280px] h-screen sticky left-0 top-0 bg-primary dark:bg-deep-navy shadow-sm z-40">
+<div class="px-6 mb-8">
+<h1 class="font-headline-md text-headline-md text-on-primary font-bold">Career Portal</h1>
+<p class="font-label-sm text-label-sm text-on-primary opacity-80 mt-1">University Alumni</p>
+</div>
+<nav class="flex-1 flex flex-col gap-1 px-4 overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all rounded-DEFAULT" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all rounded-DEFAULT" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-md text-label-md">Profile</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all rounded-DEFAULT" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="font-label-md text-label-md">Documents</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all rounded-DEFAULT" href="#">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+<span class="font-label-md text-label-md">Find Jobs</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all rounded-DEFAULT" href="#">
+<span class="material-symbols-outlined" data-icon="work">work</span>
+<span class="font-label-md text-label-md">My Applications</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all rounded-DEFAULT" href="#">
+<span class="material-symbols-outlined" data-icon="event">event</span>
+<span class="font-label-md text-label-md">Schedule</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all rounded-DEFAULT" href="#">
+<span class="material-symbols-outlined" data-icon="bookmark">bookmark</span>
+<span class="font-label-md text-label-md">Saved</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-100 bg-primary-container/20 border-r-4 border-secondary-container hover:opacity-100 hover:bg-primary-container/10 transition-all rounded-l-DEFAULT" href="#">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="font-label-md text-label-md">Notifications</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all rounded-DEFAULT" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</nav>
+<div class="p-6 mt-auto">
+<div class="flex items-center gap-3">
+<img alt="User Profile Avatar" class="w-10 h-10 rounded-full object-cover border-2 border-surface-container-highest/20" data-alt="A small circular avatar placeholder image showing a professional headshot of a diverse corporate employee on a minimalist light gray background. Soft studio lighting. 1:1 aspect ratio." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAe1v2n6PsyQRB3hEUSBhnhnuITmPAkaxAyiprvWN0MBrMpKRDiAoIgl7Smk8O12aWDt2tW9fTaXP2nnCBxo_7wIDzCtw29prjqPhmz5_0uvJO58FIV2mIo7wsl7wGsVzvpBwcWLa3iwI1peo5GIW0kTM3K3dmLHiOrCmV8ixMAVBreAUVUltW-Wc6Ih6j1T2Wg8gy6w2zeeMvmu8yxFmczebe-gWh4IfkKX99YHBXzK9NxpUr5gGf04Q"/>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-primary">Budi Santoso</span>
+<span class="font-label-sm text-label-sm text-on-primary opacity-70">Teknik Informatika '22</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0 bg-background">
+<!-- TopNavBar (Mobile) -->
+<header class="md:hidden full-width sticky top-0 z-50 bg-surface dark:bg-inverse-surface border-b border-outline-variant shadow-sm">
+<div class="flex justify-between items-center h-16 px-margin-mobile">
+<h2 class="font-title-lg text-title-lg text-primary dark:text-inverse-primary font-bold">Career Portal</h2>
+<div class="flex gap-4 items-center">
+<button class="text-on-surface-variant hover:text-primary transition-colors focus:ring-2 focus:ring-primary-container rounded-full p-1">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<img alt="Profile Picture" class="w-8 h-8 rounded-full object-cover border border-outline-variant" data-alt="A small circular avatar placeholder image showing a professional headshot of a diverse corporate employee on a minimalist light gray background. Soft studio lighting. 1:1 aspect ratio." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2lbuOGbn0bP9T5nQVw8hl3OkhuJ0Y5xxt1GPoxWml0C3fgi0lneAGob5_jmIpe-UcgUxb21-4KdUzl2Ka57OH1a9TqAIuskxd_xCSd8qgpJXhxA--3anbQ4BHRUGmPYPckKiwILoouxj8YGcNIBFO7KDoUJngAo2gyQNJcitX_ifwOAKrlSXKLPW1DZAhHD-THCrk6I7yzURg3ZFn43otbKZYYx7L9b_0OUW_k0mXmb0_nuJlcmPsUA"/>
+</div>
+</div>
+</header>
+<!-- Canvas -->
+<div class="flex-1 p-margin-mobile md:p-margin-desktop overflow-y-auto">
+<div class="max-w-container-max mx-auto">
+<!-- Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+<div>
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-2">Pusat Notifikasi</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Pantau aktivitas, lamaran, dan pengumuman terbaru Anda.</p>
+</div>
+<button class="font-label-md text-label-md text-secondary hover:text-primary transition-colors bg-surface-container-low hover:bg-surface-container py-2 px-4 rounded-lg self-start md:self-auto">
+                        Tandai semua dibaca
+                    </button>
+</div>
+<!-- Tabs -->
+<div class="flex gap-2 overflow-x-auto pb-4 mb-6 hide-scrollbar border-b border-outline-variant">
+<button class="font-label-md text-label-md px-4 py-2 text-primary font-bold border-b-2 border-primary whitespace-nowrap">Semua</button>
+<button class="font-label-md text-label-md px-4 py-2 text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap">Belum Dibaca</button>
+<button class="font-label-md text-label-md px-4 py-2 text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap">Lamaran</button>
+<button class="font-label-md text-label-md px-4 py-2 text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap">Jadwal</button>
+</div>
+<!-- Notification List -->
+<div class="flex flex-col gap-4">
+<!-- Item 1: Success -->
+<div class="bg-surface rounded-xl p-4 md:p-6 border border-outline-variant shadow-[0_4px_10px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_20px_rgba(0,32,69,0.05)] transition-all flex gap-4 cursor-pointer relative group overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-secondary rounded-l-xl"></div>
+<div class="w-12 h-12 rounded-full bg-secondary-fixed flex items-center justify-center flex-shrink-0 text-on-secondary-fixed">
+<span class="material-symbols-outlined" data-icon="check_circle" data-weight="fill">check_circle</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-title-lg text-title-lg text-on-surface truncate pr-4">Lamaran Berhasil Dikirim</h3>
+<span class="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">Baru saja</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-3">Lamaran Anda untuk posisi <span class="font-semibold text-on-surface">Data Analyst</span> di <span class="font-semibold text-on-surface">PT Nusa Teknologi</span> telah berhasil diterima oleh tim rekrutmen.</p>
+<div class="flex gap-2">
+<span class="inline-flex items-center px-2 py-1 rounded-full bg-surface-container-high font-label-sm text-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[14px] mr-1" data-icon="work">work</span> Lamaran
+                                </span>
+</div>
+</div>
+</div>
+<!-- Item 2: Schedule (Actionable) -->
+<div class="bg-surface rounded-xl p-4 md:p-6 border border-outline-variant shadow-[0_4px_10px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_20px_rgba(0,32,69,0.05)] transition-all flex gap-4 cursor-pointer relative group">
+<div class="w-12 h-12 rounded-full bg-primary-fixed-dim flex items-center justify-center flex-shrink-0 text-on-primary-fixed">
+<span class="material-symbols-outlined" data-icon="event">event</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-title-lg text-title-lg text-on-surface truncate pr-4">Jadwal Seleksi Dibuat</h3>
+<span class="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">2 jam yang lalu</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4">Anda diundang untuk mengikuti tes teknikal secara daring oleh <span class="font-semibold text-on-surface">Bank Mandiri</span> pada tanggal <span class="font-semibold text-on-surface">15 Mei 2026</span>.</p>
+<div class="flex flex-wrap gap-3">
+<button class="font-label-md text-label-md bg-primary text-on-primary px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="visibility">visibility</span>
+                                    Lihat Jadwal
+                                </button>
+<span class="inline-flex items-center px-2 py-1 rounded-full bg-surface-container-high font-label-sm text-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[14px] mr-1" data-icon="calendar_month">calendar_month</span> Jadwal
+                                </span>
+</div>
+</div>
+</div>
+<!-- Item 3: Offering -->
+<div class="bg-surface rounded-xl p-4 md:p-6 border border-outline-variant shadow-[0_4px_10px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_20px_rgba(0,32,69,0.05)] transition-all flex gap-4 cursor-pointer relative group opacity-70">
+<div class="w-12 h-12 rounded-full bg-tertiary-fixed flex items-center justify-center flex-shrink-0 text-on-tertiary-fixed">
+<span class="material-symbols-outlined" data-icon="celebration">celebration</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-title-lg text-title-lg text-on-surface truncate pr-4 font-normal">Offering Tersedia</h3>
+<span class="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">Kemarin</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-3">Selamat! Anda telah menerima surat penawaran kerja (Offering Letter) dari <span class="font-semibold text-on-surface">Gojek</span>. Mohon tinjau dan berikan tanggapan sebelum 20 Mei 2026.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<style>
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</body></html>

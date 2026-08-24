@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lowongan Tersimpan - Portal Karir</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                            "error": "#E11B22",
+                            "error-container": "#ffdad6",
+                            "on-primary": "#ffffff",
+                            "primary-fixed-dim": "#adc7f7",
+                            "primary-fixed": "#d6e3ff",
+                            "on-error-container": "#93000a",
+                            "inverse-surface": "#2d3133",
+                            "surface-variant": "#e0e3e5",
+                            "inverse-primary": "#adc7f7",
+                            "on-primary-fixed": "#001b3c",
+                            "surface-container": "#ebeef0",
+                            "secondary-container": "#66affe",
+                            "on-tertiary-fixed": "#271900",
+                            "on-primary-fixed-variant": "#2d476f",
+                            "on-secondary-fixed-variant": "#00497e",
+                            "outline": "#74777f",
+                            "on-surface-variant": "#43474e",
+                            "on-secondary": "#ffffff",
+                            "secondary": "#0061a5",
+                            "success": "#38a169",
+                            "on-tertiary-container": "#cb9524",
+                            "on-secondary-container": "#004172",
+                            "background": "#f7fafc",
+                            "on-background": "#181c1e",
+                            "tertiary-container": "#493100",
+                            "on-secondary-fixed": "#001d37",
+                            "secondary-fixed": "#d2e4ff",
+                            "on-error": "#ffffff",
+                            "surface-bright": "#f7fafc",
+                            "primary-container": "#1a365d",
+                            "surface-container-high": "#e5e9eb",
+                            "surface-tint": "#455f88",
+                            "secondary-fixed-dim": "#9fcaff",
+                            "tertiary-fixed": "#ffdeaa",
+                            "surface-container-low": "#f1f4f6",
+                            "primary": "#002045",
+                            "tertiary": "#2d1d00",
+                            "outline-variant": "#c4c6cf",
+                            "surface-dim": "#d7dadc",
+                            "on-surface": "#181c1e",
+                            "on-tertiary": "#ffffff",
+                            "on-tertiary-fixed-variant": "#5f4100",
+                            "inverse-on-surface": "#eef1f3",
+                            "surface-container-highest": "#e0e3e5",
+                            "surface-container-lowest": "#ffffff",
+                            "on-primary-container": "#86a0cd",
+                            "tertiary-fixed-dim": "#f8bc4b",
+                            "deep-navy": "#1B2D4F",
+                            "surface": "#ffffff"
+                    },
+                    "borderRadius": {
+                            "DEFAULT": "0.25rem",
+                            "lg": "0.5rem",
+                            "xl": "0.75rem",
+                            "full": "9999px"
+                    },
+                    "spacing": {
+                            "gutter": "24px",
+                            "margin-mobile": "16px",
+                            "margin-desktop": "48px",
+                            "container-max": "1280px",
+                            "base": "4px"
+                    },
+                    "fontFamily": {
+                            "headline-lg": ["Inter"],
+                            "body-lg": ["Inter"],
+                            "title-lg": ["Inter"],
+                            "headline-md": ["Inter"],
+                            "body-md": ["Inter"],
+                            "headline-lg-mobile": ["Inter"],
+                            "display-lg": ["Inter"],
+                            "label-sm": ["Inter"],
+                            "label-md": ["Inter"]
+                    },
+                    "fontSize": {
+                            "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                            "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                            "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                            "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                            "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                            "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                            "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                            "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                            "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer utilities {
+            .shadow-ambient {
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+            }
+            .shadow-hover {
+                box-shadow: 0 8px 20px rgba(0, 32, 69, 0.05);
+            }
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen">
+<!-- Top Navigation (Mobile Only) -->
+<nav class="md:hidden w-full sticky top-0 z-50 bg-surface border-b border-outline-variant shadow-sm flex justify-between items-center h-16 px-margin-mobile">
+<div class="font-headline-md text-headline-md font-bold text-primary">Portal Karir</div>
+<button class="text-primary hover:text-primary transition-colors opacity-80 active:opacity-100">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</nav>
+<div class="flex flex-col md:flex-row h-screen overflow-hidden">
+<!-- SideNav (Desktop) -->
+<aside class="hidden md:flex flex-col h-full py-6 px-4 w-[280px] bg-deep-navy shadow-sm shrink-0 overflow-y-auto">
+<div class="mb-8 px-4">
+<div class="font-headline-md text-headline-md text-on-primary mb-1">Portal Karir</div>
+<div class="font-label-sm text-label-sm text-on-primary/80">Kandidat Mahasiswa</div>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary hover:bg-primary-container transition-colors rounded-lg scale-95 duration-150 font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary hover:bg-primary-container transition-colors rounded-lg scale-95 duration-150 font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+<span>Profil</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary hover:bg-primary-container transition-colors rounded-lg scale-95 duration-150 font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">description</span>
+<span>Dokumen</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary hover:bg-primary-container transition-colors rounded-lg scale-95 duration-150 font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">search</span>
+<span>Cari Lowongan</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary hover:bg-primary-container transition-colors rounded-lg scale-95 duration-150 font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">work_history</span>
+<span>Lamaranku</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary hover:bg-primary-container transition-colors rounded-lg scale-95 duration-150 font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span>Jadwal</span>
+</a>
+<!-- Active State -->
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-lg font-bold scale-95 duration-150 font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">bookmark</span>
+<span>Tersimpan</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary hover:bg-primary-container transition-colors rounded-lg scale-95 duration-150 font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">notifications</span>
+<span>Notifikasi</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary hover:bg-primary-container transition-colors rounded-lg scale-95 duration-150 font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Pengaturan</span>
+</a>
+</nav>
+<div class="mt-auto pt-6 px-4">
+<button class="w-full bg-secondary text-on-secondary py-3 rounded-lg font-label-md text-label-md hover:bg-secondary/90 transition-colors">
+                    Cari Lowongan
+                </button>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 overflow-y-auto w-full md:w-[calc(100%-280px)]">
+<div class="px-margin-mobile md:px-margin-desktop py-8 md:py-12 max-w-container-max mx-auto">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+<div>
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-2">Lowongan Tersimpan</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Daftar posisi yang Anda simpan untuk dilamar nanti.</p>
+</div>
+<!-- Filter/Sort Controls -->
+<div class="flex items-center gap-3">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="pl-10 pr-4 py-2 border border-outline-variant rounded-lg bg-surface text-on-surface font-body-md focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary w-full md:w-64" placeholder="Cari tersimpan..." type="text"/>
+</div>
+<button class="flex items-center justify-center p-2 border border-outline-variant rounded-lg bg-surface hover:bg-surface-container-low transition-colors text-on-surface">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+</div>
+</div>
+<!-- Job Cards Grid (Bento/Card Layout) -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Active Job Card 1 -->
+<div class="bg-surface border border-surface-variant rounded-xl p-6 shadow-ambient hover:shadow-hover hover:-translate-y-[2px] transition-all cursor-pointer relative group flex flex-col h-full">
+<div class="flex justify-between items-start mb-4">
+<div class="flex items-center gap-3">
+<img class="w-12 h-12 rounded bg-surface-container-low object-cover" data-alt="A clean, modern corporate logo for a tech company, featuring a minimalist blue geometric shape on a pristine white background. High resolution, suitable for a professional career portal interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhV6Ce1oQFV21HxHaApdl6TQBk3p3QBDZr-pn7fWk1p0S__XXf1VXOiItyM3l4Wna9-aNDkyumWztNJK2cNdnuxuWgQWlprtiO36VoIiqlTwAGoBsjM-vdmFUp1Z0XM7GEMp-LTuz7DrcQCzXRuXg3Y86NZydnGVC48YXaxKX3kE4icV2VGTYk0H93yOeftGKF_Jb2HAr7_a7h9v6R_C4oGP8LuyKleuxpGXSO87b1vZvgbt0ofScNkQ"/>
+<div>
+<div class="flex items-center gap-1">
+<span class="font-label-md text-label-md text-on-surface-variant">TechNusa Utama</span>
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-[16px]" style="font-variation-settings: 'FILL' 1;" title="Mitra Resmi">verified</span>
+</div>
+<h3 class="font-title-lg text-title-lg text-primary mt-1">Software Engineer Intern</h3>
+</div>
+</div>
+<button class="text-secondary-container hover:text-primary transition-colors p-1">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">bookmark</span>
+</button>
+</div>
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">location_on</span> Jakarta
+                            </span>
+<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm">
+                                Internship
+                            </span>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-sm text-label-sm">
+                                Mitra Kampus
+                            </span>
+</div>
+<div class="mt-auto pt-4 border-t border-surface-variant flex justify-between items-center">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-success"></span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Aktif • Selesai 24 Okt</span>
+</div>
+<button class="font-label-md text-label-md text-secondary hover:underline group-hover:text-primary transition-colors">Lihat Detail</button>
+</div>
+</div>
+<!-- Active Job Card 2 -->
+<div class="bg-surface border border-surface-variant rounded-xl p-6 shadow-ambient hover:shadow-hover hover:-translate-y-[2px] transition-all cursor-pointer relative group flex flex-col h-full">
+<div class="flex justify-between items-start mb-4">
+<div class="flex items-center gap-3">
+<img class="w-12 h-12 rounded bg-surface-container-low object-cover" data-alt="A sophisticated, modern logo for a financial services firm. The logo utilizes deep navy and silver colors, conveying trust and stability, set against a solid white background in a square aspect ratio." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDidMz2fICsUngIq27lsEO1vWvLPPEtRUA6HEfF_-U4zG11kT6bO_eUyfDqiusQ9VS9amicqBaMbYF0XnRHQj48LSYIi-FBDiNZXOtCNyLGKAkBpFD7fl9IdD0CBkRCwOlGszY_nqCgNlyQJluXVQmua0_7GOdv1zcJS3q463dS_A4WkmHRCM5yJ5SYAi83dJfSqAhVwYSUEBD2k9VYmnGDfJjcBsHTloWyW1WiY85h14c1_ThtFBNi3Q"/>
+<div>
+<div class="flex items-center gap-1">
+<span class="font-label-md text-label-md text-on-surface-variant">Bank Binar</span>
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-[16px]" style="font-variation-settings: 'FILL' 1;" title="Mitra Resmi">verified</span>
+</div>
+<h3 class="font-title-lg text-title-lg text-primary mt-1">Data Analyst ODP</h3>
+</div>
+</div>
+<button class="text-secondary-container hover:text-primary transition-colors p-1">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">bookmark</span>
+</button>
+</div>
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">location_on</span> Bandung
+                            </span>
+<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm">
+                                Full-time
+                            </span>
+</div>
+<div class="mt-auto pt-4 border-t border-surface-variant flex justify-between items-center">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-success"></span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Aktif • Selesai 30 Nov</span>
+</div>
+<button class="font-label-md text-label-md text-secondary hover:underline group-hover:text-primary transition-colors">Lihat Detail</button>
+</div>
+</div>
+<!-- Expired Job Card -->
+<div class="bg-surface-container-low border border-outline-variant/50 rounded-xl p-6 relative flex flex-col h-full opacity-75">
+<!-- Overlay for expired state visual cue -->
+<div class="absolute inset-0 bg-surface/40 rounded-xl pointer-events-none"></div>
+<div class="flex justify-between items-start mb-4 relative z-10">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded bg-surface-variant flex items-center justify-center grayscale">
+<span class="material-symbols-outlined text-outline">apartment</span>
+</div>
+<div>
+<span class="font-label-md text-label-md text-outline">Kreatif Mediatama</span>
+<h3 class="font-title-lg text-title-lg text-on-surface-variant mt-1">UX Researcher</h3>
+</div>
+</div>
+<button class="text-outline hover:text-error transition-colors p-1" title="Hapus dari tersimpan">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+<div class="flex flex-wrap gap-2 mb-6 relative z-10">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-outline-variant text-outline font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">location_on</span> Yogyakarta
+                            </span>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant/30 flex justify-between items-center relative z-10">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-error"></span>
+<span class="font-label-sm text-label-sm text-error">Kedaluwarsa</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lamaran Berhasil - Career Portal</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config injected from instructions -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-surface": "#2d3133",
+                    "primary-container": "#1a365d",
+                    "surface-container-highest": "#e0e3e5",
+                    "secondary-container": "#66affe",
+                    "on-tertiary-fixed-variant": "#5f4100",
+                    "surface-bright": "#f7fafc",
+                    "surface-tint": "#455f88",
+                    "on-background": "#181c1e",
+                    "surface-container": "#ebeef0",
+                    "on-error-container": "#93000a",
+                    "surface-container-lowest": "#ffffff",
+                    "outline-variant": "#c4c6cf",
+                    "secondary-fixed": "#d2e4ff",
+                    "on-secondary-fixed-variant": "#00497e",
+                    "on-tertiary-fixed": "#271900",
+                    "inverse-primary": "#adc7f7",
+                    "on-secondary-fixed": "#001d37",
+                    "secondary-fixed-dim": "#9fcaff",
+                    "surface-container-high": "#e5e9eb",
+                    "on-primary-container": "#86a0cd",
+                    "on-surface": "#181c1e",
+                    "on-error": "#ffffff",
+                    "success": "#38a169",
+                    "primary-fixed-dim": "#adc7f7",
+                    "on-secondary-container": "#004172",
+                    "background": "#f7fafc",
+                    "tertiary-container": "#493100",
+                    "on-surface-variant": "#43474e",
+                    "tertiary-fixed": "#ffdeaa",
+                    "surface-dim": "#d7dadc",
+                    "primary": "#002045",
+                    "surface-container-low": "#f1f4f6",
+                    "inverse-on-surface": "#eef1f3",
+                    "primary-fixed": "#d6e3ff",
+                    "on-tertiary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "outline": "#74777f",
+                    "on-secondary": "#ffffff",
+                    "error": "#E11B22",
+                    "secondary": "#0061a5",
+                    "surface": "#ffffff",
+                    "tertiary": "#2d1d00",
+                    "tertiary-fixed-dim": "#f8bc4b",
+                    "on-tertiary-container": "#cb9524",
+                    "deep-navy": "#1B2D4F",
+                    "on-primary-fixed": "#001b3c",
+                    "on-primary-fixed-variant": "#2d476f",
+                    "on-primary": "#ffffff",
+                    "surface-variant": "#e0e3e5"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "16px",
+                    "container-max": "1280px",
+                    "base": "4px",
+                    "margin-desktop": "48px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "headline-lg-mobile": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "title-lg": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "label-sm": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                    "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        @keyframes scaleIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-scale-in {
+            animation: scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+</head>
+<body class="bg-background min-h-screen flex items-center justify-center p-margin-mobile md:p-margin-desktop">
+<!-- Main Success Container (No Nav/Footer due to transactional success screen intent) -->
+<main class="w-full max-w-lg animate-scale-in">
+<div class="bg-surface rounded-xl shadow-sm border border-outline-variant p-6 md:p-10 flex flex-col items-center">
+<!-- Success Icon -->
+<div class="mb-6 relative">
+<div class="absolute inset-0 bg-success/10 rounded-full scale-150 animate-pulse"></div>
+<span class="material-symbols-outlined text-[72px] text-success relative z-10" style="font-variation-settings: 'FILL' 1;">
+                    check_circle
+                </span>
+</div>
+<!-- Title & Subtitle -->
+<h1 class="font-headline-md text-headline-md text-primary text-center mb-2">
+                Lamaran Berhasil Dikirim
+            </h1>
+<p class="font-body-md text-body-md text-on-surface-variant text-center mb-8 max-w-[300px]">
+                Profil dan dokumen Anda telah berhasil dikirimkan ke perusahaan.
+            </p>
+<!-- Application Details Card -->
+<div class="w-full bg-surface-container-low rounded-lg p-5 space-y-4 mb-8 border border-outline-variant/30">
+<div class="flex justify-between items-start border-b border-outline-variant/30 pb-3">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Nomor Lamaran</span>
+<span class="font-label-md text-label-md text-on-surface font-mono">APP-2026-001</span>
+</div>
+<div class="flex justify-between items-start border-b border-outline-variant/30 pb-3">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Posisi</span>
+<span class="font-body-md text-body-md text-on-surface font-medium text-right">Data Analyst Intern</span>
+</div>
+<div class="flex justify-between items-start border-b border-outline-variant/30 pb-3">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Perusahaan</span>
+<span class="font-body-md text-body-md text-on-surface font-medium text-right">Tech Nusantara Group</span>
+</div>
+<div class="flex justify-between items-start border-b border-outline-variant/30 pb-3">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Tanggal</span>
+<span class="font-body-md text-body-md text-on-surface font-medium text-right">12 Agustus 2026</span>
+</div>
+<div class="flex justify-between items-center pt-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Status</span>
+<span class="bg-primary-fixed text-on-primary-fixed px-3 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">inbox</span>
+                        Lamaran Diterima
+                    </span>
+</div>
+</div>
+<!-- Call to Actions -->
+<div class="w-full space-y-3">
+<button class="w-full bg-primary text-on-primary py-3 px-4 rounded-lg font-label-md text-label-md hover:bg-on-primary-fixed-variant transition-colors flex items-center justify-center gap-2 shadow-sm" type="button">
+<span class="material-symbols-outlined text-[20px]">description</span>
+                    Lihat Lamaran Saya
+                </button>
+<button class="w-full bg-surface-container text-on-surface py-3 px-4 rounded-lg font-label-md text-label-md hover:bg-surface-container-high transition-colors flex items-center justify-center gap-2" type="button">
+<span class="material-symbols-outlined text-[20px]">search</span>
+                    Cari Lowongan Lain
+                </button>
+</div>
+</div>
+</main>
+</body></html>

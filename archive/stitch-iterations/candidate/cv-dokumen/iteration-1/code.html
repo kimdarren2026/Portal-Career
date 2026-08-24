@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Manajemen Dokumen - Career Portal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-surface": "#2d3133",
+                    "primary-container": "#1a365d",
+                    "surface-container-highest": "#e0e3e5",
+                    "secondary-container": "#66affe",
+                    "on-tertiary-fixed-variant": "#5f4100",
+                    "surface-bright": "#f7fafc",
+                    "surface-tint": "#455f88",
+                    "on-background": "#181c1e",
+                    "surface-container": "#ebeef0",
+                    "on-error-container": "#93000a",
+                    "surface-container-lowest": "#ffffff",
+                    "outline-variant": "#c4c6cf",
+                    "secondary-fixed": "#d2e4ff",
+                    "on-secondary-fixed-variant": "#00497e",
+                    "on-tertiary-fixed": "#271900",
+                    "inverse-primary": "#adc7f7",
+                    "on-secondary-fixed": "#001d37",
+                    "secondary-fixed-dim": "#9fcaff",
+                    "surface-container-high": "#e5e9eb",
+                    "on-primary-container": "#86a0cd",
+                    "on-surface": "#181c1e",
+                    "on-error": "#ffffff",
+                    "success": "#38a169",
+                    "primary-fixed-dim": "#adc7f7",
+                    "on-secondary-container": "#004172",
+                    "background": "#f7fafc",
+                    "tertiary-container": "#493100",
+                    "on-surface-variant": "#43474e",
+                    "tertiary-fixed": "#ffdeaa",
+                    "surface-dim": "#d7dadc",
+                    "primary": "#002045",
+                    "surface-container-low": "#f1f4f6",
+                    "inverse-on-surface": "#eef1f3",
+                    "primary-fixed": "#d6e3ff",
+                    "on-tertiary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "outline": "#74777f",
+                    "on-secondary": "#ffffff",
+                    "error": "#E11B22",
+                    "secondary": "#0061a5",
+                    "surface": "#ffffff",
+                    "tertiary": "#2d1d00",
+                    "tertiary-fixed-dim": "#f8bc4b",
+                    "on-tertiary-container": "#cb9524",
+                    "deep-navy": "#1B2D4F",
+                    "on-primary-fixed": "#001b3c",
+                    "on-primary-fixed-variant": "#2d476f",
+                    "on-primary": "#ffffff",
+                    "surface-variant": "#e0e3e5"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "16px",
+                    "container-max": "1280px",
+                    "base": "4px",
+                    "margin-desktop": "48px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "headline-lg-mobile": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "title-lg": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "label-sm": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                    "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-background min-h-screen text-on-background flex flex-col md:flex-row">
+<!-- SideNavBar (Hidden on Mobile) -->
+<aside class="hidden md:flex w-[280px] h-screen sticky left-0 top-0 bg-primary shadow-sm flex-col py-6 z-40">
+<div class="px-6 mb-8 flex flex-col gap-2">
+<h1 class="font-headline-md text-headline-md text-on-primary font-bold">Career Portal</h1>
+<p class="font-label-sm text-label-sm text-on-primary opacity-80">University Alumni</p>
+</div>
+<nav class="flex-1 overflow-y-auto">
+<ul class="flex flex-col gap-1">
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                        Dashboard
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+                        Profile
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-100 bg-primary-container/20 border-r-4 border-secondary-container font-body-md text-body-md scale-[0.99] transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+                        Documents
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+                        Find Jobs
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="work">work</span>
+                        My Applications
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="event">event</span>
+                        Schedule
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="bookmark">bookmark</span>
+                        Saved
+                    </a>
+</li>
+</ul>
+</nav>
+<div class="px-4 mt-auto">
+<ul class="flex flex-col gap-1">
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+                        Notifications
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                        Settings
+                    </a>
+</li>
+</ul>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-h-screen">
+<!-- TopNavBar (Visible on Mobile) -->
+<header class="md:hidden flex justify-between items-center h-16 px-gutter w-full sticky top-0 z-50 bg-surface border-b border-outline-variant shadow-sm">
+<span class="font-title-lg text-title-lg text-primary font-bold">Career Portal</span>
+<div class="flex items-center gap-4 text-on-surface-variant">
+<span class="material-symbols-outlined hover:text-primary cursor-pointer transition-colors" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined hover:text-primary cursor-pointer transition-colors" data-icon="help">help</span>
+<img alt="Profile Picture" class="w-8 h-8 rounded-full object-cover border border-outline-variant" data-alt="A close up portrait of a young professional wearing smart casual clothing, looking confidently at the camera. The background is a brightly lit, modern office space with subtle geometric patterns. The lighting is soft and natural, emphasizing a clean, corporate aesthetic suited for a career portal avatar." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYNQW8mLvV7y25NxUO_oUt--ss-Q5ZgEGASC6-PO1nAoj6ADlwO4Ygu7LSYdK7Y6S8nnJwv7Vgv5b3TUW-jfcdq36L7JY_Zj4yI76H2m781yVPteC0C9IPQLbVmO6JZEORQDoudBNZcmTF9b48nA7XJEqEm0ofOeT2TQdWJXJU1ylou8YUbybhjut2K2Y8zQqacy3Ql0gVwJoX6wJbK7yh2b8UmVW_I9oqF0YEGcnWak_QqOIp4km0XQ"/>
+</div>
+</header>
+<!-- TopNavBar Desktop actions (only trailing icons/profile) -->
+<div class="hidden md:flex justify-end items-center h-16 px-margin-desktop bg-surface w-full sticky top-0 z-30 bg-opacity-90 backdrop-blur-sm border-b border-outline-variant">
+<div class="flex items-center gap-6 text-on-surface-variant">
+<span class="material-symbols-outlined hover:text-primary cursor-pointer transition-colors" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined hover:text-primary cursor-pointer transition-colors" data-icon="help">help</span>
+<img alt="Profile Picture" class="w-10 h-10 rounded-full object-cover border border-outline-variant" data-alt="A close up portrait of a young professional wearing smart casual clothing, looking confidently at the camera. The background is a brightly lit, modern office space with subtle geometric patterns. The lighting is soft and natural, emphasizing a clean, corporate aesthetic suited for a career portal avatar." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcUG5h1ACTNdtTmRcbqteUOVHRuaObXDrewYXludNi2TxejBOrmcAW1VGcFNop8hetKDO1HfPr0NXko96qZg6DBTt4u5y-b8L6h24NIA80y3fSmQu-TnB_EKHXreNkKI0ak19BGnsIIsFjn2CujlWjb3LoHW3vaptqYSIw6S62ebsseaNySxxqxRNuD_vGab_bpo3FzhdaUCQDtGjSalstLGBhpHN_ZslJocQcCaH8oz-0S49oP4LBMQ"/>
+</div>
+</div>
+<div class="flex-1 p-margin-mobile md:p-margin-desktop max-w-container-max mx-auto w-full">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+<div>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-2">Manajemen Dokumen</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Kelola CV, transkrip, dan dokumen pendukung lainnya untuk keperluan melamar kerja.</p>
+</div>
+<button class="bg-primary text-on-primary hover:bg-primary-container px-6 py-3 rounded-lg font-label-md text-label-md transition-colors flex items-center gap-2 shadow-sm focus:ring-2 focus:ring-primary-container outline-none">
+<span class="material-symbols-outlined" data-icon="upload">upload</span>
+                    Unggah Dokumen Baru
+                </button>
+</div>
+<!-- Bento Grid Layout for Documents -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Card 1: CV Utama -->
+<div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm hover:shadow-[0_8px_20px_rgba(0,32,69,0.05)] transition-shadow flex flex-col h-full group relative overflow-hidden">
+<div class="absolute top-0 right-0 w-24 h-24 bg-primary-fixed/30 rounded-bl-full -mr-4 -mt-4 opacity-50 pointer-events-none"></div>
+<div class="flex justify-between items-start mb-4">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 bg-secondary-fixed flex items-center justify-center rounded-lg text-on-secondary-fixed-variant">
+<span class="material-symbols-outlined" data-icon="picture_as_pdf" data-weight="fill" style="font-variation-settings: 'FILL' 1;">picture_as_pdf</span>
+</div>
+<div>
+<h3 class="font-title-lg text-title-lg text-on-surface">CV Utama</h3>
+<span class="bg-primary/10 text-primary px-2 py-1 rounded-full font-label-sm text-label-sm">Primary</span>
+</div>
+</div>
+</div>
+<div class="mb-6 flex-1">
+<p class="font-label-md text-label-md text-on-surface-variant truncate mb-1" title="CV_Budi_Santoso_2026_Final.pdf">CV_Budi_Santoso_2026_Final.pdf</p>
+<div class="flex items-center gap-2 font-label-sm text-label-sm text-outline">
+<span>PDF</span>
+<span>•</span>
+<span>1.2 MB</span>
+<span>•</span>
+<span>Diunggah: 12 Jan 2026</span>
+</div>
+</div>
+<div class="flex gap-2 border-t border-surface-variant pt-4 mt-auto">
+<button class="flex-1 py-2 font-label-md text-label-md text-secondary hover:bg-secondary-fixed/50 rounded transition-colors text-center">Lihat</button>
+<button class="flex-1 py-2 font-label-md text-label-md text-on-surface-variant hover:bg-surface-variant rounded transition-colors text-center">Ganti</button>
+<button aria-label="Hapus" class="px-3 py-2 text-error hover:bg-error-container/50 rounded transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+<!-- Card 2: CV Alternatif -->
+<div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm hover:shadow-[0_8px_20px_rgba(0,32,69,0.05)] transition-shadow flex flex-col h-full group">
+<div class="flex justify-between items-start mb-4">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 bg-surface-container-high flex items-center justify-center rounded-lg text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="design_services">design_services</span>
+</div>
+<div>
+<h3 class="font-title-lg text-title-lg text-on-surface">CV Alternatif (Desain)</h3>
+</div>
+</div>
+</div>
+<div class="mb-6 flex-1">
+<p class="font-label-md text-label-md text-on-surface-variant truncate mb-1" title="Portfolio_Desain_Budi_2026.pdf">Portfolio_Desain_Budi_2026.pdf</p>
+<div class="flex items-center gap-2 font-label-sm text-label-sm text-outline">
+<span>PDF</span>
+<span>•</span>
+<span>4.5 MB</span>
+<span>•</span>
+<span>Diunggah: 05 Jan 2026</span>
+</div>
+</div>
+<div class="flex gap-2 border-t border-surface-variant pt-4 mt-auto">
+<button class="flex-1 py-2 font-label-md text-label-md text-secondary hover:bg-secondary-fixed/50 rounded transition-colors text-center">Lihat</button>
+<button class="flex-1 py-2 font-label-md text-label-md text-on-surface-variant hover:bg-surface-variant rounded transition-colors text-center">Ganti</button>
+<button aria-label="Hapus" class="px-3 py-2 text-error hover:bg-error-container/50 rounded transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+<!-- Card 3: Transkrip Nilai -->
+<div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm hover:shadow-[0_8px_20px_rgba(0,32,69,0.05)] transition-shadow flex flex-col h-full group">
+<div class="flex justify-between items-start mb-4">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 bg-surface-container-high flex items-center justify-center rounded-lg text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="school">school</span>
+</div>
+<div>
+<h3 class="font-title-lg text-title-lg text-on-surface">Transkrip Nilai</h3>
+<div class="flex items-center gap-1 text-success mt-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="verified">verified</span>
+<span class="font-label-sm text-label-sm">Terverifikasi Kampus</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mb-6 flex-1">
+<p class="font-label-md text-label-md text-on-surface-variant truncate mb-1" title="Transkrip_Resmi_Universitas_2026.pdf">Transkrip_Resmi_Universitas_2026.pdf</p>
+<div class="flex items-center gap-2 font-label-sm text-label-sm text-outline">
+<span>PDF</span>
+<span>•</span>
+<span>800 KB</span>
+<span>•</span>
+<span>Diunggah: 01 Feb 2026</span>
+</div>
+</div>
+<div class="flex gap-2 border-t border-surface-variant pt-4 mt-auto">
+<button class="flex-1 py-2 font-label-md text-label-md text-secondary hover:bg-secondary-fixed/50 rounded transition-colors text-center">Lihat</button>
+<button class="flex-1 py-2 font-label-md text-label-md text-on-surface-variant hover:bg-surface-variant rounded transition-colors text-center">Ganti</button>
+</div>
+</div>
+<!-- Card 4: Ijazah (Empty State) -->
+<div class="bg-surface-bright rounded-xl border-2 border-dashed border-outline-variant p-6 flex flex-col h-full items-center justify-center text-center hover:bg-surface-container-lowest transition-colors cursor-pointer group min-h-[240px]">
+<div class="w-16 h-16 bg-surface-container rounded-full flex items-center justify-center mb-4 group-hover:bg-primary-fixed transition-colors">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors text-[32px]" data-icon="add_circle">add_circle</span>
+</div>
+<h3 class="font-title-lg text-title-lg text-on-surface mb-1">Ijazah</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4">Belum ada dokumen yang diunggah</p>
+<button class="font-label-md text-label-md text-primary hover:underline">Unggah Sekarang</button>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="w-full py-8 bg-surface-container-high border-t border-outline-variant mt-auto">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-desktop max-w-container-max mx-auto gap-4">
+<div class="font-headline-md text-headline-md font-bold text-primary">Career Portal</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant">© 2024 University Career Center. All rights reserved.</div>
+<div class="flex gap-4">
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:underline hover:text-primary transition-all duration-200" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:underline hover:text-primary transition-all duration-200" href="#">Terms of Service</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:underline hover:text-primary transition-all duration-200" href="#">Contact Support</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:underline hover:text-primary transition-all duration-200" href="#">Employer Portal</a>
+</div>
+</div>
+</footer>
+</main>
+<!-- BottomNavBar (Visible only on Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-surface border-t border-outline-variant flex justify-around items-center h-16 pb-safe z-50">
+<a class="flex flex-col items-center justify-center w-full h-full text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-sm text-[10px] mt-1">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-primary font-bold" href="#">
+<div class="px-4 py-1 bg-primary-container/20 rounded-full mb-1">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+</div>
+<span class="font-label-sm text-[10px]">Documents</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+<span class="font-label-sm text-[10px] mt-1">Find Jobs</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-sm text-[10px] mt-1">Profile</span>
+</a>
+</nav>
+</body></html>

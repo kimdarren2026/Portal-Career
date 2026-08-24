@@ -1,0 +1,25 @@
+{
+    "//": "Self-contained: node_modules lives in apps/api (the Laravel root), so an `extends` referencing a package cannot resolve from this directory.",
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "lib": ["ESNext", "DOM", "DOM.Iterable"],
+        "jsx": "preserve",
+        "strict": true,
+        "noEmit": true,
+        "isolatedModules": true,
+        "esModuleInterop": true,
+        "allowImportingTsExtensions": true,
+        "resolveJsonModule": true,
+        "skipLibCheck": true,
+        "useDefineForClassFields": true,
+        "verbatimModuleSyntax": true,
+        "forceConsistentCasingInFileNames": true,
+        "baseUrl": ".",
+        "paths": { "@/*": ["./src/*"] },
+        "typeRoots": ["../../node_modules/@types"],
+        "types": ["vite/client"]
+    },
+    "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.vue"]
+}

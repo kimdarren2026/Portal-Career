@@ -1,0 +1,384 @@
+<!DOCTYPE html><html lang="id"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Dashboard Kepegawaian - Portal Karir</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#2d1d00",
+                        "on-primary-container": "#86a0cd",
+                        "deep-navy": "#1B2D4F",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed-variant": "#00497e",
+                        "surface-variant": "#e0e3e5",
+                        "on-tertiary-fixed": "#271900",
+                        "surface-container-highest": "#e0e3e5",
+                        "secondary-container": "#66affe",
+                        "on-tertiary": "#ffffff",
+                        "surface-dim": "#d7dadc",
+                        "on-primary": "#ffffff",
+                        "surface-container": "#ebeef0",
+                        "error-container": "#ffdad6",
+                        "primary-fixed-dim": "#adc7f7",
+                        "on-secondary-fixed": "#001d37",
+                        "on-primary-fixed-variant": "#2d476f",
+                        "on-error-container": "#93000a",
+                        "background": "#f7fafc",
+                        "surface-bright": "#f7fafc",
+                        "surface-container-high": "#e5e9eb",
+                        "primary-container": "#1a365d",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#f8bc4b",
+                        "on-background": "#181c1e",
+                        "on-primary-fixed": "#001b3c",
+                        "on-surface": "#181c1e",
+                        "secondary-fixed-dim": "#9fcaff",
+                        "on-tertiary-container": "#cb9524",
+                        "primary-fixed": "#d6e3ff",
+                        "tertiary-container": "#493100",
+                        "on-tertiary-fixed-variant": "#5f4100",
+                        "surface-tint": "#455f88",
+                        "on-secondary-container": "#004172",
+                        "inverse-surface": "#2d3133",
+                        "outline": "#74777f",
+                        "outline-variant": "#c4c6cf",
+                        "inverse-primary": "#adc7f7",
+                        "inverse-on-surface": "#eef1f3",
+                        "primary": "#002045",
+                        "on-surface-variant": "#43474e",
+                        "tertiary-fixed": "#ffdeaa",
+                        "secondary-fixed": "#d2e4ff",
+                        "secondary": "#0061a5",
+                        "surface-container-low": "#f1f4f6",
+                        "surface": "#ffffff",
+                        "success": "#38a169",
+                        "error": "#E11B22",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "margin-desktop": "48px",
+                        "container-max": "1280px",
+                        "base": "4px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-background flex min-h-screen">
+<!-- SideNavBar -->
+<nav class="w-[280px] h-screen sticky top-0 left-0 bg-deep-navy shadow-sm hidden md:flex flex-col py-6">
+<div class="px-6 mb-8 flex items-center gap-4">
+<img alt="Logo Universitas" class="w-12 h-12 rounded-full bg-white p-1 object-contain" data-alt="A professional university logo featuring a minimalist shield design in white and light blue, set against a deep navy background. The style is modern, corporate, and academic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrtWm6Rpb9a1nXDXxjD80LpCqwMu1cBPdiGbgUVm37jGDEj3tusfYoXqWh9zKTZqWQzGC2Nty_vV_r7TqqV2fRmc7mT-TC2RNlrWYuMvnWkKTyrBHjqNyKpp5vZe61Jj4cmgtjWjKLaLGk5BTuBuL7Sgduf3Yr0pwdp44wj732WvOBfFJVD9RVrEXV7VwQF3-DkayImC8j_l_pI6uE1wTW7YswUIpgxTS-qceh4TEX2BeQxHgtAPbUng">
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-white">Portal Karir</h1>
+<p class="font-label-md text-label-md text-on-primary-container">Admin Kepegawaian</p>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto w-full">
+<ul class="flex flex-col gap-1 w-full">
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary font-bold border-l-4 border-secondary-container hover:bg-white/10 transition-colors duration-200 opacity-100 transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+                        Dashboard
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md border-l-4 border-transparent hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">work</span>
+                        Lowongan Kampus
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md border-l-4 border-transparent hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">group</span>
+                        Pelamar
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md border-l-4 border-transparent hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+                        Jadwal Seleksi
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md border-l-4 border-transparent hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">fact_check</span>
+                        Penilaian
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md border-l-4 border-transparent hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">contract</span>
+                        Offering
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md border-l-4 border-transparent hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">analytics</span>
+                        Outcome Rekrutmen
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md border-l-4 border-transparent hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">description</span>
+                        Laporan
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md border-l-4 border-transparent hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">notifications</span>
+                        Notifikasi
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md border-l-4 border-transparent hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+                        Pengaturan
+                    </a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop h-16 bg-surface dark:bg-surface-container top-0 sticky border-b border-outline-variant z-10">
+<div class="flex items-center gap-4">
+<button class="md:hidden text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="hidden md:flex flex-col">
+<h2 class="font-title-lg text-title-lg font-bold text-deep-navy">Admin Kepegawaian</h2>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<!-- Search -->
+<div class="hidden lg:flex items-center bg-surface-container-low rounded-full px-4 py-2 border border-outline-variant">
+<span class="material-symbols-outlined text-on-surface-variant mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-md font-body-md w-64 text-on-surface p-0" placeholder="Cari kandidat, posisi..." type="text">
+</div>
+<!-- Actions -->
+<div class="flex items-center gap-3">
+<button class="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-container-high">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-container-high">
+<span class="material-symbols-outlined">help</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center overflow-hidden cursor-pointer border border-outline-variant ml-2">
+<img alt="Foto Profil Admin" class="w-full h-full object-cover" data-alt="A professional headshot of a confident HR administrator, smiling slightly, wearing a neat navy blue blazer. Soft, flattering studio lighting with a clean, light gray background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBzfO8GVzdD8_G2Tw798SPxv0u31huhL2nV5Lv2-pDAPCs8lswtwqCqXnE91OWd0WZqY6IhAtTRDbpM1OJey_EHf_Y8NNV6dBSQa7_uLeVLkb_ElEOfMgcnXA9ET8eH-n0R8pkf_eYxccyLzJyJdAa3xl8vQLUos9uQPhWZj8Dc4TLOmRBG6OIPii_O1EECwAN_qSK4go0XKGHDgYJJ8jEQgJ3S9uzcR0rgo80kxhS1ISWzBgujp37WA">
+</div>
+</div>
+</div>
+</header>
+<!-- Dashboard Content -->
+<div class="p-margin-mobile md:p-margin-desktop max-w-container-max mx-auto w-full space-y-8">
+<!-- Page Header -->
+<div>
+<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-on-surface">Dashboard Kepegawaian</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-2">Kelola lowongan, pelamar, proses seleksi, dan hasil rekrutmen pegawai kampus.</p>
+</div>
+<!-- KPI Cards Grid (Bento Style) -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-gutter">
+<div class="bg-surface rounded-xl p-5 border border-outline-variant shadow-sm flex flex-col justify-between hover:-translate-y-1 transition-transform duration-200">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-primary-fixed rounded-lg">
+<span class="material-symbols-outlined text-primary">work</span>
+</div>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Lowongan Aktif</p>
+<h3 class="font-display-lg text-display-lg font-bold text-deep-navy mt-1">12</h3>
+</div>
+</div>
+<div class="bg-surface rounded-xl p-5 border border-outline-variant shadow-sm flex flex-col justify-between hover:-translate-y-1 transition-transform duration-200">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-secondary-fixed rounded-lg">
+<span class="material-symbols-outlined text-secondary">group</span>
+</div>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Total Pelamar</p>
+<h3 class="font-display-lg text-display-lg font-bold text-deep-navy mt-1">1,450</h3>
+</div>
+</div>
+<div class="bg-surface rounded-xl p-5 border border-outline-variant shadow-sm flex flex-col justify-between hover:-translate-y-1 transition-transform duration-200">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-tertiary-fixed rounded-lg">
+<span class="material-symbols-outlined text-tertiary">hourglass_top</span>
+</div>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Kandidat Dalam Proses</p>
+<h3 class="font-display-lg text-display-lg font-bold text-deep-navy mt-1">85</h3>
+</div>
+</div>
+<div class="bg-surface rounded-xl p-5 border border-outline-variant shadow-sm flex flex-col justify-between hover:-translate-y-1 transition-transform duration-200">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-error-container rounded-lg">
+<span class="material-symbols-outlined text-on-error-container">event</span>
+</div>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Jadwal Seleksi Hari Ini</p>
+<h3 class="font-display-lg text-display-lg font-bold text-deep-navy mt-1">4</h3>
+</div>
+</div>
+</div>
+<!-- Main Tables Section -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<!-- Lowongan Aktif Table (Spans 2 columns on large screens) -->
+<div class="lg:col-span-2 bg-surface rounded-xl border border-outline-variant shadow-sm overflow-hidden flex flex-col">
+<div class="p-5 border-b border-outline-variant flex justify-between items-center bg-surface-bright">
+<h3 class="font-title-lg text-title-lg font-bold text-deep-navy">Lowongan Aktif</h3>
+<button class="text-primary font-label-md text-label-md hover:underline flex items-center gap-1">
+                            Lihat Semua
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">
+<th class="p-4 border-b border-outline-variant font-medium">Posisi</th>
+<th class="p-4 border-b border-outline-variant font-medium">Unit</th>
+<th class="p-4 border-b border-outline-variant font-medium hidden sm:table-cell">Tgl Tayang</th>
+<th class="p-4 border-b border-outline-variant font-medium text-center">Pelamar</th>
+<th class="p-4 border-b border-outline-variant font-medium text-right">Action</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md text-on-surface divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="p-4">
+<div class="font-medium text-deep-navy">Dosen Tetap IT</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant sm:hidden">Fakultas Ilmu Komputer</div>
+</td>
+<td class="p-4 hidden sm:table-cell">Fakultas Ilmu Komputer</td>
+<td class="p-4 hidden sm:table-cell">10 Jan 2026</td>
+<td class="p-4 text-center">
+<span class="inline-flex items-center justify-center bg-secondary-fixed text-on-secondary-fixed px-2.5 py-0.5 rounded-full font-label-sm text-label-sm font-bold">142</span>
+</td>
+<td class="p-4 text-right">
+<button class="text-primary hover:text-primary-container p-1 rounded hover:bg-primary-fixed transition-colors">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="p-4">
+<div class="font-medium text-deep-navy">Staf Administrasi Akademik</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant sm:hidden">Direktorat Pendidikan</div>
+</td>
+<td class="p-4 hidden sm:table-cell">Direktorat Pendidikan</td>
+<td class="p-4 hidden sm:table-cell">15 Jan 2026</td>
+<td class="p-4 text-center">
+<span class="inline-flex items-center justify-center bg-secondary-fixed text-on-secondary-fixed px-2.5 py-0.5 rounded-full font-label-sm text-label-sm font-bold">315</span>
+</td>
+<td class="p-4 text-right">
+<button class="text-primary hover:text-primary-container p-1 rounded hover:bg-primary-fixed transition-colors">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="p-4">
+<div class="font-medium text-deep-navy">Laboran Biologi</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant sm:hidden">Fakultas MIPA</div>
+</td>
+<td class="p-4 hidden sm:table-cell">Fakultas MIPA</td>
+<td class="p-4 hidden sm:table-cell">20 Jan 2026</td>
+<td class="p-4 text-center">
+<span class="inline-flex items-center justify-center bg-secondary-fixed text-on-secondary-fixed px-2.5 py-0.5 rounded-full font-label-sm text-label-sm font-bold">45</span>
+</td>
+<td class="p-4 text-right">
+<button class="text-primary hover:text-primary-container p-1 rounded hover:bg-primary-fixed transition-colors">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Proses Seleksi Terbaru & Jadwal Mendatang Sidebar Column -->
+<div class="space-y-gutter flex flex-col">
+<!-- Jadwal Mendatang -->
+<div class="bg-surface rounded-xl border border-outline-variant shadow-sm p-5 flex flex-col flex-1">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-title-lg text-title-lg font-bold text-deep-navy">Jadwal Hari Ini</h3>
+<span class="material-symbols-outlined text-on-surface-variant">event</span>
+</div>
+<div class="space-y-4 flex-1">
+<div class="flex gap-4 items-start border-l-2 border-primary pl-3">
+<div class="flex-shrink-0 w-12 h-12 rounded-lg bg-surface-container-highest flex flex-col items-center justify-center text-on-surface">
+<span class="font-label-sm text-label-sm uppercase leading-none">Feb</span>
+<span class="font-title-lg text-title-lg font-bold leading-none mt-1">10</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface">Wawancara User</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Dosen Tetap IT • Budi Santoso</p>
+<p class="font-label-sm text-label-sm text-primary font-medium mt-1">10:00 - 11:30 WIB</p>
+</div>
+</div>
+<div class="flex gap-4 items-start border-l-2 border-tertiary-fixed-dim pl-3">
+<div class="flex-shrink-0 w-12 h-12 rounded-lg bg-surface-container-highest flex flex-col items-center justify-center text-on-surface">
+<span class="font-label-sm text-label-sm uppercase leading-none">Feb</span>
+<span class="font-title-lg text-title-lg font-bold leading-none mt-1">10</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface">Tes Tulis Administrasi</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Staf Admin • Batch 1 (30 Org)</p>
+<p class="font-label-sm text-label-sm text-primary font-medium mt-1">13:00 - 15:00 WIB</p>
+</div>
+</div>
+</div>
+<button class="mt-4 w-full py-2 border border-outline-variant rounded-lg font-label-md text-label-md text-on-surface hover:bg-surface-container-low transition-colors">Lihat Kalender Lengkap</button>
+</div>
+</div>
+</div>
+</div>
+<footer class="p-margin-mobile md:p-margin-desktop border-t border-outline-variant mt-auto"><p class="text-label-sm text-on-surface-variant">© 2026 Portal Karir Kampus</p></footer></main>
+
+
+</body></html>

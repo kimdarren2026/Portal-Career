@@ -1,0 +1,206 @@
+<!DOCTYPE html><html lang="id" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Status Aktivitas Lamaran Eksternal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#f1f4f6",
+                        "on-primary-fixed": "#001b3c",
+                        "outline": "#74777f",
+                        "surface-container-high": "#e5e9eb",
+                        "outline-variant": "#c4c6cf",
+                        "on-surface-variant": "#43474e",
+                        "on-secondary-fixed": "#001d37",
+                        "deep-navy": "#1B2D4F",
+                        "secondary-fixed-dim": "#9fcaff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-tint": "#455f88",
+                        "surface-container-highest": "#e0e3e5",
+                        "tertiary-fixed-dim": "#f8bc4b",
+                        "on-secondary-container": "#004172",
+                        "on-primary": "#ffffff",
+                        "tertiary-container": "#493100",
+                        "on-tertiary-container": "#cb9524",
+                        "secondary": "#0061a5",
+                        "on-secondary-fixed-variant": "#00497e",
+                        "surface-bright": "#f7fafc",
+                        "on-primary-fixed-variant": "#2d476f",
+                        "on-tertiary-fixed": "#271900",
+                        "on-secondary": "#ffffff",
+                        "success": "#38a169",
+                        "primary": "#002045",
+                        "surface-variant": "#e0e3e5",
+                        "tertiary-fixed": "#ffdeaa",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "error-container": "#ffdad6",
+                        "on-surface": "#181c1e",
+                        "surface-container": "#ebeef0",
+                        "primary-container": "#1a365d",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#2d3133",
+                        "secondary-fixed": "#d2e4ff",
+                        "inverse-on-surface": "#eef1f3",
+                        "on-primary-container": "#86a0cd",
+                        "inverse-primary": "#adc7f7",
+                        "surface-dim": "#d7dadc",
+                        "primary-fixed": "#d6e3ff",
+                        "background": "#f7fafc",
+                        "secondary-container": "#66affe",
+                        "on-background": "#181c1e",
+                        "error": "#E11B22",
+                        "primary-fixed-dim": "#adc7f7",
+                        "surface": "#ffffff",
+                        "on-tertiary-fixed-variant": "#5f4100",
+                        "tertiary": "#2d1d00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "48px",
+                        "gutter": "24px",
+                        "container-max": "1280px",
+                        "base": "4px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background antialiased min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="bg-surface dark:bg-inverse-surface border-b border-outline-variant dark:border-outline shadow-sm dark:shadow-none sticky top-0 z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop w-full max-w-container-max mx-auto h-20"><div class="flex items-center gap-4"><span class="text-title-lg font-title-lg font-bold text-primary dark:text-primary-fixed">Portal Karir Kampus</span></div><nav class="hidden md:flex gap-8 items-center h-full"><a class="text-on-surface-variant dark:text-surface-variant font-medium hover:text-secondary dark:hover:text-secondary-fixed-dim transition-colors duration-200 h-full flex items-center" href="#">Lowongan</a><a class="text-on-surface-variant dark:text-surface-variant font-medium hover:text-secondary dark:hover:text-secondary-fixed-dim transition-colors duration-200 h-full flex items-center" href="#">Karier di Kampus</a><a class="text-on-surface-variant dark:text-surface-variant font-medium hover:text-secondary dark:hover:text-secondary-fixed-dim transition-colors duration-200 h-full flex items-center" href="#">Karier untuk Alumni</a><a class="text-on-surface-variant dark:text-surface-variant font-medium hover:text-secondary dark:hover:text-secondary-fixed-dim transition-colors duration-200 h-full flex items-center" href="#">Panduan</a></nav><div class="flex items-center gap-4"><div class="flex items-center gap-3 cursor-pointer"><div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed font-bold">BS</div><div class="hidden md:block text-right"><div class="text-label-md font-label-md text-on-surface">Budi Santoso</div><div class="text-label-sm font-label-sm text-on-surface-variant">Mahasiswa</div></div><span class="material-symbols-outlined text-on-surface-variant">expand_more</span></div></div></header>
+<main class="flex-grow w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-12 flex gap-gutter">
+<!-- Sidebar (Simulated for Context) -->
+<aside class="hidden lg:block w-[280px] shrink-0">
+<div class="bg-deep-navy text-white rounded-xl p-6 sticky top-28 h-auto flex flex-col gap-4 shadow-sm">
+<div class="flex items-center gap-3 py-3 px-4 rounded-lg bg-white/10 font-label-md text-label-md text-white cursor-pointer transition-colors">
+<span class="material-symbols-outlined" data-icon="work" data-weight="fill" style="font-variation-settings: 'FILL' 1;">work</span>
+                    Lamaran Saya
+                </div>
+<div class="flex items-center gap-3 py-3 px-4 rounded-lg text-white/80 hover:bg-white/5 hover:text-white font-label-md text-label-md cursor-pointer transition-colors">
+<span class="material-symbols-outlined" data-icon="bookmark">bookmark</span>
+                    Tersimpan
+                </div>
+</div>
+</aside>
+<!-- Main Content -->
+<div class="flex-1 max-w-3xl">
+<div class="mb-8">
+<a class="inline-flex items-center text-secondary hover:text-primary transition-colors font-label-md text-label-md mb-4 gap-1" href="#">
+<span class="material-symbols-outlined text-[18px]">arrow_back</span>
+                    Kembali ke Daftar Lamaran
+                </a>
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-background mb-2">Aktivitas Lamaran Eksternal</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Pantau status lamaran yang Anda mulai di luar Portal Karir Kampus.</p>
+</div>
+<!-- Detail Card - External Application -->
+<div class="bg-surface rounded-xl border-l-4 border-l-tertiary-fixed-dim border-y border-r border-outline-variant shadow-sm mb-8 overflow-hidden">
+<div class="p-6 md:p-8 bg-surface-container-low/30">
+<div class="flex flex-col md:flex-row md:items-start justify-between gap-6">
+<div class="flex gap-5 items-start">
+<div class="w-16 h-16 rounded-lg bg-white border border-outline-variant flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover p-2" data-alt="A clean, minimalist abstract logo design suitable for a modern technology company, featuring geometric shapes in shades of deep blue and vibrant orange on a crisp white background. High resolution, flat vector style, corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB68zfu5EbveayrPgVO4aU_UrsJTTrWUAQp1IEAVpIL4HGWNCIf7W4mK39l3de7KoguTstU79ZhAUTeda6q-oav9gO6I4xv36RFran84Y7GOz1w9t-elNTlWsku2uGwEb10Qt_P7aItb5YIOLFTcftoLQj5tOSoRjPhAMnSNP9RBJtMcwyMiqc9-rtgNtrV4DA-ha4jnWi1c2Z9qZQQfCK0ywLJUEYkuqAQFbpggpYvZ8dVaGcdnHbppg">
+</div>
+<div>
+<h2 class="font-title-lg text-title-lg text-on-background mb-1">Software Engineer</h2>
+<div class="flex items-center gap-2 mb-3">
+<span class="font-body-md text-body-md text-on-surface-variant">PT Teknologi Nusantara</span>
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-tertiary-fixed-dim/20 text-on-tertiary-container font-label-sm text-label-sm border border-tertiary-fixed-dim/50"><span class="material-symbols-outlined text-[14px]" data-icon="verified" data-weight="fill" style="font-variation-settings: &quot;FILL&quot; 1;">verified</span>Terverifikasi Mitra Kampus</span>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1 bg-surface-container-high rounded-full font-label-sm text-label-sm text-on-surface-variant border border-outline-variant">
+                                        Full-time
+                                    </span>
+<span class="px-3 py-1 bg-surface-container-high rounded-full font-label-sm text-label-sm text-on-surface-variant border border-outline-variant">
+                                        Jakarta Selatan, Indonesia
+                                    </span>
+</div>
+</div>
+</div>
+<div class="shrink-0">
+<!-- External Indicator Badge -->
+<div class="inline-flex flex-col items-end gap-1">
+<span class="px-3 py-1.5 bg-surface-container border border-outline-variant rounded-md font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1.5 shadow-sm"><span class="material-symbols-outlined text-[16px]">open_in_new</span>ATS Eksternal</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Status Area -->
+<div class="p-6 md:p-8 bg-surface border-t border-outline-variant">
+<div class="flex items-start gap-4 p-5 rounded-lg bg-tertiary-fixed-dim/10 border border-tertiary-fixed-dim/30">
+<div class="mt-0.5">
+<span class="material-symbols-outlined text-on-tertiary-container text-[24px]" data-icon="info" data-weight="fill" style="font-variation-settings: 'FILL' 1;">info</span>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-on-background mb-1">Proses Lamaran Eksternal Dimulai</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-2">
+                                Anda telah diarahkan ke sistem rekrutmen pihak ketiga (External ATS) pada <strong>12 Agustus 2026</strong>.
+                            </p>
+<p class="font-label-sm text-label-sm text-on-surface-variant/80 italic">
+                                *Portal Karir Kampus belum menerima konfirmasi otomatis bahwa proses lamaran telah selesai di platform eksternal tersebut.
+                            </p>
+</div>
+</div>
+</div>
+</div>
+<!-- Internal App Example (For visual distinction comparison - hidden or smaller to not distract) -->
+
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-deep-navy dark:bg-surface-container-lowest w-full py-12 px-margin-mobile md:px-margin-desktop grid grid-cols-1 md:grid-cols-4 gap-gutter mt-auto">
+<div class="flex flex-col gap-4 col-span-1 md:col-span-1">
+<span class="text-headline-md font-headline-md font-bold text-white">Portal Karir Kampus</span>
+<p class="font-body-md text-body-md text-on-secondary/80 dark:text-on-surface/80 mt-2">© 2026 Portal Karir Kampus. Seluruh hak cipta dilindungi.</p>
+</div>
+<div class="flex flex-col gap-3">
+<a class="font-label-sm text-label-sm text-on-secondary/80 dark:text-on-surface/80 hover:text-white dark:hover:text-primary transition-colors" href="#">Tentang Kami</a>
+<a class="font-label-sm text-label-sm text-on-secondary/80 dark:text-on-surface/80 hover:text-white dark:hover:text-primary transition-colors" href="#">Pusat Bantuan</a>
+</div>
+<div class="flex flex-col gap-3">
+<a class="font-label-sm text-label-sm text-on-secondary/80 dark:text-on-surface/80 hover:text-white dark:hover:text-primary transition-colors" href="#">Kebijakan Privasi</a>
+<a class="font-label-sm text-label-sm text-on-secondary/80 dark:text-on-surface/80 hover:text-white dark:hover:text-primary transition-colors" href="#">Syarat &amp; Ketentuan</a>
+</div>
+<div class="flex flex-col gap-3">
+<a class="font-label-sm text-label-sm text-on-secondary/80 dark:text-on-surface/80 hover:text-white dark:hover:text-primary transition-colors" href="#">Kontak Kami</a>
+</div>
+</footer>
+
+
+</body></html>

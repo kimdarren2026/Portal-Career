@@ -1,0 +1,308 @@
+<!DOCTYPE html><html lang="id" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Buat Lowongan Kampus - Informasi Posisi</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                            "tertiary": "#2d1d00",
+                            "on-primary-container": "#86a0cd",
+                            "deep-navy": "#1B2D4F",
+                            "on-error": "#ffffff",
+                            "on-secondary-fixed-variant": "#00497e",
+                            "surface-variant": "#e0e3e5",
+                            "on-tertiary-fixed": "#271900",
+                            "surface-container-highest": "#e0e3e5",
+                            "secondary-container": "#66affe",
+                            "on-tertiary": "#ffffff",
+                            "surface-dim": "#d7dadc",
+                            "on-primary": "#ffffff",
+                            "surface-container": "#ebeef0",
+                            "error-container": "#ffdad6",
+                            "primary-fixed-dim": "#adc7f7",
+                            "on-secondary-fixed": "#001d37",
+                            "on-primary-fixed-variant": "#2d476f",
+                            "on-error-container": "#93000a",
+                            "background": "#f7fafc",
+                            "surface-bright": "#f7fafc",
+                            "surface-container-high": "#e5e9eb",
+                            "primary-container": "#1a365d",
+                            "on-secondary": "#ffffff",
+                            "tertiary-fixed-dim": "#f8bc4b",
+                            "on-background": "#181c1e",
+                            "on-primary-fixed": "#001b3c",
+                            "on-surface": "#181c1e",
+                            "secondary-fixed-dim": "#9fcaff",
+                            "on-tertiary-container": "#cb9524",
+                            "primary-fixed": "#d6e3ff",
+                            "tertiary-container": "#493100",
+                            "on-tertiary-fixed-variant": "#5f4100",
+                            "surface-tint": "#455f88",
+                            "on-secondary-container": "#004172",
+                            "inverse-surface": "#2d3133",
+                            "outline": "#74777f",
+                            "outline-variant": "#c4c6cf",
+                            "inverse-primary": "#adc7f7",
+                            "inverse-on-surface": "#eef1f3",
+                            "primary": "#002045",
+                            "on-surface-variant": "#43474e",
+                            "tertiary-fixed": "#ffdeaa",
+                            "secondary-fixed": "#d2e4ff",
+                            "secondary": "#0061a5",
+                            "surface-container-low": "#f1f4f6",
+                            "surface": "#ffffff",
+                            "success": "#38a169",
+                            "error": "#E11B22",
+                            "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                            "DEFAULT": "0.25rem",
+                            "lg": "0.5rem",
+                            "xl": "0.75rem",
+                            "full": "9999px"
+                    },
+                    "spacing": {
+                            "margin-mobile": "16px",
+                            "margin-desktop": "48px",
+                            "container-max": "1280px",
+                            "base": "4px",
+                            "gutter": "24px"
+                    },
+                    "fontFamily": {
+                            "label-md": [
+                                    "Inter"
+                            ],
+                            "body-md": [
+                                    "Inter"
+                            ],
+                            "headline-lg-mobile": [
+                                    "Inter"
+                            ],
+                            "headline-md": [
+                                    "Inter"
+                            ],
+                            "label-sm": [
+                                    "Inter"
+                            ],
+                            "headline-lg": [
+                                    "Inter"
+                            ],
+                            "title-lg": [
+                                    "Inter"
+                            ],
+                            "display-lg": [
+                                    "Inter"
+                            ],
+                            "body-lg": [
+                                    "Inter"
+                            ]
+                    },
+                    "fontSize": {
+                            "label-md": [
+                                    "14px",
+                                    {
+                                            "lineHeight": "20px",
+                                            "letterSpacing": "0.01em",
+                                            "fontWeight": "600"
+                                    }
+                            ],
+                            "body-md": [
+                                    "16px",
+                                    {
+                                            "lineHeight": "24px",
+                                            "fontWeight": "400"
+                                    }
+                            ],
+                            "headline-lg-mobile": [
+                                    "24px",
+                                    {
+                                            "lineHeight": "32px",
+                                            "fontWeight": "700"
+                                    }
+                            ],
+                            "headline-md": [
+                                    "24px",
+                                    {
+                                            "lineHeight": "32px",
+                                            "fontWeight": "600"
+                                    }
+                            ],
+                            "label-sm": [
+                                    "12px",
+                                    {
+                                            "lineHeight": "16px",
+                                            "fontWeight": "500"
+                                    }
+                            ],
+                            "headline-lg": [
+                                    "32px",
+                                    {
+                                            "lineHeight": "40px",
+                                            "fontWeight": "700"
+                                    }
+                            ],
+                            "title-lg": [
+                                    "20px",
+                                    {
+                                            "lineHeight": "28px",
+                                            "fontWeight": "600"
+                                    }
+                            ],
+                            "display-lg": [
+                                    "48px",
+                                    {
+                                            "lineHeight": "56px",
+                                            "letterSpacing": "-0.02em",
+                                            "fontWeight": "700"
+                                    }
+                            ],
+                            "body-lg": [
+                                    "18px",
+                                    {
+                                            "lineHeight": "28px",
+                                            "fontWeight": "400"
+                                    }
+                            ]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex">
+<!-- SideNavBar -->
+<aside class="w-[280px] h-screen sticky top-0 left-0 bg-deep-navy shadow-sm flex flex-col h-full py-6 hidden md:flex z-50">
+<div class="px-6 mb-8 flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-white flex items-center justify-center">
+<span class="material-symbols-outlined text-deep-navy font-bold">school</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-white">Portal Karir</h1>
+<p class="font-label-sm text-label-sm text-white/80">Admin Kepegawaian</p>
+</div>
+</div>
+<nav class="flex-1 overflow-y-auto">
+<ul class="space-y-1">
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                        Dashboard
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary font-bold border-l-4 border-secondary-container opacity-100 transition-all" href="#">
+<span class="material-symbols-outlined">work</span>
+                        Lowongan Kampus
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">group</span>
+                        Pelamar
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+                        Jadwal Seleksi
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">fact_check</span>
+                        Penilaian
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">contract</span>
+                        Offering
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">analytics</span>
+                        Outcome Rekrutmen
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">description</span>
+                        Laporan
+                    </a>
+</li>
+</ul>
+</nav>
+<div class="mt-auto px-4 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">notifications</span>
+                Notifikasi
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+                Pengaturan
+            </a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0">
+<!-- TopNavBar -->
+<header class="full-width top-0 sticky flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop h-16 bg-surface border-b border-outline-variant z-40">
+<div class="flex items-center gap-4">
+<button class="md:hidden p-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="hidden md:block">
+<h2 class="font-title-lg text-title-lg font-bold text-deep-navy">Admin Kepegawaian</h2>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-full font-body-md text-sm focus:ring-2 focus:ring-primary focus:outline-none w-64" placeholder="Cari..." type="text">
+</div>
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">help</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img alt="Foto Profil Admin" class="w-full h-full object-cover" data-alt="A professional headshot of a university administrator in their 40s. They are wearing smart business attire, a navy blue blazer. Soft, natural light illuminates their face against a blurred office background, suggesting a modern, academic setting. Corporate modern aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuALmoj8oBQrEYsC1LVYqbJmsNxtRE6-iZqP-j7Pm9f0jyiZxj4AfQNFikaTU2fUD7mk5lXOsJm0LAoIdclFdfU310FNy0OW9sugKfLgkKgD1s9Vcd7fAtMAFMVwTlNOO2YTJE9ix_VB-zAdYRACm2tnn8YE8bBnDg2whuN79OeFywxXZgZ01pyeK1JKE_8lD5nkZF4HeLxC-y2gX5mePNCn3mr8PAs7EF3D61CEfZmi9N_RJh9ASmc4BQ">
+</div>
+</div>
+</header>
+<!-- Content -->
+<div class="flex-1 p-margin-mobile md:p-margin-desktop overflow-y-auto">
+<div class="max-w-container-max mx-auto">
+<!-- Page Header -->
+<div class="mb-8 flex items-center justify-between">
+<div>
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-2">Buat Lowongan Kampus</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Lengkapi informasi untuk membuka lowongan baru di lingkungan kampus.</p>
+</div>
+</div>
+<div class="flex flex-col lg:flex-row gap-8 items-start">
+<!-- Stepper Sidebar -->
+<div class="w-full lg:w-1/4 bg-surface rounded-xl border border-outline-variant p-6 sticky top-24">
+<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-6">Progress</h3>
+<ul class="relative space-y-6 before:content-[''] before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-surface-container-high"><li class="relative flex items-start gap-4"><div class="relative z-10 w-6 h-6 rounded-full bg-success flex items-center justify-center ring-4 ring-surface"><span class="material-symbols-outlined text-white text-[16px]">check</span></div><div><p class="font-body-md text-body-md text-on-surface-variant">1. Informasi Posisi</p></div></li><li class="relative flex items-start gap-4"><div class="relative z-10 w-6 h-6 rounded-full bg-success flex items-center justify-center ring-4 ring-surface"><span class="material-symbols-outlined text-white text-[16px]">check</span></div><div><p class="font-body-md text-body-md text-on-surface-variant">2. Deskripsi &amp; Kualifikasi</p></div></li><li class="relative flex items-start gap-4"><div class="relative z-10 w-6 h-6 rounded-full bg-primary flex items-center justify-center ring-4 ring-surface"><span class="w-2.5 h-2.5 rounded-full bg-white"></span></div><div><p class="font-label-md text-label-md text-primary">3. Target Kandidat</p></div></li><li class="relative flex items-start gap-4"><div class="relative z-10 w-6 h-6 rounded-full bg-surface-container-high flex items-center justify-center ring-4 ring-surface"></div><div><p class="font-body-md text-body-md text-on-surface-variant">4. Dokumen Kandidat</p></div></li><li class="relative flex items-start gap-4"><div class="relative z-10 w-6 h-6 rounded-full bg-surface-container-high flex items-center justify-center ring-4 ring-surface"></div><div><p class="font-body-md text-body-md text-on-surface-variant">5. Pertanyaan Seleksi</p></div></li><li class="relative flex items-start gap-4"><div class="relative z-10 w-6 h-6 rounded-full bg-surface-container-high flex items-center justify-center ring-4 ring-surface"></div><div><p class="font-body-md text-body-md text-on-surface-variant">6. Jadwal Publikasi</p></div></li><li class="relative flex items-start gap-4"><div class="relative z-10 w-6 h-6 rounded-full bg-surface-container-high flex items-center justify-center ring-4 ring-surface"></div><div><p class="font-body-md text-body-md text-on-surface-variant">7. Preview</p></div></li></ul>
+</div>
+<!-- Form Area -->
+<div class="w-full lg:w-3/4">
+<div class="bg-surface rounded-xl border border-outline-variant p-6 md:p-8 shadow-[0_4px_10px_rgba(0,0,0,0.02)]"><h2 class="font-title-lg text-title-lg text-primary mb-6 border-b border-surface-container-high pb-4">Target Kandidat</h2><form class="space-y-6"><div class="space-y-4"><label class="block font-label-md text-label-md text-on-surface mb-4">Pilih Target Audiens Lowongan <span class="text-error">*</span></label><div class="grid grid-cols-1 gap-4"><label class="flex items-center gap-4 p-4 rounded-lg border border-outline-variant cursor-pointer hover:bg-surface-container-low transition-colors group"><input type="radio" name="target_kandidat" value="publik" class="w-5 h-5 text-primary focus:ring-primary border-outline-variant"><div class="flex flex-col"><span class="font-label-md text-on-surface">Publik</span><span class="text-label-sm text-on-surface-variant">Lowongan dapat dilihat dan dilamar oleh siapa saja.</span></div></label><label class="flex items-center gap-4 p-4 rounded-lg border border-outline-variant cursor-pointer hover:bg-surface-container-low transition-colors group"><input type="radio" name="target_kandidat" value="alumni" class="w-5 h-5 text-primary focus:ring-primary border-outline-variant"><div class="flex flex-col"><span class="font-label-md text-on-surface">Alumni</span><span class="text-label-sm text-on-surface-variant">Khusus untuk lulusan universitas ini.</span></div></label><label class="flex items-center gap-4 p-4 rounded-lg border border-outline-variant cursor-pointer hover:bg-surface-container-low transition-colors group"><input type="radio" name="target_kandidat" value="mahasiswa_alumni" class="w-5 h-5 text-primary focus:ring-primary border-outline-variant"><div class="flex flex-col"><span class="font-label-md text-on-surface">Mahasiswa Tingkat Akhir &amp; Alumni</span><span class="text-label-sm text-on-surface-variant">Terbuka untuk mahasiswa semester akhir dan lulusan.</span></div></label><label class="flex items-center gap-4 p-4 rounded-lg border border-outline-variant cursor-pointer hover:bg-surface-container-low transition-colors group"><input type="radio" name="target_kandidat" value="internal" class="w-5 h-5 text-primary focus:ring-primary border-outline-variant"><div class="flex flex-col"><span class="font-label-md text-on-surface">Internal</span><span class="text-label-sm text-on-surface-variant">Hanya untuk staf atau pegawai internal kampus.</span></div></label></div></div><div class="mt-8 pt-6 border-t border-surface-container-high flex justify-between items-center"><button class="px-6 py-2.5 rounded-lg border border-outline font-label-md text-label-md text-on-surface hover:bg-surface-container-low transition-colors" type="button">Kembali</button><button class="px-6 py-2.5 rounded-lg bg-primary font-label-md text-label-md text-on-primary hover:bg-primary-container transition-colors flex items-center gap-2" type="submit">Selanjutnya<span class="material-symbols-outlined text-[20px]">arrow_forward</span></button></div></form></div>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+
+</body></html>

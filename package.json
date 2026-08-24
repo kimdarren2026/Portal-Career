@@ -1,0 +1,18 @@
+{
+    "name": "portal-karir-kampus",
+    "private": true,
+    "description": "Monorepo root. Dependency management only — the deployable is apps/api (SYSTEM_ARCHITECTURE.md §1).",
+    "workspaces": [
+        "apps/api",
+        "apps/web"
+    ],
+    "scripts": {
+        "dev": "npm run dev --workspace apps/api",
+        "build": "npm run build --workspace apps/api",
+        "build:ssr": "npm run build:ssr --workspace apps/api",
+        "type-check": "npm run type-check --workspace apps/api"
+    },
+    "engines": {
+        "node": ">=22"
+    }
+}

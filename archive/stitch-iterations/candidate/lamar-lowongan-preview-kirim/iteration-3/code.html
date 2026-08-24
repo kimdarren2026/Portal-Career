@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lamar Lowongan: Preview &amp; Kirim</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "inverse-surface": "#2d3133",
+                      "primary-container": "#1a365d",
+                      "surface-container-highest": "#e0e3e5",
+                      "secondary-container": "#66affe",
+                      "on-tertiary-fixed-variant": "#5f4100",
+                      "surface-bright": "#f7fafc",
+                      "surface-tint": "#455f88",
+                      "on-background": "#181c1e",
+                      "surface-container": "#ebeef0",
+                      "on-error-container": "#93000a",
+                      "surface-container-lowest": "#ffffff",
+                      "outline-variant": "#c4c6cf",
+                      "secondary-fixed": "#d2e4ff",
+                      "on-secondary-fixed-variant": "#00497e",
+                      "on-tertiary-fixed": "#271900",
+                      "inverse-primary": "#adc7f7",
+                      "on-secondary-fixed": "#001d37",
+                      "secondary-fixed-dim": "#9fcaff",
+                      "surface-container-high": "#e5e9eb",
+                      "on-primary-container": "#86a0cd",
+                      "on-surface": "#181c1e",
+                      "on-error": "#ffffff",
+                      "success": "#38a169",
+                      "primary-fixed-dim": "#adc7f7",
+                      "on-secondary-container": "#004172",
+                      "background": "#f7fafc",
+                      "tertiary-container": "#493100",
+                      "on-surface-variant": "#43474e",
+                      "tertiary-fixed": "#ffdeaa",
+                      "surface-dim": "#d7dadc",
+                      "primary": "#002045",
+                      "surface-container-low": "#f1f4f6",
+                      "inverse-on-surface": "#eef1f3",
+                      "primary-fixed": "#d6e3ff",
+                      "on-tertiary": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "outline": "#74777f",
+                      "on-secondary": "#ffffff",
+                      "error": "#E11B22",
+                      "secondary": "#0061a5",
+                      "surface": "#ffffff",
+                      "tertiary": "#2d1d00",
+                      "tertiary-fixed-dim": "#f8bc4b",
+                      "on-tertiary-container": "#cb9524",
+                      "deep-navy": "#1B2D4F",
+                      "on-primary-fixed": "#001b3c",
+                      "on-primary-fixed-variant": "#2d476f",
+                      "on-primary": "#ffffff",
+                      "surface-variant": "#e0e3e5"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-mobile": "16px",
+                      "container-max": "1280px",
+                      "base": "4px",
+                      "margin-desktop": "48px",
+                      "gutter": "24px"
+              },
+              "fontFamily": {
+                      "headline-lg-mobile": ["Inter"],
+                      "headline-lg": ["Inter"],
+                      "title-lg": ["Inter"],
+                      "display-lg": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "body-md": ["Inter"],
+                      "label-md": ["Inter"],
+                      "headline-md": ["Inter"],
+                      "label-sm": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                      "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+<!-- Top Navigation (Shell suppressed for linear/transactional flow as per instructions, but keeping minimal header) -->
+<header class="bg-surface border-b border-outline-variant shadow-sm sticky top-0 z-50">
+<div class="flex justify-between items-center h-16 px-gutter max-w-container-max mx-auto">
+<div class="flex items-center gap-4">
+<a class="text-on-surface-variant hover:text-primary transition-colors flex items-center" href="#">
+<span class="material-symbols-outlined mr-2">arrow_back</span>
+<span class="font-label-md text-label-md hidden md:inline">Kembali ke Pencarian</span>
+</a>
+</div>
+<div class="font-title-lg text-title-lg text-primary font-bold">Career Portal</div>
+<div class="w-8"></div> <!-- Spacer for balance -->
+</div>
+</header>
+<main class="flex-grow py-8 px-margin-mobile md:px-margin-desktop max-w-3xl mx-auto w-full">
+<!-- Header & Stepper -->
+<div class="mb-10 text-center">
+<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-2">Lamar Lowongan: Preview &amp; Kirim</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Langkah 4 dari 4</p>
+<!-- Minimal Stepper -->
+<div class="flex items-center justify-center mt-6 max-w-md mx-auto">
+<div class="w-8 h-8 rounded-full bg-success text-on-primary flex items-center justify-center font-label-md text-label-md"><span class="material-symbols-outlined text-sm">check</span></div>
+<div class="h-1 bg-success flex-1 mx-2 rounded-full"></div>
+<div class="w-8 h-8 rounded-full bg-success text-on-primary flex items-center justify-center font-label-md text-label-md"><span class="material-symbols-outlined text-sm">check</span></div>
+<div class="h-1 bg-success flex-1 mx-2 rounded-full"></div>
+<div class="w-8 h-8 rounded-full bg-success text-on-primary flex items-center justify-center font-label-md text-label-md"><span class="material-symbols-outlined text-sm">check</span></div>
+<div class="h-1 bg-primary flex-1 mx-2 rounded-full"></div>
+<div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-label-md text-label-md">4</div>
+</div>
+</div>
+<!-- Preview Content -->
+<div class="bg-surface rounded-xl shadow-sm border border-outline-variant p-6 md:p-8 mb-8 space-y-8">
+<!-- Job Target -->
+<div class="flex items-center pb-6 border-b border-outline-variant">
+<div class="w-16 h-16 rounded bg-surface-container flex items-center justify-center mr-4">
+<span class="material-symbols-outlined text-3xl text-primary">business</span>
+</div>
+<div>
+<h2 class="font-title-lg text-title-lg text-primary mb-1">Data Scientist</h2>
+<div class="flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm">
+<span>PT Tech Nusantara</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="flex items-center text-tertiary-container"><span class="material-symbols-outlined text-[16px] mr-1">verified</span> Mitra Resmi</span>
+</div>
+</div>
+</div>
+<!-- Profile Summary -->
+<section>
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-headline-md text-headline-md text-primary">Data Profil</h3>
+<button class="text-secondary font-label-md text-label-md hover:underline flex items-center"><span class="material-symbols-outlined text-sm mr-1">edit</span> Edit</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8 font-body-md text-body-md text-on-surface">
+<div>
+<span class="block text-on-surface-variant font-label-sm text-label-sm mb-1">Nama Lengkap</span>
+<span>Budi Santoso</span>
+</div>
+<div>
+<span class="block text-on-surface-variant font-label-sm text-label-sm mb-1">Email</span>
+<span>budi.santoso@alumni.univ.edu</span>
+</div>
+<div>
+<span class="block text-on-surface-variant font-label-sm text-label-sm mb-1">Telepon</span>
+<span>+62 812 3456 7890</span>
+</div>
+<div>
+<span class="block text-on-surface-variant font-label-sm text-label-sm mb-1">Pendidikan Terakhir</span>
+<span>S1 Teknik Informatika (Lulus 2026)</span>
+</div>
+</div>
+</section>
+<!-- Documents Summary -->
+<section class="pt-6 border-t border-outline-variant">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-headline-md text-headline-md text-primary">Dokumen Terlampir</h3>
+<button class="text-secondary font-label-md text-label-md hover:underline flex items-center"><span class="material-symbols-outlined text-sm mr-1">edit</span> Edit</button>
+</div>
+<div class="space-y-3">
+<div class="flex items-center p-3 bg-surface-container-low rounded-lg border border-outline-variant">
+<span class="material-symbols-outlined text-primary mr-3">description</span>
+<div class="flex-grow">
+<span class="block font-label-md text-label-md text-on-surface">CV_Budi_Santoso_2026.pdf</span>
+<span class="block font-label-sm text-label-sm text-on-surface-variant">Diunggah pada 15 Mei 2026 • 2.4 MB</span>
+</div>
+<a class="text-secondary font-label-md text-label-md hover:underline" href="#">Lihat</a>
+</div>
+<div class="flex items-center p-3 bg-surface-container-low rounded-lg border border-outline-variant">
+<span class="material-symbols-outlined text-primary mr-3">article</span>
+<div class="flex-grow">
+<span class="block font-label-md text-label-md text-on-surface">Transkrip_Nilai_Final.pdf</span>
+<span class="block font-label-sm text-label-sm text-on-surface-variant">Diunggah pada 15 Mei 2026 • 1.1 MB</span>
+</div>
+<a class="text-secondary font-label-md text-label-md hover:underline" href="#">Lihat</a>
+</div>
+</div>
+</section>
+</div>
+<!-- Consent & Actions -->
+<div class="space-y-6">
+<label class="flex items-start gap-3 p-4 bg-surface-bright rounded-lg border border-outline-variant cursor-pointer hover:bg-surface-container-low transition-colors">
+<div class="pt-0.5">
+<input class="w-5 h-5 rounded border-outline text-primary focus:ring-primary focus:ring-2 bg-surface" type="checkbox"/>
+</div>
+<span class="font-body-md text-body-md text-on-surface">
+                    Saya menyetujui pembagian data profil dan dokumen yang terlampir kepada pihak perusahaan untuk keperluan rekrutmen sesuai dengan Kebijakan Privasi Portal Karir Universitas.
+                </span>
+</label>
+<div class="flex flex-col-reverse md:flex-row justify-between items-center gap-4 pt-4 border-t border-outline-variant">
+<button class="w-full md:w-auto px-6 py-3 rounded-lg border border-outline font-label-md text-label-md text-on-surface hover:bg-surface-container-low transition-colors">
+                    Kembali
+                </button>
+<button class="w-full md:w-auto px-6 py-3 rounded-lg bg-primary font-label-md text-label-md text-on-primary hover:bg-primary-container hover:shadow-sm transition-all flex items-center justify-center">
+<span class="material-symbols-outlined mr-2">send</span>
+                    Kirim Lamaran
+                </button>
+</div>
+</div>
+</main>
+<!-- Footer Landing Type -->
+<footer class="bg-surface-container-high dark:bg-inverse-surface text-on-surface dark:text-inverse-on-surface font-label-sm text-label-sm w-full py-8 border-t border-outline-variant flex flex-col md:flex-row justify-between items-center px-margin-desktop gap-4">
+<div class="font-headline-md text-headline-md font-bold text-primary">Career Portal</div>
+<div class="flex gap-4">
+<a class="text-on-surface-variant hover:underline hover:text-primary transition-all duration-200" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant hover:underline hover:text-primary transition-all duration-200" href="#">Terms of Service</a>
+<a class="text-on-surface-variant hover:underline hover:text-primary transition-all duration-200" href="#">Contact Support</a>
+<a class="text-on-surface-variant hover:underline hover:text-primary transition-all duration-200" href="#">Employer Portal</a>
+</div>
+<div class="text-on-surface-variant">© 2024 University Career Center. All rights reserved.</div>
+</footer>
+</body></html>

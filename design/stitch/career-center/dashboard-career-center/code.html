@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dashboard Admin - Career Center 2026</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-secondary": "#ffffff",
+                      "outline-variant": "#c4c6cf",
+                      "inverse-surface": "#2d3133",
+                      "surface-container": "#ebeef0",
+                      "primary-fixed": "#d6e3ff",
+                      "surface-container-high": "#e5e9eb",
+                      "primary": "#002045",
+                      "on-tertiary-fixed": "#271900",
+                      "primary-container": "#1a365d",
+                      "on-primary-container": "#86a0cd",
+                      "on-tertiary": "#ffffff",
+                      "deep-navy": "#1B2D4F",
+                      "error": "#E11B22",
+                      "tertiary-fixed": "#ffdeaa",
+                      "on-background": "#181c1e",
+                      "on-secondary-fixed": "#001d37",
+                      "inverse-on-surface": "#eef1f3",
+                      "background": "#f7fafc",
+                      "on-error-container": "#93000a",
+                      "tertiary-fixed-dim": "#f8bc4b",
+                      "surface-container-low": "#f1f4f6",
+                      "inverse-primary": "#adc7f7",
+                      "surface-container-highest": "#e0e3e5",
+                      "tertiary-container": "#493100",
+                      "surface-bright": "#f7fafc",
+                      "surface-tint": "#455f88",
+                      "surface": "#ffffff",
+                      "outline": "#74777f",
+                      "on-tertiary-fixed-variant": "#5f4100",
+                      "on-surface": "#181c1e",
+                      "surface-container-lowest": "#ffffff",
+                      "secondary-fixed": "#d2e4ff",
+                      "surface-dim": "#d7dadc",
+                      "on-primary": "#ffffff",
+                      "on-tertiary-container": "#cb9524",
+                      "on-primary-fixed-variant": "#2d476f",
+                      "success": "#38a169",
+                      "on-surface-variant": "#43474e",
+                      "on-error": "#ffffff",
+                      "secondary-fixed-dim": "#9fcaff",
+                      "on-primary-fixed": "#001b3c",
+                      "on-secondary-container": "#004172",
+                      "error-container": "#ffdad6",
+                      "surface-variant": "#e0e3e5",
+                      "tertiary": "#2d1d00",
+                      "secondary-container": "#66affe",
+                      "secondary": "#0061a5",
+                      "primary-fixed-dim": "#adc7f7",
+                      "on-secondary-fixed-variant": "#00497e"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-desktop": "48px",
+                      "gutter": "24px",
+                      "container-max": "1280px",
+                      "base": "4px",
+                      "margin-mobile": "16px"
+              },
+              "fontFamily": {
+                      "title-lg": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "label-sm": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "display-lg": [
+                              "Inter"
+                      ],
+                      "headline-lg-mobile": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "title-lg": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f4f6; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c4c6cf; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #74777f; 
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex">
+<!-- SideNavBar (Admin) -->
+<nav class="fixed left-0 top-0 h-screen w-[280px] flex flex-col p-4 bg-deep-navy dark:bg-primary shadow-sm shadow-md z-50">
+<!-- Header -->
+<div class="flex items-center gap-4 mb-8 p-2">
+<img alt="Logo Career Center" class="w-12 h-12 rounded-lg object-cover bg-white/10 p-1" data-alt="A modern, minimalist corporate logo featuring an abstract geometric shape in brilliant white against a deep blue background. High quality, crisp lines, symbolizing structure and professional growth in a bright, clean lighting environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXye_jZ966hGgST5pMWBsLRwERFnbndD0RttCflfI_X_rDI-iaEuatPX0h4qRd_4xK7ZI8pPs9P_cvBnPFfw2hL1kSraeAyFcRSDE0vGydk7-INxrL6vvbBY8JttiUHf5tCB1WDG075s3Ko2ukLTUBR1grjDl_1LhfBaoLv_MeUwP5jqXe2Jmptu7dM2XpQMRBn8JiU_RN83qviUItdVSvb843imktQNADuDqWW362qqVxRtd9CwX3kg"/>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-on-primary">Career Center</h1>
+<p class="font-label-sm text-label-sm text-on-primary/70">Administrator 2026</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<div class="flex-1 overflow-y-auto pr-2 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-lg font-bold font-label-md text-label-md scale-95 transition-all" href="#">
+<span class="material-symbols-outlined fill text-[20px]" data-icon="analytics" data-weight="fill">analytics</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary hover:bg-white/10 transition-colors rounded-lg font-label-md text-label-md scale-95 transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="verified_user">verified_user</span>
+<span>Verifikasi Perusahaan</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary hover:bg-white/10 transition-colors rounded-lg font-label-md text-label-md scale-95 transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="assignment_turned_in">assignment_turned_in</span>
+<span>Moderasi Lowongan</span>
+<span class="ml-auto bg-error text-on-error text-xs font-bold px-2 py-0.5 rounded-full">8</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary hover:bg-white/10 transition-colors rounded-lg font-label-md text-label-md scale-95 transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="domain">domain</span>
+<span>Data Perusahaan</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary hover:bg-white/10 transition-colors rounded-lg font-label-md text-label-md scale-95 transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="handshake">handshake</span>
+<span>Kemitraan</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary hover:bg-white/10 transition-colors rounded-lg font-label-md text-label-md scale-95 transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="school">school</span>
+<span>Alumni &amp; Outcome</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary hover:bg-white/10 transition-colors rounded-lg font-label-md text-label-md scale-95 transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="assessment">assessment</span>
+<span>Laporan</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary hover:bg-white/10 transition-colors rounded-lg font-label-md text-label-md scale-95 transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="notifications">notifications</span>
+<span>Notifikasi</span>
+</a>
+</div>
+<!-- CTA -->
+<div class="mt-4 pt-4 border-t border-white/10">
+<button class="w-full flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-on-primary py-3 rounded-lg font-label-md text-label-md transition-colors">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                Unduh Laporan Tahunan
+            </button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="ml-[280px] flex-1 flex flex-col min-h-screen relative">
+<!-- TopNavBar (Admin) -->
+<header class="flex justify-between items-center w-full px-margin-desktop h-16 z-40 bg-surface dark:bg-inverse-surface border-b border-outline-variant sticky top-0">
+<div class="flex items-center gap-4">
+<h2 class="font-headline-md text-headline-md font-extrabold text-deep-navy">Dashboard</h2>
+<span class="text-outline hidden md:inline">|</span>
+<span class="text-on-surface-variant font-body-md hidden md:inline">Ringkasan Sistem Career Center</span>
+</div>
+<div class="flex items-center gap-6">
+<!-- Search -->
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-full text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary w-64 transition-all" placeholder="Cari data..." type="text"/>
+</div>
+<!-- Actions -->
+<button class="text-primary dark:text-primary-fixed hover:bg-surface-container-low dark:hover:bg-primary-container/20 p-2 rounded-full transition-all duration-200 relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="text-primary dark:text-primary-fixed hover:bg-surface-container-low dark:hover:bg-primary-container/20 p-2 rounded-full transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<div class="w-px h-6 bg-outline-variant"></div>
+<!-- Profile -->
+<button class="flex items-center gap-3 hover:bg-surface-container-low rounded-full pr-4 p-1 transition-colors">
+<img alt="Avatar Admin" class="w-8 h-8 rounded-full object-cover border border-outline-variant" data-alt="A professional headshot of a female administrator in her mid-30s. She is smiling confidently, wearing a tailored navy blazer over a crisp white shirt. The background is a soft, blurred corporate office setting with bright, natural daylight illuminating the scene." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvRmKSSf4B-Ys-SB2IFnTPrLO7H5YFMmQkqSAokBg_437MQ4yU24RHgMRMgEpzU3B4mx9DP4AtfZlo9I-mh5M2YyG1BlroMAYu7iRoFyI0bnZD_TgpyzM9VmrDGctNs94th1iNGuDWZK-sW4aUGZnJFWBoXHVZdfd7QrdU7jm9URWLu2D45v8X-C2ciGdwXfxgRqMOrTZFSh4eGFJt7j4-p3SbpcyNWXzLFyt-eWri-mTakDAyJ8LtfA"/>
+<div class="text-left hidden md:block">
+<p class="font-label-md text-label-md text-on-surface">Admin Pusat</p>
+</div>
+</button>
+</div>
+</header>
+<!-- Canvas -->
+<div class="flex-1 p-gutter max-w-container-max mx-auto w-full space-y-8 pb-12">
+<!-- Context Banner -->
+<div class="bg-gradient-to-r from-deep-navy to-primary-container rounded-xl p-6 shadow-sm flex items-center justify-between relative overflow-hidden">
+<div class="relative z-10">
+<h3 class="font-headline-lg text-headline-lg text-white mb-2">Selamat Pagi, Admin.</h3>
+<p class="font-body-md text-body-md text-primary-fixed-dim max-w-2xl">Berikut adalah ringkasan aktivitas dan metrik utama pada platform Career Center hari ini. Terdapat 8 lowongan yang membutuhkan moderasi segera.</p>
+</div>
+<div class="relative z-10 hidden lg:block">
+<button class="bg-white text-primary font-label-md text-label-md px-6 py-2.5 rounded-lg font-semibold hover:bg-surface-container-low transition-colors shadow-sm">
+                        Lihat Laporan Harian
+                    </button>
+</div>
+<!-- Abstract decorative element -->
+<div class="absolute -right-20 -bottom-20 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
+</div>
+<!-- Bento Grid KPIs -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- KPI 1 -->
+<div class="bg-surface rounded-xl p-5 border border-outline-variant shadow-[0_4px_10px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_20px_rgba(0,32,69,0.05)] transition-shadow group">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-tertiary-fixed rounded-lg text-on-tertiary-fixed">
+<span class="material-symbols-outlined text-[24px]">pending_actions</span>
+</div>
+<span class="text-error font-bold font-label-sm text-label-sm flex items-center gap-1 bg-error-container px-2 py-1 rounded-full"><span class="material-symbols-outlined text-[14px]">arrow_upward</span> Action Needed</span>
+</div>
+<p class="font-label-md text-label-md text-on-surface-variant mb-1">Perusahaan Menunggu Verifikasi</p>
+<div class="flex items-end gap-2">
+<h4 class="font-display-lg text-display-lg text-on-surface group-hover:text-primary transition-colors">5</h4>
+</div>
+</div>
+<!-- KPI 2 -->
+<div class="bg-surface rounded-xl p-5 border border-outline-variant shadow-[0_4px_10px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_20px_rgba(0,32,69,0.05)] transition-shadow group">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-error-container rounded-lg text-on-error-container">
+<span class="material-symbols-outlined text-[24px]">report_problem</span>
+</div>
+</div>
+<p class="font-label-md text-label-md text-on-surface-variant mb-1">Perusahaan Perlu Perbaikan</p>
+<div class="flex items-end gap-2">
+<h4 class="font-display-lg text-display-lg text-on-surface group-hover:text-primary transition-colors">2</h4>
+</div>
+</div>
+<!-- KPI 3 -->
+<div class="bg-surface rounded-xl p-5 border border-outline-variant shadow-[0_4px_10px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_20px_rgba(0,32,69,0.05)] transition-shadow group">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-secondary-fixed rounded-lg text-on-secondary-fixed">
+<span class="material-symbols-outlined text-[24px]">verified</span>
+</div>
+</div>
+<p class="font-label-md text-label-md text-on-surface-variant mb-1">Perusahaan Terverifikasi</p>
+<div class="flex items-end gap-2">
+<h4 class="font-display-lg text-display-lg text-on-surface group-hover:text-primary transition-colors">120</h4>
+</div>
+</div>
+<!-- KPI 4 -->
+<div class="bg-surface rounded-xl p-5 border border-outline-variant shadow-[0_4px_10px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_20px_rgba(0,32,69,0.05)] transition-shadow group relative overflow-hidden">
+<div class="flex justify-between items-start mb-4 relative z-10">
+<div class="p-2 bg-tertiary-fixed-dim rounded-lg text-tertiary-container">
+<span class="material-symbols-outlined text-[24px]">workspace_premium</span>
+</div>
+</div>
+<p class="font-label-md text-label-md text-on-surface-variant mb-1 relative z-10">Mitra Kampus Aktif</p>
+<div class="flex items-end gap-2 relative z-10">
+<h4 class="font-display-lg text-display-lg text-on-surface group-hover:text-primary transition-colors">45</h4>
+</div>
+<!-- subtle background element for premium metric -->
+<span class="material-symbols-outlined absolute -right-6 -bottom-6 text-[120px] text-tertiary-fixed-dim/10 pointer-events-none">workspace_premium</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- KPI 5 -->
+<div class="bg-surface rounded-xl p-5 border border-primary/20 shadow-[0_4px_10px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_20px_rgba(0,32,69,0.05)] transition-shadow group ring-1 ring-primary/10">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-primary-fixed rounded-lg text-on-primary-fixed">
+<span class="material-symbols-outlined text-[24px]">fact_check</span>
+</div>
+<span class="text-error font-bold font-label-sm text-label-sm flex items-center gap-1 bg-error-container px-2 py-1 rounded-full animate-pulse">Urgent</span>
+</div>
+<p class="font-label-md text-label-md text-on-surface-variant mb-1">Lowongan Menunggu Pemeriksaan</p>
+<div class="flex items-end gap-2">
+<h4 class="font-display-lg text-display-lg text-primary">8</h4>
+</div>
+</div>
+<!-- KPI 6 -->
+<div class="bg-surface rounded-xl p-5 border border-outline-variant shadow-[0_4px_10px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_20px_rgba(0,32,69,0.05)] transition-shadow group">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-surface-container-highest rounded-lg text-on-surface">
+<span class="material-symbols-outlined text-[24px]">work</span>
+</div>
+</div>
+<p class="font-label-md text-label-md text-on-surface-variant mb-1">Lowongan Aktif</p>
+<div class="flex items-end gap-2">
+<h4 class="font-display-lg text-display-lg text-on-surface group-hover:text-primary transition-colors">210</h4>
+</div>
+</div>
+<!-- KPI 7 -->
+<div class="bg-surface rounded-xl p-5 border border-outline-variant shadow-[0_4px_10px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_20px_rgba(0,32,69,0.05)] transition-shadow group lg:col-span-2">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-inverse-primary rounded-lg text-primary-container">
+<span class="material-symbols-outlined text-[24px]">groups</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="text-right">
+<p class="font-label-sm text-label-sm text-on-surface-variant">Outcome Belum Lengkap</p>
+<p class="font-label-md text-label-md text-error">12 Alumni</p>
+</div>
+</div>
+</div>
+<p class="font-label-md text-label-md text-on-surface-variant mb-1">Alumni Dalam Proses Rekrutmen</p>
+<div class="flex items-end gap-2">
+<h4 class="font-display-lg text-display-lg text-on-surface group-hover:text-primary transition-colors">1,450</h4>
+<span class="text-success font-label-md text-label-md mb-2 flex items-center"><span class="material-symbols-outlined text-[16px]">trending_up</span> +12% bln ini</span>
+</div>
+</div>
+</div>
+<!-- Table Section -->
+<div class="bg-surface rounded-xl border border-outline-variant shadow-[0_4px_10px_rgba(0,0,0,0.02)] overflow-hidden">
+<div class="p-6 border-b border-outline-variant flex justify-between items-center bg-surface-bright">
+<div>
+<h3 class="font-title-lg text-title-lg text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">fact_check</span>
+                            Antrean Moderasi Lowongan
+                        </h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Daftar lowongan kerja yang memerlukan review sebelum dipublikasikan.</p>
+</div>
+<button class="text-primary font-label-md text-label-md font-semibold hover:bg-surface-container-low px-4 py-2 rounded-lg transition-colors flex items-center gap-2 border border-primary/20">
+<span class="material-symbols-outlined text-[18px]">filter_list</span> Filter
+                    </button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-lowest border-b border-outline-variant">
+<th class="py-4 px-6 font-label-md text-label-md text-on-surface-variant font-semibold">Posisi</th>
+<th class="py-4 px-6 font-label-md text-label-md text-on-surface-variant font-semibold">Perusahaan</th>
+<th class="py-4 px-6 font-label-md text-label-md text-on-surface-variant font-semibold">Target Kandidat</th>
+<th class="py-4 px-6 font-label-md text-label-md text-on-surface-variant font-semibold text-right">Aksi</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-4 px-6">
+<div class="font-label-md text-label-md text-on-surface font-semibold">Software Engineer - Backend</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">Dikirim: Hari ini, 09:15</div>
+</td>
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container flex items-center justify-center text-primary font-bold font-label-sm text-label-sm">TB</div>
+<div>
+<div class="font-label-md text-label-md text-on-surface">TechBridges Inc.</div>
+<div class="flex items-center gap-1 text-tertiary-container mt-0.5">
+<span class="material-symbols-outlined text-[14px]">workspace_premium</span>
+<span class="font-label-sm text-label-sm">Mitra Kampus</span>
+</div>
+</div>
+</div>
+</td>
+<td class="py-4 px-6">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-fixed text-on-primary-fixed">
+                                        Alumni
+                                    </span>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="text-primary hover:bg-primary-fixed-dim/20 px-3 py-1.5 rounded-md font-label-sm text-label-sm transition-colors border border-transparent group-hover:border-primary/20">Review</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-4 px-6">
+<div class="font-label-md text-label-md text-on-surface font-semibold">Management Trainee Program</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">Dikirim: Hari ini, 08:30</div>
+</td>
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container flex items-center justify-center text-primary font-bold font-label-sm text-label-sm">GL</div>
+<div>
+<div class="font-label-md text-label-md text-on-surface">Global Logistics Tbk</div>
+</div>
+</div>
+</td>
+<td class="py-4 px-6">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-surface-variant text-on-surface-variant border border-outline-variant">
+                                        Mahasiswa Tingkat Akhir &amp; Alumni
+                                    </span>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="text-primary hover:bg-primary-fixed-dim/20 px-3 py-1.5 rounded-md font-label-sm text-label-sm transition-colors border border-transparent group-hover:border-primary/20">Review</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-4 px-6">
+<div class="font-label-md text-label-md text-on-surface font-semibold">Data Analyst Intern</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">Dikirim: Kemarin, 16:45</div>
+</td>
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container flex items-center justify-center text-primary font-bold font-label-sm text-label-sm">ND</div>
+<div>
+<div class="font-label-md text-label-md text-on-surface">Nusa Data Solutions</div>
+</div>
+</div>
+</td>
+<td class="py-4 px-6">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-surface-container-highest text-on-surface">
+                                        Publik
+                                    </span>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="text-primary hover:bg-primary-fixed-dim/20 px-3 py-1.5 rounded-md font-label-sm text-label-sm transition-colors border border-transparent group-hover:border-primary/20">Review</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-4 px-6">
+<div class="font-label-md text-label-md text-on-surface font-semibold">Asisten Peneliti Laboratorium</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">Dikirim: Kemarin, 14:20</div>
+</td>
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed font-bold font-label-sm text-label-sm"><span class="material-symbols-outlined text-[16px]">account_balance</span></div>
+<div>
+<div class="font-label-md text-label-md text-on-surface">Fakultas Teknik</div>
+</div>
+</div>
+</td>
+<td class="py-4 px-6">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-on-secondary">
+                                        Internal
+                                    </span>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="text-primary hover:bg-primary-fixed-dim/20 px-3 py-1.5 rounded-md font-label-sm text-label-sm transition-colors border border-transparent group-hover:border-primary/20">Review</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 border-t border-outline-variant bg-surface-bright flex justify-center">
+<button class="text-primary font-label-md text-label-md hover:underline flex items-center gap-1">
+                        Lihat 4 lowongan lainnya <span class="material-symbols-outlined text-[18px]">arrow_downward</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+</body></html>

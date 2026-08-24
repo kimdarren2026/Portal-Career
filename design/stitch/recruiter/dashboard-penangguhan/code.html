@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Akses Perusahaan Ditangguhkan - Career Center</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-container": "#86a0cd",
+                        "on-surface": "#181c1e",
+                        "surface-variant": "#e0e3e5",
+                        "outline": "#74777f",
+                        "primary-fixed": "#d6e3ff",
+                        "surface-container-low": "#f1f4f6",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#181c1e",
+                        "inverse-on-surface": "#eef1f3",
+                        "background": "#f7fafc",
+                        "on-tertiary-fixed": "#271900",
+                        "outline-variant": "#c4c6cf",
+                        "on-tertiary-container": "#cb9524",
+                        "primary": "#002045",
+                        "success": "#38a169",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#455f88",
+                        "secondary-container": "#66affe",
+                        "surface-bright": "#f7fafc",
+                        "error": "#E11B22",
+                        "on-tertiary-fixed-variant": "#5f4100",
+                        "surface-dim": "#d7dadc",
+                        "surface-container": "#ebeef0",
+                        "primary-container": "#1a365d",
+                        "secondary": "#0061a5",
+                        "tertiary-fixed": "#ffdeaa",
+                        "tertiary": "#2d1d00",
+                        "inverse-primary": "#adc7f7",
+                        "surface-container-high": "#e5e9eb",
+                        "on-primary-fixed": "#001b3c",
+                        "tertiary-container": "#493100",
+                        "secondary-fixed-dim": "#9fcaff",
+                        "secondary-fixed": "#d2e4ff",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-primary-fixed-variant": "#2d476f",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed-dim": "#f8bc4b",
+                        "inverse-surface": "#2d3133",
+                        "primary-fixed-dim": "#adc7f7",
+                        "on-secondary-container": "#004172",
+                        "on-error": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-surface-variant": "#43474e",
+                        "on-secondary-fixed": "#001d37",
+                        "surface": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "deep-navy": "#1B2D4F",
+                        "on-secondary-fixed-variant": "#00497e",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "margin-desktop": "48px",
+                        "margin-mobile": "16px",
+                        "container-max": "1280px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "headline-lg-mobile": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex">
+<!-- SideNavBar -->
+<nav class="hidden md:flex flex-col h-screen sticky top-0 fixed left-0 top-0 h-full w-[280px] bg-deep-navy shadow-sm z-50">
+<div class="px-6 py-8">
+<h1 class="font-title-lg text-title-lg font-bold text-white">Career Center</h1>
+<p class="font-label-sm text-label-sm text-white/70 mt-1">Recruiter Portal</p>
+</div>
+<div class="flex-1 overflow-y-auto mt-4 px-2 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-primary-container/50 transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-white border-l-4 border-secondary-container rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">business_center</span>
+<span class="font-body-md text-body-md">Profil Perusahaan</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-primary-container/50 transition-colors rounded-lg cursor-not-allowed opacity-50 pointer-events-none" href="#" title="Akses Ditangguhkan">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">work_history</span>
+<span class="font-body-md text-body-md">Lowongan</span>
+<span class="material-symbols-outlined ml-auto text-sm" style="font-variation-settings: 'FILL' 0;">lock</span>
+</a>
+</div>
+<div class="p-4 mt-auto border-t border-white/10">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-primary-container/50 transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">help</span>
+<span class="font-body-md text-body-md">Bantuan</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-primary-container/50 transition-colors rounded-lg mt-1" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">logout</span>
+<span class="font-body-md text-body-md">Keluar</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col md:ml-[280px] min-w-0">
+<!-- TopNavBar (Mobile Only for Recruiter Context here as requested by simpler layout) -->
+<header class="md:hidden bg-surface border-b border-outline-variant flex justify-between items-center w-full px-4 h-16 sticky top-0 z-40">
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Career Center</h1>
+<button class="text-on-surface-variant p-2">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</header>
+<main class="flex-1 p-margin-mobile md:p-margin-desktop overflow-y-auto max-w-container-max mx-auto w-full">
+<div class="mb-8">
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Status Perusahaan</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">Informasi terkini mengenai status verifikasi perusahaan Anda.</p>
+</div>
+<!-- Suspension/Rejection Alert Card -->
+<div class="bg-error-container border border-[#ffb4ab] rounded-xl p-6 md:p-8 flex flex-col md:flex-row gap-6 items-start shadow-sm mb-8">
+<div class="flex-shrink-0 bg-[#ffb4ab]/30 p-3 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-error text-4xl" style="font-variation-settings: 'FILL' 1;">error</span>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-3 mb-2">
+<h3 class="font-title-lg text-title-lg text-on-error-container">Akses Perusahaan Ditangguhkan</h3>
+<span class="px-3 py-1 bg-error text-on-error font-label-sm text-label-sm rounded-full">Ditolak</span>
+</div>
+<p class="font-body-md text-body-md text-on-error-container/90 mb-4">
+                        Kami menemukan ketidaksesuaian pada dokumen profil perusahaan yang Anda ajukan. Untuk menjaga kualitas dan keamanan platform, akses untuk membuat lowongan baru saat ini ditangguhkan.
+                    </p>
+<div class="bg-surface/60 rounded-lg p-4 border border-[#ffb4ab]/50">
+<h4 class="font-label-md text-label-md text-on-error-container mb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">speaker_notes</span> Catatan dari Career Center (Diperbarui: 12 Okt 2023)
+                        </h4>
+<ul class="list-disc list-inside font-body-md text-body-md text-on-error-container/80 space-y-1">
+<li>NIB (Nomor Induk Berusaha) yang diunggah tidak dapat diverifikasi atau kadaluarsa.</li>
+<li>Terdapat perbedaan antara nama perusahaan di profil dengan dokumen legal.</li>
+<li>Logo perusahaan memiliki resolusi sangat rendah dan terpotong.</li>
+</ul>
+</div>
+<div class="mt-6 flex flex-wrap gap-4">
+<button class="bg-error text-on-error px-6 py-2.5 rounded-lg font-label-md text-label-md hover:bg-error/90 transition-colors shadow-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">edit_document</span>
+                            Perbaiki dan Ajukan Kembali
+                        </button>
+<button class="bg-transparent border-2 border-error text-error px-6 py-2.5 rounded-lg font-label-md text-label-md hover:bg-error/10 transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">support_agent</span>
+                            Hubungi Career Center
+                        </button>
+</div>
+</div>
+</div>
+<!-- Profile Summary (Read-Only) -->
+<div class="bg-surface rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+<div class="px-6 py-5 border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
+<h3 class="font-title-lg text-title-lg text-on-surface">Data Profil Saat Ini</h3>
+<span class="text-on-surface-variant font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">lock</span> Read Only
+                    </span>
+</div>
+<div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Nama Perusahaan</p>
+<p class="font-body-md text-body-md text-on-surface">PT Teknologi Nusantara Sejahtera</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Nomor Induk Berusaha (NIB)</p>
+<p class="font-body-md text-body-md text-error flex items-center gap-2">
+                            9120391029301
+                            <span class="material-symbols-outlined text-error text-sm cursor-help" title="Tidak valid">warning</span>
+</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Industri</p>
+<p class="font-body-md text-body-md text-on-surface">Information Technology</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Website</p>
+<p class="font-body-md text-body-md text-on-surface">www.teknologinusantara.co.id</p>
+</div>
+<div class="md:col-span-2">
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Alamat Lengkap</p>
+<p class="font-body-md text-body-md text-on-surface">Gedung Menara Mulia Lt. 15, Jl. Jend. Gatot Subroto Kav. 9-11, Jakarta Selatan 12930</p>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

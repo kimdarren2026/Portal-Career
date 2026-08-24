@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lamar Lowongan: Periksa Profil</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "inverse-surface": "#2d3133",
+                      "primary-container": "#1a365d",
+                      "surface-container-highest": "#e0e3e5",
+                      "secondary-container": "#66affe",
+                      "on-tertiary-fixed-variant": "#5f4100",
+                      "surface-bright": "#f7fafc",
+                      "surface-tint": "#455f88",
+                      "on-background": "#181c1e",
+                      "surface-container": "#ebeef0",
+                      "on-error-container": "#93000a",
+                      "surface-container-lowest": "#ffffff",
+                      "outline-variant": "#c4c6cf",
+                      "secondary-fixed": "#d2e4ff",
+                      "on-secondary-fixed-variant": "#00497e",
+                      "on-tertiary-fixed": "#271900",
+                      "inverse-primary": "#adc7f7",
+                      "on-secondary-fixed": "#001d37",
+                      "secondary-fixed-dim": "#9fcaff",
+                      "surface-container-high": "#e5e9eb",
+                      "on-primary-container": "#86a0cd",
+                      "on-surface": "#181c1e",
+                      "on-error": "#ffffff",
+                      "success": "#38a169",
+                      "primary-fixed-dim": "#adc7f7",
+                      "on-secondary-container": "#004172",
+                      "background": "#f7fafc",
+                      "tertiary-container": "#493100",
+                      "on-surface-variant": "#43474e",
+                      "tertiary-fixed": "#ffdeaa",
+                      "surface-dim": "#d7dadc",
+                      "primary": "#002045",
+                      "surface-container-low": "#f1f4f6",
+                      "inverse-on-surface": "#eef1f3",
+                      "primary-fixed": "#d6e3ff",
+                      "on-tertiary": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "outline": "#74777f",
+                      "on-secondary": "#ffffff",
+                      "error": "#E11B22",
+                      "secondary": "#0061a5",
+                      "surface": "#ffffff",
+                      "tertiary": "#2d1d00",
+                      "tertiary-fixed-dim": "#f8bc4b",
+                      "on-tertiary-container": "#cb9524",
+                      "deep-navy": "#1B2D4F",
+                      "on-primary-fixed": "#001b3c",
+                      "on-primary-fixed-variant": "#2d476f",
+                      "on-primary": "#ffffff",
+                      "surface-variant": "#e0e3e5"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-mobile": "16px",
+                      "container-max": "1280px",
+                      "base": "4px",
+                      "margin-desktop": "48px",
+                      "gutter": "24px"
+              },
+              "fontFamily": {
+                      "headline-lg-mobile": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "title-lg": [
+                              "Inter"
+                      ],
+                      "display-lg": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Inter"
+                      ],
+                      "label-sm": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "title-lg": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen font-body-md">
+<!-- Top Navigation (Hidden on this transactional page to focus on task) -->
+<main class="max-w-4xl mx-auto px-margin-mobile md:px-margin-desktop py-8 md:py-12">
+<!-- Header & Vacancy Info -->
+<header class="mb-8">
+<div class="flex items-center gap-4 mb-2">
+<button class="text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center p-2 rounded-full hover:bg-surface-variant/50">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Lamar Lowongan</h1>
+</div>
+<div class="bg-surface border border-outline-variant rounded-lg p-6 flex items-start gap-4 shadow-sm">
+<div class="w-12 h-12 bg-surface-container rounded-md flex items-center justify-center overflow-hidden shrink-0 border border-outline-variant">
+<img class="object-cover w-full h-full" data-alt="A clean, modern logo for PT Teknologi Nusantara, featuring abstract geometric shapes in deep navy and secondary blue colors, professional corporate identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4cYg4RorLBpjBHWFljST1ihPpDdMk28IoYQzshP12-lXYJWp6V7dijKuOBNf37THJ-yUL3BMgXMtg-hWrsUwzz0dmLL8rR9dazgkQTkm4VSFSGI6lHTE8hDanokstWb3IITMXzzo7S09R2JRQLXR2MM0f05P8Gl_Bb9fqqgr593JFsWHbEi-0y42AmIKvTzFMvZefBp3iG06fvFxb-a9o5qypcOCzsgV3TyD4-IPSqMgyQZ09hm94UA"/>
+</div>
+<div>
+<h2 class="font-title-lg text-title-lg text-on-surface mb-1">Senior Data Analyst</h2>
+<div class="flex items-center gap-2 font-label-md text-label-md text-on-surface-variant">
+<span>PT Teknologi Nusantara</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="flex items-center gap-1 text-success">
+<span class="material-symbols-outlined text-[16px]" data-icon="verified">verified</span>
+                            Mitra Kampus
+                        </span>
+</div>
+</div>
+</div>
+</header>
+<!-- Stepper -->
+<div class="mb-10 px-4">
+<div class="flex items-center justify-between relative">
+<!-- Progress Line -->
+<div class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-surface-variant z-0 rounded-full"></div>
+<!-- Active Progress Line -->
+<div class="absolute left-0 top-1/2 -translate-y-1/2 w-0 h-1 bg-primary z-0 rounded-full transition-all duration-300"></div>
+<!-- Steps -->
+<div class="relative z-10 flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-label-md text-label-md shadow-sm border-2 border-primary">
+                        1
+                    </div>
+<span class="font-label-sm text-label-sm text-primary font-semibold">Periksa Profil</span>
+</div>
+<div class="relative z-10 flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-surface text-on-surface-variant flex items-center justify-center font-label-md text-label-md shadow-sm border-2 border-surface-variant">
+                        2
+                    </div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Dokumen</span>
+</div>
+<div class="relative z-10 flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-surface text-on-surface-variant flex items-center justify-center font-label-md text-label-md shadow-sm border-2 border-surface-variant">
+                        3
+                    </div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Ulasan</span>
+</div>
+</div>
+</div>
+<!-- Content Area -->
+<section class="bg-surface border border-outline-variant rounded-xl shadow-sm p-6 md:p-8 mb-8">
+<div class="mb-6 pb-4 border-b border-outline-variant flex justify-between items-end">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1">Periksa Profil Anda</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Pastikan informasi di bawah ini akurat sebelum melanjutkan ke tahap berikutnya.</p>
+</div>
+<button class="font-label-md text-label-md text-primary hover:text-secondary-container transition-colors flex items-center gap-2 px-4 py-2 border border-outline-variant rounded-lg hover:bg-surface-variant/20">
+<span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span>
+                    Edit Profil
+                </button>
+</div>
+<!-- Bento Grid Style Data Display -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Data Pribadi -->
+<div class="bg-surface-container-low rounded-lg p-5 border border-outline-variant/50">
+<div class="flex items-center gap-3 mb-4 text-primary">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<h4 class="font-title-lg text-title-lg text-on-surface">Data Pribadi</h4>
+</div>
+<dl class="space-y-4">
+<div>
+<dt class="font-label-sm text-label-sm text-on-surface-variant mb-1">Nama Lengkap</dt>
+<dd class="font-body-md text-body-md text-on-surface font-medium">Budi Santoso</dd>
+</div>
+<div>
+<dt class="font-label-sm text-label-sm text-on-surface-variant mb-1">Email</dt>
+<dd class="font-body-md text-body-md text-on-surface">budi.santoso@alumni.univ.ac.id</dd>
+</div>
+<div>
+<dt class="font-label-sm text-label-sm text-on-surface-variant mb-1">Nomor Telepon</dt>
+<dd class="font-body-md text-body-md text-on-surface">+62 812 3456 7890</dd>
+</div>
+<div>
+<dt class="font-label-sm text-label-sm text-on-surface-variant mb-1">Lokasi</dt>
+<dd class="font-body-md text-body-md text-on-surface">Jakarta, Indonesia</dd>
+</div>
+</dl>
+</div>
+<!-- Latar Belakang Akademik -->
+<div class="bg-surface-container-low rounded-lg p-5 border border-outline-variant/50">
+<div class="flex items-center gap-3 mb-4 text-primary">
+<span class="material-symbols-outlined" data-icon="school">school</span>
+<h4 class="font-title-lg text-title-lg text-on-surface">Latar Belakang Akademik</h4>
+</div>
+<div class="space-y-5">
+<div class="relative pl-4 border-l-2 border-primary-container/20">
+<h5 class="font-label-md text-label-md text-on-surface mb-1">Universitas Indonesia Raya</h5>
+<p class="font-body-md text-body-md text-on-surface-variant mb-1">S1 Sistem Informasi</p>
+<div class="flex justify-between items-center font-label-sm text-label-sm text-outline">
+<span>Lulus: Agustus 2026</span>
+<span class="bg-surface-variant px-2 py-1 rounded text-on-surface-variant">IPK: 3.85</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Kemampuan -->
+<div class="md:col-span-2 bg-surface-container-low rounded-lg p-5 border border-outline-variant/50">
+<div class="flex items-center gap-3 mb-4 text-primary">
+<span class="material-symbols-outlined" data-icon="bolt">bolt</span>
+<h4 class="font-title-lg text-title-lg text-on-surface">Kemampuan (Skills)</h4>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1 bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm rounded-full">Python</span>
+<span class="px-3 py-1 bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm rounded-full">SQL</span>
+<span class="px-3 py-1 bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm rounded-full">Data Visualization</span>
+<span class="px-3 py-1 bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm rounded-full">Machine Learning</span>
+<span class="px-3 py-1 bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm rounded-full">Tableau</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Actions -->
+<div class="flex flex-col-reverse md:flex-row justify-end items-center gap-4 border-t border-outline-variant pt-6">
+<button class="w-full md:w-auto font-label-md text-label-md text-on-surface hover:text-primary transition-colors px-6 py-3 rounded-lg hover:bg-surface-variant/50">
+                Batal
+            </button>
+<button class="w-full md:w-auto bg-primary text-on-primary hover:bg-primary-container font-label-md text-label-md px-8 py-3 rounded-lg shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2">
+                Lanjutkan
+                <span class="material-symbols-outlined text-[18px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</main>
+</body></html>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Detail Lamaran - Universitas Career</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "error-container": "#ffdad6",
+                      "primary-fixed": "#d6e3ff",
+                      "background": "#f7fafc",
+                      "on-error-container": "#93000a",
+                      "on-surface": "#181c1e",
+                      "surface-container-lowest": "#ffffff",
+                      "on-primary-fixed-variant": "#2d476f",
+                      "deep-navy": "#1B2D4F",
+                      "secondary": "#0061a5",
+                      "secondary-fixed": "#d2e4ff",
+                      "on-tertiary-container": "#cb9524",
+                      "inverse-surface": "#2d3133",
+                      "on-background": "#181c1e",
+                      "primary-fixed-dim": "#adc7f7",
+                      "on-primary-fixed": "#001b3c",
+                      "primary": "#002045",
+                      "surface-container-highest": "#e0e3e5",
+                      "tertiary-fixed-dim": "#f8bc4b",
+                      "tertiary": "#2d1d00",
+                      "on-secondary-fixed": "#001d37",
+                      "secondary-container": "#66affe",
+                      "on-primary-container": "#86a0cd",
+                      "on-tertiary-fixed-variant": "#5f4100",
+                      "on-error": "#ffffff",
+                      "on-tertiary-fixed": "#271900",
+                      "on-secondary": "#ffffff",
+                      "surface-container": "#ebeef0",
+                      "inverse-primary": "#adc7f7",
+                      "on-tertiary": "#ffffff",
+                      "surface": "#ffffff",
+                      "surface-tint": "#455f88",
+                      "on-surface-variant": "#43474e",
+                      "surface-variant": "#e0e3e5",
+                      "outline": "#74777f",
+                      "surface-dim": "#d7dadc",
+                      "inverse-on-surface": "#eef1f3",
+                      "surface-bright": "#f7fafc",
+                      "on-secondary-container": "#004172",
+                      "on-primary": "#ffffff",
+                      "surface-container-low": "#f1f4f6",
+                      "primary-container": "#1a365d",
+                      "tertiary-container": "#493100",
+                      "outline-variant": "#c4c6cf",
+                      "tertiary-fixed": "#ffdeaa",
+                      "surface-container-high": "#e5e9eb",
+                      "secondary-fixed-dim": "#9fcaff",
+                      "success": "#38a169",
+                      "on-secondary-fixed-variant": "#00497e",
+                      "error": "#E11B22"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "24px",
+                      "margin-desktop": "48px",
+                      "container-max": "1280px",
+                      "base": "4px",
+                      "margin-mobile": "16px"
+              },
+              "fontFamily": {
+                      "body-lg": ["Inter"],
+                      "headline-md": ["Inter"],
+                      "headline-lg": ["Inter"],
+                      "body-md": ["Inter"],
+                      "headline-lg-mobile": ["Inter"],
+                      "title-lg": ["Inter"],
+                      "label-sm": ["Inter"],
+                      "display-lg": ["Inter"],
+                      "label-md": ["Inter"]
+              },
+              "fontSize": {
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                      "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                      "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col md:flex-row font-body-md">
+<!-- TopNavBar (Mobile Only) -->
+<header class="md:hidden w-full h-16 sticky top-0 z-40 bg-surface text-primary border-b border-outline-variant flex items-center justify-between px-margin-mobile">
+<div class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-deep-navy">CareerPortal</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined cursor-pointer hover:bg-surface-container-low p-2 rounded-full transition-colors" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined cursor-pointer hover:bg-surface-container-low p-2 rounded-full transition-colors" data-icon="help_outline">help_outline</span>
+<img class="w-8 h-8 rounded-full object-cover border border-outline-variant" data-alt="A professional headshot of a university student in a modern, well-lit studio setting. The student is smiling confidently. High-key lighting emphasizes a clean, corporate modern aesthetic suitable for a career portal avatar." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHWiBxaHpsCuUTMekh7wOpRRXN1IHvyPyU5x0i4Mi__oS0yjis0SphR2rakmHt-zVYePOl2HFT89CR0yOBZXyp7vV72oX1JKpgGdauAbvq3RoMnlPDmavZCI8g9irP66oFOUYrFd1LR7YTcSwGRqSAiuX2u3NaKgmf-ieuBM0VtacgsxBwKXfC7tIydKtnoDNAJIc4xSWGdXec8ljF82dnjF37wDZTMElCY9ORZNbNM9TW1pYsBG8uIA"/>
+</div>
+</header>
+<!-- SideNavBar (Desktop) -->
+<nav class="hidden md:flex fixed left-0 top-0 h-screen w-[280px] z-50 bg-deep-navy flex-col py-6 shadow-md">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-4 mb-4">
+<img class="w-10 h-10 object-contain" data-alt="A sleek, minimalist university logo featuring a stylized shield and book, rendered in crisp white against the dark navy background. The design is modern, academic, and authoritative, suitable for a high-end educational institution's brand identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-lzaLDePkmwsVwPsJweP6OuUCbzX4KjGUQWiH11U8pv17AO8HnUQTkExHiWrCGyGS-_AbNKWCW_ZPQOduvvfevwDqM7NmEDp-Ojd9oQhH78jehdfkwYcuguboxsbkh69O0pvZXq7CZ_gahv2mVpuaDW5jyKj7FcgcH7ZSQo_03K19rlDFAudwnXGgYqZKQXV0l6iOJsTCWohk2VQKHylHOWPjonSJqqUCHop2YGHTNmgPnUv4wjZ5GQ"/>
+<div>
+<h1 class="font-title-lg text-title-lg font-bold text-white">Universitas Career</h1>
+<p class="font-label-sm text-label-sm text-surface-variant">Portal Karir Terpadu</p>
+</div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto space-y-1">
+<a class="text-white opacity-80 hover:opacity-100 flex items-center gap-4 px-4 py-3 mx-2 transition-all hover:bg-primary-container rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="text-white opacity-80 hover:opacity-100 flex items-center gap-4 px-4 py-3 mx-2 transition-all hover:bg-primary-container rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-md text-label-md">Profil Saya</span>
+</a>
+<a class="text-white opacity-80 hover:opacity-100 flex items-center gap-4 px-4 py-3 mx-2 transition-all hover:bg-primary-container rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="font-label-md text-label-md">CV &amp; Dokumen</span>
+</a>
+<a class="text-white opacity-80 hover:opacity-100 flex items-center gap-4 px-4 py-3 mx-2 transition-all hover:bg-primary-container rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+<span class="font-label-md text-label-md">Cari Lowongan</span>
+</a>
+<a class="bg-secondary-container text-on-secondary-container rounded-lg flex items-center gap-4 px-4 py-3 mx-2 scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="work" data-weight="fill" style="font-variation-settings: 'FILL' 1;">work</span>
+<span class="font-label-md text-label-md font-bold">Lamaran Saya</span>
+</a>
+<a class="text-white opacity-80 hover:opacity-100 flex items-center gap-4 px-4 py-3 mx-2 transition-all hover:bg-primary-container rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span class="font-label-md text-label-md">Jadwal Seleksi</span>
+</a>
+<a class="text-white opacity-80 hover:opacity-100 flex items-center gap-4 px-4 py-3 mx-2 transition-all hover:bg-primary-container rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="bookmark">bookmark</span>
+<span class="font-label-md text-label-md">Lowongan Tersimpan</span>
+</a>
+<a class="text-white opacity-80 hover:opacity-100 flex items-center gap-4 px-4 py-3 mx-2 transition-all hover:bg-primary-container rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="font-label-md text-label-md">Notifikasi</span>
+</a>
+<a class="text-white opacity-80 hover:opacity-100 flex items-center gap-4 px-4 py-3 mx-2 transition-all hover:bg-primary-container rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Pengaturan Akun</span>
+</a>
+</div>
+<div class="px-6 mt-4">
+<button class="w-full bg-secondary-container text-on-secondary-container hover:bg-primary-fixed font-label-md text-label-md py-3 rounded-lg font-bold transition-colors">
+                Cari Lowongan Baru
+            </button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-[280px] p-margin-mobile md:p-margin-desktop w-full max-w-container-max mx-auto flex flex-col min-h-screen">
+<!-- Header Section -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-6 mb-gutter shadow-[0_4px_10px_rgba(0,0,0,0.02)]">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+<div class="flex items-center gap-4">
+<img class="w-16 h-16 rounded-lg object-contain border border-surface-variant p-2" data-alt="A clean, modern corporate logo for 'TechCorp Indonesia' featuring abstract geometric shapes in shades of blue. The logo is displayed on a crisp white background with a subtle border, fitting a professional tech company profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGiaXbdYPpiDcySU7D1vU6ub_k8aiEeFyQlJs2SGwJvGWEvwa4FusCocKjwQLKlOX3mXHxBess99uQeLknOOnwQIihWcQN_YAQa5p4x0JHYbfagVSLeVDc5Ij0jdRgqP4RnXYbiR3AStO9tdD8Af1cuXkeqg14oxDVwwyShoHfykDZ4e0fQ3Y8RkjLnIIdKNhNjjtG-3dCHbc85-JsJ8k3odUKEnT3XL6yUvJWbWRZjreCs-pkBqHYMA"/>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-on-surface flex items-center gap-2">
+                            Data Analyst Intern
+                        </h1>
+<div class="flex items-center gap-2 mt-1">
+<span class="font-body-md text-body-md text-on-surface-variant">TechCorp Indonesia</span>
+<span class="bg-tertiary-fixed-dim text-tertiary font-label-sm text-label-sm px-2 py-0.5 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="verified">verified</span>
+                                Mitra Kampus
+                            </span>
+</div>
+</div>
+</div>
+<div class="flex gap-3 w-full md:w-auto">
+<button class="flex-1 md:flex-none border border-outline text-on-surface font-label-md text-label-md py-2 px-4 rounded-lg hover:bg-surface-container-low transition-colors">
+                        Hubungi Rekrutmen
+                    </button>
+<button class="flex-1 md:flex-none border border-error text-error font-label-md text-label-md py-2 px-4 rounded-lg hover:bg-error-container transition-colors">
+                        Mengundurkan Diri
+                    </button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-outline-variant">
+<div>
+<p class="font-label-sm text-label-sm text-outline mb-1">No Lamaran</p>
+<p class="font-body-md text-body-md font-medium">APP-2024-0891</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-outline mb-1">Tanggal Melamar</p>
+<p class="font-body-md text-body-md font-medium">12 Okt 2026</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-outline mb-1">Status Saat Ini</p>
+<span class="inline-flex items-center gap-1 bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm px-3 py-1 rounded-full">
+<span class="material-symbols-outlined text-[14px]" data-icon="hourglass_empty">hourglass_empty</span>
+                        Sedang Ditinjau
+                    </span>
+</div>
+</div>
+</div>
+<!-- Content Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter mb-gutter">
+<!-- Timeline (Left Column) -->
+<div class="lg:col-span-2 space-y-gutter">
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-6 shadow-[0_4px_10px_rgba(0,0,0,0.02)]">
+<h2 class="font-title-lg text-title-lg font-semibold mb-6">Timeline Riwayat Lamaran</h2>
+<div class="relative pl-6 space-y-8 before:absolute before:inset-y-0 before:left-[11px] before:w-[2px] before:bg-surface-variant">
+<!-- Step 3 (Pending) -->
+<div class="relative">
+<div class="absolute -left-[30px] bg-surface-container-lowest border-2 border-surface-variant w-5 h-5 rounded-full z-10"></div>
+<div class="opacity-50">
+<h3 class="font-label-md text-label-md font-semibold text-on-surface-variant">Proses Seleksi</h3>
+<p class="font-label-sm text-label-sm text-outline mt-1">Pending</p>
+</div>
+</div>
+<!-- Step 2 (Active) -->
+<div class="relative">
+<div class="absolute -left-[30px] bg-secondary-container border-2 border-primary w-5 h-5 rounded-full z-10"></div>
+<div>
+<h3 class="font-label-md text-label-md font-bold text-primary">Sedang Ditinjau</h3>
+<p class="font-label-sm text-label-sm text-outline mt-1">14 Okt 2026, 14:15</p>
+<div class="bg-surface-container-low p-4 rounded-lg mt-3 border border-outline-variant">
+<p class="font-body-md text-body-md text-on-surface-variant">"Tim rekrutmen sedang meninjau profil Anda. Kami akan menghubungi Anda segera jika kualifikasi sesuai."</p>
+</div>
+</div>
+</div>
+<!-- Step 1 (Completed) -->
+<div class="relative">
+<div class="absolute -left-[30px] bg-success border-2 border-success w-5 h-5 rounded-full z-10 flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[12px]" data-icon="check">check</span>
+</div>
+<div>
+<h3 class="font-label-md text-label-md font-semibold text-on-surface">Lamaran Diterima</h3>
+<p class="font-label-sm text-label-sm text-outline mt-1">12 Okt 2026, 09:30</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Sidebar (Right Column) -->
+<div class="space-y-gutter">
+<!-- Jadwal Seleksi -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-6 shadow-[0_4px_10px_rgba(0,0,0,0.02)]">
+<h2 class="font-title-lg text-title-lg font-semibold mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="event">event</span>
+                        Jadwal Seleksi
+                    </h2>
+<div class="text-center py-6 bg-surface-container-low rounded-lg border border-dashed border-outline-variant">
+<span class="material-symbols-outlined text-outline text-4xl mb-2" data-icon="event_busy">event_busy</span>
+<p class="font-body-md text-body-md text-on-surface-variant">Belum ada jadwal seleksi yang ditentukan.</p>
+</div>
+</div>
+<!-- Dokumen Terlampir -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-6 shadow-[0_4px_10px_rgba(0,0,0,0.02)]">
+<h2 class="font-title-lg text-title-lg font-semibold mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="folder">folder</span>
+                        Dokumen Terlampir
+                    </h2>
+<ul class="space-y-3">
+<li class="flex items-center justify-between p-3 border border-outline-variant rounded-lg hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary" data-icon="description">description</span>
+<div>
+<p class="font-label-md text-label-md text-on-surface">CV_Budi_Santoso_2026.pdf</p>
+<p class="font-label-sm text-label-sm text-outline">1.2 MB</p>
+</div>
+</div>
+<button class="text-primary hover:text-primary-container">
+<span class="material-symbols-outlined" data-icon="download">download</span>
+</button>
+</li>
+<li class="flex items-center justify-between p-3 border border-outline-variant rounded-lg hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary" data-icon="description">description</span>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Portofolio_Data_Analyst.pdf</p>
+<p class="font-label-sm text-label-sm text-outline">4.5 MB</p>
+</div>
+</div>
+<button class="text-primary hover:text-primary-container">
+<span class="material-symbols-outlined" data-icon="download">download</span>
+</button>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="w-full py-8 mt-auto border-t border-outline-variant bg-surface-container-lowest flex flex-col md:flex-row justify-between items-center px-margin-desktop max-w-container-max mx-auto gap-4">
+<p class="font-label-sm text-label-sm text-on-surface-variant">© 2024 Career Services Center. All Rights Reserved.</p>
+<div class="flex gap-4">
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Kebijakan Privasi</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Syarat &amp; Ketentuan</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Bantuan</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Kontak Kami</a>
+</div>
+<div class="font-label-md text-label-md font-bold text-deep-navy">Universitas Career</div>
+</footer>
+</main>
+</body></html>

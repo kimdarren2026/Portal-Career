@@ -1,0 +1,413 @@
+<!DOCTYPE html><html lang="id"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Penilaian Kandidat - Portal Karir Admin</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#2d1d00",
+                        "on-primary-container": "#86a0cd",
+                        "deep-navy": "#1B2D4F",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed-variant": "#00497e",
+                        "surface-variant": "#e0e3e5",
+                        "on-tertiary-fixed": "#271900",
+                        "surface-container-highest": "#e0e3e5",
+                        "secondary-container": "#66affe",
+                        "on-tertiary": "#ffffff",
+                        "surface-dim": "#d7dadc",
+                        "on-primary": "#ffffff",
+                        "surface-container": "#ebeef0",
+                        "error-container": "#ffdad6",
+                        "primary-fixed-dim": "#adc7f7",
+                        "on-secondary-fixed": "#001d37",
+                        "on-primary-fixed-variant": "#2d476f",
+                        "on-error-container": "#93000a",
+                        "background": "#f7fafc",
+                        "surface-bright": "#f7fafc",
+                        "surface-container-high": "#e5e9eb",
+                        "primary-container": "#1a365d",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#f8bc4b",
+                        "on-background": "#181c1e",
+                        "on-primary-fixed": "#001b3c",
+                        "on-surface": "#181c1e",
+                        "secondary-fixed-dim": "#9fcaff",
+                        "on-tertiary-container": "#cb9524",
+                        "primary-fixed": "#d6e3ff",
+                        "tertiary-container": "#493100",
+                        "on-tertiary-fixed-variant": "#5f4100",
+                        "surface-tint": "#455f88",
+                        "on-secondary-container": "#004172",
+                        "inverse-surface": "#2d3133",
+                        "outline": "#74777f",
+                        "outline-variant": "#c4c6cf",
+                        "inverse-primary": "#adc7f7",
+                        "inverse-on-surface": "#eef1f3",
+                        "primary": "#002045",
+                        "on-surface-variant": "#43474e",
+                        "tertiary-fixed": "#ffdeaa",
+                        "secondary-fixed": "#d2e4ff",
+                        "secondary": "#0061a5",
+                        "surface-container-low": "#f1f4f6",
+                        "surface": "#ffffff",
+                        "success": "#38a169",
+                        "error": "#E11B22",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "margin-desktop": "48px",
+                        "container-max": "1280px",
+                        "base": "4px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                    },
+                    "boxShadow": {
+                        "soft": "0 4px 10px rgba(0, 0, 0, 0.02)",
+                        "hover": "0 8px 20px rgba(0, 32, 69, 0.05)",
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .score-radio:checked + label {
+            background-color: theme('colors.primary');
+            color: theme('colors.on-primary');
+            border-color: theme('colors.primary');
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md flex min-h-screen">
+<!-- SideNavBar (Shared Component) -->
+<aside class="w-[280px] h-screen sticky top-0 left-0 bg-deep-navy shadow-sm hidden md:flex flex-col py-6 z-40">
+<!-- Brand / Header -->
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-white flex items-center justify-center overflow-hidden">
+<img alt="Logo Universitas" class="w-full h-full object-cover" data-alt="A clean, minimalist university logo icon in navy blue on a white background, flat vector style, corporate and academic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDvlx3BChS8wlFW3F4nF9N400wPx4O5MmmZhYbYFOfbMzYOXWQPzBbUhIALi3y5faw2MPq25_aiGZigTKUvqdWCDCvK_QPwCKa7nwf8g2-84RBJzbT_5xLSBccCnta90mvoY7mEk6Esv9PdtoDLt-Z9d1R7Bd9NvLD0vdhCnFEeTVqokJlTsU1InFVaYmU5LDsEGfeuiK25bNs_U8kgBU5rI-nRUKY3DYjP_3hiRSNASTmhbX8FVIAxxQ">
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-white leading-tight">Portal Karir</h1>
+<p class="font-label-sm text-label-sm text-white/70">Admin Kepegawaian</p>
+</div>
+</div>
+</div>
+<!-- Navigation Links -->
+<nav class="flex-1 overflow-y-auto w-full">
+<ul class="flex flex-col w-full">
+<li class=""><a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md hover:bg-white/10 transition-colors duration-200" href="#"><span class="material-symbols-outlined">dashboard</span>Dashboard</a></li>
+<li class=""><a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md hover:bg-white/10 transition-colors duration-200" href="#"><span class="material-symbols-outlined">work</span>Lowongan Kampus</a></li>
+<li class=""><a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md hover:bg-white/10 transition-colors duration-200" href="#"><span class="material-symbols-outlined">group</span>Pelamar</a></li>
+<li class=""><a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md hover:bg-white/10 transition-colors duration-200" href="#"><span class="material-symbols-outlined">calendar_today</span>Jadwal Seleksi</a></li>
+<!-- Active Navigation -->
+<li class=""><a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary font-bold border-l-4 border-secondary-container opacity-100 transition-all" href="#"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">fact_check</span>Penilaian</a></li>
+<li class=""><a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md hover:bg-white/10 transition-colors duration-200" href="#"><span class="material-symbols-outlined">contract</span>Offering</a></li>
+<li class=""><a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md hover:bg-white/10 transition-colors duration-200" href="#"><span class="material-symbols-outlined">analytics</span>Outcome Rekrutmen</a></li>
+<li class=""><a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md hover:bg-white/10 transition-colors duration-200" href="#"><span class="material-symbols-outlined">description</span>Laporan</a></li>
+<li class=""><a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md hover:bg-white/10 transition-colors duration-200" href="#"><span class="material-symbols-outlined">notifications</span>Notifikasi</a></li>
+<li class=""><a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md hover:bg-white/10 transition-colors duration-200" href="#"><span class="material-symbols-outlined">settings</span>Pengaturan</a></li>
+</ul>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0">
+<!-- TopNavBar (Shared Component) -->
+<header class="w-full top-0 sticky bg-surface border-b border-outline-variant z-30 flex justify-between items-center px-margin-mobile md:px-margin-desktop h-16">
+<div class="flex items-center md:hidden">
+<button class="text-on-surface-variant p-2"><span class="material-symbols-outlined">menu</span></button>
+</div>
+<!-- Contextual Title (Hidden on desktop as side nav handles brand) -->
+<div class="hidden md:flex items-center flex-1">
+<h2 class="font-title-lg text-title-lg font-bold text-deep-navy">Penilaian Kandidat</h2>
+</div>
+<div class="flex items-center md:hidden flex-1 justify-center">
+<h2 class="font-title-lg text-title-lg font-bold text-deep-navy">Admin Kepegawaian</h2>
+</div>
+<!-- Actions -->
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full"><span class="material-symbols-outlined">notifications</span></button>
+<button class="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hidden sm:block"><span class="material-symbols-outlined">help</span></button>
+<div class="h-8 w-8 rounded-full bg-surface-variant overflow-hidden border border-outline-variant ml-2 cursor-pointer">
+<img alt="Foto Profil Admin" class="w-full h-full object-cover" data-alt="Professional headshot of an administrative staff member, wearing formal business attire, neutral soft grey background, bright even lighting, high quality portrait." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWXZzp3iAbKBVE-L-8EF6QuGruIBYAmqwBZgAkUnUQwXcG9yh_gX37BQz46Ridbl9Xsrhbu31YCckd5ht_6XhojSEN7C6D5JJI5Ix6M0EDd-tJCjxBGT2NRaXPZucgD_SGEMUL84lssDzCUCIOO_Q2Nd2uBFm7NY__w_wZ0GpwkYKcJsfGeUeV55bogcJQm7kZJIwdaszFpZtOUbS8VTOS_M_8YQZp_X17b8t0sv3-spr5xqIuF2TA-A">
+</div>
+</div>
+</header>
+<!-- Page Content -->
+<div class="p-6 md:p-margin-desktop max-w-container-max mx-auto w-full space-y-8 pb-20">
+<!-- Breadcrumbs / Page Title (Mobile) -->
+<div class="md:hidden">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Penilaian Kandidat</h2>
+</div>
+<!-- Candidate Header Info Card -->
+<section class="bg-surface rounded-xl shadow-soft border border-surface-variant p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
+<!-- Decorative accent -->
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-secondary rounded-l-xl"></div>
+<div class="flex items-start md:items-center gap-5">
+<div class="w-16 h-16 rounded-full bg-surface-container-high border-2 border-white shadow-sm overflow-hidden flex-shrink-0">
+<img alt="Foto Budi Santoso" class="w-full h-full object-cover" data-alt="Professional portrait of a male candidate, wearing a neat button-down shirt and tie, confident smile, soft studio lighting, light background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5UOyrjXR9mcFCzZQ1sad4hkM0TjNcruLp_15PgTAmqjMFDv8ufI-FPP14cG5nCFmcZ2oBEv2IZtA7JJcbrxWLP2HVbin6VDokbPWoXYXfkgOqMX1GK-cFU8Q7U5Xq1ATA3l3tc_1_RTGBWu8Mqw1YXyFsYuEnMPkdQPinKoUBiqxl3vyCDwGBgSQ0n28E60vvEl_or1wfEMSLZE1lB2bRy_F7jwU4kWc6JWTk-I5lmtI41RXcjwLxaQ">
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1">Budi Santoso, S.Kom., M.Cs.</h3>
+<div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-on-surface-variant">
+<div class="flex items-center gap-1.5 font-label-md text-label-md">
+<span class="material-symbols-outlined text-[18px]">work</span>
+<span class="">Dosen Informatika</span>
+</div>
+<span class="hidden sm:inline-block w-1 h-1 rounded-full bg-outline-variant"></span>
+<div class="flex items-center gap-1.5 font-label-md text-label-md">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span class="">ID: KND-2026-084</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Status Badge -->
+<div class="flex flex-col items-start md:items-end gap-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Tahap Saat Ini</span>
+<div class="inline-flex items-center gap-2 bg-primary-fixed text-on-primary-fixed font-label-md text-label-md px-4 py-2 rounded-full border border-primary-fixed-dim">
+<span class="material-symbols-outlined text-[18px]">record_voice_over</span>
+                        Wawancara HR
+                    </div>
+</div>
+</section>
+<!-- Evaluation Form -->
+<section class="bg-surface rounded-xl shadow-soft border border-surface-variant p-6 md:p-8">
+<div class="mb-6 pb-4 border-b border-surface-variant flex justify-between items-end">
+<div>
+<h3 class="font-title-lg text-title-lg text-on-surface mb-1">Formulir Penilaian Teknis &amp; Perilaku</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Berikan skor (1-5) dan komentar untuk setiap kriteria evaluasi.</p>
+</div>
+<div class="hidden sm:block text-right">
+<p class="font-label-sm text-label-sm text-on-surface-variant">Skala: 1 (Sangat Kurang) - 5 (Sangat Baik)</p>
+</div>
+</div>
+<form action="#" class="space-y-10" id="evaluation-form" method="POST">
+<!-- Criteria Group -->
+<div class="space-y-8">
+<!-- Criteria 1 -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start group">
+<!-- Label & Weight -->
+<div class="lg:col-span-3">
+<label class="block font-label-md text-label-md text-on-surface mb-1 group-hover:text-primary transition-colors">Kompetensi Teknis</label>
+<span class="inline-flex items-center bg-surface-container text-on-surface-variant font-label-sm text-label-sm px-2 py-1 rounded">Bobot: 30%</span>
+<p class="text-sm text-on-surface-variant mt-2 hidden lg:block">Penguasaan materi ilmu komputer, bahasa pemrograman, dan metodologi riset terkini.</p>
+</div>
+<!-- Scoring -->
+<div class="lg:col-span-4 flex items-center justify-between lg:justify-start gap-2 sm:gap-4 bg-surface-bright p-3 rounded-lg border border-surface-container-high">
+<div class="flex items-center gap-2 sm:gap-3">
+<!-- Radio inputs hidden, labels styled as buttons -->
+<div class="relative">
+<input class="sr-only score-radio" id="tek_1" name="score_teknis" type="radio" value="1">
+<label class="w-10 h-10 rounded-full flex items-center justify-center border border-outline-variant font-label-md text-label-md text-on-surface-variant cursor-pointer hover:bg-surface-container transition-colors" for="tek_1">1</label>
+</div>
+<div class="relative">
+<input class="sr-only score-radio" id="tek_2" name="score_teknis" type="radio" value="2">
+<label class="w-10 h-10 rounded-full flex items-center justify-center border border-outline-variant font-label-md text-label-md text-on-surface-variant cursor-pointer hover:bg-surface-container transition-colors" for="tek_2">2</label>
+</div>
+<div class="relative">
+<input class="sr-only score-radio" id="tek_3" name="score_teknis" type="radio" value="3">
+<label class="w-10 h-10 rounded-full flex items-center justify-center border border-outline-variant font-label-md text-label-md text-on-surface-variant cursor-pointer hover:bg-surface-container transition-colors" for="tek_3">3</label>
+</div>
+<div class="relative">
+<input checked="" class="sr-only score-radio" id="tek_4" name="score_teknis" type="radio" value="4">
+<label class="w-10 h-10 rounded-full flex items-center justify-center border border-outline-variant font-label-md text-label-md text-on-surface-variant cursor-pointer hover:bg-surface-container transition-colors" for="tek_4">4</label>
+</div>
+<div class="relative">
+<input class="sr-only score-radio" id="tek_5" name="score_teknis" type="radio" value="5">
+<label class="w-10 h-10 rounded-full flex items-center justify-center border border-outline-variant font-label-md text-label-md text-on-surface-variant cursor-pointer hover:bg-surface-container transition-colors" for="tek_5">5</label>
+</div>
+</div>
+</div>
+<!-- Comment -->
+<div class="lg:col-span-5">
+<textarea class="w-full bg-surface border border-outline-variant rounded-lg p-3 font-body-md text-body-md text-on-surface focus:ring-2 focus:ring-primary focus:border-primary placeholder-outline resize-none" name="komentar_teknis" placeholder="Tambahkan catatan khusus... (Opsional)" rows="2"></textarea>
+</div>
+</div>
+<hr class="border-surface-variant border-dashed">
+<!-- Criteria 2 -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start group">
+<div class="lg:col-span-3">
+<label class="block font-label-md text-label-md text-on-surface mb-1 group-hover:text-primary transition-colors">Pengalaman Mengajar</label>
+<span class="inline-flex items-center bg-surface-container text-on-surface-variant font-label-sm text-label-sm px-2 py-1 rounded">Bobot: 20%</span>
+</div>
+<div class="lg:col-span-4 flex items-center justify-between lg:justify-start gap-2 sm:gap-4 bg-surface-bright p-3 rounded-lg border border-surface-container-high">
+<div class="flex items-center gap-2 sm:gap-3">
+<!-- Repeat structure for scores -->
+<input class="sr-only score-radio" id="peng_1" name="score_pengalaman" type="radio" value="1"><label class="w-10 h-10 rounded-full flex items-center justify-center border border-outline-variant font-label-md text-label-md text-on-surface-variant cursor-pointer hover:bg-surface-container" for="peng_1">1</label>
+<input class="sr-only score-radio" id="peng_2" name="score_pengalaman" type="radio" value="2"><label class="w-10 h-10 rounded-full flex items-center justify-center border border-outline-variant font-label-md text-label-md text-on-surface-variant cursor-pointer hover:bg-surface-container" for="peng_2">2</label>
+<input checked="" class="sr-only score-radio" id="peng_3" name="score_pengalaman" type="radio" value="3"><label class="w-10 h-10 rounded-full flex items-center justify-center border border-outline-variant font-label-md text-label-md text-on-surface-variant cursor-pointer hover:bg-surface-container" for="peng_3">3</label>
+<input class="sr-only score-radio" id="peng_4" name="score_pengalaman" type="radio" value="4"><label class="w-10 h-10 rounded-full flex items-center justify-center border border-outline-variant font-label-md text-label-md text-on-surface-variant cursor-pointer hover:bg-surface-container" for="peng_4">4</label>
+<input class="sr-only score-radio" id="peng_5" name="score_pengalaman" type="radio" value="5"><label class="w-10 h-10 rounded-full flex items-center justify-center border border-outline-variant font-label-md text-label-md text-on-surface-variant cursor-pointer hover:bg-surface-container" for="peng_5">5</label>
+</div>
+</div>
+<div class="lg:col-span-5">
+<textarea class="w-full bg-surface border border-outline-variant rounded-lg p-3 font-body-md text-body-md focus:ring-2 focus:ring-primary focus:border-primary resize-none" name="komentar_pengalaman" placeholder="Pengalaman relevan di tingkat sarjana..." rows="2"></textarea>
+</div>
+</div>
+<hr class="border-surface-variant border-dashed">
+<!-- Criteria 3 -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start group">
+<div class="lg:col-span-3">
+<label class="block font-label-md text-label-md text-on-surface mb-1 group-hover:text-primary transition-colors">Komunikasi &amp; Interpersonal</label>
+<span class="inline-flex items-center bg-surface-container text-on-surface-variant font-label-sm text-label-sm px-2 py-1 rounded">Bobot: 15%</span>
+</div>
+<div class="lg:col-span-4 flex items-center justify-between lg:justify-start gap-2 sm:gap-4 bg-surface-bright p-3 rounded-lg border border-surface-container-high">
+<div class="flex items-center gap-2 sm:gap-3">
+<input class="sr-only score-radio" id="kom_1" name="score_komunikasi" type="radio" value="1"><label class="w-10 h-10 rounded-full flex items-center justify-center border border-outline-variant font-label-md text-label-md text-on-surface-variant cursor-pointer hover:bg-surface-container" for="kom_1">1</label>
+<input class="sr-only score-radio" id="kom_2" name="score_komunikasi" type="radio" value="2"><label class="w-10 h-10 rounded-full flex items-center justify-center border border-outline-variant font-label-md text-label-md text-on-surface-variant cursor-pointer hover:bg-surface-container" for="kom_2">2</label>
+<input class="sr-only score-radio" id="kom_3" name="score_komunikasi" type="radio" value="3"><label class="w-10 h-10 rounded-full flex items-center justify-center border border-outline-variant font-label-md text-label-md text-on-surface-variant cursor-pointer hover:bg-surface-container" for="kom_3">3</label>
+<input checked="" class="sr-only score-radio" id="kom_4" name="score_komunikasi" type="radio" value="4"><label class="w-10 h-10 rounded-full flex items-center justify-center border border-outline-variant font-label-md text-label-md text-on-surface-variant cursor-pointer hover:bg-surface-container" for="kom_4">4</label>
+<input class="sr-only score-radio" id="kom_5" name="score_komunikasi" type="radio" value="5"><label class="w-10 h-10 rounded-full flex items-center justify-center border border-outline-variant font-label-md text-label-md text-on-surface-variant cursor-pointer hover:bg-surface-container" for="kom_5">5</label>
+</div>
+</div>
+<div class="lg:col-span-5">
+<textarea class="w-full bg-surface border border-outline-variant rounded-lg p-3 font-body-md text-body-md focus:ring-2 focus:ring-primary focus:border-primary resize-none" name="komentar_komunikasi" placeholder="Kemampuan artikulasi ide..." rows="2"></textarea>
+</div>
+</div>
+<hr class="border-surface-variant border-dashed">
+<!-- Criteria 4 -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start group">
+<div class="lg:col-span-3">
+<label class="block font-label-md text-label-md text-on-surface mb-1 group-hover:text-primary transition-colors">Kesesuaian Posisi (Culture Fit)</label>
+<span class="inline-flex items-center bg-surface-container text-on-surface-variant font-label-sm text-label-sm px-2 py-1 rounded">Bobot: 20%</span>
+</div>
+<div class="lg:col-span-4 flex items-center justify-between lg:justify-start gap-2 sm:gap-4 bg-surface-bright p-3 rounded-lg border border-surface-container-high">
+<div class="flex items-center gap-2 sm:gap-3">
+<input class="sr-only score-radio" id="ses_1" name="score_kesesuaian" type="radio" value="1"><label class="w-10 h-10 rounded-full flex items-center justify-center border border-outline-variant font-label-md text-label-md text-on-surface-variant cursor-pointer hover:bg-surface-container" for="ses_1">1</label>
+<input class="sr-only score-radio" id="ses_2" name="score_kesesuaian" type="radio" value="2"><label class="w-10 h-10 rounded-full flex items-center justify-center border border-outline-variant font-label-md text-label-md text-on-surface-variant cursor-pointer hover:bg-surface-container" for="ses_2">2</label>
+<input class="sr-only score-radio" id="ses_3" name="score_kesesuaian" type="radio" value="3"><label class="w-10 h-10 rounded-full flex items-center justify-center border border-outline-variant font-label-md text-label-md text-on-surface-variant cursor-pointer hover:bg-surface-container" for="ses_3">3</label>
+<input class="sr-only score-radio" id="ses_4" name="score_kesesuaian" type="radio" value="4"><label class="w-10 h-10 rounded-full flex items-center justify-center border border-outline-variant font-label-md text-label-md text-on-surface-variant cursor-pointer hover:bg-surface-container" for="ses_4">4</label>
+<input checked="" class="sr-only score-radio" id="ses_5" name="score_kesesuaian" type="radio" value="5"><label class="w-10 h-10 rounded-full flex items-center justify-center border border-outline-variant font-label-md text-label-md text-on-surface-variant cursor-pointer hover:bg-surface-container" for="ses_5">5</label>
+</div>
+</div>
+<div class="lg:col-span-5">
+<textarea class="w-full bg-surface border border-outline-variant rounded-lg p-3 font-body-md text-body-md focus:ring-2 focus:ring-primary focus:border-primary resize-none" name="komentar_kesesuaian" placeholder="Pemahaman visi &amp; misi universitas..." rows="2"></textarea>
+</div>
+</div>
+<hr class="border-surface-variant border-dashed">
+<!-- Criteria 5 -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start group">
+<div class="lg:col-span-3">
+<label class="block font-label-md text-label-md text-on-surface mb-1 group-hover:text-primary transition-colors">Motivasi &amp; Komitmen</label>
+<span class="inline-flex items-center bg-surface-container text-on-surface-variant font-label-sm text-label-sm px-2 py-1 rounded">Bobot: 15%</span>
+</div>
+<div class="lg:col-span-4 flex items-center justify-between lg:justify-start gap-2 sm:gap-4 bg-surface-bright p-3 rounded-lg border border-surface-container-high">
+<div class="flex items-center gap-2 sm:gap-3">
+<input class="sr-only score-radio" id="mot_1" name="score_motivasi" type="radio" value="1"><label class="w-10 h-10 rounded-full flex items-center justify-center border border-outline-variant font-label-md text-label-md text-on-surface-variant cursor-pointer hover:bg-surface-container" for="mot_1">1</label>
+<input class="sr-only score-radio" id="mot_2" name="score_motivasi" type="radio" value="2"><label class="w-10 h-10 rounded-full flex items-center justify-center border border-outline-variant font-label-md text-label-md text-on-surface-variant cursor-pointer hover:bg-surface-container" for="mot_2">2</label>
+<input checked="" class="sr-only score-radio" id="mot_3" name="score_motivasi" type="radio" value="3"><label class="w-10 h-10 rounded-full flex items-center justify-center border border-outline-variant font-label-md text-label-md text-on-surface-variant cursor-pointer hover:bg-surface-container" for="mot_3">3</label>
+<input class="sr-only score-radio" id="mot_4" name="score_motivasi" type="radio" value="4"><label class="w-10 h-10 rounded-full flex items-center justify-center border border-outline-variant font-label-md text-label-md text-on-surface-variant cursor-pointer hover:bg-surface-container" for="mot_4">4</label>
+<input class="sr-only score-radio" id="mot_5" name="score_motivasi" type="radio" value="5"><label class="w-10 h-10 rounded-full flex items-center justify-center border border-outline-variant font-label-md text-label-md text-on-surface-variant cursor-pointer hover:bg-surface-container" for="mot_5">5</label>
+</div>
+</div>
+<div class="lg:col-span-5">
+<textarea class="w-full bg-surface border border-outline-variant rounded-lg p-3 font-body-md text-body-md focus:ring-2 focus:ring-primary focus:border-primary resize-none" name="komentar_motivasi" placeholder="Dorongan internal dan rencana jangka panjang..." rows="2"></textarea>
+</div>
+</div>
+</div>
+<!-- Summary & Final Decision -->
+<div class="mt-12 bg-surface-container-lowest border border-outline-variant rounded-xl p-6 md:p-8">
+<h4 class="font-title-lg text-title-lg text-on-surface mb-6 border-b border-surface-variant pb-3">Kesimpulan Penilaian</h4>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+<!-- Score Display -->
+<div class="flex flex-col justify-center items-center md:items-start bg-primary-fixed p-6 rounded-xl border border-primary-fixed-dim text-center md:text-left">
+<span class="font-label-md text-label-md text-on-primary-fixed-variant uppercase tracking-wider mb-2">Total Skor Akhir</span>
+<div class="flex items-end gap-2">
+<span class="font-display-lg text-display-lg text-primary leading-none" id="total-score-display">3.85</span>
+<span class="font-body-md text-body-md text-on-primary-fixed-variant mb-1">/ 5.00</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-primary-fixed-variant mt-3 opacity-80">(Berdasarkan kalkulasi bobot kriteria)</p>
+</div>
+<!-- Recommendation -->
+<div class="space-y-4">
+<label class="block font-label-md text-label-md text-on-surface">Rekomendasi Tindak Lanjut <span class="text-error">*</span></label>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+<div class="relative">
+<input class="peer sr-only" id="rec_lanjut" name="rekomendasi" type="radio" value="lanjut">
+<label class="flex flex-col items-center justify-center p-3 border border-outline-variant rounded-lg cursor-pointer hover:bg-surface-container peer-checked:border-success peer-checked:bg-success/10 peer-checked:text-success transition-all text-center h-full" for="rec_lanjut">
+<span class="material-symbols-outlined mb-1">check_circle</span>
+<span class="font-label-md text-label-md">Lanjutkan</span>
+</label>
+</div>
+<div class="relative">
+<input checked="" class="peer sr-only" id="rec_pertimbangkan" name="rekomendasi" type="radio" value="pertimbangkan">
+<label class="flex flex-col items-center justify-center p-3 border border-outline-variant rounded-lg cursor-pointer hover:bg-surface-container peer-checked:border-secondary peer-checked:bg-secondary/10 peer-checked:text-secondary transition-all text-center h-full" for="rec_pertimbangkan">
+<span class="material-symbols-outlined mb-1">pending</span>
+<span class="font-label-md text-label-md">Pertimbangkan</span>
+</label>
+</div>
+<div class="relative">
+<input class="peer sr-only" id="rec_tidak" name="rekomendasi" type="radio" value="tidak">
+<label class="flex flex-col items-center justify-center p-3 border border-outline-variant rounded-lg cursor-pointer hover:bg-surface-container peer-checked:border-error peer-checked:bg-error/10 peer-checked:text-error transition-all text-center h-full" for="rec_tidak">
+<span class="material-symbols-outlined mb-1">cancel</span>
+<span class="font-label-md text-label-md">Tidak Lanjut</span>
+</label>
+</div>
+</div>
+</div>
+<!-- Internal Note -->
+<div class="md:col-span-2">
+<label class="block font-label-md text-label-md text-on-surface mb-2">Catatan Internal (Hanya untuk Admin/HR)</label>
+<textarea class="w-full bg-surface border border-outline-variant rounded-lg p-4 font-body-md text-body-md text-on-surface focus:ring-2 focus:ring-primary focus:border-primary resize-y" name="catatan_internal" placeholder="Tuliskan rangkuman impresi keseluruhan, red flags, atau poin penting yang perlu didiskusikan dengan manajemen..." rows="4"></textarea>
+</div>
+</div>
+</div>
+<!-- Form Actions -->
+<div class="flex flex-col sm:flex-row justify-end items-center gap-4 pt-6 border-t border-surface-variant">
+<button class="w-full sm:w-auto px-6 py-2.5 font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded-lg transition-colors" type="button">Batal</button>
+<button class="w-full sm:w-auto px-8 py-2.5 bg-primary text-on-primary font-label-md text-label-md rounded-lg shadow-sm hover:shadow-hover hover:bg-primary-container transition-all flex items-center justify-center gap-2" type="submit">
+<span class="material-symbols-outlined text-[20px]">save</span>
+                            Simpan Penilaian
+                        </button>
+</div>
+</form>
+</section>
+</div>
+<footer class="w-full py-6 px-margin-desktop border-t border-outline-variant bg-surface text-center">
+    <p class="font-label-sm text-label-sm text-on-surface-variant">© 2026 Portal Karir Kampus. Seluruh hak cipta dilindungi undang-undang.</p>
+</footer></main>
+
+
+</body></html>

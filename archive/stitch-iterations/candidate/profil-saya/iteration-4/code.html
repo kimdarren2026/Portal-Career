@@ -1,0 +1,422 @@
+<!DOCTYPE html><html lang="id"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Profil Saya - Budi Santoso</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#d6e3ff",
+                        "background": "#f7fafc",
+                        "on-error-container": "#93000a",
+                        "on-surface": "#181c1e",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#2d476f",
+                        "deep-navy": "#1B2D4F",
+                        "secondary": "#0061a5",
+                        "secondary-fixed": "#d2e4ff",
+                        "on-tertiary-container": "#cb9524",
+                        "inverse-surface": "#2d3133",
+                        "on-background": "#181c1e",
+                        "primary-fixed-dim": "#adc7f7",
+                        "on-primary-fixed": "#001b3c",
+                        "primary": "#002045",
+                        "surface-container-highest": "#e0e3e5",
+                        "tertiary-fixed-dim": "#f8bc4b",
+                        "tertiary": "#2d1d00",
+                        "on-secondary-fixed": "#001d37",
+                        "secondary-container": "#66affe",
+                        "on-primary-container": "#86a0cd",
+                        "on-tertiary-fixed-variant": "#5f4100",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed": "#271900",
+                        "on-secondary": "#ffffff",
+                        "surface-container": "#ebeef0",
+                        "inverse-primary": "#adc7f7",
+                        "on-tertiary": "#ffffff",
+                        "surface": "#ffffff",
+                        "surface-tint": "#455f88",
+                        "on-surface-variant": "#43474e",
+                        "surface-variant": "#e0e3e5",
+                        "outline": "#74777f",
+                        "surface-dim": "#d7dadc",
+                        "inverse-on-surface": "#eef1f3",
+                        "surface-bright": "#f7fafc",
+                        "on-secondary-container": "#004172",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#f1f4f6",
+                        "primary-container": "#1a365d",
+                        "tertiary-container": "#493100",
+                        "outline-variant": "#c4c6cf",
+                        "tertiary-fixed": "#ffdeaa",
+                        "surface-container-high": "#e5e9eb",
+                        "secondary-fixed-dim": "#9fcaff",
+                        "success": "#38a169",
+                        "on-secondary-fixed-variant": "#00497e",
+                        "error": "#E11B22"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "margin-desktop": "48px",
+                        "container-max": "1280px",
+                        "base": "4px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "label-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex antialiased">
+<!-- TopNavBar (Mobile Only) -->
+<header class="md:hidden flex items-center justify-between px-margin-mobile w-full h-16 sticky top-0 z-40 bg-surface border-b border-outline-variant">
+<div class="font-headline-md text-headline-md font-bold text-deep-navy">CareerPortal</div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-primary cursor-pointer active:opacity-80">notifications</span>
+<span class="material-symbols-outlined text-primary cursor-pointer active:opacity-80">help_outline</span>
+</div>
+</header>
+<!-- SideNavBar (Desktop Only) -->
+<nav class="hidden md:flex flex-col fixed left-0 top-0 h-screen w-[280px] z-50 bg-deep-navy shadow-md py-6">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface flex items-center justify-center">
+<img alt="University Logo" class="w-8 h-8 rounded-full object-cover" data-alt="A clean, minimalist abstract geometric logo representing a modern university in shades of deep navy and white. The design is sleek and professional, fitting a corporate academic aesthetic. High resolution, bright lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCrhZ9UzeQw1GapFzzKEbYzDAWBYk-y_4PSPQDOgGyHC1UbTRp1ODbAGGx5U4UVwOuid3hV87SIORUUg1pcyi3hlJbAd9Xjkvkio-NRKGGTxlukheyQwP5at4zBcgzQOPupE-CRcVhXBbiFOn5yg2ST-HFYkNiPhY9Lvswry2tFwMi_vMQs8VH5XXbRD1WxxoLrO4Pbco4_F_PIStmYpf4-YS1rXSCVQlwspYUJLtDtUfHdjMxEFaFQmg">
+</div>
+<div>
+<h1 class="font-title-lg text-title-lg font-bold text-white">Universitas Career</h1>
+<p class="font-label-sm text-label-sm text-white opacity-80">Portal Karir Terpadu</p>
+</div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto space-y-2 px-2">
+<a class="text-white opacity-80 hover:opacity-100 flex items-center gap-4 px-4 py-3 mx-2 transition-all hover:bg-primary-container rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="bg-secondary-container text-on-secondary-container rounded-lg flex items-center gap-4 px-4 py-3 mx-2 scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-label-md text-label-md">Profil Saya</span>
+</a>
+<a class="text-white opacity-80 hover:opacity-100 flex items-center gap-4 px-4 py-3 mx-2 transition-all hover:bg-primary-container rounded-lg" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-md text-label-md">CV &amp; Dokumen</span>
+</a>
+<a class="text-white opacity-80 hover:opacity-100 flex items-center gap-4 px-4 py-3 mx-2 transition-all hover:bg-primary-container rounded-lg" href="#">
+<span class="material-symbols-outlined">search</span>
+<span class="font-label-md text-label-md">Cari Lowongan</span>
+</a>
+<a class="text-white opacity-80 hover:opacity-100 flex items-center gap-4 px-4 py-3 mx-2 transition-all hover:bg-primary-container rounded-lg" href="#">
+<span class="material-symbols-outlined">work</span>
+<span class="font-label-md text-label-md">Lamaran Saya</span>
+</a>
+<a class="text-white opacity-80 hover:opacity-100 flex items-center gap-4 px-4 py-3 mx-2 transition-all hover:bg-primary-container rounded-lg" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-md text-label-md">Jadwal Seleksi</span>
+</a>
+<a class="text-white opacity-80 hover:opacity-100 flex items-center gap-4 px-4 py-3 mx-2 transition-all hover:bg-primary-container rounded-lg" href="#">
+<span class="material-symbols-outlined">bookmark</span>
+<span class="font-label-md text-label-md">Lowongan Tersimpan</span>
+</a>
+<a class="text-white opacity-80 hover:opacity-100 flex items-center gap-4 px-4 py-3 mx-2 transition-all hover:bg-primary-container rounded-lg" href="#">
+<span class="material-symbols-outlined">notifications</span>
+<span class="font-label-md text-label-md">Notifikasi</span>
+</a>
+<a class="text-white opacity-80 hover:opacity-100 flex items-center gap-4 px-4 py-3 mx-2 transition-all hover:bg-primary-container rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Pengaturan Akun</span>
+</a>
+</div>
+<div class="px-6 mt-auto">
+<button class="w-full bg-secondary text-white font-label-md text-label-md py-3 rounded-lg hover:bg-secondary-container hover:text-on-secondary-container transition-colors shadow-sm">
+                Cari Lowongan Baru
+            </button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-[280px] p-margin-mobile md:p-margin-desktop max-w-container-max mx-auto w-full flex flex-col min-h-screen">
+<div class="flex justify-between items-center mb-8">
+<h2 class="font-headline-lg text-headline-lg font-bold text-deep-navy hidden md:block">Profil Saya</h2>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-deep-navy md:hidden">Profil Saya</h2>
+<div class="flex gap-4">
+<button class="px-4 py-2 border border-outline rounded-lg text-on-surface hover:bg-surface-container-low transition-colors font-label-md text-label-md flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+                    Edit Profil
+                </button>
+<button class="px-4 py-2 bg-primary text-on-primary rounded-lg hover:bg-primary-container transition-colors font-label-md text-label-md shadow-sm">
+                    Simpan Perubahan
+                </button>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<!-- Left Column: Profile Card & Preferences -->
+<div class="lg:col-span-1 flex flex-col gap-gutter">
+<!-- Profile Card -->
+<div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm flex flex-col items-center text-center">
+<div class="relative mb-4">
+<img alt="Budi Santoso Profile Picture" class="w-32 h-32 rounded-full object-cover border-4 border-surface-container-low shadow-md" data-alt="A professional headshot of a young Indonesian male software developer. He is smiling warmly, wearing a clean smart-casual shirt, against a bright, modern office background. High quality photography, crisp focus, soft natural lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBiGevATYhEAxR5pWW8ovksYpbiU3QXff9balepqe__pyIvD1VERGYqi4MYJT5uCMdIXrHonn2nxgbGSIk-6aUko9CCb06hLXM60e7sZRlOMP_y3E3xJUDWSWuKSiJrOmz2Aj46EWlLER-87rafu4v6Bo9VVkRG5uLQJk1s8y5V2iUcEWSsBCFEKnleh4ciaEm8V7Vvg58qKI5zgThKLq3pIHxI1W8bsx-iKcu0qkA5UAu37iKvPNxqew">
+<button class="absolute bottom-0 right-0 bg-secondary text-white p-2 rounded-full shadow-md hover:bg-secondary-container transition-colors">
+<span class="material-symbols-outlined text-[16px]">photo_camera</span>
+</button>
+</div>
+<h3 class="font-title-lg text-title-lg font-bold text-on-surface mb-1">Budi Santoso</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-4">Alumni</p>
+<div class="w-full flex justify-center gap-2 mb-6 flex-wrap">
+<span class="px-3 py-1 bg-primary-fixed text-on-primary-fixed rounded-full font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">school</span>
+                            Informatika UI
+                        </span>
+<span class="px-3 py-1 bg-secondary-fixed text-on-secondary-fixed rounded-full font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" style="color: #cb9524">verified</span>
+                            Alumni Terverifikasi
+                        </span>
+</div>
+<div class="w-full text-left space-y-4">
+<h4 class="font-label-md text-label-md text-deep-navy border-b border-outline-variant pb-2">Informasi Dasar</h4>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-outline">mail</span>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Email</p>
+<p class="font-body-md text-body-md text-on-surface flex items-center gap-2">
+                                    budi.santoso@ui.ac.id
+                                    <span class="flex items-center gap-1 px-2 py-0.5 bg-green-50 text-success rounded-full text-[10px] font-semibold border border-green-200">
+<span class="material-symbols-outlined text-[12px]">check_circle</span>
+                                        Email Terverifikasi
+                                    </span>
+</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-outline">phone_iphone</span>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">No WhatsApp</p>
+<p class="font-body-md text-body-md text-on-surface">+62 812-3456-7890</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-outline">location_on</span>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Domisili</p>
+<p class="font-body-md text-body-md text-on-surface">Jakarta Selatan</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Work Preferences -->
+<div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+<h4 class="font-label-md text-label-md text-deep-navy border-b border-outline-variant pb-2 mb-4 flex items-center justify-between">
+                        Preferensi Kerja
+                        <button class="text-secondary hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+</h4>
+<div class="space-y-4">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Tipe Pekerjaan</p>
+<span class="inline-block px-3 py-1 bg-surface-container-high text-on-surface rounded-full font-label-sm text-label-sm">Penuh Waktu</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Lokasi</p>
+<div class="flex gap-2 flex-wrap">
+<span class="inline-block px-3 py-1 bg-surface-container-high text-on-surface rounded-full font-label-sm text-label-sm">Remote</span>
+<span class="inline-block px-3 py-1 bg-surface-container-high text-on-surface rounded-full font-label-sm text-label-sm">Jakarta</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Tautan Profesional -->
+<div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+<h4 class="font-label-md text-label-md text-deep-navy border-b border-outline-variant pb-2 mb-4 flex items-center justify-between">
+                        Tautan Profesional
+                        <button class="text-secondary hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+</h4>
+<div class="space-y-3">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-outline">link</span>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">LinkedIn</p>
+<a class="font-body-md text-body-md text-secondary hover:underline" href="#">linkedin.com/in/budisantoso</a>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-outline">code</span>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">GitHub</p>
+<a class="font-body-md text-body-md text-secondary hover:underline" href="#">github.com/budisantoso</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Details (Bento-style layout) -->
+<div class="lg:col-span-2 flex flex-col gap-gutter">
+<!-- Education -->
+<div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary-fixed-dim rounded-bl-full opacity-20 -z-10 group-hover:scale-110 transition-transform duration-500"></div>
+<div class="flex justify-between items-start mb-6">
+<h4 class="font-title-lg text-title-lg font-bold text-deep-navy flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">school</span>
+                            Pendidikan
+                        </h4>
+<button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors"><span class="material-symbols-outlined text-[20px] text-on-surface-variant">add</span></button>
+</div>
+<div class="relative pl-6 border-l-2 border-primary-fixed pb-4">
+<div class="absolute w-3 h-3 bg-primary rounded-full -left-[7px] top-1"></div>
+<h5 class="font-body-md text-body-md font-semibold text-on-surface">S1 Teknik Informatika</h5>
+<p class="font-body-md text-body-md text-on-surface-variant mb-1">Universitas Indonesia</p>
+<p class="font-label-sm text-label-sm text-outline flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">calendar_month</span> 2020 - 2026</p>
+</div>
+</div>
+<!-- Experience -->
+<div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm relative overflow-hidden group">
+<div class="absolute bottom-0 right-0 w-40 h-40 bg-secondary-fixed rounded-tl-full opacity-20 -z-10 group-hover:scale-110 transition-transform duration-500"></div>
+<div class="flex justify-between items-start mb-6">
+<h4 class="font-title-lg text-title-lg font-bold text-deep-navy flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">work</span>
+                            Pengalaman Kerja
+                        </h4>
+<button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors"><span class="material-symbols-outlined text-[20px] text-on-surface-variant">add</span></button>
+</div>
+<div class="relative pl-6 border-l-2 border-outline-variant pb-6">
+<div class="absolute w-3 h-3 bg-secondary rounded-full -left-[7px] top-1 shadow-sm"></div>
+<h5 class="font-body-md text-body-md font-semibold text-on-surface">Frontend Developer Intern</h5>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-2 mb-1">
+                            PT Teknologi Nusantara 
+                            <span class="material-symbols-outlined text-[16px] text-[#cb9524]" title="Mitra Kampus Resmi">verified</span>
+</p>
+<p class="font-label-sm text-label-sm text-outline flex items-center gap-1 mb-3">
+<span class="material-symbols-outlined text-[14px]">calendar_month</span>
+                            Jun 2023 - Ags 2023
+                        </p>
+<p class="font-body-md text-body-md text-on-surface text-sm">Membantu pengembangan antarmuka pengguna untuk aplikasi manajemen sumber daya manusia internal. Berkolaborasi dengan tim desain menggunakan Figma dan mengimplementasikan komponen menggunakan React.js dan Tailwind CSS.</p>
+</div>
+</div>
+<!-- Organization Experience -->
+<div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm relative overflow-hidden group">
+<div class="flex justify-between items-start mb-6">
+<h4 class="font-title-lg text-title-lg font-bold text-deep-navy flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary">groups</span>
+                            Pengalaman Organisasi
+                        </h4>
+<button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors"><span class="material-symbols-outlined text-[20px] text-on-surface-variant">add</span></button>
+</div>
+<div class="relative pl-6 border-l-2 border-outline-variant pb-4">
+<div class="absolute w-3 h-3 bg-tertiary rounded-full -left-[7px] top-1 shadow-sm"></div>
+<h5 class="font-body-md text-body-md font-semibold text-on-surface">Ketua Divisi IT</h5>
+<p class="font-body-md text-body-md text-on-surface-variant mb-1">Himpunan Mahasiswa Ilmu Komputer (HMIK)</p>
+<p class="font-label-sm text-label-sm text-outline flex items-center gap-1 mb-3">
+<span class="material-symbols-outlined text-[14px]">calendar_month</span>
+                            Jan 2022 - Des 2022
+                        </p>
+<p class="font-body-md text-body-md text-on-surface text-sm">Memimpin tim yang terdiri dari 5 orang dalam mengelola website himpunan dan menyelenggarakan workshop teknologi bulanan untuk mahasiswa.</p>
+</div>
+</div>
+<!-- Certifications -->
+<div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm relative overflow-hidden group">
+<div class="flex justify-between items-start mb-6">
+<h4 class="font-title-lg text-title-lg font-bold text-deep-navy flex items-center gap-2">
+<span class="material-symbols-outlined text-success">workspace_premium</span>
+                            Sertifikasi
+                        </h4>
+<button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors"><span class="material-symbols-outlined text-[20px] text-on-surface-variant">add</span></button>
+</div>
+<div class="relative pl-6 border-l-2 border-outline-variant pb-4">
+<div class="absolute w-3 h-3 bg-success rounded-full -left-[7px] top-1 shadow-sm"></div>
+<h5 class="font-body-md text-body-md font-semibold text-on-surface">AWS Certified Cloud Practitioner</h5>
+<p class="font-body-md text-body-md text-on-surface-variant mb-1">Amazon Web Services</p>
+<p class="font-label-sm text-label-sm text-outline flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">calendar_month</span>
+                            Diterbitkan: Okt 2023 - Berlaku hingga: Okt 2026
+                        </p>
+</div>
+</div>
+<!-- Skills -->
+<div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+<div class="flex justify-between items-start mb-6">
+<h4 class="font-title-lg text-title-lg font-bold text-deep-navy flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary">code</span>
+                            Keterampilan
+                        </h4>
+<button class="text-secondary hover:text-primary transition-colors text-sm font-label-md">Kelola</button>
+</div>
+<div class="flex flex-wrap gap-3">
+<div class="px-4 py-2 border border-outline-variant rounded-lg flex items-center gap-2 bg-surface hover:-translate-y-1 transition-transform cursor-default shadow-sm">
+<img alt="JavaScript Logo" class="w-5 h-5 object-contain" data-alt="A clean, minimalist 24x24 pixel icon representing JavaScript. Bright yellow square with black 'JS' letters. Professional digital asset style, flat design on a white background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7Ewv7QI1YpNxC-YIsC552TiRuqheru-jZLOJHfhbd82-M5aHP0ilMPoKM364u3pHG6kuKGUdF5JOxyoYV8mfvfl9wMXEBdiVzr4V4uw1VFQKtxTUeBQOTdg27iwgif6_DaS6gYLaKmm-MVSxSDLQ5acX00c4FM3i3oF90jYeb75FwRzBF6gPIVjmGY_ltyFyVj9L3cVZ0ltuYYVe_52_ngOD8u61bHsy2haWiuMnYIQC1-QYUqqUeiw">
+<span class="font-body-md text-body-md text-on-surface">JavaScript</span>
+</div>
+<div class="px-4 py-2 border border-outline-variant rounded-lg flex items-center gap-2 bg-surface hover:-translate-y-1 transition-transform cursor-default shadow-sm">
+<img alt="React.js Logo" class="w-5 h-5 object-contain" data-alt="A clean, minimalist 24x24 pixel icon representing React.js. Cyan atom symbol on a transparent or white background. Professional digital asset style, flat design." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjtCxSmuKYhmMuMWTLk3XJZ6Z6bmQdgumDf7itNpzl5CeSKWo66I__aIyjZ5eWj1TdN-DlUKE69iY7IpLldmQcb2nIogQ9foyp56Iqgf5YCyORT34LhTGtpFZRWKIqjdI-6pcYKD2b0taHhEVVDGK8XtUm_X3oLSSgg03wWwhpv4T_KNBqSKSRwygMqYfJwIbYVrae9vHH4cK_XFQylHVnRdniY-8IC-XQMNoLJXAMuDNzjGFR3twt2g">
+<span class="font-body-md text-body-md text-on-surface">React.js</span>
+</div>
+<div class="px-4 py-2 border border-outline-variant rounded-lg flex items-center gap-2 bg-surface hover:-translate-y-1 transition-transform cursor-default shadow-sm">
+<img alt="Tailwind CSS Logo" class="w-5 h-5 object-contain" data-alt="A clean, minimalist 24x24 pixel icon representing Tailwind CSS. Cyan wave symbol. Professional digital asset style, flat design on white background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWutYFYYDSD2Rmpj5UDbiwqtgOKEseft-Kwy21AXWUlWLVUMEaWwQoDC_heiSwFHIlAU1YlE-bcJyK6iAjDpM0CsmCeqdHrPbkD5LZA3r4ZcIjp3Q17Pryl5_xsa8cptUl_pOXoqhyGZuGN6vC31lajNpjAnppCTnQovtbmW2s30tcaoX18XjD4b6ZL3asLIixR-SMCb38n0bWZ2RCttU1sMJkJuPRGxuoSiAl3j0fn21-TVCFR0GjkA">
+<span class="font-body-md text-body-md text-on-surface">Tailwind CSS</span>
+</div>
+<div class="px-4 py-2 border border-outline-variant rounded-lg flex items-center gap-2 bg-surface hover:-translate-y-1 transition-transform cursor-default shadow-sm">
+<img alt="Figma Logo" class="w-5 h-5 object-contain" data-alt="A clean, minimalist 24x24 pixel icon representing Figma. Colorful multi-layered droplet shape. Professional digital asset style, flat design." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsAYqnUEwAISJC3YeJrETIZqBlb8YfHTqoeXpDxrPEf5o7kOpO9j4-hSFhrCvDPRnRGHOQTVEvN8AjdiaO-HmsbufvITU0mjJ4B5ovjuiZ1f5yYS4QurnP_E0dSm-y3h6c5O4pcZrV8uLwqn_jhwelR-Uhaq0g1x0fGRKUM0PrfzqT_Erz9jIFbvHtwlqHxiSKQMYdLhBBq4dBS8iu3jnHvIobG_FR8oo_UtFA-pLzqcuNeXGPXMHTLw">
+<span class="font-body-md text-body-md text-on-surface">Figma</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-surface border-t border-outline-variant flex justify-around items-center z-50">
+<a class="flex flex-col items-center justify-center w-full h-full text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">dashboard</span>
+<span class="text-[10px] font-medium mt-1">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-primary font-bold bg-primary-container bg-opacity-10 border-t-2 border-primary" href="#">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="text-[10px] font-medium mt-1">Profil</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">search</span>
+<span class="text-[10px] font-medium mt-1">Cari</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">menu</span>
+<span class="text-[10px] font-medium mt-1">Menu</span>
+</a>
+</nav>
+
+
+</body></html>

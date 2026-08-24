@@ -1,0 +1,471 @@
+<!DOCTYPE html><html lang="id"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Detail Lowongan Kampus - Portal Karir Admin</title>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary": "#2d1d00",
+                      "on-primary-container": "#86a0cd",
+                      "deep-navy": "#1B2D4F",
+                      "on-error": "#ffffff",
+                      "on-secondary-fixed-variant": "#00497e",
+                      "surface-variant": "#e0e3e5",
+                      "on-tertiary-fixed": "#271900",
+                      "surface-container-highest": "#e0e3e5",
+                      "secondary-container": "#66affe",
+                      "on-tertiary": "#ffffff",
+                      "surface-dim": "#d7dadc",
+                      "on-primary": "#ffffff",
+                      "surface-container": "#ebeef0",
+                      "error-container": "#ffdad6",
+                      "primary-fixed-dim": "#adc7f7",
+                      "on-secondary-fixed": "#001d37",
+                      "on-primary-fixed-variant": "#2d476f",
+                      "on-error-container": "#93000a",
+                      "background": "#f7fafc",
+                      "surface-bright": "#f7fafc",
+                      "surface-container-high": "#e5e9eb",
+                      "primary-container": "#1a365d",
+                      "on-secondary": "#ffffff",
+                      "tertiary-fixed-dim": "#f8bc4b",
+                      "on-background": "#181c1e",
+                      "on-primary-fixed": "#001b3c",
+                      "on-surface": "#181c1e",
+                      "secondary-fixed-dim": "#9fcaff",
+                      "on-tertiary-container": "#cb9524",
+                      "primary-fixed": "#d6e3ff",
+                      "tertiary-container": "#493100",
+                      "on-tertiary-fixed-variant": "#5f4100",
+                      "surface-tint": "#455f88",
+                      "on-secondary-container": "#004172",
+                      "inverse-surface": "#2d3133",
+                      "outline": "#74777f",
+                      "outline-variant": "#c4c6cf",
+                      "inverse-primary": "#adc7f7",
+                      "inverse-on-surface": "#eef1f3",
+                      "primary": "#002045",
+                      "on-surface-variant": "#43474e",
+                      "tertiary-fixed": "#ffdeaa",
+                      "secondary-fixed": "#d2e4ff",
+                      "secondary": "#0061a5",
+                      "surface-container-low": "#f1f4f6",
+                      "surface": "#ffffff",
+                      "success": "#38a169",
+                      "error": "#E11B22",
+                      "surface-container-lowest": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-mobile": "16px",
+                      "margin-desktop": "48px",
+                      "container-max": "1280px",
+                      "base": "4px",
+                      "gutter": "24px"
+              },
+              "fontFamily": {
+                      "label-md": ["Inter"],
+                      "body-md": ["Inter"],
+                      "headline-lg-mobile": ["Inter"],
+                      "headline-md": ["Inter"],
+                      "label-sm": ["Inter"],
+                      "headline-lg": ["Inter"],
+                      "title-lg": ["Inter"],
+                      "display-lg": ["Inter"],
+                      "body-lg": ["Inter"]
+              },
+              "fontSize": {
+                      "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                      "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Hide scrollbar for clean dashboard look */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md overflow-hidden">
+<!-- Dashboard Layout Wrapper -->
+<div class="flex h-screen w-full">
+<!-- ==========================================
+             SideNavBar (From JSON Blueprint)
+             ========================================== -->
+<nav class="w-[280px] h-screen sticky top-0 left-0 bg-deep-navy shadow-sm flex flex-col h-full py-6 flex-shrink-0 z-20">
+<!-- Header Brand -->
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-deep-navy">school</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-white leading-tight">Portal Karir</h1>
+<p class="font-label-sm text-label-sm text-white/70">Admin Kepegawaian</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<div class="flex flex-col gap-1 flex-1 overflow-y-auto no-scrollbar px-2">
+<!-- Dashboard -->
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md rounded-lg hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="">Dashboard</span>
+</a>
+<!-- Lowongan Kampus (ACTIVE STATE) -->
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary font-bold border-l-4 border-secondary-container rounded-r-lg shadow-sm" href="#">
+<span class="material-symbols-outlined icon-fill" data-icon="work">work</span>
+<span class="">Lowongan Kampus</span>
+</a>
+<!-- Pelamar -->
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md rounded-lg hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="">Pelamar</span>
+</a>
+<!-- Jadwal Seleksi -->
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md rounded-lg hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span class="">Jadwal Seleksi</span>
+</a>
+<!-- Penilaian -->
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md rounded-lg hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="fact_check">fact_check</span>
+<span class="">Penilaian</span>
+</a>
+<!-- Offering -->
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md rounded-lg hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="contract">contract</span>
+<span class="">Offering</span>
+</a>
+<!-- Outcome Rekrutmen -->
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md rounded-lg hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="">Outcome Rekrutmen</span>
+</a>
+<!-- Laporan -->
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md rounded-lg hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="">Laporan</span>
+</a>
+</div>
+<!-- Bottom Actions -->
+<div class="px-2 mt-auto pt-4 border-t border-white/10">
+<!-- Notifikasi -->
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md rounded-lg hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="">Notifikasi</span>
+</a>
+<!-- Pengaturan -->
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md rounded-lg hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="">Pengaturan</span>
+</a>
+</div>
+</nav>
+<!-- ==========================================
+             Main Content Area
+             ========================================== -->
+<main class="flex-1 flex flex-col h-screen overflow-hidden bg-background">
+<!-- TopNavBar (From JSON Blueprint) -->
+<header class="full-width top-0 sticky flex justify-between items-center w-full px-margin-desktop h-16 bg-surface dark:bg-surface-container border-b border-outline-variant z-10">
+<!-- Search Bar (on_left) -->
+<div class="flex-1 max-w-md">
+<div class="relative flex items-center w-full h-10 rounded-lg focus-within:shadow-sm bg-surface-container-low overflow-hidden">
+<div class="grid place-items-center h-full w-12 text-outline">
+<span class="material-symbols-outlined text-sm">search</span>
+</div>
+<input class="peer h-full w-full outline-none text-sm text-on-surface bg-transparent pr-2 font-body-md" id="search" placeholder="Cari data kandidat, lowongan..." type="text">
+</div>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-highest">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-highest">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<div class="h-8 w-px bg-outline-variant mx-2"></div>
+<!-- Profile -->
+<div class="flex items-center gap-3 cursor-pointer group">
+<div class="text-right hidden md:block">
+<p class="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors">Admin Kepegawaian</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Administrator</p>
+</div>
+<img alt="Foto Profil Admin" class="w-10 h-10 rounded-full object-cover border border-outline-variant" data-alt="A professional headshot of an Indonesian administrative staff member, wearing formal business attire, bright neutral lighting, clean modern office background, high quality portrait photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3f1z8W7H2u45PFuSIwFcFlhCFFv1lUOvwmqlYNEwjCCOTs9kh4qnwV8FOKDbEg_-xenFuBylklsPoGFzJfzeJWY6EN-E-k07GgWkhfKDP5NGJDR76dAxdEmwvTQVa2FHmHT6pzTXV3ASGi89lQBllxZD_9c4xGUCoExNUIzbdJhIjkJuz4t38Ct0pciTnMCONnVF7foeOHv1bfn0uMDN3NBVzbVbqLvobNvR_PJD9wBlhc_dJ9W7KIw">
+</div>
+</div>
+</header>
+<!-- Canvas Container -->
+<div class="flex-1 overflow-y-auto p-gutter lg:p-margin-desktop pb-24 no-scrollbar">
+<div class="max-w-[1200px] mx-auto">
+<!-- Breadcrumbs -->
+<nav class="flex items-center gap-2 text-label-sm font-label-sm text-on-surface-variant mb-6">
+<a class="hover:text-primary transition-colors" href="#">Portal Karir</a>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<a class="hover:text-primary transition-colors" href="#">Lowongan Kampus</a>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span class="text-on-surface font-semibold">Detail Lowongan</span>
+</nav>
+<!-- Header Hero Card -->
+<div class="bg-surface border border-outline-variant rounded-xl p-8 mb-8 shadow-sm relative overflow-hidden">
+<!-- Decorative bg accent -->
+<div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-primary-fixed to-transparent opacity-30 rounded-bl-full pointer-events-none"></div>
+<div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-8 relative z-10">
+<!-- Key Info -->
+<div class="flex-1">
+<div class="flex items-center gap-3 mb-3">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#E6F4EA] text-[#1E7E34] font-label-sm text-label-sm border border-[#C3E6CB]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#1E7E34]"></span>
+                                        Status: Tayang
+                                    </span>
+<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm">Target: Publik</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-deep-navy mb-1 tracking-tight">Dosen Informatika</h2>
+<p class="font-title-lg text-title-lg text-secondary mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">domain</span>
+                                    Fakultas Ilmu Komputer
+                                </p>
+<!-- Metrics Row -->
+<div class="flex flex-wrap items-center gap-6 md:gap-12 p-4 bg-surface-container-lowest border border-outline-variant rounded-lg inline-flex">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">event_available</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Tanggal Buka</p>
+<p class="font-label-md text-label-md text-on-surface">10 Okt 2026</p>
+</div>
+</div>
+<div class="w-px h-8 bg-outline-variant hidden md:block"></div>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-error">
+<span class="material-symbols-outlined">event_busy</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Tanggal Tutup</p>
+<p class="font-label-md text-label-md text-on-surface">10 Nov 2026</p>
+</div>
+</div>
+<div class="w-px h-8 bg-outline-variant hidden md:block"></div>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined">group</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Jumlah Pelamar</p>
+<p class="font-headline-md text-headline-md text-primary font-bold">128</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex flex-col sm:flex-row gap-3 w-full xl:w-auto shrink-0">
+<button class="flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg border border-outline font-label-md text-label-md text-on-surface hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+                                    Edit Lowongan
+                                </button>
+<button class="flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg border border-error text-error font-label-md text-label-md hover:bg-error-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">block</span>
+                                    Tutup Lowongan
+                                </button>
+<button class="flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-primary text-on-primary font-label-md text-label-md shadow-sm hover:bg-secondary transition-colors md:ml-4">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+                                    Lihat Pelamar
+                                </button>
+</div>
+</div>
+</div>
+<!-- Bento Grid Content -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+<!-- Left Column (Wide) -->
+<div class="xl:col-span-2 flex flex-col gap-6">
+<!-- Informasi Posisi -->
+<div class="bg-surface border border-outline-variant rounded-xl p-6 shadow-sm">
+<h3 class="font-title-lg text-title-lg text-deep-navy mb-4 border-b border-outline-variant pb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">info</span>
+                                    Informasi Posisi
+                                </h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Jenis Pekerjaan</p>
+<p class="font-body-md text-body-md text-on-surface font-medium">Purna Waktu (Full-time)</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Kategori</p>
+<p class="font-body-md text-body-md text-on-surface font-medium">Akademik / Pengajar</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Lokasi Kampus</p>
+<p class="font-body-md text-body-md text-on-surface font-medium">Kampus Utama, Gedung D</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Rentang Gaji (Opsional)</p>
+<p class="font-body-md text-body-md text-on-surface font-medium">Sesuai Standar Universitas</p>
+</div>
+</div>
+</div>
+<!-- Deskripsi & Kualifikasi -->
+<div class="bg-surface border border-outline-variant rounded-xl p-6 shadow-sm">
+<div class="mb-8">
+<h3 class="font-title-lg text-title-lg text-deep-navy mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">description</span>
+                                        Deskripsi Pekerjaan
+                                    </h3>
+<div class="font-body-md text-body-md text-on-surface-variant space-y-3">
+<p class="">Fakultas Ilmu Komputer mencari individu yang berdedikasi tinggi untuk bergabung sebagai Dosen Tetap di Program Studi Informatika. Kandidat terpilih akan bertanggung jawab dalam melaksanakan Tridharma Perguruan Tinggi yang mencakup Pendidikan, Penelitian, dan Pengabdian kepada Masyarakat.</p>
+<ul class="list-disc pl-5 space-y-1 mt-2">
+<li class="">Mengampu mata kuliah terkait Rekayasa Perangkat Lunak dan Kecerdasan Buatan.</li>
+<li class="">Membimbing mahasiswa dalam penyusunan tugas akhir dan skripsi.</li>
+<li class="">Aktif melakukan penelitian dan publikasi di jurnal nasional maupun internasional.</li>
+</ul>
+</div>
+</div>
+<div>
+<h3 class="font-title-lg text-title-lg text-deep-navy mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">verified</span>
+                                        Kualifikasi Minimum
+                                    </h3>
+<div class="font-body-md text-body-md text-on-surface-variant">
+<ul class="list-disc pl-5 space-y-2">
+<li class="">Pendidikan minimal S2/Magister di bidang Ilmu Komputer, Teknik Informatika, atau disiplin ilmu serumpun dari perguruan tinggi terakreditasi Minimal B (Diutamakan lulusan S3).</li>
+<li class="">IPK minimal 3.25 (skala 4.00) untuk jenjang S1 dan 3.50 untuk jenjang S2.</li>
+<li class="">Memiliki pengalaman mengajar atau asisten dosen minimal 1 tahun menjadi nilai tambah.</li>
+<li class="">Memiliki rekam jejak publikasi ilmiah (minimal prosiding seminar nasional).</li>
+<li class="">Mampu berkomunikasi dengan baik dalam Bahasa Indonesia dan Bahasa Inggris (TOEFL ITP Min. 500 / IELTS Min. 6.0).</li>
+</ul>
+</div>
+</div>
+</div>
+<!-- Pertanyaan Seleksi -->
+<div class="bg-surface border border-outline-variant rounded-xl p-6 shadow-sm">
+<div class="flex justify-between items-center mb-4 border-b border-outline-variant pb-2">
+<h3 class="font-title-lg text-title-lg text-deep-navy flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">quiz</span>
+                                        Pertanyaan Seleksi (Pre-Screening)
+                                    </h3>
+<span class="px-2 py-1 bg-surface-container text-on-surface-variant font-label-sm text-label-sm rounded">3 Pertanyaan</span>
+</div>
+<div class="space-y-4">
+<div class="p-4 bg-surface-bright border border-outline-variant rounded-lg">
+<div class="flex justify-between items-start mb-2">
+<p class="font-label-md text-label-md text-on-surface">1. Apakah Anda saat ini memiliki NIDN (Nomor Induk Dosen Nasional)?</p>
+<span class="px-2 py-1 bg-secondary-container text-on-secondary-container font-label-sm text-label-sm rounded-md">Pilihan Ganda</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">Opsi: Ya, Sudah Punya | Belum, namun bersedia mengurus | Tidak</p>
+</div>
+<div class="p-4 bg-surface-bright border border-outline-variant rounded-lg">
+<div class="flex justify-between items-start mb-2">
+<p class="font-label-md text-label-md text-on-surface">2. Sebutkan fokus area penelitian Anda saat ini beserta satu contoh publikasi terakhir jika ada.</p>
+<span class="px-2 py-1 bg-tertiary-container text-on-tertiary-container font-label-sm text-label-sm rounded-md">Esai Pendek</span>
+</div>
+</div>
+<div class="p-4 bg-surface-bright border border-outline-variant rounded-lg">
+<div class="flex justify-between items-start mb-2">
+<p class="font-label-md text-label-md text-on-surface">3. Apakah Anda bersedia ditempatkan mengajar untuk kelas reguler malam jika diperlukan?</p>
+<span class="px-2 py-1 bg-secondary-container text-on-secondary-container font-label-sm text-label-sm rounded-md">Ya / Tidak</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column (Narrow) -->
+<div class="xl:col-span-1 flex flex-col gap-6">
+<!-- Dokumen Wajib -->
+<div class="bg-surface border border-outline-variant rounded-xl p-6 shadow-sm">
+<h3 class="font-title-lg text-title-lg text-deep-navy mb-4 border-b border-outline-variant pb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">folder_open</span>
+                                    Dokumen Wajib
+                                </h3>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm mb-4">Pelamar wajib mengunggah dokumen berikut saat melamar:</p>
+<ul class="space-y-3">
+<li class="flex items-center gap-3 font-label-md text-label-md text-on-surface">
+<span class="material-symbols-outlined text-success text-[20px]">check_circle</span>
+                                        Curriculum Vitae (CV) Terkini
+                                    </li>
+<li class="flex items-center gap-3 font-label-md text-label-md text-on-surface">
+<span class="material-symbols-outlined text-success text-[20px]">check_circle</span>
+                                        Scan Ijazah Asli (S1 &amp; S2/S3)
+                                    </li>
+<li class="flex items-center gap-3 font-label-md text-label-md text-on-surface">
+<span class="material-symbols-outlined text-success text-[20px]">check_circle</span>
+                                        Scan Transkrip Nilai (S1 &amp; S2/S3)
+                                    </li>
+<li class="flex items-center gap-3 font-label-md text-label-md text-on-surface">
+<span class="material-symbols-outlined text-success text-[20px]">check_circle</span>
+                                        KTP &amp; Pas Foto Terbaru
+                                    </li>
+<li class="flex items-center gap-3 font-label-md text-label-md text-on-surface">
+<span class="material-symbols-outlined text-success text-[20px]">check_circle</span>
+                                        Sertifikat TOEFL/IELTS
+                                    </li>
+</ul>
+</div>
+<!-- Riwayat Lowongan (Audit Log) -->
+<div class="bg-surface border border-outline-variant rounded-xl p-6 shadow-sm">
+<h3 class="font-title-lg text-title-lg text-deep-navy mb-4 border-b border-outline-variant pb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">history</span>
+                                    Riwayat Aktivitas
+                                </h3>
+<div class="relative border-l-2 border-outline-variant ml-3 mt-4 space-y-6 pb-2">
+<!-- Event 2 -->
+<div class="relative pl-6">
+<span class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-success ring-4 ring-surface"></span>
+<p class="font-label-md text-label-md text-on-surface">Status Diubah: Tayang</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">Oleh: Sistem Otomatis</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">10 Okt 2026, 08:00 WIB</p>
+</div>
+<!-- Event 1 -->
+<div class="relative pl-6">
+<span class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-surface-variant border-2 border-outline ring-4 ring-surface"></span>
+<p class="font-label-md text-label-md text-on-surface">Lowongan Dibuat (Draft)</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">Oleh: Budi Santoso (Admin)</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">01 Okt 2026, 14:30 WIB</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+
+</body></html>

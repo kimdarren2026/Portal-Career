@@ -1,0 +1,321 @@
+<!DOCTYPE html><html lang="id"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Detail Jadwal Seleksi - Portal Karir Kampus</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#f1f4f6",
+                        "on-primary-fixed": "#001b3c",
+                        "outline": "#74777f",
+                        "surface-container-high": "#e5e9eb",
+                        "outline-variant": "#c4c6cf",
+                        "on-surface-variant": "#43474e",
+                        "on-secondary-fixed": "#001d37",
+                        "deep-navy": "#1B2D4F",
+                        "secondary-fixed-dim": "#9fcaff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-tint": "#455f88",
+                        "surface-container-highest": "#e0e3e5",
+                        "tertiary-fixed-dim": "#f8bc4b",
+                        "on-secondary-container": "#004172",
+                        "on-primary": "#ffffff",
+                        "tertiary-container": "#493100",
+                        "on-tertiary-container": "#cb9524",
+                        "secondary": "#0061a5",
+                        "on-secondary-fixed-variant": "#00497e",
+                        "surface-bright": "#f7fafc",
+                        "on-primary-fixed-variant": "#2d476f",
+                        "on-tertiary-fixed": "#271900",
+                        "on-secondary": "#ffffff",
+                        "success": "#38a169",
+                        "primary": "#002045",
+                        "surface-variant": "#e0e3e5",
+                        "tertiary-fixed": "#ffdeaa",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "error-container": "#ffdad6",
+                        "on-surface": "#181c1e",
+                        "surface-container": "#ebeef0",
+                        "primary-container": "#1a365d",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#2d3133",
+                        "secondary-fixed": "#d2e4ff",
+                        "inverse-on-surface": "#eef1f3",
+                        "on-primary-container": "#86a0cd",
+                        "inverse-primary": "#adc7f7",
+                        "surface-dim": "#d7dadc",
+                        "primary-fixed": "#d6e3ff",
+                        "background": "#f7fafc",
+                        "secondary-container": "#66affe",
+                        "on-background": "#181c1e",
+                        "error": "#E11B22",
+                        "primary-fixed-dim": "#adc7f7",
+                        "surface": "#ffffff",
+                        "on-tertiary-fixed-variant": "#5f4100",
+                        "tertiary": "#2d1d00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "48px",
+                        "gutter": "24px",
+                        "container-max": "1280px",
+                        "base": "4px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+<!-- TopNavBar (Shared Component) -->
+<nav class="bg-surface border-b border-outline-variant shadow-sm sticky top-0 z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop w-full max-w-container-max mx-auto h-20">
+<div class="flex items-center gap-6">
+<a class="text-title-lg font-title-lg font-bold text-primary" href="#">Portal Karir Kampus</a>
+<div class="hidden md:flex gap-4">
+<a class="text-on-surface-variant font-medium text-label-md hover:text-secondary transition-colors duration-200" href="#">Lowongan</a>
+<a class="text-on-surface-variant font-medium text-label-md hover:text-secondary transition-colors duration-200" href="#">Karier di Kampus</a>
+<a class="text-on-surface-variant font-medium text-label-md hover:text-secondary transition-colors duration-200" href="#">Karier untuk Alumni</a>
+<a class="text-on-surface-variant font-medium text-label-md hover:text-secondary transition-colors duration-200" href="#">Panduan</a>
+</div>
+</div>
+<div class="hidden md:flex items-center gap-4"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold">BS</div><div class="flex flex-col"><span class="text-label-md font-bold text-on-surface">Budi Santoso</span><span class="text-xs text-on-surface-variant">Mahasiswa</span></div></div></div>
+<!-- Mobile Menu Button (Placeholder) -->
+<button class="md:hidden text-on-surface">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-grow w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-8 md:py-12">
+<!-- Breadcrumb / Back Navigation -->
+<div class="mb-6 flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm">
+<a class="hover:text-primary flex items-center gap-1" href="#">
+<span class="material-symbols-outlined" style="font-size: 16px;">arrow_back</span>
+                Kembali ke Daftar Jadwal
+            </a>
+</div>
+<!-- Update Banner -->
+<div class="mb-8 bg-tertiary-fixed text-on-tertiary-fixed-variant p-4 rounded-lg flex items-start gap-3 shadow-sm border border-tertiary-fixed-dim">
+<span class="material-symbols-outlined text-on-tertiary-fixed-variant mt-0.5">info</span>
+<div>
+<h4 class="font-label-md text-label-md font-bold mb-1">Jadwal Diperbarui</h4>
+<p class="font-body-md text-body-md text-sm">Waktu seleksi telah diubah dari jadwal semula. Harap perhatikan waktu terbaru di bawah ini.</p>
+</div>
+</div>
+<!-- Content Layout: Bento-style Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Left Column: Main Details -->
+<div class="lg:col-span-2 flex flex-col gap-6">
+<!-- Header Card -->
+<div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm relative overflow-hidden">
+<div class="absolute top-0 left-0 w-1 h-full bg-secondary"></div>
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+<div>
+<div class="flex items-center gap-2 mb-2">
+<span class="bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm px-2.5 py-1 rounded-full uppercase tracking-wide">Jenis Seleksi: Wawancara HR</span>
+<span class="text-on-surface-variant font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined" style="font-size: 14px;">work</span>
+                                    Full-time
+                                </span>
+</div>
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Software Engineer - Backend</h1>
+</div>
+<img alt="Logo Perusahaan" class="w-16 h-16 object-contain rounded border border-outline-variant p-1 bg-white" data-alt="A clean, modern corporate logo placeholder for a tech company, featuring abstract geometric shapes in blue and grey tones on a white background, suitable for a professional career portal interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdMOlRlN5iDze6PKjE5Ben-Ftky-aMbomsHVy95rZTwuIuCiBGPJjJEsjiWiMda8srQMb8xa-sisIxfLQCWfmVsKEub3-ub3PRTWKthy_QaW0MZJqUTxUk8U35gS4Qs_p6eCJq4JCBG_GKOVH3nFck2r1rz2zAu1HwwksA_zXDCBC_4b6sFHVZ7XDc8Y_zk-cQeUcvKFg5J4yBB28EkojkPgxVyampgBSzJx9Grf5iSmvOry9Ck72YiA">
+</div>
+<div class="flex items-center gap-3 mb-6 pb-6 border-b border-outline-variant/50">
+<div class="flex flex-col">
+<span class="font-title-lg text-title-lg text-on-surface flex items-center gap-2">
+                                PT Teknologi Maju Indonesia
+                                <!-- Verification Badge -->
+<span class="flex items-center gap-1 text-tertiary-container bg-tertiary-fixed px-2 py-0.5 rounded-full font-label-sm text-label-sm"><span class="material-symbols-outlined" style="font-size: 14px; font-variation-settings: &quot;FILL&quot; 1;">verified</span> Terverifikasi Mitra Kampus</span>
+</span>
+<span class="font-body-md text-body-md text-on-surface-variant mt-1">Jakarta Pusat, Indonesia</span>
+</div>
+</div>
+<!-- Date/Time Focus -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="flex items-start gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container-low flex items-center justify-center text-primary flex-shrink-0">
+<span class="material-symbols-outlined">calendar_today</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-0.5">Tanggal</p>
+<p class="font-body-md text-body-md font-semibold text-on-surface">Selasa, 15 Oktober 2026</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container-low flex items-center justify-center text-primary flex-shrink-0">
+<span class="material-symbols-outlined">schedule</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-0.5">Waktu</p>
+<p class="font-body-md text-body-md font-semibold text-on-surface">09:00 - 10:30 WIB <span class="text-sm font-normal text-on-surface-variant">(UTC+7)</span></p>
+</div>
+</div>
+</div>
+</div>
+<!-- Location / Meeting Details -->
+<div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+<h3 class="font-title-lg text-title-lg text-on-surface mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">videocam</span>
+                        Detail Pertemuan Online
+                    </h3>
+<div class="bg-surface-container-low rounded-lg p-4 mb-6 border border-outline-variant/30">
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Platform</p>
+<p class="font-body-md text-body-md font-medium flex items-center gap-2">
+                                    Google Meet
+                                </p>
+</div>
+<div class="w-full sm:w-auto">
+<a class="inline-flex items-center justify-center gap-2 bg-primary text-on-primary font-label-md text-label-md px-6 py-3 rounded-lg shadow-sm hover:bg-primary/90 transition-colors w-full" href="#">
+                                    Buka Tautan Pertemuan
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">open_in_new</span>
+</a>
+</div>
+</div>
+</div>
+<div class="space-y-4">
+<div>
+<h4 class="font-label-md text-label-md text-on-surface mb-2">Instruksi Khusus:</h4>
+<ul class="list-disc pl-5 font-body-md text-body-md text-on-surface-variant space-y-1">
+<li class="">Harap bergabung 5 menit sebelum jadwal dimulai.</li>
+<li class="">Pastikan koneksi internet stabil dan kamera aktif selama sesi.</li>
+<li class="">Gunakan pakaian formal / business casual.</li>
+<li class="">Siapkan portofolio terbaru untuk dipresentasikan (opsional namun disarankan).</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Contextual Info -->
+<div class="flex flex-col gap-6">
+<!-- PIC Card -->
+<div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+<h3 class="font-title-lg text-title-lg text-on-surface mb-4 flex items-center gap-2 border-b border-outline-variant/50 pb-3"><span class="material-symbols-outlined text-secondary">person</span> PIC / Penanggung Jawab</h3>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-headline-md text-headline-md font-bold">
+                            AS
+                        </div>
+<div>
+<p class="font-label-md text-label-md font-bold text-on-surface">Amanda Setiawan</p>
+<p class="font-body-md text-body-md text-sm text-on-surface-variant">Senior HR Business Partner</p>
+</div>
+</div>
+<div class="mt-4 space-y-2">
+<a class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md text-sm" href="mailto:amanda@tekmaju.id">
+<span class="material-symbols-outlined" style="font-size: 16px;">mail</span>
+                            amanda@tekmaju.id
+                        </a>
+<p class="flex items-center gap-2 text-on-surface-variant font-body-md text-body-md text-sm">
+<span class="material-symbols-outlined" style="font-size: 16px;">phone</span>
+                            +62 812-3456-7890 (Hanya WA)
+                        </p>
+</div>
+</div>
+<!-- Attachments Card -->
+<div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+<h3 class="font-title-lg text-title-lg text-on-surface mb-4 flex items-center gap-2 border-b border-outline-variant/50 pb-3">
+<span class="material-symbols-outlined text-secondary">attachment</span>
+                        Lampiran
+                    </h3>
+<div class="space-y-3">
+<a class="flex items-center justify-between p-3 rounded border border-outline-variant hover:bg-surface-container-low transition-colors group" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-error">picture_as_pdf</span>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface group-hover:text-primary transition-colors">Company_Profile_2026.pdf</p>
+<p class="text-xs text-on-surface-variant">2.4 MB</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">download</span>
+</a>
+<a class="flex items-center justify-between p-3 rounded border border-outline-variant hover:bg-surface-container-low transition-colors group" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">description</span>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface group-hover:text-primary transition-colors">Panduan_Wawancara.docx</p>
+<p class="text-xs text-on-surface-variant">845 KB</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">download</span>
+</a>
+</div>
+</div>
+<!-- Action / Help -->
+<div class="bg-surface-container-low rounded-xl p-6 text-center mt-auto">
+<p class="font-body-md text-body-md text-sm text-on-surface-variant mb-3">Tidak bisa hadir pada jadwal ini?</p>
+<button class="text-error font-label-md text-label-md border border-error px-4 py-2 rounded w-full hover:bg-error-container transition-colors">Ajukan Perubahan Jadwal</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer (Shared Component) -->
+<footer class="bg-deep-navy w-full mt-auto py-12 px-margin-mobile md:px-margin-desktop grid grid-cols-1 md:grid-cols-4 gap-gutter">
+<div class="col-span-1 md:col-span-1 flex flex-col gap-4">
+<span class="text-headline-md font-headline-md font-bold text-white">Portal Karir Kampus</span>
+<p class="font-body-md text-body-md text-on-secondary/80 text-sm">
+                Menjembatani talenta akademik dengan peluang profesional global.
+            </p>
+<p class="font-label-sm text-label-sm text-on-secondary/60 mt-4">
+                © 2026 Portal Karir Kampus. Seluruh hak cipta dilindungi.
+            </p>
+</div>
+<div class="col-span-1 flex flex-col gap-3">
+<h4 class="font-label-md text-label-md text-white mb-2">Navigasi</h4>
+<a class="font-body-md text-body-md text-sm text-on-secondary/80 hover:text-white transition-colors" href="#">Tentang Kami</a>
+<a class="font-body-md text-body-md text-sm text-on-secondary/80 hover:text-white transition-colors" href="#">Kontak Kami</a>
+</div>
+<div class="col-span-1 flex flex-col gap-3">
+<h4 class="font-label-md text-label-md text-white mb-2">Dukungan</h4>
+<a class="font-body-md text-body-md text-sm text-on-secondary/80 hover:text-white transition-colors" href="#">Pusat Bantuan</a>
+<a class="font-body-md text-body-md text-sm text-on-secondary/80 hover:text-white transition-colors" href="#">Panduan Wawancara</a>
+</div>
+<div class="col-span-1 flex flex-col gap-3">
+<h4 class="font-label-md text-label-md text-white mb-2">Legal</h4>
+<a class="font-body-md text-body-md text-sm text-on-secondary/80 hover:text-white transition-colors" href="#">Kebijakan Privasi</a>
+<a class="font-body-md text-body-md text-sm text-on-secondary/80 hover:text-white transition-colors" href="#">Syarat &amp; Ketentuan</a>
+</div>
+</footer>
+
+
+</body></html>

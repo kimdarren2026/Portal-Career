@@ -1,0 +1,12 @@
+/*
+ * Tailwind entry.
+ *
+ * The visual source of truth is the frozen Stitch baseline in `design/stitch/`
+ * (design/stitch/design-system/DESIGN.md holds the "Academic Career Nexus"
+ * colour and typography tokens). Those tokens are ported into a Tailwind theme
+ * in a later UI phase.
+ *
+ * Deliberately minimal for bootstrap: no design system is adopted here, and no
+ * component layer may override Stitch as the product design authority.
+ */
+@import 'tailwindcss';

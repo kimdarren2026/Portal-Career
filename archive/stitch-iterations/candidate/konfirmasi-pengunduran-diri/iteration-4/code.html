@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Application Detail &amp; Withdraw Modal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-surface": "#2d3133",
+                        "primary-container": "#1a365d",
+                        "surface-container-highest": "#e0e3e5",
+                        "secondary-container": "#66affe",
+                        "on-tertiary-fixed-variant": "#5f4100",
+                        "surface-bright": "#f7fafc",
+                        "surface-tint": "#455f88",
+                        "on-background": "#181c1e",
+                        "surface-container": "#ebeef0",
+                        "on-error-container": "#93000a",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#c4c6cf",
+                        "secondary-fixed": "#d2e4ff",
+                        "on-secondary-fixed-variant": "#00497e",
+                        "on-tertiary-fixed": "#271900",
+                        "inverse-primary": "#adc7f7",
+                        "on-secondary-fixed": "#001d37",
+                        "secondary-fixed-dim": "#9fcaff",
+                        "surface-container-high": "#e5e9eb",
+                        "on-primary-container": "#86a0cd",
+                        "on-surface": "#181c1e",
+                        "on-error": "#ffffff",
+                        "success": "#38a169",
+                        "primary-fixed-dim": "#adc7f7",
+                        "on-secondary-container": "#004172",
+                        "background": "#f7fafc",
+                        "tertiary-container": "#493100",
+                        "on-surface-variant": "#43474e",
+                        "tertiary-fixed": "#ffdeaa",
+                        "surface-dim": "#d7dadc",
+                        "primary": "#002045",
+                        "surface-container-low": "#f1f4f6",
+                        "inverse-on-surface": "#eef1f3",
+                        "primary-fixed": "#d6e3ff",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "outline": "#74777f",
+                        "on-secondary": "#ffffff",
+                        "error": "#E11B22",
+                        "secondary": "#0061a5",
+                        "surface": "#ffffff",
+                        "tertiary": "#2d1d00",
+                        "tertiary-fixed-dim": "#f8bc4b",
+                        "on-tertiary-container": "#cb9524",
+                        "deep-navy": "#1B2D4F",
+                        "on-primary-fixed": "#001b3c",
+                        "on-primary-fixed-variant": "#2d476f",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#e0e3e5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "container-max": "1280px",
+                        "base": "4px",
+                        "margin-desktop": "48px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background min-h-screen text-on-background font-body-md relative">
+<!-- Top NavBar (Shared Component) -->
+<header class="w-full sticky top-0 z-40 bg-surface border-b border-outline-variant shadow-sm flex justify-between items-center h-16 px-gutter max-w-container-max mx-auto md:px-margin-desktop">
+<div class="flex items-center gap-4">
+<span class="font-title-lg text-title-lg text-primary font-bold">Career Portal</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:text-primary transition-colors focus:ring-2 focus:ring-primary-container p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors focus:ring-2 focus:ring-primary-container p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors focus:ring-2 focus:ring-primary-container p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden shadow-sm ml-2">
+<img alt="Profile Picture" class="w-full h-full object-cover" data-alt="A professional headshot of a young university student in corporate attire, well-lit studio environment, subtle light gray background, modern professional aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWexRe6-EidOL2INysUA80M_lWFpvDXonBzLdpnaYpk5YJ0SA-ukOOPkXaWGMxIxxWvudK91GTfRawTCTuH5vtaCqgG27FXrKjUVZbQV59F2Pbgn9oVj-bpIL-GOZ72WWw0-C-BHDzSP8Nr1Vkqz-Q2rx3vx1MqvS7w68uLdozvSvqf51FS5_VZiNJKvECUtw7BaERlbYrvFpjjInwSoXZeTuQ-CXzYEZvEZ_YxZdEsCaHEUQqfF6tEg"/>
+</div>
+</div>
+</header>
+<div class="flex max-w-container-max mx-auto min-h-[calc(100vh-64px)] relative">
+<!-- Side NavBar (Shared Component) -->
+<aside class="w-[280px] h-[calc(100vh-64px)] sticky left-0 top-16 bg-primary hidden md:flex flex-col py-6 shadow-sm z-30">
+<div class="px-6 mb-8">
+<p class="font-label-md text-label-md text-on-primary opacity-80 uppercase tracking-wider mb-2">University Alumni</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-6 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span> Dashboard
+                </a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span> Profile
+                </a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span> Documents
+                </a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="search">search</span> Find Jobs
+                </a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-primary opacity-100 bg-primary-container/20 border-r-4 border-secondary-container transition-all font-body-md text-body-md scale-[0.99]" href="#">
+<span class="material-symbols-outlined" data-icon="work" style="font-variation-settings: 'FILL' 1;">work</span> My Applications
+                </a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="event">event</span> Schedule
+                </a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="bookmark">bookmark</span> Saved
+                </a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span> Notifications
+                </a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span> Settings
+                </a>
+</nav>
+</aside>
+<!-- Main Content Area (Background Application Detail) -->
+<main class="flex-1 w-full p-4 md:p-gutter lg:p-margin-desktop overflow-y-auto">
+<div class="mb-6">
+<a class="inline-flex items-center gap-2 text-primary hover:underline font-label-sm text-label-sm mb-4" href="#">
+<span class="material-symbols-outlined text-[16px]" data-icon="arrow_back">arrow_back</span> Kembali ke Aplikasi Saya
+                </a>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-primary mb-2">Data Analyst Intern</h1>
+<div class="flex items-center gap-4 text-on-surface-variant font-body-md text-body-md">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[18px]" data-icon="business">business</span> TechNova Solutions</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[18px]" data-icon="location_on">location_on</span> Jakarta, Indonesia</span>
+</div>
+</div>
+<!-- Bento Grid Structure for Detail -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Status Card -->
+<div class="lg:col-span-2 bg-surface rounded-xl border border-outline-variant shadow-[0_4px_10px_rgba(0,0,0,0.02)] p-6">
+<h2 class="font-title-lg text-title-lg text-primary mb-6 border-b border-outline-variant pb-4">Status Lamaran</h2>
+<!-- Stepper -->
+<div class="relative flex items-center justify-between w-full mb-8">
+<div class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-surface-variant z-0 rounded-full"></div>
+<div class="absolute left-0 top-1/2 -translate-y-1/2 w-1/3 h-1 bg-success z-0 rounded-full"></div>
+<div class="relative z-10 flex flex-col items-center">
+<div class="w-8 h-8 rounded-full bg-success text-on-primary flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[16px]" data-icon="check">check</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface mt-2 text-center">Terkirim<br/><span class="text-on-surface-variant font-normal">12 Jan 2026</span></span>
+</div>
+<div class="relative z-10 flex flex-col items-center">
+<div class="w-8 h-8 rounded-full bg-success text-on-primary flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[16px]" data-icon="check">check</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface mt-2 text-center">Review<br/><span class="text-on-surface-variant font-normal">15 Jan 2026</span></span>
+</div>
+<div class="relative z-10 flex flex-col items-center">
+<div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-sm border-2 border-surface">
+<span class="material-symbols-outlined text-[16px]" data-icon="schedule">schedule</span>
+</div>
+<span class="font-label-sm text-label-sm text-primary font-bold mt-2 text-center">Wawancara<br/><span class="text-primary font-normal">Menunggu Jadwal</span></span>
+</div>
+<div class="relative z-10 flex flex-col items-center">
+<div class="w-8 h-8 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[16px]" data-icon="flag">flag</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-2 text-center">Keputusan<br/><span class="opacity-0">-</span></span>
+</div>
+</div>
+<div class="bg-surface-container-low p-4 rounded-lg flex items-start gap-4">
+<div class="bg-primary/10 p-2 rounded-full text-primary mt-1">
+<span class="material-symbols-outlined" data-icon="info">info</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-primary mb-1">Tahap Selanjutnya: Wawancara HR</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Tim rekrutmen sedang meninjau profil Anda. Undangan wawancara akan dikirimkan melalui email dan portal ini jika Anda lolos ke tahap berikutnya.</p>
+</div>
+</div>
+</div>
+<!-- Action Card -->
+<div class="lg:col-span-1 bg-surface rounded-xl border border-outline-variant shadow-[0_4px_10px_rgba(0,0,0,0.02)] p-6 flex flex-col h-full">
+<h2 class="font-title-lg text-title-lg text-primary mb-6 border-b border-outline-variant pb-4">Tindakan</h2>
+<div class="flex-1 flex flex-col gap-4">
+<button class="w-full py-3 px-4 bg-primary text-on-primary rounded-lg font-label-md text-label-md hover:bg-primary-container transition-colors shadow-sm flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="mail">mail</span> Hubungi Rekruter
+                        </button>
+<button class="w-full py-3 px-4 bg-surface text-primary border border-primary rounded-lg font-label-md text-label-md hover:bg-surface-container transition-colors shadow-sm flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="download">download</span> Unduh Berkas
+                        </button>
+</div>
+<div class="mt-8 pt-6 border-t border-outline-variant">
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-4 text-center">Tidak lagi tertarik dengan posisi ini?</p>
+<!-- Button to trigger modal - Note: for static HTML this is just visual -->
+<button class="w-full py-3 px-4 bg-error-container text-on-error-container border border-error-container rounded-lg font-label-md text-label-md hover:bg-[#ffc2be] transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="cancel">cancel</span> Tarik Lamaran
+                        </button>
+</div>
+</div>
+<!-- Job Details Snippet -->
+<div class="lg:col-span-3 bg-surface rounded-xl border border-outline-variant shadow-[0_4px_10px_rgba(0,0,0,0.02)] p-6">
+<h2 class="font-title-lg text-title-lg text-primary mb-4">Ringkasan Pekerjaan</h2>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Tipe Pekerjaan</p>
+<p class="font-body-md text-body-md text-on-surface font-medium flex items-center gap-2">
+<span class="px-2 py-1 bg-secondary-fixed text-on-secondary-fixed rounded-full text-[10px] font-bold">Internship</span>
+</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Lokasi</p>
+<p class="font-body-md text-body-md text-on-surface font-medium">Hybrid</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Tanggal Melamar</p>
+<p class="font-body-md text-body-md text-on-surface font-medium">12 Jan 2026</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">ID Lamaran</p>
+<p class="font-body-md text-body-md text-on-surface font-medium font-mono text-sm">APP-2026-9482</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- MODAL OVERLAY (Withdraw Confirmation) -->
+<div aria-modal="true" class="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6" role="dialog">
+<!-- Backdrop -->
+<div class="absolute inset-0 bg-on-background/40 backdrop-blur-[4px] transition-opacity"></div>
+<!-- Modal Content Box -->
+<div class="relative bg-surface rounded-xl shadow-[0_24px_48px_-12px_rgba(0,0,0,0.18)] max-w-lg w-full overflow-hidden flex flex-col transform scale-100 transition-transform">
+<!-- Danger Indicator Header Strip -->
+<div class="h-2 w-full bg-error"></div>
+<div class="p-6 md:p-8 flex flex-col gap-6">
+<!-- Header -->
+<div class="flex items-start gap-4">
+<div class="bg-error-container text-error p-3 rounded-full flex-shrink-0">
+<span class="material-symbols-outlined text-[28px]" data-icon="warning" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<div>
+<h2 class="font-headline-md text-headline-md text-primary mb-2">Mengundurkan Diri?</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Anda akan keluar dari proses rekrutmen ini secara permanen. Tindakan ini tidak dapat dibatalkan dan aplikasi Anda akan dihapus dari tinjauan rekruter.</p>
+</div>
+</div>
+<!-- Optional Reason Form -->
+<div class="bg-surface-container-low p-4 rounded-lg border border-outline-variant">
+<label class="block font-label-sm text-label-sm text-on-surface mb-2" for="reason">Alasan Pengunduran Diri (Opsional)</label>
+<p class="font-label-sm text-[11px] text-on-surface-variant mb-3">Membantu kami memberikan umpan balik kepada mitra perusahaan kami.</p>
+<textarea class="w-full bg-surface border border-outline-variant rounded-md px-3 py-2 text-on-surface font-body-md text-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none resize-none placeholder:text-outline" id="reason" placeholder="Misalnya: Telah menerima tawaran lain..." rows="3"></textarea>
+</div>
+<!-- Actions -->
+<div class="flex flex-col-reverse sm:flex-row justify-end gap-3 mt-2">
+<button class="py-2.5 px-6 bg-surface text-on-surface border border-outline-variant rounded-lg font-label-md text-label-md hover:bg-surface-container transition-colors w-full sm:w-auto">
+                        Batal
+                    </button>
+<button class="py-2.5 px-6 bg-error text-on-error rounded-lg font-label-md text-label-md hover:bg-[#c9181e] transition-colors shadow-sm w-full sm:w-auto flex items-center justify-center gap-2">
+                        Konfirmasi Pengunduran Diri
+                    </button>
+</div>
+</div>
+</div>
+</div>
+</body></html>

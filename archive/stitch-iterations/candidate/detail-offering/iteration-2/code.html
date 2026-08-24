@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Detail Offering - Portal Karir</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#E11B22",
+                        "error-container": "#ffdad6",
+                        "on-primary": "#ffffff",
+                        "primary-fixed-dim": "#adc7f7",
+                        "primary-fixed": "#d6e3ff",
+                        "on-error-container": "#93000a",
+                        "inverse-surface": "#2d3133",
+                        "surface-variant": "#e0e3e5",
+                        "inverse-primary": "#adc7f7",
+                        "on-primary-fixed": "#001b3c",
+                        "surface-container": "#ebeef0",
+                        "secondary-container": "#66affe",
+                        "on-tertiary-fixed": "#271900",
+                        "on-primary-fixed-variant": "#2d476f",
+                        "on-secondary-fixed-variant": "#00497e",
+                        "outline": "#74777f",
+                        "on-surface-variant": "#43474e",
+                        "on-secondary": "#ffffff",
+                        "secondary": "#0061a5",
+                        "success": "#38a169",
+                        "on-tertiary-container": "#cb9524",
+                        "on-secondary-container": "#004172",
+                        "background": "#f7fafc",
+                        "on-background": "#181c1e",
+                        "tertiary-container": "#493100",
+                        "on-secondary-fixed": "#001d37",
+                        "secondary-fixed": "#d2e4ff",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#f7fafc",
+                        "primary-container": "#1a365d",
+                        "surface-container-high": "#e5e9eb",
+                        "surface-tint": "#455f88",
+                        "secondary-fixed-dim": "#9fcaff",
+                        "tertiary-fixed": "#ffdeaa",
+                        "surface-container-low": "#f1f4f6",
+                        "primary": "#002045",
+                        "tertiary": "#2d1d00",
+                        "outline-variant": "#c4c6cf",
+                        "surface-dim": "#d7dadc",
+                        "on-surface": "#181c1e",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#5f4100",
+                        "inverse-on-surface": "#eef1f3",
+                        "surface-container-highest": "#e0e3e5",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-container": "#86a0cd",
+                        "tertiary-fixed-dim": "#f8bc4b",
+                        "deep-navy": "#1B2D4F",
+                        "surface": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "48px",
+                        "container-max": "1280px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "label-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex">
+<!-- SideNavBar -->
+<nav class="hidden md:flex flex-col h-full fixed left-0 top-0 w-[280px] bg-deep-navy text-on-primary font-body-md text-body-md shadow-sm z-50">
+<div class="flex flex-col h-full py-6 px-4">
+<!-- Header -->
+<div class="flex items-center gap-4 mb-8 px-4">
+<img class="w-12 h-12 rounded-full object-cover" data-alt="A professional headshot of a young university student wearing business casual attire, smiling confidently against a plain studio background, high quality portrait lighting, corporate modern aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAp1AOMw33P3ZKng6hnASOdHKKdPXUWISr7_7y0h2P0U-n0mHVPdcbFvTQdTm6WJhQ_Fib26-4nQ0C27zjN7-l81xhRhN615y5B49mP6Zre7qQUHY5Rl-SW9YzOeb6nvk3jLAwfjov0GLd-tqrkTLDt1GoWnEYw4sAgZw_Gy9QXpbwUeT_kmJejj12xq7mR6rmFcLVaPmfC5y_t4kpCx3C4Xx0C5hZChLBgavqzRYnPh1ntIlWFcP_g3A"/>
+<div>
+<h1 class="font-headline-md text-headline-md text-on-primary font-bold">Portal Karir</h1>
+<p class="font-label-sm text-label-sm text-on-primary/80">Kandidat Mahasiswa</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<div class="flex flex-col gap-2 flex-grow">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary hover:bg-primary-container transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary hover:bg-primary-container transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+<span>Profil</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary hover:bg-primary-container transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span>Dokumen</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary hover:bg-primary-container transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+<span>Cari Lowongan</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary hover:bg-primary-container transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined" data-icon="work_history">work_history</span>
+<span>Lamaranku</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-lg font-bold scale-95 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span>Jadwal</span> <!-- Highlighted as Notification/Schedule based on 'Offering' context -->
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary hover:bg-primary-container transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined" data-icon="bookmark">bookmark</span>
+<span>Tersimpan</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary hover:bg-primary-container transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span>Notifikasi</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary hover:bg-primary-container transition-colors rounded-lg group mt-auto" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>Pengaturan</span>
+</a>
+</div>
+<button class="mt-4 w-full bg-secondary text-on-secondary py-3 rounded-lg font-label-md text-label-md hover:opacity-90 transition-opacity">
+                Cari Lowongan
+            </button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-[280px] p-margin-mobile md:p-margin-desktop max-w-container-max mx-auto w-full">
+<!-- Breadcrumb & Header -->
+<div class="mb-8">
+<a class="inline-flex items-center gap-2 text-on-surface-variant hover:text-primary font-label-md text-label-md mb-4 transition-colors" href="#">
+<span class="material-symbols-outlined text-sm">arrow_back</span>
+                Kembali ke Daftar Lamaran
+            </a>
+<h2 class="font-headline-lg text-headline-lg text-primary">Detail Offering</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">Tinjau tawaran pekerjaan Anda dengan seksama sebelum memberikan keputusan.</p>
+</div>
+<!-- Content Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Main Info Column -->
+<div class="lg:col-span-2 space-y-6">
+<!-- Company & Position Card -->
+<div class="bg-surface rounded-xl shadow-sm border border-outline-variant p-6 flex flex-col sm:flex-row gap-6 items-start">
+<img class="w-20 h-20 rounded-lg object-contain border border-outline-variant bg-surface-container-lowest p-2" data-alt="A minimalist and modern corporate logo for a technology company, featuring clean geometric lines in deep blue and gold accents, isolated on a white background, corporate modern style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCd5gyeDbBjoyZRXMzn4n1BeMrBafjTRFc3LCoEFIvUpVFFlI8yJIuDnb9PQ46lxUndUW5Bzu1SgQNQo4dwKrrDt97Bql-J3RnV7la6YGmQhTrLCoZFxF8-rPHdNsnr9DvA2FpECQ31sSN_SfoXEze_Soic8ZZtJt9_hDtS24a8wu93KX27XY5nXMTAAfZzjXSEQEqGPWoC48-3U9orQ1LjE4o686eG9x_f73YYk-iekRsg_0_MR5nSWA"/>
+<div class="flex-1">
+<div class="flex flex-wrap items-center gap-3 mb-2">
+<h3 class="font-title-lg text-title-lg text-on-surface">Software Engineer - Backend</h3>
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-primary text-on-primary font-label-sm text-label-sm">Full-time</span>
+</div>
+<div class="flex items-center gap-2 mb-4">
+<p class="font-body-md text-body-md text-on-surface-variant">PT Teknologi Nusantara Sejahtera</p>
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+                                Mitra Resmi
+                            </span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6 p-4 bg-surface-container-lowest rounded-lg border border-outline-variant">
+<div>
+<p class="font-label-sm text-label-sm text-outline mb-1">Tanggal Offering</p>
+<p class="font-label-md text-label-md text-on-surface">15 Oktober 2024</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-outline mb-1">Batas Respons</p>
+<p class="font-label-md text-label-md text-error font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+                                    22 Oktober 2024 (7 Hari)
+                                </p>
+</div>
+</div>
+</div>
+</div>
+<!-- Notes Section -->
+<div class="bg-surface rounded-xl shadow-sm border border-outline-variant p-6">
+<h4 class="font-title-lg text-title-lg text-on-surface mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">note_alt</span>
+                        Catatan dari HR
+                    </h4>
+<div class="bg-surface-container-low p-4 rounded-lg font-body-md text-body-md text-on-surface-variant">
+<p>Selamat! Kami sangat terkesan dengan profil dan hasil wawancara Anda. Kami ingin menawarkan posisi Software Engineer - Backend di perusahaan kami.</p>
+<br/>
+<p>Mohon tinjau dokumen offering letter terlampir yang berisi rincian kompensasi, benefit, dan ketentuan kerja. Jika ada pertanyaan, jangan ragu untuk menghubungi kami melalui portal ini atau email langsung ke hr@teknusantara.co.id.</p>
+<br/>
+<p>Kami berharap Anda dapat bergabung dengan tim kami.</p>
+</div>
+</div>
+</div>
+<!-- Sidebar Actions & Documents -->
+<div class="lg:col-span-1 space-y-6">
+<!-- Actions Card -->
+<div class="bg-surface rounded-xl shadow-sm border border-outline-variant p-6 sticky top-24">
+<h4 class="font-title-lg text-title-lg text-on-surface mb-4">Keputusan Anda</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-6">Mohon berikan keputusan Anda sebelum batas waktu berakhir. Keputusan yang diambil tidak dapat diubah.</p>
+<div class="flex flex-col gap-3">
+<button class="w-full py-3 px-4 bg-success text-on-primary rounded-lg font-label-md text-label-md hover:bg-opacity-90 transition-all flex justify-center items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined">check_circle</span>
+                            Terima Offering
+                        </button>
+<button class="w-full py-3 px-4 bg-surface text-error border border-error rounded-lg font-label-md text-label-md hover:bg-error-container transition-all flex justify-center items-center gap-2">
+<span class="material-symbols-outlined">cancel</span>
+                            Tolak Offering
+                        </button>
+</div>
+</div>
+<!-- Document Card -->
+<div class="bg-surface rounded-xl shadow-sm border border-outline-variant p-6">
+<h4 class="font-title-lg text-title-lg text-on-surface mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">description</span>
+                        Dokumen Offering
+                    </h4>
+<a class="group flex items-center p-4 border border-outline-variant rounded-lg hover:border-primary hover:bg-surface-container-lowest transition-all" href="#">
+<div class="w-10 h-10 bg-error-container rounded flex items-center justify-center mr-4">
+<span class="material-symbols-outlined text-error">picture_as_pdf</span>
+</div>
+<div class="flex-1">
+<p class="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors">Offering_Letter_PT_TNS.pdf</p>
+<p class="font-label-sm text-label-sm text-outline">1.2 MB</p>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">download</span>
+</a>
+</div>
+</div>
+</div>
+</main>
+</body></html>

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Recruiter Dashboard - Vacancy Revision</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                            "on-primary-container": "#86a0cd",
+                            "on-surface": "#181c1e",
+                            "surface-variant": "#e0e3e5",
+                            "outline": "#74777f",
+                            "primary-fixed": "#d6e3ff",
+                            "surface-container-low": "#f1f4f6",
+                            "on-secondary": "#ffffff",
+                            "on-background": "#181c1e",
+                            "inverse-on-surface": "#eef1f3",
+                            "background": "#f7fafc",
+                            "on-tertiary-fixed": "#271900",
+                            "outline-variant": "#c4c6cf",
+                            "on-tertiary-container": "#cb9524",
+                            "primary": "#002045",
+                            "success": "#38a169",
+                            "on-error-container": "#93000a",
+                            "surface-tint": "#455f88",
+                            "secondary-container": "#66affe",
+                            "surface-bright": "#f7fafc",
+                            "error": "#E11B22",
+                            "on-tertiary-fixed-variant": "#5f4100",
+                            "surface-dim": "#d7dadc",
+                            "surface-container": "#ebeef0",
+                            "primary-container": "#1a365d",
+                            "secondary": "#0061a5",
+                            "tertiary-fixed": "#ffdeaa",
+                            "tertiary": "#2d1d00",
+                            "inverse-primary": "#adc7f7",
+                            "surface-container-high": "#e5e9eb",
+                            "on-primary-fixed": "#001b3c",
+                            "tertiary-container": "#493100",
+                            "secondary-fixed-dim": "#9fcaff",
+                            "secondary-fixed": "#d2e4ff",
+                            "surface-container-highest": "#e0e3e5",
+                            "on-primary-fixed-variant": "#2d476f",
+                            "on-tertiary": "#ffffff",
+                            "tertiary-fixed-dim": "#f8bc4b",
+                            "inverse-surface": "#2d3133",
+                            "primary-fixed-dim": "#adc7f7",
+                            "on-secondary-container": "#004172",
+                            "on-error": "#ffffff",
+                            "on-primary": "#ffffff",
+                            "on-surface-variant": "#43474e",
+                            "on-secondary-fixed": "#001d37",
+                            "surface": "#ffffff",
+                            "error-container": "#ffdad6",
+                            "deep-navy": "#1B2D4F",
+                            "on-secondary-fixed-variant": "#00497e",
+                            "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                            "DEFAULT": "0.25rem",
+                            "lg": "0.5rem",
+                            "xl": "0.75rem",
+                            "full": "9999px"
+                    },
+                    "spacing": {
+                            "gutter": "24px",
+                            "margin-desktop": "48px",
+                            "margin-mobile": "16px",
+                            "container-max": "1280px",
+                            "base": "4px"
+                    },
+                    "fontFamily": {
+                            "body-lg": ["Inter"],
+                            "headline-lg": ["Inter"],
+                            "label-sm": ["Inter"],
+                            "title-lg": ["Inter"],
+                            "headline-md": ["Inter"],
+                            "body-md": ["Inter"],
+                            "label-md": ["Inter"],
+                            "display-lg": ["Inter"],
+                            "headline-lg-mobile": ["Inter"]
+                    },
+                    "fontSize": {
+                            "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                            "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                            "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                            "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                            "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                            "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                            "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                            "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                            "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.filled {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen flex">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 h-full w-[280px] bg-deep-navy dark:bg-primary-container shadow-sm flex flex-col h-screen sticky top-0 hidden md:flex z-50">
+<div class="p-6 pb-2">
+<h1 class="font-title-lg text-title-lg font-bold text-white">Career Center</h1>
+<p class="font-body-md text-body-md text-secondary-container dark:text-secondary-fixed mt-1">Back-office Portal</p>
+</div>
+<div class="mt-8 flex-1 overflow-y-auto">
+<ul class="space-y-1">
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-primary-container/50 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>Dashboard</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-primary-container/50 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="fact_check">fact_check</span>
+<span>Verification Queue</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-primary-container/50 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="business_center">business_center</span>
+<span>Company Audits</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-white border-l-4 border-secondary-container scale-[0.98] transition-transform" href="#">
+<span class="material-symbols-outlined filled" data-icon="work_history" data-weight="fill">work_history</span>
+<span>Vacancy Moderation</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-primary-container/50 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="supervisor_account">supervisor_account</span>
+<span>Recruiter Status</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-primary-container/50 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>System Settings</span>
+</a>
+</li>
+</ul>
+</div>
+<div class="p-4 mt-auto border-t border-white/10">
+<button class="w-full py-2 px-4 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors font-label-md text-label-md flex items-center justify-center gap-2 mb-4">
+                Export Reports
+            </button>
+<ul class="space-y-1">
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-primary-container/50 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span>Help Center</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-primary-container/50 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span>Logout</span>
+</a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col min-w-0 md:ml-[280px]">
+<!-- TopNavBar -->
+<header class="bg-surface dark:bg-surface-container-highest border-b border-outline-variant dark:border-outline flex justify-between items-center w-full px-gutter h-16 max-w-full docked full-width top-0 z-40 sticky">
+<div class="flex items-center gap-4">
+<h2 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">Admin Console</h2>
+<nav class="hidden lg:flex ml-8 gap-6">
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors font-label-md text-label-md" href="#">Verification</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors font-label-md text-label-md" href="#">Audit Log</a>
+<a class="text-primary font-bold border-b-2 border-primary pb-1 font-label-md text-label-md opacity-80" href="#">Moderation</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="pl-9 pr-4 py-1.5 bg-surface-container-low border border-outline-variant rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary w-48" placeholder="Search..." type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Canvas -->
+<main class="flex-1 p-margin-mobile md:p-gutter lg:p-margin-desktop overflow-y-auto">
+<div class="max-w-container-max mx-auto">
+<!-- Breadcrumb & Header -->
+<div class="mb-8">
+<div class="flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm mb-2">
+<a class="hover:text-primary transition-colors" href="#">Vacancy Moderation</a>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span class="text-on-surface">Senior Frontend Developer</span>
+</div>
+<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+<div>
+<h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Senior Frontend Developer</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">TechNova Solutions • Jakarta Pusat</p>
+</div>
+<div class="flex gap-3 shrink-0">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm border border-error/20">
+<span class="material-symbols-outlined text-[16px]">error</span>
+                                Revision Required
+                            </span>
+</div>
+</div>
+</div>
+<!-- Alert Banner -->
+<div class="bg-error-container/20 border border-error/30 rounded-xl p-4 md:p-6 mb-8 flex items-start gap-4 shadow-sm">
+<div class="p-2 bg-error-container rounded-full text-on-error-container shrink-0 mt-1">
+<span class="material-symbols-outlined">warning</span>
+</div>
+<div class="flex-1">
+<h3 class="font-title-lg text-title-lg text-on-surface mb-2">Lowongan ini memerlukan revisi.</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4">
+                            Tim Career Center telah meninjau lowongan Anda. Terdapat beberapa bagian yang perlu disesuaikan dengan pedoman penulisan lowongan kerja universitas sebelum dapat ditayangkan kepada mahasiswa.
+                        </p>
+<div class="bg-surface border border-error/20 rounded-lg p-4 mb-4">
+<h4 class="font-label-md text-label-md text-on-surface mb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-error text-[18px]">comment</span>
+                                Catatan Moderator:
+                            </h4>
+<p class="font-body-md text-body-md text-on-surface-variant italic border-l-4 border-error/50 pl-3 py-1">
+                                "Mohon perjelas kualifikasi minimum terkait pengalaman kerja. Hindari penggunaan istilah yang ambigu pada deskripsi tanggung jawab. Selain itu, kisaran gaji mohon disesuaikan agar lebih transparan bagi kandidat fresh graduate."
+                            </p>
+</div>
+<button class="inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-error text-white rounded-lg hover:bg-error/90 transition-colors shadow-sm font-label-md text-label-md">
+                            Perbaiki Lowongan
+                            <span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

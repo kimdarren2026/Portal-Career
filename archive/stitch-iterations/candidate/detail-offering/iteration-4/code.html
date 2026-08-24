@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Detail Offering - Career Portal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-surface": "#2d3133",
+                        "primary-container": "#1a365d",
+                        "surface-container-highest": "#e0e3e5",
+                        "secondary-container": "#66affe",
+                        "on-tertiary-fixed-variant": "#5f4100",
+                        "surface-bright": "#f7fafc",
+                        "surface-tint": "#455f88",
+                        "on-background": "#181c1e",
+                        "surface-container": "#ebeef0",
+                        "on-error-container": "#93000a",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#c4c6cf",
+                        "secondary-fixed": "#d2e4ff",
+                        "on-secondary-fixed-variant": "#00497e",
+                        "on-tertiary-fixed": "#271900",
+                        "inverse-primary": "#adc7f7",
+                        "on-secondary-fixed": "#001d37",
+                        "secondary-fixed-dim": "#9fcaff",
+                        "surface-container-high": "#e5e9eb",
+                        "on-primary-container": "#86a0cd",
+                        "on-surface": "#181c1e",
+                        "on-error": "#ffffff",
+                        "success": "#38a169",
+                        "primary-fixed-dim": "#adc7f7",
+                        "on-secondary-container": "#004172",
+                        "background": "#f7fafc",
+                        "tertiary-container": "#493100",
+                        "on-surface-variant": "#43474e",
+                        "tertiary-fixed": "#ffdeaa",
+                        "surface-dim": "#d7dadc",
+                        "primary": "#002045",
+                        "surface-container-low": "#f1f4f6",
+                        "inverse-on-surface": "#eef1f3",
+                        "primary-fixed": "#d6e3ff",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "outline": "#74777f",
+                        "on-secondary": "#ffffff",
+                        "error": "#E11B22",
+                        "secondary": "#0061a5",
+                        "surface": "#ffffff",
+                        "tertiary": "#2d1d00",
+                        "tertiary-fixed-dim": "#f8bc4b",
+                        "on-tertiary-container": "#cb9524",
+                        "deep-navy": "#1B2D4F",
+                        "on-primary-fixed": "#001b3c",
+                        "on-primary-fixed-variant": "#2d476f",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#e0e3e5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "container-max": "1280px",
+                        "base": "4px",
+                        "margin-desktop": "48px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #f7fafc; }
+    </style>
+</head>
+<body class="flex min-h-screen bg-background font-body-md text-on-background">
+<!-- SideNavBar -->
+<aside class="w-[280px] h-screen sticky left-0 top-0 bg-primary dark:bg-deep-navy shadow-sm hidden md:flex flex-col z-40">
+<div class="flex flex-col h-full py-6">
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold text-lg">CP</div>
+<div>
+<h1 class="font-headline-md text-headline-md text-on-primary font-bold">Career Portal</h1>
+<p class="font-label-sm text-label-sm text-on-primary opacity-80">University Alumni</p>
+</div>
+</div>
+<nav class="flex-1 overflow-y-auto">
+<ul class="space-y-1">
+<li><a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all font-body-md text-body-md" href="#"><span class="material-symbols-outlined">dashboard</span>Dashboard</a></li>
+<li><a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all font-body-md text-body-md" href="#"><span class="material-symbols-outlined">person</span>Profile</a></li>
+<li><a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all font-body-md text-body-md" href="#"><span class="material-symbols-outlined">description</span>Documents</a></li>
+<li><a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all font-body-md text-body-md" href="#"><span class="material-symbols-outlined">search</span>Find Jobs</a></li>
+<li><a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all font-body-md text-body-md" href="#"><span class="material-symbols-outlined">work</span>My Applications</a></li>
+<li><a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-100 bg-primary-container/20 border-r-4 border-secondary-container font-body-md text-body-md scale-[0.99] transition-transform" href="#"><span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: 'FILL' 1;">event</span>Schedule</a></li>
+<li><a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all font-body-md text-body-md" href="#"><span class="material-symbols-outlined">bookmark</span>Saved</a></li>
+<li><a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all font-body-md text-body-md" href="#"><span class="material-symbols-outlined">notifications</span>Notifications</a></li>
+<li><a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all font-body-md text-body-md" href="#"><span class="material-symbols-outlined">settings</span>Settings</a></li>
+</ul>
+</nav>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col min-w-0">
+<!-- TopNavBar Mobile -->
+<header class="md:hidden full-width sticky top-0 z-50 bg-surface dark:bg-inverse-surface border-b border-outline-variant shadow-sm flex justify-between items-center h-16 px-margin-mobile">
+<div class="font-title-lg text-title-lg text-primary dark:text-inverse-primary font-bold">Career Portal</div>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:text-primary transition-colors focus:ring-2 focus:ring-primary-container"><span class="material-symbols-outlined">notifications</span></button>
+<button class="text-on-surface-variant hover:text-primary transition-colors focus:ring-2 focus:ring-primary-container"><span class="material-symbols-outlined">menu</span></button>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto px-margin-mobile md:px-margin-desktop py-8 max-w-container-max mx-auto w-full">
+<!-- Breadcrumb & Title -->
+<div class="mb-8">
+<nav aria-label="Breadcrumb" class="flex text-on-surface-variant font-label-md text-label-md mb-2">
+<ol class="inline-flex items-center space-x-1 md:space-x-3">
+<li class="inline-flex items-center">
+<a class="hover:text-primary transition-colors" href="#">Jadwal Seleksi</a>
+</li>
+<li>
+<div class="flex items-center">
+<span class="material-symbols-outlined text-sm mx-1">chevron_right</span>
+<span class="text-on-surface">Detail Offering</span>
+</div>
+</li>
+</ol>
+</nav>
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Detail Offering</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Tinjau tawaran pekerjaan dan ambil keputusan.</p>
+</div>
+<div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-label-sm text-label-sm border border-secondary-fixed-dim">
+<span class="material-symbols-outlined text-[16px]">pending_actions</span>
+                        Menunggu Respons
+                    </div>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Main Offering Content (Spans 2 columns on lg) -->
+<div class="lg:col-span-2 flex flex-col gap-6">
+<!-- Header Card -->
+<div class="bg-surface rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.02)] border border-outline-variant p-6 md:p-8">
+<div class="flex items-start gap-6">
+<div class="w-16 h-16 rounded-lg border border-outline-variant bg-surface-container-lowest flex-shrink-0 overflow-hidden">
+<img alt="TechCorp Logo" class="w-full h-full object-contain p-2" data-alt="A modern corporate logo for TechCorp, featuring a stylized blue and gray geometric 'T' on a clean white background, conveying professionalism and technology in a minimalist flat design style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEHWWbyDM5Rgmd0ncjGIk07-5lpc1PPPflWFkZ-CDU9Uarvn6OJNlI11x1z-pj8xElFft2smcNfCYTkCEQqVqQa_PS4GGkkoDSmANDwAgxdsIzOk3qobPLMBCIZveTlScIszd13kURDrTHjp9ldRrHxh1jh3vxgSfD-cO_mkjNSo0QaFqzy1GWF5TB7FT04ptmWx8l2sX_fJhh7xwbCWaDg6RqABW2fUoc4F2Xza4IDqFzvpC5krYgZQ"/>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-3 mb-2">
+<h3 class="font-title-lg text-title-lg text-on-surface">Senior Software Engineer</h3>
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#fef08a]/20 text-[#cb9524] font-label-sm text-label-sm border border-[#cb9524]/30">
+<span class="material-symbols-outlined text-[14px]">verified</span> Mitra Resmi
+                                    </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">TechCorp Indonesia • Jakarta Selatan, Indonesia (Hybrid)</p>
+</div>
+</div>
+<hr class="my-6 border-outline-variant"/>
+<div class="prose max-w-none font-body-md text-body-md text-on-surface leading-relaxed">
+<p>Yth. Kandidat,</p>
+<p>Selamat! Kami sangat senang menawarkan Anda posisi <strong>Senior Software Engineer</strong> di TechCorp Indonesia. Setelah melalui proses seleksi yang kompetitif, kami yakin bahwa keterampilan, pengalaman, dan visi Anda sangat selaras dengan tujuan perusahaan kami.</p>
+<p>Surat ini merupakan ringkasan dari tawaran pekerjaan resmi kami. Silakan tinjau detail kompensasi dan ketentuan di bawah ini dengan saksama.</p>
+</div>
+</div>
+<!-- Details Card -->
+<div class="bg-surface rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.02)] border border-outline-variant p-6 md:p-8">
+<h4 class="font-title-lg text-title-lg text-on-surface mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">payments</span> Ringkasan Kompensasi
+                        </h4>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="p-4 bg-surface-container-lowest rounded-lg border border-outline-variant">
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Gaji Pokok (Bulanan)</p>
+<p class="font-headline-md text-headline-md text-on-surface font-semibold">Rp 25.000.000</p>
+</div>
+<div class="p-4 bg-surface-container-lowest rounded-lg border border-outline-variant">
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Tunjangan Kinerja (Maksimal)</p>
+<p class="font-headline-md text-headline-md text-on-surface font-semibold">Rp 5.000.000</p>
+</div>
+</div>
+<h4 class="font-title-lg text-title-lg text-on-surface mt-8 mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">gavel</span> Ketentuan Utama
+                        </h4>
+<ul class="space-y-3 font-body-md text-body-md text-on-surface">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-success mt-0.5">check_circle</span>
+<div>
+<strong class="block">Tanggal Mulai Bekerja</strong>
+<span class="text-on-surface-variant">15 Januari 2026</span>
+</div>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-success mt-0.5">check_circle</span>
+<div>
+<strong class="block">Status Pekerjaan</strong>
+<span class="text-on-surface-variant">Karyawan Tetap (Full-time) setelah masa percobaan 3 bulan.</span>
+</div>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-success mt-0.5">check_circle</span>
+<div>
+<strong class="block">Benefit Tambahan</strong>
+<span class="text-on-surface-variant">Asuransi kesehatan menyeluruh, BPJS Ketenagakerjaan, dan alokasi dana pengembangan diri.</span>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<!-- Right Panel (Action) -->
+<div class="lg:col-span-1">
+<div class="bg-surface rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.02)] border border-outline-variant p-6 sticky top-24">
+<h3 class="font-title-lg text-title-lg text-on-surface mb-2">Keputusan Anda</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6">Batas waktu respons: <strong class="text-error">10 Januari 2026</strong>. Harap tinjau dokumen kontrak terlampir sebelum mengambil keputusan.</p>
+<div class="mb-6 p-4 bg-surface-container rounded-lg flex items-center gap-3 border border-outline-variant hover:bg-surface-container-high transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-primary text-3xl">picture_as_pdf</span>
+<div class="flex-1">
+<p class="font-label-md text-label-md text-on-surface">Kontrak_Kerja_TechCorp.pdf</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">1.2 MB</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">download</span>
+</div>
+<div class="flex flex-col gap-3">
+<button class="w-full py-3 px-4 bg-primary text-on-primary rounded-lg font-label-md text-label-md hover:bg-primary/90 transition-colors shadow-sm flex justify-center items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">thumb_up</span> Terima Offering
+                            </button>
+<button class="w-full py-3 px-4 bg-surface-container-lowest text-error border border-error rounded-lg font-label-md text-label-md hover:bg-error-container transition-colors flex justify-center items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">thumb_down</span> Tolak Offering
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="w-full py-8 bg-surface-container-high dark:bg-inverse-surface border-t border-outline-variant mt-auto">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto gap-4">
+<div class="font-headline-md text-headline-md font-bold text-primary">Career Portal</div>
+<div class="font-label-sm text-label-sm text-on-surface dark:text-inverse-on-surface">
+                    © 2024 University Career Center. All rights reserved.
+                </div>
+<nav class="flex gap-4 font-label-sm text-label-sm text-on-surface-variant">
+<a class="hover:underline hover:text-primary transition-all duration-200" href="#">Privacy Policy</a>
+<a class="hover:underline hover:text-primary transition-all duration-200" href="#">Terms of Service</a>
+<a class="hover:underline hover:text-primary transition-all duration-200" href="#">Contact Support</a>
+<a class="hover:underline hover:text-primary transition-all duration-200" href="#">Employer Portal</a>
+</nav>
+</div>
+</footer>
+</main>
+</body></html>

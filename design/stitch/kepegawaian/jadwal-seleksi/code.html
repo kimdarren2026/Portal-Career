@@ -1,0 +1,518 @@
+<!DOCTYPE html><html lang="id"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Jadwal Seleksi - Admin Kepegawaian</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#2d1d00",
+                        "on-primary-container": "#86a0cd",
+                        "deep-navy": "#1B2D4F",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed-variant": "#00497e",
+                        "surface-variant": "#e0e3e5",
+                        "on-tertiary-fixed": "#271900",
+                        "surface-container-highest": "#e0e3e5",
+                        "secondary-container": "#66affe",
+                        "on-tertiary": "#ffffff",
+                        "surface-dim": "#d7dadc",
+                        "on-primary": "#ffffff",
+                        "surface-container": "#ebeef0",
+                        "error-container": "#ffdad6",
+                        "primary-fixed-dim": "#adc7f7",
+                        "on-secondary-fixed": "#001d37",
+                        "on-primary-fixed-variant": "#2d476f",
+                        "on-error-container": "#93000a",
+                        "background": "#f7fafc",
+                        "surface-bright": "#f7fafc",
+                        "surface-container-high": "#e5e9eb",
+                        "primary-container": "#1a365d",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#f8bc4b",
+                        "on-background": "#181c1e",
+                        "on-primary-fixed": "#001b3c",
+                        "on-surface": "#181c1e",
+                        "secondary-fixed-dim": "#9fcaff",
+                        "on-tertiary-container": "#cb9524",
+                        "primary-fixed": "#d6e3ff",
+                        "tertiary-container": "#493100",
+                        "on-tertiary-fixed-variant": "#5f4100",
+                        "surface-tint": "#455f88",
+                        "on-secondary-container": "#004172",
+                        "inverse-surface": "#2d3133",
+                        "outline": "#74777f",
+                        "outline-variant": "#c4c6cf",
+                        "inverse-primary": "#adc7f7",
+                        "inverse-on-surface": "#eef1f3",
+                        "primary": "#002045",
+                        "on-surface-variant": "#43474e",
+                        "tertiary-fixed": "#ffdeaa",
+                        "secondary-fixed": "#d2e4ff",
+                        "secondary": "#0061a5",
+                        "surface-container-low": "#f1f4f6",
+                        "surface": "#ffffff",
+                        "success": "#38a169",
+                        "error": "#E11B22",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "margin-desktop": "48px",
+                        "container-max": "1280px",
+                        "base": "4px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-unfilled {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .modal-overlay {
+            backdrop-filter: blur(4px);
+        }
+        /* Hide scrollbar for clean modal look */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c4c6cf;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #74777f;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md flex h-screen overflow-hidden">
+<!-- SideNavBar -->
+<aside class="w-[280px] h-screen sticky top-0 left-0 bg-deep-navy shadow-sm hidden md:flex flex-col flex-shrink-0 z-20">
+<div class="py-6 flex flex-col h-full">
+<div class="px-6 mb-8 flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-white flex items-center justify-center overflow-hidden">
+<img alt="Logo Universitas" class="w-full h-full object-cover" data-alt="University Logo featuring a stylized open book and classical columns in navy blue and gold, set against a solid white background, corporate modern aesthetic, sharp and high resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAb6wrUFC7-a1zztQhZK7sSsGzutHDZISGjW1p0R3IcmuDGI8iJ7ABZoPnuyZhcNG0zbpQouj8Dap9o0ZDTnm2dLgak8nu_D90Bo4JLbkLFgMesU2aQ7tV9Uy_3X_1HOWzJtYZVH5AfWdWySC9s3xDljifDBuqKndsWRmqo3drGVqgoVCkcklXhmZAabBH1d9sSAz_n7Ee02XxT-UbMxYw4OgLIN58Du9k_Jnb0FN2Pc39kV0YSAfnq6A">
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-white">Portal Karir</h1>
+<p class="font-label-sm text-label-sm text-white/80 mt-1">Admin Kepegawaian</p>
+</div>
+</div>
+<nav class="flex-1 overflow-y-auto">
+<ul class="flex flex-col space-y-1">
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md text-body-md hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined icon-unfilled" data-icon="dashboard">dashboard</span>
+<span class="">Dashboard</span>
+</a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md text-body-md hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined icon-unfilled" data-icon="work">work</span>
+<span class="">Lowongan Kampus</span>
+</a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md text-body-md hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined icon-unfilled" data-icon="group">group</span>
+<span class="">Pelamar</span>
+</a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary font-bold border-l-4 border-secondary-container opacity-100 transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today" data-weight="fill">calendar_today</span>
+<span class="">Jadwal Seleksi</span>
+</a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md text-body-md hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined icon-unfilled" data-icon="fact_check">fact_check</span>
+<span class="">Penilaian</span>
+</a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md text-body-md hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined icon-unfilled" data-icon="contract">contract</span>
+<span class="">Offering</span>
+</a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md text-body-md hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined icon-unfilled" data-icon="analytics">analytics</span>
+<span class="">Outcome Rekrutmen</span>
+</a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md text-body-md hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined icon-unfilled" data-icon="description">description</span>
+<span class="">Laporan</span>
+</a>
+</li>
+<li class="mt-8">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md text-body-md hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined icon-unfilled" data-icon="notifications">notifications</span>
+<span class="">Notifikasi</span>
+</a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md text-body-md hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined icon-unfilled" data-icon="settings">settings</span>
+<span class="">Pengaturan</span>
+</a>
+</li>
+</ul>
+</nav>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col h-screen overflow-hidden relative">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop h-16 bg-surface border-b border-outline-variant full-width top-0 sticky z-10 flex-shrink-0">
+<div class="flex items-center gap-4">
+<button class="md:hidden text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<div class="font-title-lg text-title-lg font-bold text-deep-navy">Admin Kepegawaian</div>
+</div>
+<div class="flex items-center gap-6">
+<!-- Search -->
+<div class="hidden md:flex items-center bg-surface-container-low rounded-full px-4 py-2 border border-outline-variant focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all">
+<span class="material-symbols-outlined text-on-surface-variant mr-2" data-icon="search">search</span>
+<input class="bg-transparent border-none outline-none text-body-md text-on-surface focus:ring-0 placeholder-on-surface-variant/70 w-48" placeholder="Cari..." type="text">
+</div>
+<!-- Actions -->
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:text-primary transition-colors relative">
+<span class="material-symbols-outlined icon-unfilled" data-icon="notifications">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined icon-unfilled" data-icon="help">help</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant ml-2 cursor-pointer">
+<img alt="Foto Profil Admin" class="w-full h-full object-cover" data-alt="A professional headshot of a young Southeast Asian woman in business attire, smiling warmly against a blurred bright office background, well-lit, corporate style, high quality." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0kDXriTBJgIY1A1QFVO33Tzfwl223H4m0Yvoxrf_vDxLNn4xWiFPti9BBlZDKX-webnnwdn8JOBPEKnlyNcMFYHFZC2JlXBkRE0Wmu7SWCAjgp0ZDQKxmkwf28NZNXpAPy5QY7zBoaiKNBnwZLWZPHeCXVPKKy02kX9Fv98lasopdaVlfUFjSCFjFJiVNzKn6c5Y45YuEYA-frBp3kNk1xVslIHYS1gMr7Col8MfDAPY0XIszTDZgtg">
+</div>
+</div>
+</div>
+</header>
+<!-- Page Content -->
+<div class="flex-1 overflow-y-auto bg-background p-margin-mobile md:p-margin-desktop">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+<div>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-background">Jadwal Seleksi</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Kelola dan pantau jadwal wawancara serta tes kandidat.</p>
+</div>
+<button class="bg-primary hover:bg-deep-navy text-on-primary font-label-md text-label-md py-3 px-6 rounded-lg shadow-sm hover:shadow-md transition-all flex items-center gap-2" onclick="document.getElementById('modal-buat-jadwal').classList.remove('hidden')">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+                    Buat Jadwal Baru
+                </button>
+</div>
+<!-- Dashboard / List View (Background Content) -->
+<div class="bg-surface rounded-xl shadow-sm border border-outline-variant/30 overflow-hidden mb-8">
+<div class="flex flex-col md:flex-row justify-between items-center p-6 border-b border-outline-variant/50 bg-surface-bright gap-4">
+<div class="flex items-center gap-2 w-full md:w-auto">
+<div class="relative w-full md:w-72">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface border border-outline-variant rounded-lg text-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="Cari kandidat atau posisi..." type="text">
+</div>
+</div>
+<div class="flex items-center gap-3 w-full md:w-auto">
+<button class="flex items-center gap-2 px-4 py-2 bg-surface border border-outline-variant rounded-lg text-label-md font-label-md text-on-surface hover:bg-surface-container-low transition-colors w-full md:w-auto justify-center">
+<span class="material-symbols-outlined icon-unfilled text-[20px]" data-icon="filter_list">filter_list</span>
+                            Filter
+                        </button>
+<select class="px-4 py-2 bg-surface border border-outline-variant rounded-lg text-label-md font-label-md text-on-surface outline-none focus:border-primary w-full md:w-auto appearance-none cursor-pointer">
+<option>Semua Status</option>
+<option>Mendatang</option>
+<option>Selesai</option>
+<option>Dibatalkan</option>
+</select>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-lowest border-b border-outline-variant/50">
+<th class="p-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Kandidat &amp; Posisi</th>
+<th class="p-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Jenis Seleksi</th>
+<th class="p-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Waktu (WIB)</th>
+<th class="p-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Metode</th>
+<th class="p-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Status</th>
+<th class="p-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider text-right">Aksi</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group cursor-pointer">
+<td class="p-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-fixed-dim text-primary flex items-center justify-center font-bold font-title-lg">B</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Budi Santoso</p>
+<p class="font-body-md text-[13px] text-on-surface-variant">Dosen Teknik Informatika</p>
+</div>
+</div>
+</td>
+<td class="p-4">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[12px] font-medium bg-secondary-container/20 text-on-secondary-container border border-secondary-container/30">Wawancara HR</span>
+</td>
+<td class="p-4">
+<p class="font-label-md text-label-md text-on-surface">15 Okt 2026</p>
+<p class="font-body-md text-[13px] text-on-surface-variant">09:00 - 10:00</p>
+</td>
+<td class="p-4">
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]" data-icon="videocam">videocam</span>
+<span class="font-body-md text-[14px]">Online</span>
+</div>
+</td>
+<td class="p-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-medium bg-tertiary-fixed/30 text-on-tertiary-fixed-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-dim"></span>
+                                        Mendatang
+                                    </span>
+</td>
+<td class="p-4 text-right">
+<button class="text-on-surface-variant hover:text-primary p-2 rounded-full hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group cursor-pointer">
+<td class="p-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center font-bold font-title-lg">S</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Siti Rahma</p>
+<p class="font-body-md text-[13px] text-on-surface-variant">Staf Administrasi Akademik</p>
+</div>
+</div>
+</td>
+<td class="p-4">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[12px] font-medium bg-surface-variant/50 text-on-surface-variant border border-outline-variant/50">Tes Kompetensi</span>
+</td>
+<td class="p-4">
+<p class="font-label-md text-label-md text-on-surface">16 Okt 2026</p>
+<p class="font-body-md text-[13px] text-on-surface-variant">13:00 - 15:00</p>
+</td>
+<td class="p-4">
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]" data-icon="location_on">location_on</span>
+<span class="font-body-md text-[14px]">On-site</span>
+</div>
+</td>
+<td class="p-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-medium bg-tertiary-fixed/30 text-on-tertiary-fixed-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-dim"></span>
+                                        Mendatang
+                                    </span>
+</td>
+<td class="p-4 text-right">
+<button class="text-on-surface-variant hover:text-primary p-2 rounded-full hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+<!-- Modal: Buat Jadwal Seleksi -->
+<!-- OVERLAY IS ACTIVE, MODAL IS SHOWN ON TOP BY DEFAULT -->
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6" id="modal-buat-jadwal">
+<!-- Backdrop -->
+<div class="absolute inset-0 bg-on-background/40 modal-overlay" onclick="this.parentElement.classList.add('hidden')"></div>
+<!-- Modal Content -->
+<div class="relative bg-surface rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden animate-[fadeIn_0.2s_ease-out]">
+<!-- Modal Header -->
+<div class="flex justify-between items-center px-6 py-4 border-b border-outline-variant bg-surface-bright">
+<h3 class="font-title-lg text-title-lg text-on-background">Buat Jadwal Seleksi</h3>
+<button class="text-on-surface-variant hover:text-error transition-colors p-1 rounded-full hover:bg-error-container/20" onclick="document.getElementById('modal-buat-jadwal').classList.add('hidden')">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+<!-- Modal Body (Scrollable) -->
+<div class="px-6 py-6 overflow-y-auto flex-1">
+<form class="space-y-6">
+<!-- Row 1: Jenis Seleksi -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-2">Jenis Seleksi <span class="text-error">*</span></label>
+<div class="relative">
+<select class="w-full appearance-none bg-surface border border-outline-variant rounded-lg px-4 py-3 pr-10 text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all cursor-pointer">
+<option disabled="" selected="" value="">Pilih jenis seleksi...</option>
+<option value="wawancara_hr">Wawancara HR</option>
+<option value="wawancara_user">Wawancara User</option>
+<option value="tes_kompetensi">Tes Kompetensi</option>
+<option value="microteaching">Microteaching</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+<!-- Row 2: Kandidat & Posisi -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-2">Kandidat <span class="text-error">*</span></label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
+<input class="w-full pl-10 pr-4 py-3 bg-surface border border-outline-variant rounded-lg text-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="Cari nama kandidat..." type="text">
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-2">Posisi Dilamar</label>
+<input class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-lg text-body-md text-on-surface-variant cursor-not-allowed" readonly="" type="text" value="Dosen Teknik Informatika">
+</div>
+</div>
+<!-- Row 3: Tanggal & Waktu -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-2">Tanggal <span class="text-error">*</span></label>
+<div class="relative">
+<input class="w-full px-4 py-3 bg-surface border border-outline-variant rounded-lg text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" type="date">
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-2">Waktu Mulai <span class="text-error">*</span></label>
+<input class="w-full px-4 py-3 bg-surface border border-outline-variant rounded-lg text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" type="time">
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-2">Zona Waktu</label>
+<input class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-lg text-body-md text-on-surface-variant cursor-not-allowed" readonly="" type="text" value="WIB (Waktu Indonesia Barat)">
+</div>
+</div>
+<!-- Row 4: Metode -->
+<div class="pt-2 border-t border-outline-variant/30">
+<label class="block font-label-md text-label-md text-on-surface mb-3">Metode Pelaksanaan <span class="text-error">*</span></label>
+<div class="flex flex-col sm:flex-row gap-4 mb-4">
+<label class="flex-1 relative flex items-center justify-center p-4 border border-outline-variant rounded-lg cursor-pointer hover:bg-surface-container-low transition-colors group">
+<input checked="" class="peer sr-only" name="metode" onchange="document.getElementById('online-fields').classList.remove('hidden'); document.getElementById('onsite-fields').classList.add('hidden');" type="radio" value="online">
+<div class="absolute inset-0 border-2 border-transparent peer-checked:border-primary rounded-lg transition-colors pointer-events-none"></div>
+<div class="absolute top-3 right-3 w-4 h-4 rounded-full border border-outline peer-checked:border-[5px] peer-checked:border-primary transition-all"></div>
+<div class="flex flex-col items-center gap-2">
+<span class="material-symbols-outlined text-[28px] text-on-surface-variant peer-checked:text-primary transition-colors" data-icon="videocam">videocam</span>
+<span class="font-label-md text-label-md text-on-surface group-hover:text-primary">Online (Video Call)</span>
+</div>
+</label>
+<label class="flex-1 relative flex items-center justify-center p-4 border border-outline-variant rounded-lg cursor-pointer hover:bg-surface-container-low transition-colors group">
+<input class="peer sr-only" name="metode" onchange="document.getElementById('online-fields').classList.add('hidden'); document.getElementById('onsite-fields').classList.remove('hidden');" type="radio" value="onsite">
+<div class="absolute inset-0 border-2 border-transparent peer-checked:border-primary rounded-lg transition-colors pointer-events-none"></div>
+<div class="absolute top-3 right-3 w-4 h-4 rounded-full border border-outline peer-checked:border-[5px] peer-checked:border-primary transition-all"></div>
+<div class="flex flex-col items-center gap-2">
+<span class="material-symbols-outlined text-[28px] text-on-surface-variant peer-checked:text-primary transition-colors" data-icon="business">business</span>
+<span class="font-label-md text-label-md text-on-surface group-hover:text-primary">On-site (Tatap Muka)</span>
+</div>
+</label>
+</div>
+<!-- Dynamic Fields: Online -->
+<div class="space-y-4 bg-surface-container-lowest p-4 rounded-lg border border-primary-fixed-dim/30" id="online-fields">
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]" data-icon="link">link</span>
+                                    Tautan Meeting <span class="text-error">*</span>
+</label>
+<input class="w-full px-4 py-3 bg-surface border border-outline-variant rounded-lg text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="https://zoom.us/j/..." type="url">
+<p class="text-[12px] text-on-surface-variant mt-1 ml-1">Kandidat akan menerima tautan ini melalui email notifikasi.</p>
+</div>
+</div>
+<!-- Dynamic Fields: On-site -->
+<div class="space-y-4 bg-surface-container-lowest p-4 rounded-lg border border-primary-fixed-dim/30 hidden" id="onsite-fields">
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]" data-icon="location_on">location_on</span>
+                                    Lokasi / Ruangan <span class="text-error">*</span>
+</label>
+<input class="w-full px-4 py-3 bg-surface border border-outline-variant rounded-lg text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="Cth: Gedung Rektorat Lt. 3, Ruang HRD" type="text">
+</div>
+</div>
+</div>
+<!-- Row 5: PIC -->
+<div class="pt-2 border-t border-outline-variant/30">
+<label class="block font-label-md text-label-md text-on-surface mb-2">PIC / Penanggung Jawab (Pewawancara/Pengawas) <span class="text-error">*</span></label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline" data-icon="person_search">person_search</span>
+<input class="w-full pl-10 pr-4 py-3 bg-surface border border-outline-variant rounded-lg text-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="Ketik nama PIC / Penanggung Jawab..." type="text">
+</div>
+</div>
+<!-- Row 6: Instruksi Khusus -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-2">Instruksi untuk Kandidat <span class="text-on-surface-variant font-normal">(Opsional)</span></label>
+<textarea class="w-full px-4 py-3 bg-surface border border-outline-variant rounded-lg text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all resize-none" placeholder="Masukkan catatan atau instruksi khusus yang perlu dipersiapkan kandidat..." rows="3"></textarea>
+</div>
+<!-- Row 7: Lampiran -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-2">Lampiran Dokumen <span class="text-on-surface-variant font-normal">(Opsional)</span></label>
+<div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-outline-variant border-dashed rounded-lg hover:border-primary transition-colors cursor-pointer bg-surface-container-lowest">
+<div class="space-y-1 text-center">
+<span class="material-symbols-outlined text-[32px] text-on-surface-variant mb-2" data-icon="cloud_upload">cloud_upload</span>
+<div class="flex text-body-md text-on-surface-variant justify-center">
+<label class="relative cursor-pointer bg-transparent rounded-md font-label-md text-primary hover:text-deep-navy focus-within:outline-none">
+<span class="">Unggah file</span>
+<input class="sr-only" type="file">
+</label>
+<p class="pl-1">atau seret ke sini</p>
+</div>
+<p class="text-[12px] text-on-surface-variant">PDF, DOCX max 5MB</p>
+</div>
+</div>
+</div>
+</form>
+</div>
+<!-- Modal Footer -->
+<div class="px-6 py-4 border-t border-outline-variant bg-surface-container-lowest flex justify-end gap-3 mt-auto">
+<button class="px-5 py-2.5 rounded-lg border border-outline-variant text-on-surface font-label-md text-label-md hover:bg-surface-container-low transition-colors" onclick="document.getElementById('modal-buat-jadwal').classList.add('hidden')">Batal</button>
+<button class="px-6 py-2.5 rounded-lg bg-primary text-on-primary font-label-md text-label-md hover:bg-deep-navy shadow-sm transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="save">save</span>
+                    Simpan Jadwal
+                </button>
+</div>
+</div>
+</div>
+
+
+</body></html>

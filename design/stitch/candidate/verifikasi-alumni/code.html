@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Verifikasi Status Alumni</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary": "#ffffff",
+                        "outline-variant": "#c4c6cf",
+                        "inverse-surface": "#2d3133",
+                        "surface-container": "#ebeef0",
+                        "primary-fixed": "#d6e3ff",
+                        "surface-container-high": "#e5e9eb",
+                        "primary": "#002045",
+                        "on-tertiary-fixed": "#271900",
+                        "primary-container": "#1a365d",
+                        "on-primary-container": "#86a0cd",
+                        "on-tertiary": "#ffffff",
+                        "deep-navy": "#1B2D4F",
+                        "error": "#E11B22",
+                        "tertiary-fixed": "#ffdeaa",
+                        "on-background": "#181c1e",
+                        "on-secondary-fixed": "#001d37",
+                        "inverse-on-surface": "#eef1f3",
+                        "background": "#f7fafc",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed-dim": "#f8bc4b",
+                        "surface-container-low": "#f1f4f6",
+                        "inverse-primary": "#adc7f7",
+                        "surface-container-highest": "#e0e3e5",
+                        "tertiary-container": "#493100",
+                        "surface-bright": "#f7fafc",
+                        "surface-tint": "#455f88",
+                        "surface": "#ffffff",
+                        "outline": "#74777f",
+                        "on-tertiary-fixed-variant": "#5f4100",
+                        "on-surface": "#181c1e",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#d2e4ff",
+                        "surface-dim": "#d7dadc",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-container": "#cb9524",
+                        "on-primary-fixed-variant": "#2d476f",
+                        "success": "#38a169",
+                        "on-surface-variant": "#43474e",
+                        "on-error": "#ffffff",
+                        "secondary-fixed-dim": "#9fcaff",
+                        "on-primary-fixed": "#001b3c",
+                        "on-secondary-container": "#004172",
+                        "error-container": "#ffdad6",
+                        "surface-variant": "#e0e3e5",
+                        "tertiary": "#2d1d00",
+                        "secondary-container": "#66affe",
+                        "secondary": "#0061a5",
+                        "primary-fixed-dim": "#adc7f7",
+                        "on-secondary-fixed-variant": "#00497e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "48px",
+                        "gutter": "24px",
+                        "container-max": "1280px",
+                        "base": "4px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "title-lg": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "headline-lg-mobile": ["Inter"]
+                    },
+                    "fontSize": {
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex">
+<!-- SideNavBar (Kandidat Authenticated) -->
+<nav class="hidden md:flex flex-col bg-deep-navy dark:bg-primary docked left-0 h-full w-[280px] shadow-sm fixed left-0 top-0 h-screen w-[280px] flex flex-col p-4 z-50 text-on-primary">
+<div class="mb-8 flex items-center space-x-4">
+<img alt="Foto Profil Kandidat" class="w-12 h-12 rounded-full object-cover border-2 border-outline-variant/30" data-alt="A professional headshot of a university candidate suitable for an academic and corporate setting. Clean lighting, neutral background, reflecting an ambitious and polished appearance. Light mode aesthetic, sharp details, appropriate for a career portal." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEWWUTnCnb_stpHD2BzS2NaQW5SsQES7VG6xcn9XayQJdsn0EFzSyBsV2FTreiCpSLUXpu_ZMh3TLA-q63f5sky9Hy_i28CzSqqC80y-oY1gKxxu1UD2M0BI05pWrZ6LobZswssoOev3KE57xAUJuDDVtycpZyLz5uytVVYe0W_B1kuTIwvBgCgm6fKPpOV_lPBOBEa3ummpULjO0iULHJ7ykcSGkChHWBVmKTSpMZFnVKBwtd3LUdSg"/>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-on-primary">Portal Kandidat</h1>
+<p class="font-label-sm text-label-sm text-on-primary/70">Tahun Akademik 2026</p>
+</div>
+</div>
+<ul class="flex flex-col space-y-2 font-label-md text-label-md flex-1">
+<li><a class="flex items-center space-x-3 p-3 text-on-primary/80 hover:text-on-primary hover:bg-white/10 transition-colors scale-95 active:scale-90 transition-transform rounded-lg" href="#"><span class="material-symbols-outlined">dashboard</span><span>Dashboard</span></a></li>
+<li><a class="flex items-center space-x-3 p-3 bg-secondary-container text-on-secondary-container rounded-lg font-bold scale-95 active:scale-90 transition-transform" href="#"><span class="material-symbols-outlined">person</span><span>Profil Saya</span></a></li>
+<li><a class="flex items-center space-x-3 p-3 text-on-primary/80 hover:text-on-primary hover:bg-white/10 transition-colors scale-95 active:scale-90 transition-transform rounded-lg" href="#"><span class="material-symbols-outlined">description</span><span>CV &amp; Dokumen</span></a></li>
+<li><a class="flex items-center space-x-3 p-3 text-on-primary/80 hover:text-on-primary hover:bg-white/10 transition-colors scale-95 active:scale-90 transition-transform rounded-lg" href="#"><span class="material-symbols-outlined">search</span><span>Cari Lowongan</span></a></li>
+<li><a class="flex items-center space-x-3 p-3 text-on-primary/80 hover:text-on-primary hover:bg-white/10 transition-colors scale-95 active:scale-90 transition-transform rounded-lg" href="#"><span class="material-symbols-outlined">work_history</span><span>Lamaran Saya</span></a></li>
+<li><a class="flex items-center space-x-3 p-3 text-on-primary/80 hover:text-on-primary hover:bg-white/10 transition-colors scale-95 active:scale-90 transition-transform rounded-lg" href="#"><span class="material-symbols-outlined">event</span><span>Jadwal Seleksi</span></a></li>
+<li><a class="flex items-center space-x-3 p-3 text-on-primary/80 hover:text-on-primary hover:bg-white/10 transition-colors scale-95 active:scale-90 transition-transform rounded-lg" href="#"><span class="material-symbols-outlined">bookmark</span><span>Lowongan Tersimpan</span></a></li>
+<li><a class="flex items-center space-x-3 p-3 text-on-primary/80 hover:text-on-primary hover:bg-white/10 transition-colors scale-95 active:scale-90 transition-transform rounded-lg" href="#"><span class="material-symbols-outlined">notifications</span><span>Notifikasi</span></a></li>
+<li class="mt-auto"><a class="flex items-center space-x-3 p-3 text-on-primary/80 hover:text-on-primary hover:bg-white/10 transition-colors scale-95 active:scale-90 transition-transform rounded-lg" href="#"><span class="material-symbols-outlined">settings</span><span>Pengaturan Akun</span></a></li>
+</ul>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-[280px] flex flex-col min-h-screen">
+<!-- TopNavBar -->
+<header class="bg-surface dark:bg-inverse-surface text-primary dark:text-primary-fixed docked top-0 w-full border-b border-outline-variant flat no shadows flex justify-between items-center w-full px-margin-desktop h-16 z-40 sticky top-0">
+<div class="flex items-center space-x-4">
+<!-- Mobile Menu Button (Placeholder) -->
+<button class="md:hidden p-2 text-on-surface-variant hover:bg-surface-container-low transition-all duration-200 rounded-full">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<span class="font-headline-md text-headline-md font-extrabold text-deep-navy">Career Center</span>
+</div>
+<div class="flex items-center space-x-4">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-low dark:hover:bg-primary-container/20 transition-all duration-200 rounded-full">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-low dark:hover:bg-primary-container/20 transition-all duration-200 rounded-full">
+<span class="material-symbols-outlined">help</span>
+</button>
+<img alt="Avatar Admin" class="w-8 h-8 rounded-full border border-outline-variant/50" data-alt="A small, circular avatar image of an administrator or candidate, clear and professional, used in a top navigation bar. Clean, modern aesthetic, light mode styling." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBiLfMY6Wo-k9DwWOH1WDSOi4735D8aObe0wzLfsyzET4Y2_xZ7KFYEgd9FSD9qX8mPOtus0ysJKt5wpB8Z1dyn5S3OpR1BCebaFenNXg4n6mWu55SDkL16HbKV9KudaeHWWVIW36YeT9ixdbc_N51SDFc07zptfqDS3KNLdN-JNmBZTL_NNTsYxYNk31CMUNVY4AsA-D8OF9aEm-ayH4ahnFlcVtmD9Zf_hvw1XicDWzbqYXpoDUc9HQ"/>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="p-margin-mobile md:p-margin-desktop flex-1">
+<div class="max-w-3xl mx-auto space-y-8">
+<header>
+<h2 class="font-headline-lg md:text-headline-lg text-headline-lg-mobile text-on-surface mb-2">Verifikasi Status Alumni</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Memastikan status alumni sesuai dengan data resmi kampus untuk mengakses lowongan khusus alumni.</p>
+</header>
+<div class="bg-surface border border-outline-variant/50 rounded-xl shadow-sm p-6 space-y-6">
+<div class="flex items-center space-x-3 mb-4 p-4 bg-surface-container-low rounded-lg border border-outline-variant/30">
+<span class="material-symbols-outlined text-outline">info</span>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Status saat ini:</p>
+<p class="font-label-md text-label-md text-on-surface">Belum Diverifikasi</p>
+</div>
+</div>
+<form class="space-y-6">
+<div class="space-y-4">
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-1" for="nim">NIM</label>
+<input class="w-full rounded-lg border-outline-variant bg-surface px-4 py-2 text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" id="nim" name="nim" placeholder="Masukkan Nomor Induk Mahasiswa" type="text"/>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-1" for="prodi">Program Studi</label>
+<div class="relative">
+<select class="w-full rounded-lg border-outline-variant bg-surface px-4 py-2 text-on-surface appearance-none focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors pr-10" id="prodi" name="prodi">
+<option disabled="" selected="" value="">Pilih Program Studi</option>
+<option value="ti">Teknik Informatika</option>
+<option value="si">Sistem Informasi</option>
+<option value="dkv">Desain Komunikasi Visual</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline-variant pointer-events-none">expand_more</span>
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-1" for="tahun_lulus">Tahun Lulus</label>
+<div class="relative">
+<select class="w-full rounded-lg border-outline-variant bg-surface px-4 py-2 text-on-surface appearance-none focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors pr-10" id="tahun_lulus" name="tahun_lulus">
+<option disabled="" selected="" value="">Pilih Tahun Lulus</option>
+<option value="2026">2026</option>
+<option value="2025">2025</option>
+<option value="2024">2024</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline-variant pointer-events-none">expand_more</span>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-outline-variant/30 flex justify-end">
+<button class="bg-primary text-on-primary px-6 py-2 rounded-lg font-label-md text-label-md hover:bg-primary-container transition-colors shadow-sm" type="submit">
+                                Verifikasi Status Alumni
+                            </button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</main>
+</body></html>

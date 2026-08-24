@@ -1,0 +1,428 @@
+<!DOCTYPE html><html lang="id"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Moderasi Lowongan - Career Center</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary-container": "#86a0cd",
+                      "on-surface": "#181c1e",
+                      "surface-variant": "#e0e3e5",
+                      "outline": "#74777f",
+                      "primary-fixed": "#d6e3ff",
+                      "surface-container-low": "#f1f4f6",
+                      "on-secondary": "#ffffff",
+                      "on-background": "#181c1e",
+                      "inverse-on-surface": "#eef1f3",
+                      "background": "#f7fafc",
+                      "on-tertiary-fixed": "#271900",
+                      "outline-variant": "#c4c6cf",
+                      "on-tertiary-container": "#cb9524",
+                      "primary": "#002045",
+                      "success": "#38a169",
+                      "on-error-container": "#93000a",
+                      "surface-tint": "#455f88",
+                      "secondary-container": "#66affe",
+                      "surface-bright": "#f7fafc",
+                      "error": "#E11B22",
+                      "on-tertiary-fixed-variant": "#5f4100",
+                      "surface-dim": "#d7dadc",
+                      "surface-container": "#ebeef0",
+                      "primary-container": "#1a365d",
+                      "secondary": "#0061a5",
+                      "tertiary-fixed": "#ffdeaa",
+                      "tertiary": "#2d1d00",
+                      "inverse-primary": "#adc7f7",
+                      "surface-container-high": "#e5e9eb",
+                      "on-primary-fixed": "#001b3c",
+                      "tertiary-container": "#493100",
+                      "secondary-fixed-dim": "#9fcaff",
+                      "secondary-fixed": "#d2e4ff",
+                      "surface-container-highest": "#e0e3e5",
+                      "on-primary-fixed-variant": "#2d476f",
+                      "on-tertiary": "#ffffff",
+                      "tertiary-fixed-dim": "#f8bc4b",
+                      "inverse-surface": "#2d3133",
+                      "primary-fixed-dim": "#adc7f7",
+                      "on-secondary-container": "#004172",
+                      "on-error": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "on-surface-variant": "#43474e",
+                      "on-secondary-fixed": "#001d37",
+                      "surface": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "deep-navy": "#1B2D4F",
+                      "on-secondary-fixed-variant": "#00497e",
+                      "surface-container-lowest": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "24px",
+                      "margin-desktop": "48px",
+                      "margin-mobile": "16px",
+                      "container-max": "1280px",
+                      "base": "4px"
+              },
+              "fontFamily": {
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "label-sm": [
+                              "Inter"
+                      ],
+                      "title-lg": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "display-lg": [
+                              "Inter"
+                      ],
+                      "headline-lg-mobile": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "title-lg": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md text-body-md flex min-h-screen">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 h-full w-[280px] bg-deep-navy shadow-sm flex flex-col h-screen sticky top-0 z-40 hidden md:flex">
+<div class="px-6 py-8 flex flex-col gap-2 border-b border-white/10">
+<h1 class="font-title-lg text-title-lg font-bold text-white">Career Center</h1>
+<p class="text-white/70 font-label-sm text-label-sm">Back-office Portal</p>
+</div>
+<div class="flex-1 overflow-y-auto py-4 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-primary-container/50 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-primary-container/50 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="fact_check">fact_check</span>
+                Verification Queue
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-primary-container/50 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="business_center">business_center</span>
+                Company Audits
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-white border-l-4 border-secondary-container active:scale-[0.98] transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="work_history" style="font-variation-settings: 'FILL' 1;">work_history</span>
+                Vacancy Moderation
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-primary-container/50 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="supervisor_account">supervisor_account</span>
+                Recruiter Status
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-primary-container/50 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                System Settings
+            </a>
+</div>
+<div class="p-4 border-t border-white/10 flex flex-col gap-2">
+<button class="w-full py-2 bg-secondary text-white font-label-md text-label-md rounded hover:bg-secondary/90 transition-colors">Export Reports</button>
+<div class="flex flex-col gap-1 mt-2">
+<a class="flex items-center gap-3 px-4 py-2 text-white/80 hover:text-white hover:bg-primary-container/50 transition-colors font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="help">help</span>
+                    Help Center
+                </a>
+<a class="flex items-center gap-3 px-4 py-2 text-white/80 hover:text-white hover:bg-primary-container/50 transition-colors font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="logout">logout</span>
+                    Logout
+                </a>
+</div>
+<div class="mt-4 flex items-center gap-3 px-2">
+<img alt="Admin Profile Picture" class="w-8 h-8 rounded-full object-cover border border-white/20" data-alt="A small, professional headshot of an administrator in a corporate setting. The lighting is bright and modern, conveying reliability and authority. The background is a soft, blurred office environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0ikhqowYKy-FgOHkn4FFDJum6gOEjW4IdSVrnupnw5gKmevwnQPUAbBew_lUu6aI4r_E4csUcASY-THw8m6erq6gEGEW3AZyEydfCLqvGEZM0JzsGlrXZQo7GCwLeBakzxIgEES4lKrGY0Olh9t3WYkByIFWXz8PDYGtLlkMMYKwJS6ZsmJ01vRiDDAaHjQk4mhM8g1Wp_FjTO4rv-_GQgZKZHgZ7GPxamqvJMwbU1w398o75IHDaLA">
+<div class="flex flex-col">
+<span class="text-white font-label-sm text-label-sm">Admin User</span>
+<span class="text-white/60 text-[10px]">admin@careercenter.edu</span>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col min-w-0 md:ml-[280px]">
+<!-- TopNavBar -->
+<header class="bg-surface border-b border-outline-variant flex justify-between items-center w-full px-gutter h-16 sticky top-0 z-30">
+<div class="flex items-center gap-4">
+<button class="md:hidden text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<span class="font-headline-md text-headline-md font-bold text-primary">Admin Console</span>
+</div>
+<div class="hidden md:flex items-center gap-6 flex-1 justify-center">
+<a class="text-on-surface-variant font-label-md text-label-md hover:text-primary transition-colors" href="#">Verification</a>
+<a class="text-on-surface-variant font-label-md text-label-md hover:text-primary transition-colors" href="#">Audit Log</a>
+<a class="text-primary font-label-md text-label-md font-bold border-b-2 border-primary pb-1" href="#">Moderation</a>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]" data-icon="search">search</span>
+<input class="pl-10 pr-4 py-1.5 bg-surface-container-low border border-outline-variant rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 w-48 transition-all focus:w-64" placeholder="Search..." type="text">
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-colors hover:text-primary">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-colors hover:text-primary hidden sm:block">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+</button>
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-colors hover:text-primary">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Canvas -->
+<main class="flex-1 p-margin-mobile md:p-margin-desktop max-w-container-max mx-auto w-full flex flex-col gap-6">
+<!-- Page Header -->
+<div class="flex flex-col gap-2">
+<h2 class="font-headline-lg text-headline-lg md:font-headline-lg md:text-headline-lg font-headline-lg-mobile text-headline-lg-mobile text-primary">Moderasi Lowongan</h2>
+<p class="text-on-surface-variant font-body-md text-body-md">Tinjau lowongan dari perusahaan terverifikasi sebelum ditampilkan kepada kandidat.</p>
+</div>
+<!-- Controls (Search & Filter) -->
+<div class="bg-surface p-4 rounded-lg border border-outline-variant shadow-sm flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
+<div class="relative w-full lg:w-96">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" data-icon="search">search</span>
+<input class="w-full pl-10 pr-4 py-2 border border-outline-variant rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-body-md text-body-md" placeholder="Cari posisi atau perusahaan..." type="text">
+</div>
+<div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+<div class="flex items-center gap-2 text-on-surface-variant font-label-md text-label-md">
+<span class="material-symbols-outlined text-[20px]" data-icon="filter_list">filter_list</span>
+<span class="">Filters:</span>
+</div>
+<select class="border border-outline-variant rounded-md py-1.5 pl-3 pr-8 text-sm bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20">
+<option>Status: Semua</option>
+<option>Menunggu Pemeriksaan</option>
+<option>Perlu Revisi</option>
+<option>Disetujui</option>
+</select>
+<select class="border border-outline-variant rounded-md py-1.5 pl-3 pr-8 text-sm bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20"><option>Target Kandidat</option><option>Publik</option><option>Alumni</option><option>Mahasiswa Tingkat Akhir &amp; Alumni</option><option>Internal</option></select>
+<select class="border border-outline-variant rounded-md py-1.5 pl-3 pr-8 text-sm bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20">
+<option>Metode Lamaran</option>
+<option>Portal Internal</option>
+<option>Eksternal</option>
+</select>
+</div>
+</div>
+<!-- Data Table -->
+<div class="bg-surface border border-outline-variant rounded-lg shadow-sm overflow-hidden flex-1">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">
+<th class="py-4 px-6 font-semibold">Posisi</th>
+<th class="py-4 px-6 font-semibold">Perusahaan</th>
+<th class="py-4 px-6 font-semibold">Target Kandidat</th>
+<th class="py-4 px-6 font-semibold">Metode Lamaran</th>
+<th class="py-4 px-6 font-semibold">Tanggal Submit</th>
+<th class="py-4 px-6 font-semibold">Status</th>
+<th class="py-4 px-6 font-semibold text-right">Aksi</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant font-body-md text-body-md">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="py-4 px-6">
+<div class="font-semibold text-primary">Software Engineer Intern</div>
+<div class="text-on-surface-variant text-sm mt-0.5">Magang • On-site</div>
+</td>
+<td class="py-4 px-6">
+<div class="flex items-center gap-2">
+<span class="font-medium">TechCorp Indonesia</span>
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-[18px]" data-icon="verified" style="font-variation-settings: 'FILL' 1;" title="Mitra Resmi">verified</span>
+</div>
+</td>
+<td class="py-4 px-6 text-on-surface-variant">Mahasiswa Tingkat Akhir &amp; Alumni</td>
+<td class="py-4 px-6 text-on-surface-variant">Portal Internal</td>
+<td class="py-4 px-6 text-on-surface-variant">24 Okt 2023, 10:30</td>
+<td class="py-4 px-6">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container-highest text-on-surface-variant font-label-sm text-label-sm border border-outline-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+                                        Menunggu Pemeriksaan
+                                    </span>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="text-secondary hover:text-primary font-label-md text-label-md inline-flex items-center gap-1 transition-colors">
+                                        Tinjau
+                                        <span class="material-symbols-outlined text-[18px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="py-4 px-6">
+<div class="font-semibold text-primary">Data Analyst Junior</div>
+<div class="text-on-surface-variant text-sm mt-0.5">Full-time • Hybrid</div>
+</td>
+<td class="py-4 px-6">
+<div class="flex items-center gap-2">
+<span class="font-medium">DataNusa Analytics</span>
+</div>
+</td>
+<td class="py-4 px-6 text-on-surface-variant">Alumni</td>
+<td class="py-4 px-6 text-on-surface-variant">Eksternal (Web Perusahaan)</td>
+<td class="py-4 px-6 text-on-surface-variant">23 Okt 2023, 15:45</td>
+<td class="py-4 px-6">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container-highest text-on-surface-variant font-label-sm text-label-sm border border-outline-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+                                        Menunggu Pemeriksaan
+                                    </span>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="text-secondary hover:text-primary font-label-md text-label-md inline-flex items-center gap-1 transition-colors">
+                                        Tinjau
+                                        <span class="material-symbols-outlined text-[18px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="py-4 px-6">
+<div class="font-semibold text-primary">Marketing Specialist</div>
+<div class="text-on-surface-variant text-sm mt-0.5">Full-time • Remote</div>
+</td>
+<td class="py-4 px-6">
+<div class="flex items-center gap-2">
+<span class="font-medium">Kreatif Media Utama</span>
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-[18px]" data-icon="verified" style="font-variation-settings: 'FILL' 1;" title="Mitra Resmi">verified</span>
+</div>
+</td>
+<td class="py-4 px-6 text-on-surface-variant">Alumni</td>
+<td class="py-4 px-6 text-on-surface-variant">Portal Internal</td>
+<td class="py-4 px-6 text-on-surface-variant">22 Okt 2023, 09:15</td>
+<td class="py-4 px-6">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container-highest text-on-surface-variant font-label-sm text-label-sm border border-outline-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+                                        Menunggu Pemeriksaan
+                                    </span>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="text-secondary hover:text-primary font-label-md text-label-md inline-flex items-center gap-1 transition-colors">
+                                        Tinjau
+                                        <span class="material-symbols-outlined text-[18px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="bg-surface px-6 py-4 border-t border-outline-variant flex items-center justify-between">
+<div class="text-sm text-on-surface-variant">
+                        Menampilkan <span class="font-medium text-on-surface">1</span> hingga <span class="font-medium text-on-surface">3</span> dari <span class="font-medium text-on-surface">42</span> hasil
+                    </div>
+<div class="flex items-center gap-2">
+<button class="p-1 border border-outline-variant rounded hover:bg-surface-container-low disabled:opacity-50 text-on-surface-variant" disabled="">
+<span class="material-symbols-outlined" data-icon="chevron_left">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded bg-primary-container text-white font-label-md text-label-md">1</button>
+<button class="w-8 h-8 flex items-center justify-center rounded hover:bg-surface-container-low text-on-surface-variant font-label-md text-label-md">2</button>
+<button class="w-8 h-8 flex items-center justify-center rounded hover:bg-surface-container-low text-on-surface-variant font-label-md text-label-md">3</button>
+<span class="text-on-surface-variant">...</span>
+<button class="p-1 border border-outline-variant rounded hover:bg-surface-container-low text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+
+</body></html>

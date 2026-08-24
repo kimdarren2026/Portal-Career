@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Detail Lamaran - Career Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-surface": "#2d3133",
+                    "primary-container": "#1a365d",
+                    "surface-container-highest": "#e0e3e5",
+                    "secondary-container": "#66affe",
+                    "on-tertiary-fixed-variant": "#5f4100",
+                    "surface-bright": "#f7fafc",
+                    "surface-tint": "#455f88",
+                    "on-background": "#181c1e",
+                    "surface-container": "#ebeef0",
+                    "on-error-container": "#93000a",
+                    "surface-container-lowest": "#ffffff",
+                    "outline-variant": "#c4c6cf",
+                    "secondary-fixed": "#d2e4ff",
+                    "on-secondary-fixed-variant": "#00497e",
+                    "on-tertiary-fixed": "#271900",
+                    "inverse-primary": "#adc7f7",
+                    "on-secondary-fixed": "#001d37",
+                    "secondary-fixed-dim": "#9fcaff",
+                    "surface-container-high": "#e5e9eb",
+                    "on-primary-container": "#86a0cd",
+                    "on-surface": "#181c1e",
+                    "on-error": "#ffffff",
+                    "success": "#38a169",
+                    "primary-fixed-dim": "#adc7f7",
+                    "on-secondary-container": "#004172",
+                    "background": "#f7fafc",
+                    "tertiary-container": "#493100",
+                    "on-surface-variant": "#43474e",
+                    "tertiary-fixed": "#ffdeaa",
+                    "surface-dim": "#d7dadc",
+                    "primary": "#002045",
+                    "surface-container-low": "#f1f4f6",
+                    "inverse-on-surface": "#eef1f3",
+                    "primary-fixed": "#d6e3ff",
+                    "on-tertiary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "outline": "#74777f",
+                    "on-secondary": "#ffffff",
+                    "error": "#E11B22",
+                    "secondary": "#0061a5",
+                    "surface": "#ffffff",
+                    "tertiary": "#2d1d00",
+                    "tertiary-fixed-dim": "#f8bc4b",
+                    "on-tertiary-container": "#cb9524",
+                    "deep-navy": "#1B2D4F",
+                    "on-primary-fixed": "#001b3c",
+                    "on-primary-fixed-variant": "#2d476f",
+                    "on-primary": "#ffffff",
+                    "surface-variant": "#e0e3e5"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "16px",
+                    "container-max": "1280px",
+                    "base": "4px",
+                    "margin-desktop": "48px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "headline-lg-mobile": [
+                            "Inter"
+                    ],
+                    "headline-lg": [
+                            "Inter"
+                    ],
+                    "title-lg": [
+                            "Inter"
+                    ],
+                    "display-lg": [
+                            "Inter"
+                    ],
+                    "body-lg": [
+                            "Inter"
+                    ],
+                    "body-md": [
+                            "Inter"
+                    ],
+                    "label-md": [
+                            "Inter"
+                    ],
+                    "headline-md": [
+                            "Inter"
+                    ],
+                    "label-sm": [
+                            "Inter"
+                    ]
+            },
+            "fontSize": {
+                    "headline-lg-mobile": [
+                            "24px",
+                            {
+                                    "lineHeight": "32px",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "headline-lg": [
+                            "32px",
+                            {
+                                    "lineHeight": "40px",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "title-lg": [
+                            "20px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "display-lg": [
+                            "48px",
+                            {
+                                    "lineHeight": "56px",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "body-lg": [
+                            "18px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "body-md": [
+                            "16px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "label-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "20px",
+                                    "letterSpacing": "0.01em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "32px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "label-sm": [
+                            "12px",
+                            {
+                                    "lineHeight": "16px",
+                                    "fontWeight": "500"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+</head>
+<body class="bg-background text-on-background antialiased flex">
+<!-- SideNavBar (from JSON) -->
+<aside class="hidden md:flex flex-col w-[280px] h-screen sticky left-0 top-0 bg-primary shadow-sm py-6">
+<div class="px-6 mb-8">
+<h1 class="font-headline-md text-headline-md text-on-primary font-bold">Career Portal</h1>
+<p class="font-body-md text-body-md text-on-primary opacity-80 mt-1">University Alumni</p>
+</div>
+<nav class="flex-1 flex flex-col gap-1 px-2 font-body-md text-body-md">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all rounded" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all rounded" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span>Profile</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all rounded" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span>Documents</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all rounded" href="#">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+<span>Find Jobs</span>
+</a>
+<!-- Active Navigation -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-100 bg-primary-container/20 border-r-4 border-secondary-container transition-transform scale-[0.99] rounded-l" href="#">
+<span class="material-symbols-outlined" data-icon="work" style="font-variation-settings: 'FILL' 1;">work</span>
+<span>My Applications</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all rounded" href="#">
+<span class="material-symbols-outlined" data-icon="event">event</span>
+<span>Schedule</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all rounded" href="#">
+<span class="material-symbols-outlined" data-icon="bookmark">bookmark</span>
+<span>Saved</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all rounded" href="#">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span>Notifications</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary opacity-80 hover:opacity-100 hover:bg-primary-container/10 transition-all rounded mt-auto" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+<div class="px-6 mt-6">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover border-2 border-outline-variant" data-alt="A small, professional portrait photograph of a young university graduate wearing business casual attire. High-quality lighting, professional corporate style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCEnE97B2FRlKlCNxTWVL6LMntDso39o4h5qQMRUAbKOAzghw5CdPZeHusEyEMG9jg4CyhnBr1PT2SMnVtnBLCyX_WuVNn4s7LEE8xlOzYEC8JCKqUVqc211ia8brWc1ckbUEqN4DqNuR-CMS_7tbnnuzg4VLv4rY4UWquCmjJMnzyCmc3FAtHm7sa4z6HKnwyN-PdWOChXN6Uk87QLYd5Dabi5Fzuc1C-SD1nRmHi2MNbIPXRADFzRQ"/>
+<div class="text-on-primary">
+<p class="font-label-md text-label-md">Alex Johnson</p>
+<p class="font-label-sm text-label-sm opacity-80">Alumni</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-h-screen">
+<!-- TopNavBar (from JSON - Mobile fallback / secondary header) -->
+<header class="md:hidden flex justify-between items-center h-16 px-margin-mobile bg-surface shadow-sm sticky top-0 z-50">
+<h1 class="font-title-lg text-title-lg text-primary font-bold">Career Portal</h1>
+<div class="flex gap-4">
+<button class="text-on-surface-variant hover:text-primary transition-colors focus:ring-2 focus:ring-primary-container rounded-full p-1">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors focus:ring-2 focus:ring-primary-container rounded-full p-1">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="flex-1 p-margin-mobile md:p-margin-desktop md:pt-12 max-w-container-max mx-auto w-full">
+<!-- Breadcrumb & Back Action -->
+<div class="mb-6 flex items-center gap-2 text-on-surface-variant font-label-md text-label-md">
+<a class="hover:text-primary flex items-center gap-1 transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="arrow_back">arrow_back</span>
+                    Kembali
+                </a>
+<span>/</span>
+<span class="text-primary font-semibold">Detail Lamaran</span>
+</div>
+<!-- Page Title -->
+<div class="mb-8">
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-background">Detail Lamaran</h2>
+</div>
+<!-- Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Main Content Column -->
+<div class="lg:col-span-8 flex flex-col gap-6">
+<!-- Header Card -->
+<div class="bg-surface rounded-xl border border-outline-variant p-6 md:p-8 shadow-sm">
+<div class="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between mb-6">
+<div class="flex gap-4 items-center">
+<div class="w-16 h-16 bg-surface-container-low rounded border border-outline-variant flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="domain">domain</span>
+</div>
+<div>
+<h3 class="font-title-lg text-title-lg text-on-background mb-1">Data Scientist</h3>
+<div class="flex items-center gap-2 text-on-surface-variant font-body-md text-body-md">
+<span>TechCorp Indonesia</span>
+<!-- Verification Badge -->
+<div class="flex items-center gap-1 bg-[#fff8e1] text-[#b07d00] px-2 py-0.5 rounded-full border border-[#ffe082]">
+<span class="material-symbols-outlined text-[14px]" data-icon="verified" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-label-sm text-label-sm">Mitra Resmi</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Status Badge -->
+<div class="bg-primary-fixed text-on-primary-fixed px-3 py-1.5 rounded-full font-label-md text-label-md flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-secondary-container"></span>
+                                Proses Seleksi
+                            </div>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 border-t border-outline-variant pt-6 mt-4">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">ID Lamaran</p>
+<p class="font-body-md text-body-md font-medium text-on-background">#APP-2026-892</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Tanggal Melamar</p>
+<p class="font-body-md text-body-md font-medium text-on-background">12 Okt 2026</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Tipe Pekerjaan</p>
+<div class="bg-primary/10 text-primary px-2 py-0.5 rounded-full inline-block font-label-sm text-label-sm">
+                                    Full-time
+                                </div>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Lokasi</p>
+<p class="font-body-md text-body-md font-medium text-on-background">Jakarta Selatan</p>
+</div>
+</div>
+</div>
+<!-- Documents Section -->
+<div class="bg-surface rounded-xl border border-outline-variant p-6 md:p-8 shadow-sm">
+<h4 class="font-title-lg text-title-lg text-on-background mb-4">Dokumen Terlampir</h4>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="flex items-center justify-between p-4 border border-outline-variant rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="bg-error-container text-on-error-container p-2 rounded">
+<span class="material-symbols-outlined" data-icon="picture_as_pdf">picture_as_pdf</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-background">Resume_Alex_Johnson.pdf</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">2.4 MB • Diunggah 12 Okt 2026</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary" data-icon="download">download</span>
+</div>
+<div class="flex items-center justify-between p-4 border border-outline-variant rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="bg-error-container text-on-error-container p-2 rounded">
+<span class="material-symbols-outlined" data-icon="picture_as_pdf">picture_as_pdf</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-background">Cover_Letter_TechCorp.pdf</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">1.1 MB • Diunggah 12 Okt 2026</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary" data-icon="download">download</span>
+</div>
+<div class="flex items-center justify-between p-4 border border-outline-variant rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="bg-secondary-fixed text-on-secondary-fixed p-2 rounded">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-background">Portofolio_Data_2026.pdf</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">8.5 MB • Diunggah 12 Okt 2026</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary" data-icon="download">download</span>
+</div>
+</div>
+</div>
+<!-- Additional Information -->
+<div class="bg-surface rounded-xl border border-outline-variant p-6 md:p-8 shadow-sm">
+<h4 class="font-title-lg text-title-lg text-on-background mb-4">Informasi Tambahan</h4>
+<div class="space-y-4">
+<div>
+<h5 class="font-label-md text-label-md text-on-surface-variant">Ketersediaan Mulai Kerja</h5>
+<p class="font-body-md text-body-md text-on-background mt-1">November 2026</p>
+</div>
+<div>
+<h5 class="font-label-md text-label-md text-on-surface-variant">Catatan Tambahan</h5>
+<p class="font-body-md text-body-md text-on-background mt-1">Saya sangat tertarik dengan posisi ini karena sejalan dengan tesis akhir saya mengenai machine learning untuk optimalisasi logistik.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Sidebar / Timeline Column -->
+<div class="lg:col-span-4 flex flex-col gap-6">
+<!-- Progress Timeline Card -->
+<div class="bg-surface rounded-xl border border-outline-variant p-6 md:p-8 shadow-sm relative overflow-hidden">
+<h4 class="font-title-lg text-title-lg text-on-background mb-6">Status Lamaran</h4>
+<!-- Timeline -->
+<div class="relative">
+<!-- Vertical Line connecting nodes -->
+<div class="absolute left-[15px] top-4 bottom-8 w-0.5 bg-surface-variant"></div>
+<!-- Active Progress Line -->
+<div class="absolute left-[15px] top-4 h-[50%] w-0.5 bg-primary"></div>
+<!-- Node 1: Completed -->
+<div class="flex gap-4 mb-8 relative z-10">
+<div class="w-8 h-8 rounded-full bg-success text-on-error flex items-center justify-center shrink-0 border-2 border-surface shadow-sm">
+<span class="material-symbols-outlined text-[16px]" data-icon="check" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<div>
+<h5 class="font-label-md text-label-md text-on-background">Lamaran Diterima</h5>
+<p class="font-body-md text-body-md text-on-surface-variant">12 Okt 2026, 09:45 WIB</p>
+</div>
+</div>
+<!-- Node 2: Completed -->
+<div class="flex gap-4 mb-8 relative z-10">
+<div class="w-8 h-8 rounded-full bg-success text-on-error flex items-center justify-center shrink-0 border-2 border-surface shadow-sm">
+<span class="material-symbols-outlined text-[16px]" data-icon="check" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<div>
+<h5 class="font-label-md text-label-md text-on-background">Sedang Ditinjau</h5>
+<p class="font-body-md text-body-md text-on-surface-variant">14 Okt 2026, 14:20 WIB</p>
+</div>
+</div>
+<!-- Node 3: Active -->
+<div class="flex gap-4 mb-8 relative z-10">
+<div class="w-8 h-8 rounded-full bg-surface border-2 border-primary flex items-center justify-center shrink-0 shadow-[0_0_0_4px_rgba(0,32,69,0.1)]">
+<div class="w-3 h-3 rounded-full bg-primary"></div>
+</div>
+<div>
+<h5 class="font-label-md text-label-md text-primary font-bold">Proses Seleksi</h5>
+<p class="font-body-md text-body-md text-on-surface-variant">16 Okt 2026 - Saat Ini</p>
+<div class="mt-3 bg-surface-container-low p-3 rounded text-sm text-on-surface-variant border border-outline-variant font-body-md">
+                                        Undangan tes teknis telah dikirimkan ke email Anda. Harap selesaikan sebelum 20 Okt 2026.
+                                    </div>
+</div>
+</div>
+<!-- Node 4: Incomplete -->
+<div class="flex gap-4 relative z-10">
+<div class="w-8 h-8 rounded-full bg-surface border-2 border-outline-variant flex items-center justify-center shrink-0">
+</div>
+<div>
+<h5 class="font-label-md text-label-md text-on-surface-variant">Wawancara Akhir</h5>
+<p class="font-body-md text-body-md text-on-surface-variant opacity-60">Menunggu tahapan sebelumnya</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Actions -->
+<div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm flex flex-col gap-3">
+<button class="w-full bg-primary text-on-primary py-2.5 px-4 rounded font-label-md text-label-md hover:bg-primary/90 transition-colors">
+                            Cek Email Undangan
+                        </button>
+<button class="w-full bg-surface border border-outline-variant text-error py-2.5 px-4 rounded font-label-md text-label-md hover:bg-error-container transition-colors">
+                            Tarik Lamaran
+                        </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer (from JSON) -->
+<footer class="mt-auto bg-surface-container-high py-8 border-t border-outline-variant">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-desktop gap-4 max-w-container-max mx-auto w-full">
+<div class="font-headline-md text-headline-md font-bold text-primary">
+                    Career Portal
+                </div>
+<div class="flex gap-4 font-label-sm text-label-sm text-on-surface-variant">
+<a class="hover:underline hover:text-primary transition-all duration-200" href="#">Privacy Policy</a>
+<a class="hover:underline hover:text-primary transition-all duration-200" href="#">Terms of Service</a>
+<a class="hover:underline hover:text-primary transition-all duration-200" href="#">Contact Support</a>
+<a class="hover:underline hover:text-primary transition-all duration-200" href="#">Employer Portal</a>
+</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant">
+                    © 2024 University Career Center. All rights reserved.
+                </div>
+</div>
+</footer>
+</main>
+</body></html>

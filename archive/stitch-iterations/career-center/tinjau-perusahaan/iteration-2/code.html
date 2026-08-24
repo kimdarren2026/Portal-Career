@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tinjau Perusahaan - Career Center</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-container": "#86a0cd",
+                        "on-surface": "#181c1e",
+                        "surface-variant": "#e0e3e5",
+                        "outline": "#74777f",
+                        "primary-fixed": "#d6e3ff",
+                        "surface-container-low": "#f1f4f6",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#181c1e",
+                        "inverse-on-surface": "#eef1f3",
+                        "background": "#f7fafc",
+                        "on-tertiary-fixed": "#271900",
+                        "outline-variant": "#c4c6cf",
+                        "on-tertiary-container": "#cb9524",
+                        "primary": "#002045",
+                        "success": "#38a169",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#455f88",
+                        "secondary-container": "#66affe",
+                        "surface-bright": "#f7fafc",
+                        "error": "#E11B22",
+                        "on-tertiary-fixed-variant": "#5f4100",
+                        "surface-dim": "#d7dadc",
+                        "surface-container": "#ebeef0",
+                        "primary-container": "#1a365d",
+                        "secondary": "#0061a5",
+                        "tertiary-fixed": "#ffdeaa",
+                        "tertiary": "#2d1d00",
+                        "inverse-primary": "#adc7f7",
+                        "surface-container-high": "#e5e9eb",
+                        "on-primary-fixed": "#001b3c",
+                        "tertiary-container": "#493100",
+                        "secondary-fixed-dim": "#9fcaff",
+                        "secondary-fixed": "#d2e4ff",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-primary-fixed-variant": "#2d476f",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed-dim": "#f8bc4b",
+                        "inverse-surface": "#2d3133",
+                        "primary-fixed-dim": "#adc7f7",
+                        "on-secondary-container": "#004172",
+                        "on-error": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-surface-variant": "#43474e",
+                        "on-secondary-fixed": "#001d37",
+                        "surface": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "deep-navy": "#1B2D4F",
+                        "on-secondary-fixed-variant": "#00497e",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "margin-desktop": "48px",
+                        "margin-mobile": "16px",
+                        "container-max": "1280px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "headline-lg-mobile": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col md:flex-row antialiased">
+<!-- TopNavBar (Mobile Only) -->
+<header class="md:hidden flex justify-between items-center w-full px-margin-mobile h-16 bg-surface border-b border-outline-variant sticky top-0 z-50">
+<div class="font-headline-md text-headline-md font-bold text-primary">Admin Console</div>
+<div class="flex items-center gap-4 text-on-surface-variant">
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors">notifications</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors">account_circle</span>
+</div>
+</header>
+<!-- SideNavBar (Desktop) -->
+<nav class="hidden md:flex fixed left-0 top-0 h-full w-[280px] bg-deep-navy shadow-sm flex-col z-40">
+<div class="p-6 pb-2">
+<h1 class="font-title-lg text-title-lg font-bold text-white">Career Center</h1>
+<p class="font-body-md text-body-md text-white/60 mt-1">Back-office Portal</p>
+</div>
+<div class="flex flex-col gap-1 px-2 mt-6 flex-grow">
+<!-- Inactive -->
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-primary-container/50 transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" data-weight="fill">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<!-- Active -->
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-white border-l-4 border-secondary-container rounded-r-lg transition-transform scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-weight="fill">fact_check</span>
+<span class="font-body-md text-body-md">Verification Queue</span>
+</a>
+<!-- Inactive -->
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-primary-container/50 transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" data-weight="fill">business_center</span>
+<span class="font-body-md text-body-md">Company Audits</span>
+</a>
+<!-- Inactive -->
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-primary-container/50 transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" data-weight="fill">work_history</span>
+<span class="font-body-md text-body-md">Vacancy Moderation</span>
+</a>
+<!-- Inactive -->
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-primary-container/50 transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" data-weight="fill">supervisor_account</span>
+<span class="font-body-md text-body-md">Recruiter Status</span>
+</a>
+<!-- Inactive -->
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-primary-container/50 transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" data-weight="fill">settings</span>
+<span class="font-body-md text-body-md">System Settings</span>
+</a>
+</div>
+<div class="p-4 mt-auto border-t border-white/10 flex flex-col gap-1">
+<button class="w-full py-2 bg-secondary/20 text-white font-label-md text-label-md rounded-lg hover:bg-secondary/40 transition-colors mb-4 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">download</span> Export Reports
+            </button>
+<a class="flex items-center gap-3 px-4 py-2 text-white/80 hover:text-white hover:bg-primary-container/50 transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" data-weight="fill">help</span>
+<span class="font-body-md text-body-md">Help Center</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-white/80 hover:text-white hover:bg-primary-container/50 transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" data-weight="fill">logout</span>
+<span class="font-body-md text-body-md">Logout</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-grow md:ml-[280px] flex flex-col min-h-screen relative pb-24">
+<!-- TopNavBar (Desktop) -->
+<header class="hidden md:flex justify-between items-center w-full px-gutter h-16 bg-surface border-b border-outline-variant sticky top-0 z-30">
+<div class="flex items-center gap-6">
+<div class="font-headline-md text-headline-md font-bold text-primary">Admin Console</div>
+<nav class="flex gap-6 h-full items-end pb-1">
+<a class="font-label-md text-label-md text-primary font-bold border-b-2 border-primary pb-4 h-full flex items-end opacity-80" href="#">Verification</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors pb-4 h-full flex items-end" href="#">Audit Log</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors pb-4 h-full flex items-end" href="#">Moderation</a>
+</nav>
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant">
+<button class="hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-container-low"><span class="material-symbols-outlined">notifications</span></button>
+<button class="hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-container-low"><span class="material-symbols-outlined">history</span></button>
+<button class="hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-container-low"><span class="material-symbols-outlined">account_circle</span></button>
+</div>
+</header>
+<!-- Page Header -->
+<div class="px-margin-mobile md:px-margin-desktop py-8 border-b border-outline-variant bg-surface">
+<div class="max-w-container-max mx-auto">
+<div class="flex items-center gap-2 text-on-surface-variant font-label-md text-label-md mb-4">
+<a class="hover:text-primary flex items-center gap-1" href="#"><span class="material-symbols-outlined text-[16px]">arrow_back</span> Kembali ke Antrean</a>
+</div>
+<div class="flex flex-col md:flex-row md:items-start justify-between gap-6">
+<div class="flex items-start gap-6">
+<div class="w-20 h-20 bg-surface-container-high rounded-lg flex items-center justify-center border border-outline-variant overflow-hidden shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-outline text-4xl">domain</span>
+<!-- Placeholder for actual logo -->
+<!-- <img src="placeholder" data-alt="A clean, modern corporate logo for a technology company named PT Teknologi Nusantara, featuring abstract geometric shapes in blue and grey, professional corporate design, white background." class="w-full h-full object-cover"> -->
+</div>
+<div>
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-2">PT Teknologi Nusantara</h1>
+<div class="flex flex-wrap items-center gap-3 font-body-md text-body-md text-on-surface-variant">
+<span class="flex items-center gap-1 bg-surface-container-low px-3 py-1 rounded-full border border-outline-variant">
+<span class="material-symbols-outlined text-[18px] text-tertiary-container">pending</span>
+                                    Menunggu Verifikasi
+                                </span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">tag</span> #V-2026-001</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">calendar_today</span> 22 Aug 2026</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Content Canvas -->
+<div class="px-margin-mobile md:px-margin-desktop py-8 flex-grow">
+<div class="max-w-container-max mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Main Details Panel -->
+<div class="lg:col-span-2 flex flex-col gap-8">
+<!-- Section 1: Informasi Perusahaan -->
+<section class="bg-surface rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+<div class="px-6 py-4 border-b border-outline-variant bg-surface-container-lowest">
+<h2 class="font-title-lg text-title-lg text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">business</span>
+                                Informasi Perusahaan
+                            </h2>
+</div>
+<div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Nama Resmi</p>
+<p class="font-body-md text-body-md text-on-surface font-medium">PT Teknologi Nusantara</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Industri</p>
+<p class="font-body-md text-body-md text-on-surface">Teknologi Informasi &amp; Perangkat Lunak</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Ukuran Perusahaan</p>
+<p class="font-body-md text-body-md text-on-surface">51 - 200 Karyawan</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Website</p>
+<a class="font-body-md text-body-md text-secondary hover:underline flex items-center gap-1" href="#">
+                                    www.teknologinusantara.co.id
+                                    <span class="material-symbols-outlined text-[16px]">open_in_new</span>
+</a>
+</div>
+<div class="md:col-span-2">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Alamat Kantor Pusat</p>
+<p class="font-body-md text-body-md text-on-surface">Gedung Cyber 2, Jl. H. R. Rasuna Said Blok X-5 No.13, Kuningan, Kota Jakarta Selatan, Daerah Khusus Ibukota Jakarta 12950</p>
+</div>
+</div>
+</section>
+<!-- Section 2: Informasi Legalitas -->
+<section class="bg-surface rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+<div class="px-6 py-4 border-b border-outline-variant bg-surface-container-lowest">
+<h2 class="font-title-lg text-title-lg text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">gavel</span>
+                                Informasi Legalitas
+                            </h2>
+</div>
+<div class="p-6 flex flex-col gap-6">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Nomor Induk Berusaha (NIB)</p>
+<p class="font-body-md text-body-md text-on-surface font-medium">8120019283746</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Doc Card -->
+<div class="border border-outline-variant rounded-lg p-4 flex items-center justify-between bg-surface-container-lowest hover:border-secondary-container transition-colors group">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-secondary/10 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Scan_NIB_TekNusa.pdf</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">PDF • 1.2 MB</p>
+</div>
+</div>
+<button class="text-secondary hover:bg-secondary/10 p-2 rounded-full transition-colors flex items-center justify-center" title="View Document">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</div>
+<!-- Doc Card -->
+<div class="border border-outline-variant rounded-lg p-4 flex items-center justify-between bg-surface-container-lowest hover:border-secondary-container transition-colors group">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-secondary/10 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Akta_Pendirian.pdf</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">PDF • 3.5 MB</p>
+</div>
+</div>
+<button class="text-secondary hover:bg-secondary/10 p-2 rounded-full transition-colors flex items-center justify-center" title="View Document">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 5: Review Notes -->
+<section class="bg-surface rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+<div class="px-6 py-4 border-b border-outline-variant bg-surface-container-lowest">
+<h2 class="font-title-lg text-title-lg text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">edit_note</span>
+                                Catatan Peninjauan
+                            </h2>
+</div>
+<div class="p-6 flex flex-col gap-6">
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-2 flex items-center gap-2">
+                                    Catatan untuk Perusahaan
+                                    <span class="material-symbols-outlined text-[16px] text-on-surface-variant" title="Visible to recruiter">visibility</span>
+</label>
+<textarea class="w-full rounded-lg border-outline-variant bg-surface text-on-surface font-body-md focus:border-secondary focus:ring-1 focus:ring-secondary min-h-[100px] placeholder:text-on-surface-variant/50" placeholder="Tambahkan catatan jika meminta perbaikan atau menolak..."></textarea>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1">Catatan ini akan dikirimkan ke PIC perusahaan via email.</p>
+</div>
+<div class="border-t border-outline-variant pt-6">
+<label class="block font-label-md text-label-md text-on-surface mb-2 flex items-center gap-2">
+                                    Catatan Internal Career Center
+                                    <span class="material-symbols-outlined text-[16px] text-on-surface-variant" title="Hidden from recruiter">visibility_off</span>
+</label>
+<textarea class="w-full rounded-lg border-outline-variant bg-surface-container-low text-on-surface font-body-md focus:border-secondary focus:ring-1 focus:ring-secondary min-h-[100px] placeholder:text-on-surface-variant/50" placeholder="Catatan untuk tim internal (contoh: hasil pengecekan khusus)..."></textarea>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1">Hanya dapat dilihat oleh admin sistem.</p>
+</div>
+</div>
+</section>
+</div>
+<!-- Side Panel (Sticky) -->
+<div class="lg:col-span-1 flex flex-col gap-8">
+<!-- Section 4: Pemeriksaan & Risiko -->
+<section class="bg-surface rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+<div class="px-6 py-4 border-b border-outline-variant bg-surface-container-lowest">
+<h2 class="font-title-lg text-title-lg text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">security</span>
+                                Pemeriksaan &amp; Risiko
+                            </h2>
+</div>
+<div class="p-6 flex flex-col gap-4">
+<div class="flex items-start gap-3 p-3 rounded-lg bg-success/10 border border-success/20">
+<span class="material-symbols-outlined text-success mt-0.5">check_circle</span>
+<div>
+<p class="font-label-md text-label-md text-on-surface font-semibold">No risk detected</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1">Domain email sesuai dengan website resmi perusahaan.</p>
+</div>
+</div>
+<div class="flex items-start gap-3 p-3 rounded-lg bg-success/10 border border-success/20">
+<span class="material-symbols-outlined text-success mt-0.5">check_circle</span>
+<div>
+<p class="font-label-md text-label-md text-on-surface font-semibold">Duplicate check passed</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1">NIB tidak ditemukan pada perusahaan lain di database.</p>
+</div>
+</div>
+<div class="border-t border-outline-variant pt-4 mt-2">
+<button class="w-full py-2 flex justify-center items-center gap-2 text-secondary font-label-md text-label-md hover:bg-secondary/10 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[18px]">refresh</span> Jalankan Ulang Pengecekan
+                                </button>
+</div>
+</div>
+</section>
+<!-- Section 3: Informasi PIC -->
+<section class="bg-surface rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+<div class="px-6 py-4 border-b border-outline-variant bg-surface-container-lowest">
+<h2 class="font-title-lg text-title-lg text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">person_check</span>
+                                Informasi PIC
+                            </h2>
+</div>
+<div class="p-6 flex flex-col gap-5">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-primary-container text-white flex items-center justify-center font-headline-md">
+                                    A
+                                </div>
+<div>
+<p class="font-label-md text-label-md text-on-surface font-bold text-lg">Budi Santoso</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">HR Manager</p>
+</div>
+</div>
+<div class="border-t border-outline-variant pt-5 flex flex-col gap-4">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1 mb-1"><span class="material-symbols-outlined text-[16px]">mail</span> Email</p>
+<p class="font-body-md text-body-md text-on-surface">budi.s@teknologinusantara.co.id</p>
+<div class="inline-flex items-center gap-1 mt-1 bg-success/10 text-success px-2 py-0.5 rounded text-xs font-semibold">
+<span class="material-symbols-outlined text-[14px]">verified</span> Email Terverifikasi
+                                    </div>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1 mb-1"><span class="material-symbols-outlined text-[16px]">call</span> WhatsApp</p>
+<p class="font-body-md text-body-md text-on-surface">+62 812-3456-7890</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</div>
+<!-- Sticky Action Bar -->
+<div class="fixed bottom-0 left-0 md:left-[280px] right-0 bg-surface border-t border-outline-variant shadow-[0_-4px_10px_rgba(0,0,0,0.05)] p-4 md:p-6 z-40">
+<div class="max-w-container-max mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+<div class="text-on-surface-variant font-label-sm text-label-sm hidden md:block">
+                    Pastikan seluruh dokumen telah diperiksa sebelum memberikan keputusan.
+                </div>
+<div class="flex flex-wrap items-center justify-center md:justify-end gap-3 w-full md:w-auto">
+<button class="px-4 py-2 border border-error text-error font-label-md text-label-md rounded-lg hover:bg-error/10 transition-colors bg-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">block</span> Tolak
+                    </button>
+<button class="px-4 py-2 bg-surface-variant text-on-surface font-label-md text-label-md rounded-lg hover:bg-surface-dim transition-colors flex items-center gap-2 border border-transparent">
+<span class="material-symbols-outlined text-[18px]">edit</span> Minta Perbaikan
+                    </button>
+<button class="px-6 py-2 bg-primary text-on-primary font-label-md text-label-md rounded-lg hover:bg-primary/90 transition-colors shadow-sm flex items-center gap-2" onclick="document.getElementById('verifyModal').classList.remove('hidden')">
+<span class="material-symbols-outlined text-[18px]">verified</span> Verifikasi Perusahaan
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Verifikasi Confirmation Modal -->
+<div class="hidden fixed inset-0 z-50 flex items-center justify-center px-4" id="verifyModal">
+<!-- Backdrop -->
+<div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="document.getElementById('verifyModal').classList.add('hidden')"></div>
+<!-- Modal Content -->
+<div class="bg-surface rounded-xl shadow-lg border border-outline-variant w-full max-w-md relative z-10 overflow-hidden">
+<div class="p-6">
+<div class="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-2xl">verified</span>
+</div>
+<h3 class="font-title-lg text-title-lg text-on-surface mb-2">Konfirmasi Verifikasi</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6">
+                    Anda akan memverifikasi <strong class="text-on-surface">PT Teknologi Nusantara</strong>. Perusahaan ini akan mendapatkan akses penuh untuk mempublikasikan lowongan kerja di Career Center. Lanjutkan?
+                </p>
+<div class="flex items-center justify-end gap-3 mt-6">
+<button class="px-4 py-2 border border-outline text-on-surface font-label-md text-label-md rounded-lg hover:bg-surface-container-low transition-colors" onclick="document.getElementById('verifyModal').classList.add('hidden')">
+                        Batal
+                    </button>
+<button class="px-6 py-2 bg-primary text-on-primary font-label-md text-label-md rounded-lg hover:bg-primary/90 transition-colors shadow-sm" onclick="document.getElementById('verifyModal').classList.add('hidden'); alert('Perusahaan Terverifikasi!');">
+                        Ya, Verifikasi
+                    </button>
+</div>
+</div>
+</div>
+</div>
+</body></html>

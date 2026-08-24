@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Portal Karir Kampus - Beranda</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error": "#E11B22",
+                    "on-secondary": "#ffffff",
+                    "tertiary-container": "#493100",
+                    "tertiary-fixed-dim": "#f8bc4b",
+                    "on-surface": "#181c1e",
+                    "on-secondary-container": "#004172",
+                    "inverse-primary": "#adc7f7",
+                    "secondary-container": "#66affe",
+                    "on-tertiary-container": "#cb9524",
+                    "error-container": "#ffdad6",
+                    "tertiary-fixed": "#ffdeaa",
+                    "surface-dim": "#d7dadc",
+                    "surface-container-low": "#f1f4f6",
+                    "on-tertiary": "#ffffff",
+                    "primary-container": "#1a365d",
+                    "secondary": "#0061a5",
+                    "inverse-surface": "#2d3133",
+                    "on-primary-container": "#86a0cd",
+                    "on-tertiary-fixed-variant": "#5f4100",
+                    "primary-fixed-dim": "#adc7f7",
+                    "tertiary": "#2d1d00",
+                    "surface-container": "#ebeef0",
+                    "surface": "#ffffff",
+                    "surface-container-highest": "#e0e3e5",
+                    "background": "#f7fafc",
+                    "on-secondary-fixed-variant": "#00497e",
+                    "on-tertiary-fixed": "#271900",
+                    "secondary-fixed-dim": "#9fcaff",
+                    "on-background": "#181c1e",
+                    "surface-container-lowest": "#ffffff",
+                    "success": "#38a169",
+                    "surface-variant": "#e0e3e5",
+                    "on-primary": "#ffffff",
+                    "outline": "#74777f",
+                    "primary": "#002045",
+                    "on-secondary-fixed": "#001d37",
+                    "inverse-on-surface": "#eef1f3",
+                    "surface-tint": "#455f88",
+                    "primary-fixed": "#d6e3ff",
+                    "on-primary-fixed-variant": "#2d476f",
+                    "on-surface-variant": "#43474e",
+                    "secondary-fixed": "#d2e4ff",
+                    "surface-bright": "#f7fafc",
+                    "outline-variant": "#c4c6cf",
+                    "surface-container-high": "#e5e9eb",
+                    "on-error-container": "#93000a",
+                    "deep-navy": "#1B2D4F",
+                    "on-error": "#ffffff",
+                    "on-primary-fixed": "#001b3c"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "margin-desktop": "48px",
+                    "base": "4px",
+                    "container-max": "1280px",
+                    "margin-mobile": "16px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "body-md": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "title-lg": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "label-md": ["Inter"],
+                    "label-sm": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}]
+            }
+          }
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .ambient-shadow-card { box-shadow: 0px 4px 10px 0px rgba(0,0,0,0.02); }
+        .ambient-shadow-card-hover:hover { box-shadow: 0px 8px 20px 0px rgba(0, 32, 69, 0.05); transform: translateY(-2px); }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="sticky top-0 z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop w-full max-w-container-max mx-auto h-20 bg-surface border-b border-outline-variant shadow-sm">
+<div class="text-title-lg font-title-lg font-bold text-primary">Portal Karir Kampus</div>
+<div class="hidden md:flex space-x-gutter">
+<a class="text-on-surface-variant font-medium hover:text-secondary transition-colors duration-200" href="#">Lowongan</a>
+<a class="text-on-surface-variant font-medium hover:text-secondary transition-colors duration-200" href="#">Karier di Kampus</a>
+<a class="text-on-surface-variant font-medium hover:text-secondary transition-colors duration-200" href="#">Karier untuk Alumni</a>
+<a class="text-on-surface-variant font-medium hover:text-secondary transition-colors duration-200" href="#">Panduan</a>
+</div>
+<div class="hidden md:flex items-center space-x-4">
+<button class="text-secondary font-label-md font-semibold px-4 py-2 hover:bg-surface-container transition-colors rounded">Masuk</button>
+<button class="bg-primary text-on-primary font-label-md font-semibold px-6 py-2 rounded-lg hover:bg-primary-container transition-colors">Daftar</button>
+</div>
+<!-- Mobile Menu Icon (Simplified for structure) -->
+<button class="md:hidden text-primary">
+<span class="material-symbols-outlined text-3xl">menu</span>
+</button>
+</nav>
+<!-- Main Content -->
+<main class="flex-grow">
+<!-- Hero Section -->
+<section class="py-16 md:py-24 px-margin-mobile md:px-margin-desktop w-full max-w-container-max mx-auto text-center">
+<h1 class="font-display-lg text-display-lg text-primary mb-6 max-w-4xl mx-auto">
+                Temukan Peluang Karier dan Bangun Masa Depan Anda
+            </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-10 max-w-2xl mx-auto">
+                Portal resmi universitas untuk menemukan lowongan kerja akademik, tenaga kependidikan, serta peluang dari mitra perusahaan terverifikasi untuk alumni.
+            </p>
+<div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+<button class="w-full sm:w-auto bg-primary text-on-primary font-label-md text-label-md px-8 py-3 rounded-lg hover:bg-primary-container transition-colors">
+                    Cari Lowongan
+                </button>
+<button class="w-full sm:w-auto bg-surface text-secondary border border-secondary font-label-md text-label-md px-8 py-3 rounded-lg hover:bg-surface-container-low transition-colors">
+                    Daftarkan Perusahaan
+                </button>
+</div>
+</section>
+<!-- Two Career Paths -->
+<section class="py-12 px-margin-mobile md:px-margin-desktop w-full max-w-container-max mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<!-- Path 1 -->
+<a class="block bg-surface border border-outline-variant rounded-xl p-8 ambient-shadow-card ambient-shadow-card-hover transition-all duration-300 group" href="#">
+<div class="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-primary text-3xl">school</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-primary mb-3">Karier di Kampus</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                        Peluang karir sebagai Dosen, Tenaga Kependidikan (Tendik), dan Staff administrasi di lingkungan universitas.
+                    </p>
+<div class="mt-6 text-secondary font-label-md font-semibold flex items-center group-hover:translate-x-1 transition-transform">
+                        Lihat Peluang <span class="material-symbols-outlined text-lg ml-1">arrow_forward</span>
+</div>
+</a>
+<!-- Path 2 -->
+<a class="block bg-surface border border-outline-variant rounded-xl p-8 ambient-shadow-card ambient-shadow-card-hover transition-all duration-300 group" href="#">
+<div class="h-12 w-12 bg-secondary/10 rounded-lg flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-secondary text-3xl">work</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-primary mb-3">Karier untuk Alumni</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                        Lowongan pekerjaan eksklusif dari jaringan mitra perusahaan terverifikasi untuk lulusan universitas.
+                    </p>
+<div class="mt-6 text-secondary font-label-md font-semibold flex items-center group-hover:translate-x-1 transition-transform">
+                        Lihat Peluang <span class="material-symbols-outlined text-lg ml-1">arrow_forward</span>
+</div>
+</a>
+</div>
+</section>
+<!-- Featured Vacancies Section -->
+<section class="py-16 bg-surface-container-low px-margin-mobile md:px-margin-desktop">
+<div class="w-full max-w-container-max mx-auto">
+<div class="flex justify-between items-end mb-8">
+<h2 class="font-headline-lg text-headline-lg text-primary">Lowongan Terbaru</h2>
+<a class="hidden md:flex items-center text-secondary font-label-md font-semibold hover:underline" href="#">
+                        Lihat Semua <span class="material-symbols-outlined text-lg ml-1">arrow_forward</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Job Card 1 -->
+<div class="bg-surface border border-outline-variant rounded-xl p-6 ambient-shadow-card ambient-shadow-card-hover transition-all cursor-pointer">
+<div class="flex items-start justify-between mb-4">
+<div class="w-12 h-12 bg-surface-container rounded border border-outline-variant flex items-center justify-center overflow-hidden">
+<span class="material-symbols-outlined text-outline">corporate_fare</span>
+</div>
+<div class="flex flex-col items-end gap-2">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed font-label-sm px-2 py-1 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">verified</span> Mitra Resmi
+                                </span>
+<span class="bg-primary/10 text-primary font-label-sm px-2 py-1 rounded-full">
+                                    Full-time
+                                </span>
+</div>
+</div>
+<div class="mb-4">
+<h3 class="font-title-lg text-title-lg text-primary mb-1 line-clamp-1">Data Scientist</h3>
+<p class="font-label-md text-label-md text-on-surface-variant">PT Teknologi Nusantara</p>
+</div>
+<div class="flex flex-col gap-2 font-label-sm text-label-sm text-on-surface-variant mb-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-base">location_on</span> Jakarta Selatan
+                            </div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-base">payments</span> Rp 10.000.000 - Rp 15.000.000
+                            </div>
+</div>
+<div class="pt-4 border-t border-outline-variant flex justify-between items-center text-label-sm text-outline">
+<span>Ditutup: 15 Okt 2024</span>
+</div>
+</div>
+<!-- Job Card 2 -->
+<div class="bg-surface border border-outline-variant rounded-xl p-6 ambient-shadow-card ambient-shadow-card-hover transition-all cursor-pointer">
+<div class="flex items-start justify-between mb-4">
+<div class="w-12 h-12 bg-primary/5 rounded border border-outline-variant flex items-center justify-center overflow-hidden text-primary font-bold">
+                                UNIV
+                            </div>
+<div class="flex flex-col items-end gap-2">
+<span class="bg-primary/10 text-primary font-label-sm px-2 py-1 rounded-full">
+                                    Kontrak
+                                </span>
+</div>
+</div>
+<div class="mb-4">
+<h3 class="font-title-lg text-title-lg text-primary mb-1 line-clamp-1">Dosen Ilmu Komputer</h3>
+<p class="font-label-md text-label-md text-on-surface-variant">Fakultas Teknik, Universitas</p>
+</div>
+<div class="flex flex-col gap-2 font-label-sm text-label-sm text-on-surface-variant mb-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-base">location_on</span> Kampus Utama
+                            </div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-base">payments</span> Sesuai Golongan
+                            </div>
+</div>
+<div class="pt-4 border-t border-outline-variant flex justify-between items-center text-label-sm text-outline">
+<span>Ditutup: 30 Sep 2024</span>
+</div>
+</div>
+<!-- Job Card 3 -->
+<div class="bg-surface border border-outline-variant rounded-xl p-6 ambient-shadow-card ambient-shadow-card-hover transition-all cursor-pointer hidden md:block">
+<div class="flex items-start justify-between mb-4">
+<div class="w-12 h-12 bg-surface-container rounded border border-outline-variant flex items-center justify-center overflow-hidden">
+<span class="material-symbols-outlined text-outline">account_balance</span>
+</div>
+<div class="flex flex-col items-end gap-2">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed font-label-sm px-2 py-1 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">verified</span> Mitra Resmi
+                                </span>
+<span class="bg-primary/10 text-primary font-label-sm px-2 py-1 rounded-full">
+                                    Internship
+                                </span>
+</div>
+</div>
+<div class="mb-4">
+<h3 class="font-title-lg text-title-lg text-primary mb-1 line-clamp-1">Management Trainee</h3>
+<p class="font-label-md text-label-md text-on-surface-variant">Bank Mandiri Sejahtera</p>
+</div>
+<div class="flex flex-col gap-2 font-label-sm text-label-sm text-on-surface-variant mb-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-base">location_on</span> Seluruh Indonesia
+                            </div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-base">payments</span> Dirahasiakan
+                            </div>
+</div>
+<div class="pt-4 border-t border-outline-variant flex justify-between items-center text-label-sm text-outline">
+<span>Ditutup: 05 Nov 2024</span>
+</div>
+</div>
+</div>
+<div class="mt-8 text-center md:hidden">
+<button class="bg-surface border border-outline-variant text-secondary font-label-md px-6 py-2 rounded-lg w-full">Lihat Semua Lowongan</button>
+</div>
+</div>
+</section>
+<!-- Trust Section -->
+<section class="py-16 px-margin-mobile md:px-margin-desktop w-full max-w-container-max mx-auto">
+<div class="text-center mb-12">
+<h2 class="font-headline-lg text-headline-lg text-primary mb-4">Mengapa Menggunakan Portal Karir Kampus?</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl mx-auto">
+                    Platform yang dirancang khusus untuk memastikan keamanan, relevansi, dan kemudahan dalam pengembangan karir civitas akademika.
+                </p>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+<div class="flex flex-col items-center text-center">
+<div class="w-16 h-16 bg-surface-container-high rounded-full flex items-center justify-center mb-4 text-primary">
+<span class="material-symbols-outlined text-3xl">domain_verification</span>
+</div>
+<h3 class="font-title-lg text-title-lg text-primary mb-2">Perusahaan Terverifikasi</h3>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">Semua mitra perusahaan melewati proses verifikasi ketat oleh pihak universitas.</p>
+</div>
+<div class="flex flex-col items-center text-center">
+<div class="w-16 h-16 bg-surface-container-high rounded-full flex items-center justify-center mb-4 text-primary">
+<span class="material-symbols-outlined text-3xl">fact_check</span>
+</div>
+<h3 class="font-title-lg text-title-lg text-primary mb-2">Lowongan Dimoderasi</h3>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">Setiap lowongan kerja ditinjau untuk memastikan relevansi dan kebenarannya.</p>
+</div>
+<div class="flex flex-col items-center text-center">
+<div class="w-16 h-16 bg-surface-container-high rounded-full flex items-center justify-center mb-4 text-primary">
+<span class="material-symbols-outlined text-3xl">timeline</span>
+</div>
+<h3 class="font-title-lg text-title-lg text-primary mb-2">Proses Terpantau</h3>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">Lacak status lamaran Anda dengan transparan langsung dari dashboard.</p>
+</div>
+<div class="flex flex-col items-center text-center">
+<div class="w-16 h-16 bg-surface-container-high rounded-full flex items-center justify-center mb-4 text-primary">
+<span class="material-symbols-outlined text-3xl">account_balance</span>
+</div>
+<h3 class="font-title-lg text-title-lg text-primary mb-2">Informasi Resmi</h3>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">Satu-satunya sumber informasi rekrutmen resmi dari internal kampus.</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 px-margin-mobile md:px-margin-desktop bg-deep-navy dark:bg-surface-container-lowest grid grid-cols-1 md:grid-cols-4 gap-gutter text-on-secondary">
+<div class="md:col-span-1">
+<div class="text-headline-md font-headline-md font-bold text-white mb-4">Portal Karir Kampus</div>
+<p class="font-label-sm text-label-sm text-on-secondary/80">
+                Menjembatani talenta akademik dengan peluang profesional terbaik.
+            </p>
+</div>
+<div class="flex flex-col gap-3">
+<span class="font-body-md text-body-md font-semibold text-white mb-2">Layanan</span>
+<a class="font-label-sm text-label-sm text-on-secondary/80 hover:text-white transition-colors" href="#">Lowongan Pekerjaan</a>
+<a class="font-label-sm text-label-sm text-on-secondary/80 hover:text-white transition-colors" href="#">Karier di Kampus</a>
+<a class="font-label-sm text-label-sm text-on-secondary/80 hover:text-white transition-colors" href="#">Untuk Perusahaan</a>
+</div>
+<div class="flex flex-col gap-3">
+<span class="font-body-md text-body-md font-semibold text-white mb-2">Bantuan</span>
+<a class="font-label-sm text-label-sm text-on-secondary/80 hover:text-white transition-colors" href="#">Tentang Kami</a>
+<a class="font-label-sm text-label-sm text-on-secondary/80 hover:text-white transition-colors" href="#">Pusat Bantuan</a>
+<a class="font-label-sm text-label-sm text-on-secondary/80 hover:text-white transition-colors" href="#">Kontak Kami</a>
+</div>
+<div class="flex flex-col gap-3">
+<span class="font-body-md text-body-md font-semibold text-white mb-2">Legal</span>
+<a class="font-label-sm text-label-sm text-on-secondary/80 hover:text-white transition-colors" href="#">Kebijakan Privasi</a>
+<a class="font-label-sm text-label-sm text-on-secondary/80 hover:text-white transition-colors" href="#">Syarat &amp; Ketentuan</a>
+</div>
+<div class="md:col-span-4 mt-8 pt-8 border-t border-on-secondary/20 font-label-sm text-label-sm text-on-secondary/80 text-center md:text-left">
+            © 2024 Portal Karir Kampus. Seluruh hak cipta dilindungi.
+        </div>
+</footer>
+</body></html>

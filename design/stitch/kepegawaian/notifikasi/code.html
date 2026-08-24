@@ -1,0 +1,342 @@
+<!DOCTYPE html><html class="light" lang="id"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Notifikasi Kepegawaian - Admin Portal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary": "#2d1d00",
+                    "on-primary-container": "#86a0cd",
+                    "deep-navy": "#1B2D4F",
+                    "on-error": "#ffffff",
+                    "on-secondary-fixed-variant": "#00497e",
+                    "surface-variant": "#e0e3e5",
+                    "on-tertiary-fixed": "#271900",
+                    "surface-container-highest": "#e0e3e5",
+                    "secondary-container": "#66affe",
+                    "on-tertiary": "#ffffff",
+                    "surface-dim": "#d7dadc",
+                    "on-primary": "#ffffff",
+                    "surface-container": "#ebeef0",
+                    "error-container": "#ffdad6",
+                    "primary-fixed-dim": "#adc7f7",
+                    "on-secondary-fixed": "#001d37",
+                    "on-primary-fixed-variant": "#2d476f",
+                    "on-error-container": "#93000a",
+                    "background": "#f7fafc",
+                    "surface-bright": "#f7fafc",
+                    "surface-container-high": "#e5e9eb",
+                    "primary-container": "#1a365d",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed-dim": "#f8bc4b",
+                    "on-background": "#181c1e",
+                    "on-primary-fixed": "#001b3c",
+                    "on-surface": "#181c1e",
+                    "secondary-fixed-dim": "#9fcaff",
+                    "on-tertiary-container": "#cb9524",
+                    "primary-fixed": "#d6e3ff",
+                    "tertiary-container": "#493100",
+                    "on-tertiary-fixed-variant": "#5f4100",
+                    "surface-tint": "#455f88",
+                    "on-secondary-container": "#004172",
+                    "inverse-surface": "#2d3133",
+                    "outline": "#74777f",
+                    "outline-variant": "#c4c6cf",
+                    "inverse-primary": "#adc7f7",
+                    "inverse-on-surface": "#eef1f3",
+                    "primary": "#002045",
+                    "on-surface-variant": "#43474e",
+                    "tertiary-fixed": "#ffdeaa",
+                    "secondary-fixed": "#d2e4ff",
+                    "secondary": "#0061a5",
+                    "surface-container-low": "#f1f4f6",
+                    "surface": "#ffffff",
+                    "success": "#38a169",
+                    "error": "#E11B22",
+                    "surface-container-lowest": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "16px",
+                    "margin-desktop": "48px",
+                    "container-max": "1280px",
+                    "base": "4px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "label-md": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "title-lg": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                    "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+            }
+          },
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .fill-icon { font-variation-settings: 'FILL' 1; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex font-body-md">
+<!-- SideNavBar (Shared Component) -->
+<nav class="w-[280px] h-screen sticky top-0 left-0 bg-deep-navy shadow-sm flex flex-col h-full py-6 hidden md:flex shrink-0 z-20">
+<!-- Header -->
+<div class="px-6 mb-8 flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-white flex items-center justify-center overflow-hidden shrink-0">
+<img alt="Logo Universitas" class="w-full h-full object-cover" data-alt="A clean, modern geometric university logo in minimalist blue and white, centered in a circular container with a bright studio lighting aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAF0LQbNH1IdEa_S4-aUD6OLecP50ETQInTcmPSdkrJfzooUMEKqpjd1WgrvhAd0Qhd0tBXI8Ld-QsSl-hVRshkN3Ho_qCD0NCvMTa9Iv8gqn2Ei4lR_r24jaJvbwTAf27eoSFLOloOzmuLPm2niGIUaiEy2bVpWLdKk7uImwCZCL4qSEdq1NkuX4R4_AfdihIhIor8eA-dYhSqAwsKz5VJnTXNQRdqGYKP7F4G2A3_mgiUwLqfqXSDjw">
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-white leading-tight">Portal Karir</h1>
+<p class="font-label-sm text-label-sm text-on-primary-container">Admin Kepegawaian</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<div class="flex-1 overflow-y-auto w-full">
+<ul class="flex flex-col w-full">
+<!-- Dashboard -->
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+</li>
+<!-- Lowongan Kampus -->
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="work">work</span>
+<span class="font-label-md text-label-md">Lowongan Kampus</span>
+</a>
+</li>
+<!-- Pelamar -->
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-md text-label-md">Pelamar</span>
+</a>
+</li>
+<!-- Jadwal Seleksi -->
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span class="font-label-md text-label-md">Jadwal Seleksi</span>
+</a>
+</li>
+<!-- Penilaian -->
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="fact_check">fact_check</span>
+<span class="font-label-md text-label-md">Penilaian</span>
+</a>
+</li>
+<!-- Offering -->
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="contract">contract</span>
+<span class="font-label-md text-label-md">Offering</span>
+</a>
+</li>
+<!-- Outcome Rekrutmen -->
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-label-md text-label-md">Outcome Rekrutmen</span>
+</a>
+</li>
+<!-- Laporan -->
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="font-label-md text-label-md">Laporan</span>
+</a>
+</li>
+<!-- Notifikasi (ACTIVE) -->
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary font-bold border-l-4 border-secondary-container opacity-100 transition-all w-full" href="#">
+<span class="material-symbols-outlined fill-icon" data-icon="notifications">notifications</span>
+<span class="font-label-md text-label-md">Notifikasi</span>
+<!-- Notification Badge -->
+<span class="ml-auto bg-error text-on-error rounded-full px-2 py-0.5 font-label-sm text-[10px]">12</span>
+</a>
+</li>
+<!-- Pengaturan -->
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md hover:bg-white/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Pengaturan</span>
+</a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0 w-full min-h-screen">
+<!-- TopNavBar (Shared Component) -->
+<header class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop h-16 bg-surface dark:bg-surface-container border-b border-outline-variant full-width top-0 sticky z-10 shrink-0">
+<!-- Left: Search (Mobile Hamburger + Search) -->
+<div class="flex items-center gap-4">
+<button class="md:hidden text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="relative hidden sm:flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-outline">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-full text-body-md font-body-md focus:ring-1 focus:ring-primary w-64 transition-all" placeholder="Cari..." type="text">
+</div>
+</div>
+<!-- Title (Mobile Only) -->
+<div class="md:hidden font-title-lg text-title-lg font-bold text-deep-navy truncate px-2">
+                Admin Kepegawaian
+            </div>
+<!-- Right: Actions -->
+<div class="flex items-center gap-4 shrink-0">
+<button class="text-on-surface-variant hover:text-primary transition-colors relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low" title="Bantuan">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-high border border-outline-variant cursor-pointer">
+<img alt="Foto Profil Admin" class="w-full h-full object-cover" data-alt="A professional headshot portrait of a friendly Indonesian HR administrator in formal business attire, bright soft studio lighting, white background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBlxxJ6eYmUOOk9KSBIXApvz_naHm-Izkre8oPKCfMohlKkALdCHjuodZxePrrweI82hMauuHYOvNqWsDaZU1IBeq8ET7lYjy8HdVcsOCJqxX41Idu0aLPywRCJd6OCVxJOtIoTq3H14QnXffC_BWXpjng7CtT9aDbVI93yX15h8IvMZ8MdA6GJM4wDcR-CRdRc0G89y-x8NvSD-iIqIkNsQAOJxlbP3-zqq_HTa6tIDr2Jlo8scdpy7w">
+</div>
+</div>
+</header>
+<!-- Page Content: Notification Center -->
+<div class="flex-1 overflow-y-auto bg-surface-bright w-full">
+<div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-8 w-full">
+<!-- Page Header -->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+<div>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-1">Notifikasi</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Kelola pemberitahuan aktivitas portal karir (2026).</p>
+</div>
+<button class="flex items-center gap-2 text-primary hover:text-secondary font-label-md text-label-md transition-colors px-4 py-2 rounded-lg hover:bg-surface-container-low">
+<span class="material-symbols-outlined text-[20px]">done_all</span>
+                        Tandai semua dibaca
+                    </button>
+</div>
+<!-- Tabs -->
+<div class="flex gap-6 border-b border-outline-variant mb-6">
+<button class="pb-3 border-b-2 border-primary text-primary font-label-md text-label-md px-1 relative">
+                        Semua
+                        <span class="absolute top-0 -right-4 bg-surface-variant text-on-surface text-[10px] px-1.5 rounded-full">124</span>
+</button>
+<button class="pb-3 text-on-surface-variant font-label-md text-label-md hover:text-primary transition-colors px-1 relative">
+                        Belum Dibaca
+                        <span class="absolute top-0 -right-4 bg-error text-on-error text-[10px] px-1.5 rounded-full">12</span>
+</button>
+</div>
+<!-- Notification List (Bento-style list) -->
+<div class="flex flex-col gap-3">
+<!-- Item 1: Unread Application -->
+<div class="group relative bg-surface border border-outline-variant rounded-xl p-4 md:p-5 flex gap-4 items-start hover:shadow-[0_4px_20px_rgba(0,32,69,0.05)] hover:border-primary-fixed-dim transition-all cursor-pointer">
+<div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary rounded-r-full"></div>
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center shrink-0 text-primary">
+<span class="material-symbols-outlined fill-icon">work</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start gap-2 mb-1">
+<h3 class="font-label-md text-label-md text-on-surface pr-8">Lamaran baru diterima untuk posisi <span class="font-bold text-primary">Dosen Informatika</span></h3>
+<span class="font-label-sm text-label-sm text-primary shrink-0">2 menit lalu</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant truncate">Pelamar: Ahmad Rizky. IPK: 3.85. Pengalaman: 2 Tahun.</p>
+</div>
+</div>
+<!-- Item 2: Unread Offering Accepted -->
+<div class="group relative bg-surface border border-outline-variant rounded-xl p-4 md:p-5 flex gap-4 items-start hover:shadow-[0_4px_20px_rgba(0,32,69,0.05)] hover:border-success/30 transition-all cursor-pointer">
+<div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-success rounded-r-full"></div>
+<div class="w-10 h-10 rounded-full bg-[#e6f4ea] flex items-center justify-center shrink-0 text-success">
+<span class="material-symbols-outlined fill-icon">check_circle</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start gap-2 mb-1">
+<h3 class="font-label-md text-label-md text-on-surface pr-8">Kandidat <span class="font-bold">Budi Santoso</span> menerima offering</h3>
+<span class="font-label-sm text-label-sm text-primary shrink-0">1 jam lalu</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant truncate">Posisi: Staf Administrasi Akademik. Jadwal onboarding perlu diatur.</p>
+</div>
+</div>
+<!-- Item 3: Read Withdrawal -->
+<div class="group relative bg-surface border border-outline-variant rounded-xl p-4 md:p-5 flex gap-4 items-start hover:shadow-[0_4px_20px_rgba(0,32,69,0.05)] transition-all cursor-pointer opacity-75 hover:opacity-100">
+<div class="w-10 h-10 rounded-full bg-error-container flex items-center justify-center shrink-0 text-error">
+<span class="material-symbols-outlined">cancel</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start gap-2 mb-1">
+<h3 class="font-body-md text-body-md text-on-surface font-medium pr-8">Kandidat <span class="font-semibold">Siti Aminah</span> mengundurkan diri dari proses seleksi</h3>
+<span class="font-label-sm text-label-sm text-on-surface-variant shrink-0">3 jam lalu</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant truncate text-sm">Alasan: Menerima tawaran di institusi lain. Posisi: Peneliti Muda.</p>
+</div>
+</div>
+<!-- Item 4: Unread Schedule -->
+<div class="group relative bg-surface border border-outline-variant rounded-xl p-4 md:p-5 flex gap-4 items-start hover:shadow-[0_4px_20px_rgba(0,32,69,0.05)] hover:border-secondary-fixed-dim transition-all cursor-pointer">
+<div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-secondary rounded-r-full"></div>
+<div class="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center shrink-0 text-secondary">
+<span class="material-symbols-outlined fill-icon">event</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start gap-2 mb-1">
+<h3 class="font-label-md text-label-md text-on-surface pr-8">Jadwal Seleksi <span class="font-bold text-secondary">Wawancara User</span> akan dimulai dalam 30 menit</h3>
+<span class="font-label-sm text-label-sm text-primary shrink-0">30 mnt</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant truncate">Ruang Meeting Utama. Pewawancara: Dr. Hendra &amp; Prof. Yudi.</p>
+</div>
+<button class="hidden md:flex bg-surface-container border border-outline-variant text-on-surface px-4 py-1.5 rounded-full font-label-sm hover:bg-surface-container-high transition-colors self-center whitespace-nowrap">Lihat Jadwal</button>
+</div>
+<!-- Item 5: Read Warning -->
+<div class="group relative bg-surface border border-outline-variant rounded-xl p-4 md:p-5 flex gap-4 items-start hover:shadow-[0_4px_20px_rgba(0,32,69,0.05)] transition-all cursor-pointer opacity-75 hover:opacity-100">
+<div class="w-10 h-10 rounded-full bg-tertiary-fixed flex items-center justify-center shrink-0 text-tertiary">
+<span class="material-symbols-outlined">warning</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start gap-2 mb-1">
+<h3 class="font-body-md text-body-md text-on-surface font-medium pr-8">Lowongan <span class="font-semibold text-tertiary-container">Staf Administrasi</span> akan ditutup dalam 24 jam</h3>
+<span class="font-label-sm text-label-sm text-on-surface-variant shrink-0">Kemarin</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant truncate text-sm">Status saat ini: 45 Pelamar. 12 Lolos Seleksi Berkas.</p>
+</div>
+</div>
+</div>
+<!-- Load More -->
+<div class="mt-8 flex justify-center">
+<button class="border border-outline-variant text-on-surface font-label-md text-label-md px-6 py-2.5 rounded-full hover:bg-surface-container-low transition-colors">Muat Lebih Banyak</button>
+</div>
+</div>
+</div>
+<footer class="mt-auto py-6 px-margin-mobile md:px-margin-desktop border-t border-outline-variant bg-surface">
+  <div class="max-w-container-max mx-auto flex justify-between items-center">
+    <p class="text-label-sm text-on-surface-variant">© 2026 Portal Karir Kampus. Hak Cipta Dilindungi.</p>
+    <div class="flex gap-4">
+      <a href="#" class="text-label-sm text-on-surface-variant hover:text-primary transition-colors">Kebijakan Privasi</a>
+      <a href="#" class="text-label-sm text-on-surface-variant hover:text-primary transition-colors">Syarat &amp; Ketentuan</a>
+    </div>
+  </div>
+</footer></main>
+
+
+</body></html>

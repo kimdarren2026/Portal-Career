@@ -1,0 +1,81 @@
+# Local development stack — Portal Karir Kampus
+#
+# DEPLOYMENT_ARCHITECTURE.md §7: the same component set as production, at small
+# size. Developers should not meet PostgreSQL-specific or storage-specific
+# behaviour for the first time in staging.
+#
+# Run from the repository root:  docker compose -f infra/docker/compose.yaml up -d
+#
+# No production credential appears here. Values are local-only placeholders.
+
+name: portal-karir-kampus
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: portal_karir
+      POSTGRES_USER: portal_karir
+      POSTGRES_PASSWORD: local_development_only
+      # Sessions are stored here (ADR-006); business schema arrives in the
+      # migration phase (MIGRATION_PLAN.md Phases 1-5).
+      TZ: UTC
+      PGTZ: UTC
+    command: >
+      postgres -c timezone=UTC -c log_timezone=UTC
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U portal_karir -d portal_karir']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    # Cache, queue, locks and rate limiting on separate logical databases so a
+    # cache flush cannot destroy queued work (ADR-006).
+    command: >
+      redis-server --save 60 1 --appendonly no --maxmemory-policy noeviction
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  minio:
+    # S3-compatible private object storage (ADR-007). The API is specified;
+    # the vendor is not. MinIO keeps on-premise deployment viable.
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: local_development_only
+      MINIO_ROOT_PASSWORD: local_development_only
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ['CMD', 'mc', 'ready', 'local']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  mailpit:
+    # Development mail catcher. NEVER a production relay in local or development
+    # (DEPLOYMENT_ARCHITECTURE.md §1). Runtime SMTP configuration is managed by
+    # Super Admin and stored encrypted (ADR-015).
+    image: axllent/mailpit:latest
+    ports:
+      - '1025:1025'
+      - '8025:8025'
+
+volumes:
+  postgres-data:
+  minio-data:

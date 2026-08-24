@@ -1,0 +1,274 @@
+<!DOCTYPE html><html lang="id"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Portal Karir Kampus - Multi-step Company Profile Form</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface": "#181c1e",
+                        "tertiary-fixed": "#ffdeaa",
+                        "tertiary-container": "#493100",
+                        "secondary-container": "#66affe",
+                        "on-tertiary-fixed-variant": "#5f4100",
+                        "error-container": "#ffdad6",
+                        "surface-bright": "#f7fafc",
+                        "outline": "#74777f",
+                        "secondary-fixed-dim": "#9fcaff",
+                        "surface-container-high": "#e5e9eb",
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#43474e",
+                        "primary-container": "#1a365d",
+                        "on-primary-fixed": "#001b3c",
+                        "inverse-on-surface": "#eef1f3",
+                        "on-primary-container": "#86a0cd",
+                        "on-background": "#181c1e",
+                        "tertiary": "#2d1d00",
+                        "surface-container": "#ebeef0",
+                        "secondary": "#0061a5",
+                        "error": "#E11B22",
+                        "surface-tint": "#455f88",
+                        "primary-fixed-dim": "#adc7f7",
+                        "on-tertiary-fixed": "#271900",
+                        "on-secondary": "#ffffff",
+                        "surface-container-highest": "#e0e3e5",
+                        "surface-variant": "#e0e3e5",
+                        "on-primary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed-variant": "#2d476f",
+                        "tertiary-fixed-dim": "#f8bc4b",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#adc7f7",
+                        "secondary-fixed": "#d2e4ff",
+                        "on-secondary-fixed": "#001d37",
+                        "primary-fixed": "#d6e3ff",
+                        "surface": "#ffffff",
+                        "on-secondary-container": "#004172",
+                        "background": "#f7fafc",
+                        "surface-container-low": "#f1f4f6",
+                        "on-tertiary-container": "#cb9524",
+                        "success": "#38a169",
+                        "on-secondary-fixed-variant": "#00497e",
+                        "outline-variant": "#c4c6cf",
+                        "primary": "#002045",
+                        "surface-dim": "#d7dadc",
+                        "inverse-surface": "#2d3133",
+                        "deep-navy": "#1B2D4F",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-max": "1280px",
+                        "base": "4px",
+                        "gutter": "24px",
+                        "margin-desktop": "48px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen">
+<!-- TopNavBar (Transactional - Hidden Navigation Links) -->
+<header class="bg-surface border-b border-outline-variant flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop h-16 max-w-container-max mx-auto">
+<div class="font-headline-md text-headline-md font-bold text-deep-navy">Portal Karir Kampus</div>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:bg-surface-container-low transition-colors p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+</div>
+</header>
+<main class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-8 md:py-12">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Stepper Column (Left) -->
+<div class="lg:col-span-4 lg:pr-8">
+<div class="bg-surface rounded-xl p-6 shadow-sm border border-outline-variant/30 sticky top-24">
+<h2 class="font-title-lg text-title-lg text-primary mb-6">Pendaftaran Akun Perusahaan</h2>
+<div class="relative">
+<!-- Progress Line -->
+<div class="absolute left-4 top-4 bottom-4 w-0.5 bg-surface-container-highest -z-10"></div>
+<!-- Steps -->
+<div class="flex flex-col gap-8">
+<!-- Step 1: Completed -->
+<div class="flex items-start gap-4">
+<div class="w-8 h-8 rounded-full bg-success text-on-primary flex items-center justify-center flex-shrink-0 z-10 border-2 border-surface">
+<span class="material-symbols-outlined text-sm" data-icon="check" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-on-surface">Data PIC</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1">Selesai</p>
+</div>
+</div>
+<!-- Step 2: Active -->
+<div class="flex items-start gap-4">
+<div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center flex-shrink-0 z-10 border-2 border-surface shadow-[0_0_0_4px_theme(colors.primary-fixed)]">
+<span class="font-label-md text-label-md">2</span>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-primary">Profil Perusahaan</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1">Lengkapi informasi dasar</p>
+</div>
+</div>
+<!-- Step 3: Pending -->
+<div class="flex items-start gap-4">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center flex-shrink-0 z-10 border-2 border-surface">
+<span class="font-label-md text-label-md">3</span>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-on-surface-variant">Dokumen Legalitas</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1">Pending</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Form Column (Right) -->
+<div class="lg:col-span-8 mt-8 lg:mt-0">
+<div class="bg-surface rounded-xl p-6 md:p-8 shadow-sm border border-outline-variant/30">
+<div class="mb-8">
+<div class="flex items-center justify-between mb-2">
+    <h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Profil Perusahaan</h1>
+    <span class="px-3 py-1 rounded-full bg-surface-container-highest text-on-surface-variant font-label-sm text-label-sm">Draft</span>
+</div>
+<div class="flex items-center gap-2 bg-surface-container-low p-4 rounded-lg border-l-4 border-primary">
+<span class="material-symbols-outlined text-primary" data-icon="info">info</span>
+<p class="font-body-md text-body-md text-on-surface-variant">Pastikan data perusahaan sesuai dengan dokumen legalitas.</p>
+</div>
+</div>
+<form action="#" class="space-y-6" method="POST">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Nama Perusahaan -->
+<div class="md:col-span-2">
+<label class="block font-label-md text-label-md text-on-surface mb-2" for="company_name">Nama Perusahaan <span class="text-error">*</span></label>
+<input class="w-full rounded-lg border-outline-variant bg-surface px-4 py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary placeholder-on-surface-variant/50 transition-colors" id="company_name" name="company_name" placeholder="Contoh: PT Teknologi Nusantara Maju" required="" type="text">
+</div>
+<!-- Jenis Organisasi -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-2" for="org_type">Jenis Organisasi <span class="text-error">*</span></label>
+<div class="relative">
+<select class="w-full rounded-lg border-outline-variant bg-surface px-4 py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary appearance-none transition-colors" id="org_type" name="org_type" required="">
+<option disabled="" selected="" value="">Pilih jenis organisasi</option>
+<option value="pt">Perseroan Terbatas (PT)</option>
+<option value="cv">Commanditaire Vennootschap (CV)</option>
+<option value="yayasan">Yayasan</option>
+<option value="pemerintah">Instansi Pemerintah</option>
+<option value="lainnya">Lainnya</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Industri -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-2" for="industry">Industri <span class="text-error">*</span></label>
+<div class="relative">
+<select class="w-full rounded-lg border-outline-variant bg-surface px-4 py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary appearance-none transition-colors" id="industry" name="industry" required="">
+<option disabled="" selected="" value="">Pilih sektor industri</option>
+<option value="it">Teknologi Informasi</option>
+<option value="finance">Keuangan &amp; Perbankan</option>
+<option value="manufacturing">Manufaktur</option>
+<option value="education">Pendidikan</option>
+<option value="retail">Ritel</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Website -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-2" for="website">Website</label>
+<div class="relative flex">
+<span class="inline-flex items-center px-4 rounded-l-lg border border-r-0 border-outline-variant bg-surface-container-low text-on-surface-variant font-body-md text-body-md">
+                                        https://
+                                    </span>
+<input class="flex-1 rounded-none rounded-r-lg border-outline-variant bg-surface px-4 py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary placeholder-on-surface-variant/50 transition-colors" id="website" name="website" placeholder="www.perusahaananda.com" type="text">
+</div>
+</div>
+<!-- Email Resmi Perusahaan -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-2" for="company_email">Email Resmi Perusahaan <span class="text-error">*</span></label>
+<input class="w-full rounded-lg border-outline-variant bg-surface px-4 py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary placeholder-on-surface-variant/50 transition-colors" id="company_email" name="company_email" placeholder="hrd@perusahaananda.com" required="" type="email">
+</div>
+<!-- Alamat Lengkap -->
+<div class="md:col-span-2">
+<label class="block font-label-md text-label-md text-on-surface mb-2" for="address">Alamat Lengkap <span class="text-error">*</span></label>
+<textarea class="w-full rounded-lg border-outline-variant bg-surface px-4 py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary placeholder-on-surface-variant/50 transition-colors resize-none" id="address" name="address" placeholder="Masukkan alamat lengkap kantor pusat" required="" rows="3"></textarea>
+</div>
+<!-- Provinsi/Kota -->
+<div class="md:col-span-2">
+<label class="block font-label-md text-label-md text-on-surface mb-2" for="city">Provinsi/Kota <span class="text-error">*</span></label>
+<div class="relative">
+<select class="w-full rounded-lg border-outline-variant bg-surface px-4 py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary appearance-none transition-colors" id="city" name="city" required="">
+<option disabled="" selected="" value="">Pilih Provinsi / Kota</option>
+<option value="jkt-pusat">DKI Jakarta - Jakarta Pusat</option>
+<option value="jkt-selatan">DKI Jakarta - Jakarta Selatan</option>
+<option value="bdg">Jawa Barat - Bandung</option>
+<option value="sby">Jawa Timur - Surabaya</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+</div>
+</div>
+<div class="pt-6 mt-6 border-t border-outline-variant/30 flex justify-between items-center">
+<button class="px-6 py-3 rounded-lg border border-outline-variant text-on-surface font-label-md text-label-md hover:bg-surface-container-low transition-colors" type="button">
+                                Kembali
+                            </button>
+<button class="px-6 py-3 rounded-lg bg-primary text-on-primary font-label-md text-label-md hover:bg-deep-navy transition-colors flex items-center gap-2" type="submit">
+                                Lanjutkan
+                                <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<div class="flex flex-col items-end gap-2">
+    <button class="px-6 py-3 rounded-lg bg-surface-container-highest text-on-surface-variant font-label-md text-label-md cursor-not-allowed flex items-center gap-2" disabled="" type="button">
+        <span class="material-symbols-outlined text-sm">lock</span>
+        Buat Lowongan
+    </button>
+    <p class="text-label-sm text-on-surface-variant text-right max-w-[240px]">Lowongan dapat dibuat setelah perusahaan berhasil diverifikasi oleh Career Center.</p>
+</div></div>
+</form>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer omitted for focused transactional layout -->
+
+
+</body></html>

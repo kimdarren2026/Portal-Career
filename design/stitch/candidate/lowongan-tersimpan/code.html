@@ -1,0 +1,309 @@
+<!DOCTYPE html><html lang="id"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Lowongan Tersimpan - Universitas Career</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#d6e3ff",
+                        "background": "#f7fafc",
+                        "on-error-container": "#93000a",
+                        "on-surface": "#181c1e",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#2d476f",
+                        "deep-navy": "#1B2D4F",
+                        "secondary": "#0061a5",
+                        "secondary-fixed": "#d2e4ff",
+                        "on-tertiary-container": "#cb9524",
+                        "inverse-surface": "#2d3133",
+                        "on-background": "#181c1e",
+                        "primary-fixed-dim": "#adc7f7",
+                        "on-primary-fixed": "#001b3c",
+                        "primary": "#002045",
+                        "surface-container-highest": "#e0e3e5",
+                        "tertiary-fixed-dim": "#f8bc4b",
+                        "tertiary": "#2d1d00",
+                        "on-secondary-fixed": "#001d37",
+                        "secondary-container": "#66affe",
+                        "on-primary-container": "#86a0cd",
+                        "on-tertiary-fixed-variant": "#5f4100",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed": "#271900",
+                        "on-secondary": "#ffffff",
+                        "surface-container": "#ebeef0",
+                        "inverse-primary": "#adc7f7",
+                        "on-tertiary": "#ffffff",
+                        "surface": "#ffffff",
+                        "surface-tint": "#455f88",
+                        "on-surface-variant": "#43474e",
+                        "surface-variant": "#e0e3e5",
+                        "outline": "#74777f",
+                        "surface-dim": "#d7dadc",
+                        "inverse-on-surface": "#eef1f3",
+                        "surface-bright": "#f7fafc",
+                        "on-secondary-container": "#004172",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#f1f4f6",
+                        "primary-container": "#1a365d",
+                        "tertiary-container": "#493100",
+                        "outline-variant": "#c4c6cf",
+                        "tertiary-fixed": "#ffdeaa",
+                        "surface-container-high": "#e5e9eb",
+                        "secondary-fixed-dim": "#9fcaff",
+                        "success": "#38a169",
+                        "on-secondary-fixed-variant": "#00497e",
+                        "error": "#E11B22"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "margin-desktop": "48px",
+                        "container-max": "1280px",
+                        "base": "4px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "label-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex">
+<!-- SideNavBar -->
+<nav class="bg-deep-navy dark:bg-primary text-white dark:text-on-primary font-label-md text-label-md fixed left-0 top-0 h-screen w-[280px] z-50 shadow-md flex flex-col h-full py-6 hidden md:flex">
+<div class="px-6 mb-8 flex flex-col gap-2">
+<span class="font-title-lg text-title-lg font-bold text-white">Universitas Career</span>
+<span class="text-white opacity-80 text-sm">Portal Karir Terpadu</span>
+</div>
+<div class="flex flex-col gap-2 flex-grow overflow-y-auto">
+<a class="text-white opacity-80 hover:opacity-100 flex items-center gap-4 px-4 py-3 mx-2 transition-all hover:bg-primary-container dark:hover:bg-primary-fixed-dim rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard" data-weight="regular">dashboard</span>
+                Dashboard
+            </a>
+<a class="text-white opacity-80 hover:opacity-100 flex items-center gap-4 px-4 py-3 mx-2 transition-all hover:bg-primary-container dark:hover:bg-primary-fixed-dim rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="person" data-weight="regular">person</span>
+                Profil Saya
+            </a>
+<a class="text-white opacity-80 hover:opacity-100 flex items-center gap-4 px-4 py-3 mx-2 transition-all hover:bg-primary-container dark:hover:bg-primary-fixed-dim rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="description" data-weight="regular">description</span>
+                CV &amp; Dokumen
+            </a>
+<a class="text-white opacity-80 hover:opacity-100 flex items-center gap-4 px-4 py-3 mx-2 transition-all hover:bg-primary-container dark:hover:bg-primary-fixed-dim rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="search" data-weight="regular">search</span>
+                Cari Lowongan
+            </a>
+<a class="text-white opacity-80 hover:opacity-100 flex items-center gap-4 px-4 py-3 mx-2 transition-all hover:bg-primary-container dark:hover:bg-primary-fixed-dim rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="work" data-weight="regular">work</span>
+                Lamaran Saya
+            </a>
+<a class="text-white opacity-80 hover:opacity-100 flex items-center gap-4 px-4 py-3 mx-2 transition-all hover:bg-primary-container dark:hover:bg-primary-fixed-dim rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today" data-weight="regular">calendar_today</span>
+                Jadwal Seleksi
+            </a>
+<!-- Active Tab: Lowongan Tersimpan -->
+<a class="bg-secondary-container text-on-secondary-container rounded-lg flex items-center gap-4 px-4 py-3 mx-2 scale-95 active:scale-90 transition-transform font-bold" href="#">
+<span class="material-symbols-outlined" data-icon="bookmark" style="font-variation-settings: 'FILL' 1;">bookmark</span>
+                Lowongan Tersimpan
+            </a>
+<a class="text-white opacity-80 hover:opacity-100 flex items-center gap-4 px-4 py-3 mx-2 transition-all hover:bg-primary-container dark:hover:bg-primary-fixed-dim rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="notifications" data-weight="regular">notifications</span>
+                Notifikasi
+            </a>
+<a class="text-white opacity-80 hover:opacity-100 flex items-center gap-4 px-4 py-3 mx-2 transition-all hover:bg-primary-container dark:hover:bg-primary-fixed-dim rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="settings" data-weight="regular">settings</span>
+                Pengaturan Akun
+            </a>
+</div>
+<div class="px-6 mt-auto">
+<button class="w-full bg-secondary text-white py-2 px-4 rounded-lg font-label-md text-label-md hover:bg-secondary-fixed hover:text-on-secondary-fixed transition-colors">
+                Cari Lowongan Baru
+             </button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 md:ml-[280px] flex flex-col min-h-screen">
+<!-- TopNavBar (Mobile only for main nav, but used for profile/header on desktop) -->
+<header class="bg-surface dark:bg-surface-dim text-primary dark:text-primary-fixed font-body-md text-body-md w-full h-16 sticky top-0 z-40 border-b border-outline-variant dark:border-outline flex items-center justify-between px-margin-desktop md:px-8 w-full max-w-container-max mx-auto shadow-sm">
+<div class="flex items-center gap-4 md:hidden">
+<button class="text-on-surface-variant hover:bg-surface-container-low p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<span class="font-headline-md text-headline-md font-bold text-deep-navy dark:text-primary-fixed">CareerPortal</span>
+</div>
+<!-- Desktop Header Title -->
+<div class="hidden md:block">
+<h1 class="font-headline-md text-headline-md font-bold text-deep-navy">Lowongan Tersimpan - Budi Santoso</h1>
+</div>
+<div class="flex items-center gap-4 ml-auto">
+<button class="text-on-surface-variant hover:bg-surface-container-low p-2 rounded-full transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-container-low p-2 rounded-full transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-surface-container overflow-hidden cursor-pointer active:opacity-80 border border-outline-variant">
+<img alt="User Profile Avatar" class="object-cover w-full h-full" data-alt="A professional headshot of a young university student wearing a crisp white button-down shirt, smiling warmly against a soft, light gray background. Corporate modern style, bright and clean lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAk7WNlgwKKC1gkyFSt2HiXxrgbM9MF9Bd8OHSiqBP2VdOvd8ka-AwNuUOn-JG3E1TJgfiCTXsqiz_m_X4EwqfTNVpw7FXyfeGNLhdlD5oeF-JsY-Onbo78cxkrQhrtOKqJkz6QT2mvrmDeFGKSnvySrB-iRo_BNt70TJjnXFo7qRbPsHa80AwLrSeQbSZkX3acaEn3vLXRXafBZgK4GJLpEWJTk59sxeObCk66zaKC348EviguPCVsyA">
+</div>
+</div>
+</header>
+<!-- Canvas -->
+<main class="flex-1 p-margin-mobile md:p-margin-desktop max-w-container-max mx-auto w-full">
+<!-- Mobile Title (Hidden on desktop) -->
+<div class="md:hidden mb-6">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-deep-navy">Lowongan Tersimpan</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Kelola lowongan pekerjaan yang telah Anda simpan.</p>
+</div>
+<!-- Descriptive Text Desktop -->
+<div class="hidden md:block mb-8">
+<p class="font-body-md text-body-md text-on-surface-variant">Kelola lowongan pekerjaan yang telah Anda simpan. Pantau tenggat waktu dan segera kirimkan lamaran Anda.</p>
+</div>
+<!-- Job Cards Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Job Card 1 -->
+<div class="bg-surface border border-outline-variant rounded-lg p-6 hover:shadow-lg transition-all duration-300 relative group flex flex-col h-full cursor-pointer hover:-translate-y-0.5">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded bg-surface-container-low flex items-center justify-center overflow-hidden border border-surface-variant">
+<img alt="Company Logo" class="object-contain w-full h-full p-1" data-alt="A modern, minimalist corporate logo for a technology company named 'Teknologi Maju'. The logo features a sleek blue geometric shape on a clean white background. High-end SaaS aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDF4yzZKgexLsx3gegWwTs609AOtsBbZhOMFL9MNIPrQ8tekBjhRKVx-9yjmFoo2u4EYomqtoKVHD62rjpR_Wa9sHiLotOcmcVQb-bttH3RMAsTar1lCsi55ky81P-w6YgLfLfum-zvy027uKSJJ_DGjPtddlPgReGJzX-3Z73cM7KnlVgononjuCbZgyhaTPr4ajGZfBH9RJFxZ2wapxHqJkOzgHzhRmlIJ8NQhCSGgpdi4iHpiCT7zQ">
+</div>
+<div class="flex gap-2">
+<span class="bg-primary-fixed text-on-primary-fixed px-2 py-1 rounded-full font-label-sm text-label-sm">Internship</span>
+</div>
+</div>
+<h3 class="font-title-lg text-title-lg text-on-surface font-semibold mb-1 group-hover:text-primary transition-colors">Software Engineer Intern</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4">PT Teknologi Maju</p>
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="flex items-center gap-1 font-label-sm text-label-sm text-secondary bg-secondary-fixed/50 px-2 py-1 rounded-full border border-secondary-fixed">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+                            Terverifikasi
+                        </span>
+<span class="flex items-center gap-1 font-label-sm text-label-sm text-on-surface-variant bg-surface-container-low px-2 py-1 rounded-full">
+<span class="material-symbols-outlined text-[14px]">location_on</span>
+                            Jakarta
+                        </span>
+</div>
+<div class="mt-auto">
+<p class="font-label-sm text-label-sm text-error mb-4 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+                            Tutup 15 Okt 2026
+                        </p>
+<div class="flex gap-3">
+<button class="flex-1 bg-primary text-on-primary py-2 rounded font-label-md text-label-md hover:bg-primary-container transition-colors">
+                                Lihat Detail
+                            </button>
+<button class="p-2 border border-outline-variant rounded text-on-surface-variant hover:bg-error-container hover:text-on-error-container hover:border-error-container transition-colors" title="Hapus dari Tersimpan">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Job Card 2 -->
+<div class="bg-surface border border-outline-variant rounded-lg p-6 hover:shadow-lg transition-all duration-300 relative group flex flex-col h-full cursor-pointer hover:-translate-y-0.5">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded bg-surface-container-low flex items-center justify-center overflow-hidden border border-surface-variant">
+<img alt="Company Logo" class="object-contain w-full h-full p-1" data-alt="A prestigious, formal logo for a financial institution named 'Bank Sentral Indonesia'. Features a stylized gold coin and blue pillar motif on a white background. Corporate modern style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBq1Wom6ksQtBzUFe4xUFFuLK11PKex_ihU4t9Ticty088ceckJZ8rBketsBTWP_3Cf4OfFWdeRu_e9z9ykuMnUWUYNSlerD6c6GyE1Iw1UUpvtllKp_uldPuC6BgAk0hZJCERfs66WO9ZOAVeVdsQh8gXwG35tWx00lgQelIiPV7BCEVrjEdfpcGpLHGZgqZ9W8bcaJea0CKj8e-uItAAC5qYUvvu9ccqj5mrU7XilHACLnvrPjg5IGg">
+</div>
+<div class="flex gap-2">
+<span class="bg-primary text-on-primary px-2 py-1 rounded-full font-label-sm text-label-sm">Full-time</span>
+</div>
+</div>
+<h3 class="font-title-lg text-title-lg text-on-surface font-semibold mb-1 group-hover:text-primary transition-colors">Data Analyst ODP</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4">Bank Sentral Indonesia</p>
+<div class="flex flex-wrap gap-2 mb-6"><span class="flex items-center gap-1 font-label-sm text-label-sm text-secondary bg-secondary-fixed/50 px-2 py-1 rounded-full border border-secondary-fixed"><span class="material-symbols-outlined text-[14px]">verified</span>Terverifikasi</span><span class="flex items-center gap-1 font-label-sm text-label-sm text-on-tertiary-container bg-tertiary-fixed-dim/20 px-2 py-1 rounded-full border border-tertiary-fixed-dim/30"><span class="material-symbols-outlined text-[14px]">workspace_premium</span>Mitra Kampus</span></div>
+<div class="mt-auto">
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-4 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+                            Tutup 02 Nov 2026
+                        </p>
+<div class="flex gap-3">
+<button class="flex-1 bg-primary text-on-primary py-2 rounded font-label-md text-label-md hover:bg-primary-container transition-colors">
+                                Lihat Detail
+                            </button>
+<button class="p-2 border border-outline-variant rounded text-on-surface-variant hover:bg-error-container hover:text-on-error-container hover:border-error-container transition-colors" title="Hapus dari Tersimpan">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Job Card 3 (Expired) -->
+<div class="bg-surface-container-low border border-outline-variant rounded-lg p-6 opacity-75 relative group flex flex-col h-full">
+<div class="absolute inset-0 bg-surface/50 rounded-lg pointer-events-none"></div>
+<div class="flex justify-between items-start mb-4 relative z-10">
+<div class="w-12 h-12 rounded bg-surface-container flex items-center justify-center overflow-hidden border border-surface-variant grayscale">
+<img alt="Company Logo" class="object-contain w-full h-full p-1" data-alt="A trendy, vibrant logo for a digital agency named 'Kreasi Digital Studio'. Features abstract colorful shapes on a white background, rendered in greyscale to indicate an expired status." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2ziXymdWxJ2Adzby_KO2OvOMTgHwtMYoY3O5_cPYAvAFPHVSE8EdYFwIjKym5OQ380bEN4Dunq_wokAffNB1I-78pM5s6SF8vT7FxfzUG0hxcTyPY3qUlkT4qhLv2xACOi57O9kBjwfPs-8o3t6GajVuMjJCXM3GK1JT11VRT8UM8NcNGP-HEcmStmAIpxNov-fCHSAZHz0ZQ7UjY3IawuCLeV-roRJlHSYi4RLBMoA2xahfAXTwrZw">
+</div>
+</div>
+<h3 class="font-title-lg text-title-lg text-on-surface font-semibold mb-1 relative z-10">UX Researcher</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4 relative z-10">Universitas Career</p>
+<div class="flex flex-wrap gap-2 mb-6 relative z-10">
+<span class="flex items-center gap-1 font-label-sm text-label-sm text-primary bg-primary-fixed/50 px-2 py-1 rounded-full border border-primary-fixed">
+<span class="material-symbols-outlined text-[14px]">school</span>
+                            Karier di Kampus
+                        </span>
+<span class="flex items-center gap-1 font-label-sm text-label-sm text-on-surface-variant bg-surface-container-high px-2 py-1 rounded-full border border-outline-variant">
+                            Telah Berakhir
+                        </span>
+</div>
+<div class="mt-auto relative z-10">
+<div class="flex gap-3">
+<button class="flex-1 bg-surface-container-highest text-on-surface-variant py-2 rounded font-label-md text-label-md cursor-not-allowed">
+                                Lihat Detail
+                            </button>
+<button class="p-2 border border-outline-variant rounded text-on-surface-variant hover:bg-error-container hover:text-on-error-container hover:border-error-container transition-colors cursor-pointer" title="Hapus dari Tersimpan">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest dark:bg-surface-dim text-on-surface-variant dark:text-on-surface font-label-sm text-label-sm w-full py-8 mt-auto border-t border-outline-variant flex flex-col md:flex-row justify-between items-center px-margin-desktop max-w-container-max mx-auto gap-4">
+<div class="font-label-md text-label-md font-bold text-deep-navy dark:text-primary-fixed mb-4 md:mb-0">© 2026 Career Services Center. All Rights Reserved.</div>
+<div class="flex flex-wrap gap-6 justify-center">
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Kebijakan Privasi</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Syarat &amp; Ketentuan</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Bantuan</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Kontak Kami</a>
+</div>
+</footer>
+</div>
+
+
+</body></html>

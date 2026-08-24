@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Laporan Kepegawaian - Portal Karir</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#2d1d00",
+                        "on-primary-container": "#86a0cd",
+                        "deep-navy": "#1B2D4F",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed-variant": "#00497e",
+                        "surface-variant": "#e0e3e5",
+                        "on-tertiary-fixed": "#271900",
+                        "surface-container-highest": "#e0e3e5",
+                        "secondary-container": "#66affe",
+                        "on-tertiary": "#ffffff",
+                        "surface-dim": "#d7dadc",
+                        "on-primary": "#ffffff",
+                        "surface-container": "#ebeef0",
+                        "error-container": "#ffdad6",
+                        "primary-fixed-dim": "#adc7f7",
+                        "on-secondary-fixed": "#001d37",
+                        "on-primary-fixed-variant": "#2d476f",
+                        "on-error-container": "#93000a",
+                        "background": "#f7fafc",
+                        "surface-bright": "#f7fafc",
+                        "surface-container-high": "#e5e9eb",
+                        "primary-container": "#1a365d",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#f8bc4b",
+                        "on-background": "#181c1e",
+                        "on-primary-fixed": "#001b3c",
+                        "on-surface": "#181c1e",
+                        "secondary-fixed-dim": "#9fcaff",
+                        "on-tertiary-container": "#cb9524",
+                        "primary-fixed": "#d6e3ff",
+                        "tertiary-container": "#493100",
+                        "on-tertiary-fixed-variant": "#5f4100",
+                        "surface-tint": "#455f88",
+                        "on-secondary-container": "#004172",
+                        "inverse-surface": "#2d3133",
+                        "outline": "#74777f",
+                        "outline-variant": "#c4c6cf",
+                        "inverse-primary": "#adc7f7",
+                        "inverse-on-surface": "#eef1f3",
+                        "primary": "#002045",
+                        "on-surface-variant": "#43474e",
+                        "tertiary-fixed": "#ffdeaa",
+                        "secondary-fixed": "#d2e4ff",
+                        "secondary": "#0061a5",
+                        "surface-container-low": "#f1f4f6",
+                        "surface": "#ffffff",
+                        "success": "#38a169",
+                        "error": "#E11B22",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "margin-desktop": "48px",
+                        "container-max": "1280px",
+                        "base": "4px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f7fafc; color: #181c1e; }
+        .ambient-shadow { box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02); }
+        .hover-lift { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .hover-lift:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0, 32, 69, 0.05); }
+    </style>
+</head>
+<body class="flex min-h-screen">
+<!-- SideNavBar -->
+<aside class="w-[280px] h-screen sticky top-0 left-0 bg-deep-navy shadow-sm flex flex-col py-6 hidden md:flex z-20">
+<div class="px-6 mb-8 flex items-center gap-4">
+<img alt="Logo Universitas" class="w-12 h-12 rounded-full bg-white p-1" data-alt="University Logo, formal, academic blue, clear, professional, corporate modern style, clean lines, minimalist" src="https://lh3.googleusercontent.com/aida-public/AB6AXuARO3oDxFmzmu1-azuaecGKdtHcRHkYfS45No5c3mew03AfO-vYsVsAxxC019D-j0n_OtFhggvXY8Z5hnrSzaWPy0fk_Mm9l4rFC4ZKIvVrJEwuEV7MmhdA06UX35BpJklDTLqs8sLE-rQKd_n8F3iyBKhltxppUr6lVcHpSlXLuh0cuGNoNzzHGJ4UppWjCOox40xILcHD_vMU_jT4pAlHtB1XRSubgDKNUHwaea40idNhFtGlZQ3jnQ"/>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-white">Portal Karir</h1>
+<p class="font-label-sm text-label-sm text-white/80">Admin Kepegawaian</p>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-1 px-2">
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md text-body-md hover:bg-white/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md text-body-md hover:bg-white/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="work">work</span>Lowongan Kampus
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md text-body-md hover:bg-white/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>Pelamar
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md text-body-md hover:bg-white/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>Jadwal Seleksi
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md text-body-md hover:bg-white/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="fact_check">fact_check</span>Penilaian
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md text-body-md hover:bg-white/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="contract">contract</span>Offering
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md text-body-md hover:bg-white/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>Outcome Rekrutmen
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary font-bold border-l-4 border-secondary-container rounded-r-lg opacity-100 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>Laporan
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md text-body-md hover:bg-white/10 transition-colors duration-200 rounded-lg mt-auto" href="#">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>Notifikasi
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-white/80 font-body-md text-body-md hover:bg-white/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>Pengaturan
+            </a>
+</nav>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col min-w-0">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center w-full px-margin-desktop h-16 bg-surface dark:bg-surface-container sticky top-0 border-b border-outline-variant z-10">
+<div class="flex items-center gap-4">
+<button class="md:hidden text-on-surface-variant p-2">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="font-title-lg text-title-lg font-bold text-deep-navy">Laporan Kepegawaian</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="pl-10 pr-4 py-2 border border-outline-variant rounded-full text-label-md bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary w-64" placeholder="Cari data..." type="text"/>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<img alt="Foto Profil Admin" class="w-8 h-8 rounded-full border border-outline-variant" data-alt="Admin profile picture, professional headshot, corporate setting, well-lit, trustworthy, modern aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBG7F14uQwdZOY0ZSAHhL_XoKzPPLvlLZD3aIf8_fxC4i7yTBimHtYUdjDRdUKSdkQC4Ecbu3oEii6e5z2ZxAsUqxvx8AzovV6ZRcKQ8FWSxImc1N2SZ8BxgUsJnWG2AFrr08nxXt1-6pww4AbrKadOB_DlopEj0qO0unyoHxqUXHr0cIh1KoIsjHIti5S55nv67sQ0ViGTU6X7DJAhzHzFzZinjNOmPGZQbR1uVSZQvJFg6UxAvJ6_wg"/>
+</div>
+</header>
+<div class="p-margin-mobile md:p-margin-desktop flex-1 overflow-y-auto space-y-gutter flex flex-col">
+<!-- Page Header & Filters -->
+<div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-surface p-6 rounded-xl ambient-shadow border border-surface-variant">
+<div>
+<h2 class="font-headline-md text-headline-md text-primary mb-1">Ikhtisar Rekrutmen 2026</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Analisis komprehensif metrik kepegawaian institusi.</p>
+</div>
+<div class="flex flex-wrap gap-3 items-center">
+<select class="border border-outline-variant rounded-lg px-3 py-2 font-label-md text-label-md bg-surface text-on-surface focus:ring-primary focus:border-primary">
+<option>Periode: 2026</option>
+<option>Periode: 2025</option>
+</select>
+<select class="border border-outline-variant rounded-lg px-3 py-2 font-label-md text-label-md bg-surface text-on-surface focus:ring-primary focus:border-primary hidden sm:block">
+<option>Semua Unit</option>
+<option>Fakultas Teknik</option>
+<option>Fakultas Ekonomi</option>
+</select>
+<select class="border border-outline-variant rounded-lg px-3 py-2 font-label-md text-label-md bg-surface text-on-surface focus:ring-primary focus:border-primary hidden md:block">
+<option>Semua Jenis Posisi</option>
+<option>Dosen</option>
+<option>Tenaga Kependidikan</option>
+</select>
+<select class="border border-outline-variant rounded-lg px-3 py-2 font-label-md text-label-md bg-surface text-on-surface focus:ring-primary focus:border-primary hidden lg:block">
+<option>Semua Status Lowongan</option>
+<option>Aktif</option>
+<option>Ditutup</option>
+</select>
+<button class="bg-surface border border-outline-variant text-primary px-4 py-2 rounded-lg font-label-md text-label-md hover:bg-surface-container transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">filter_list</span> Terapkan Filter
+                    </button>
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-label-md text-label-md hover:bg-primary-container transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">download</span> Ekspor (CSV)
+                    </button>
+</div>
+</div>
+<!-- KPI Bento Grid -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-gutter">
+<div class="bg-surface p-5 rounded-xl ambient-shadow border border-surface-variant hover-lift flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<p class="font-label-md text-label-md text-on-surface-variant">Total Lowongan</p>
+<span class="material-symbols-outlined text-secondary bg-secondary-fixed p-1.5 rounded-md">work_outline</span>
+</div>
+<h3 class="font-display-lg text-display-lg text-primary">12</h3>
+</div>
+<div class="bg-surface p-5 rounded-xl ambient-shadow border border-surface-variant hover-lift flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<p class="font-label-md text-label-md text-on-surface-variant">Total Pelamar</p>
+<span class="material-symbols-outlined text-primary bg-primary-fixed p-1.5 rounded-md">groups</span>
+</div>
+<h3 class="font-display-lg text-display-lg text-primary">1,450</h3>
+</div>
+<div class="bg-surface p-5 rounded-xl ambient-shadow border border-surface-variant hover-lift flex flex-col justify-between col-span-2 md:col-span-1">
+<div class="flex justify-between items-start mb-4">
+<p class="font-label-md text-label-md text-on-surface-variant">Kandidat Diterima</p>
+<span class="material-symbols-outlined text-success bg-surface-container p-1.5 rounded-md">how_to_reg</span>
+</div>
+<div class="flex items-end gap-2">
+<h3 class="font-display-lg text-display-lg text-success">128</h3>
+</div>
+</div>
+<div class="bg-surface p-5 rounded-xl ambient-shadow border border-surface-variant hover-lift flex flex-col justify-between col-span-2 md:col-span-1">
+<div class="flex justify-between items-start mb-4">
+<p class="font-label-md text-label-md text-on-surface-variant">Time-to-Fill</p>
+<span class="material-symbols-outlined text-tertiary bg-tertiary-fixed p-1.5 rounded-md">timer</span>
+</div>
+<div class="flex flex-col">
+<h3 class="font-display-lg text-display-lg text-tertiary leading-none">24 <span class="font-title-lg text-title-lg text-on-surface-variant">Hari</span></h3>
+<p class="text-[10px] text-on-surface-variant leading-tight mt-1">Dihitung dari Tgl Publikasi hingga Penawaran Diterima</p>
+</div>
+</div>
+</div>
+<!-- Complex Layout: Funnel & Details -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<!-- Funnel Chart -->
+<div class="bg-surface p-6 rounded-xl ambient-shadow border border-surface-variant col-span-1 lg:col-span-2 flex flex-col">
+<h3 class="font-title-lg text-title-lg text-primary mb-6">Funnel Rekrutmen</h3>
+<div class="flex-1 w-full relative min-h-[300px]">
+<canvas id="funnelChart"></canvas>
+</div>
+</div>
+<!-- Secondary KPIs -->
+<div class="space-y-gutter flex flex-col">
+<div class="bg-surface p-6 rounded-xl ambient-shadow border border-surface-variant flex-1 hover-lift">
+<h4 class="font-label-md text-label-md text-on-surface-variant mb-2">Kandidat Dalam Proses</h4>
+<div class="flex items-center gap-4">
+<div class="w-16 h-16 rounded-full border-4 border-secondary-container flex items-center justify-center">
+<span class="font-title-lg text-title-lg text-primary">85</span>
+</div>
+<div class="flex-1">
+<div class="w-full bg-surface-container rounded-full h-2 mb-1">
+<div class="bg-primary h-2 rounded-full" style="width: 60%"></div>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant text-right">60% dari target</p>
+</div>
+</div>
+</div>
+<div class="bg-surface p-6 rounded-xl ambient-shadow border border-surface-variant flex-1 hover-lift">
+<h4 class="font-label-md text-label-md text-on-surface-variant mb-2">Time-to-Review</h4>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[32px] text-primary">rate_review</span>
+<div>
+<span class="font-headline-lg text-headline-lg text-primary">3</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Hari rata-rata</span>
+</div>
+</div>
+<p class="font-label-sm text-label-sm text-success mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">arrow_downward</span> 15% lebih cepat dari 2025
+                        </p>
+</div>
+</div>
+</div>
+<footer class="mt-auto py-6 text-center border-t border-outline-variant/30 mt-8">
+<p class="font-label-md text-label-md text-on-surface-variant">© 2026 Portal Karir Kampus</p>
+</footer>
+</div>
+</main>
+<script>
+        // Chart.js implementation for Funnel (using Bar chart horizontally for a funnel-like look)
+        document.addEventListener("DOMContentLoaded", function() {
+            const ctx = document.getElementById('funnelChart').getContext('2d');
+            
+            // Gradient for bars
+            const gradient = ctx.createLinearGradient(0, 0, 800, 0);
+            gradient.addColorStop(0, '#002045'); // primary
+            gradient.addColorStop(1, '#66affe'); // secondary-container
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Lamaran', 'Seleksi Administrasi', 'Shortlisted', 'Tes', 'Wawancara', 'Offering', 'Diterima'],
+                    datasets: [{
+                        label: 'Jumlah Kandidat',
+                        data: [1450, 400, 120, 80, 40, 15, 12],
+                        backgroundColor: gradient,
+                        borderRadius: 4,
+                        barThickness: 24,
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1B2D4F',
+                            titleFont: { family: 'Inter', size: 14 },
+                            bodyFont: { family: 'Inter', size: 16, weight: 'bold' },
+                            padding: 12,
+                            displayColors: false,
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: true, color: '#e0e3e5', drawBorder: false },
+                            ticks: { font: { family: 'Inter' } }
+                        },
+                        y: {
+                            grid: { display: false },
+                            ticks: { font: { family: 'Inter', size: 14 }, color: '#43474e' }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body></html>
