@@ -21,7 +21,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * The six repeatable profile collections of the grouped contract
- * `PUT /api/v1/candidate/{collection}`, declared once.
+ * `PUT /candidate/{collection}`, declared once.
  */
 final class CandidateCollectionRegistry
 {

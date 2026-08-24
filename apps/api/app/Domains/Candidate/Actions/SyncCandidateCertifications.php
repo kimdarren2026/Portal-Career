@@ -6,16 +6,12 @@ namespace App\Domains\Candidate\Actions;
 
 use App\Domains\Candidate\Exceptions\CandidateDocumentNotOwnedException;
 use App\Domains\Candidate\Exceptions\CandidateInvalidReferenceException;
-use App\Domains\Candidate\Models\CandidateCertification;
 use App\Domains\Candidate\Models\CandidateDocument;
 use App\Domains\Candidate\Models\CandidateProfile;
 
 final class SyncCandidateCertifications extends SyncCandidateCollection
 {
-    protected function modelClass(): string { return CandidateCertification::class; }
     protected function fields(): array { return ['certification_name', 'issuer_name', 'credential_identifier', 'issued_at', 'expires_at', 'credential_url', 'document_id']; }
-    protected function collectionName(): string { return 'certifications'; }
-    protected function orderColumn(): string { return 'issued_at'; }
     protected function validateReferences(CandidateProfile $profile, array $items): void
     {
         foreach ($items as $item) {
