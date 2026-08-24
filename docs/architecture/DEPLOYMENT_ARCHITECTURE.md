@@ -26,6 +26,23 @@
 | Search-engine indexing | Blocked | Blocked | **Blocked** | Public pages only |
 | Secrets | `.env`, untracked | Injected | Secret manager | Secret manager |
 
+### Upload and storage baseline for candidate documents
+
+Frozen with the candidate document upload policy, 25 August 2026 (`API_CONTRACT.md` Part X item 9).
+
+| Control | Required value | Authority |
+| --- | --- | --- |
+| **Business file limit** | **10 MiB — exactly 10,485,760 bytes**, one global limit for every candidate document | **Application validation is authoritative** |
+| PHP `upload_max_filesize` | **≥ 12 MiB** | Transport ceiling only |
+| PHP `post_max_size` | **≥ 13 MiB** | Transport ceiling only |
+| Reverse-proxy request body | **≥ 12 MiB** | Transport ceiling only |
+| Upload rate limit | **20 upload requests per hour per authenticated candidate**, keyed on the user identifier or another deterministic non-sensitive key — never a raw email | `API_CONTRACT.md` Part I §11.8 |
+| Storage quota | **DEFERRED** — none at MVP | — |
+
+**No transport ceiling is ever the business limit.** Where a platform exposes different controls (an ingress annotation, a WAF body limit, a serverless payload cap), the equivalent value must still sit **above** 10 MiB for the same reason.
+
+**`FILESYSTEM_DISK=s3`** — or an equivalently configured S3-compatible **private** store — **must be asserted by deployment configuration before candidate document upload is considered production-ready.** The framework default is the `local` disk; a production deployment that inherits it would place candidate documents on instance-local storage, outside object versioning and the backup guarantees in §4. Local private storage remains correct for development and test.
+
 **No production secret ever enters the repository.** `.env.example` carries variable names and placeholders only, and is created once the variables are actually defined. The root `.gitignore` already excludes `.env`, `.env.*`, `*.pem`, `*.key`, and `secrets/`.
 
 Staging must block indexing at the edge — a staging deployment indexed by a search engine leaks vacancy and company data and competes with production in results.
@@ -220,7 +237,7 @@ Health endpoints are unauthenticated but disclose nothing beyond pass/fail per d
 | Concern | Setting |
 | --- | --- |
 | TLS | Modern cipher suites, automated certificate renewal, HTTP→HTTPS redirect, HSTS |
-| Request limits | Upload size ceiling at the proxy matching the application's document limits, so oversized uploads are rejected before reaching PHP |
+| Request limits | Upload ceiling at the proxy configured **above** the application's business limit, never equal to or below it, so an oversized upload reaches the application and receives the frozen `413 PAYLOAD_TOO_LARGE` envelope instead of a bare proxy error. **Baseline for the 10 MiB candidate-document limit: proxy request-body ceiling ≥ 12 MiB.** The proxy value is a transport guard, **never** the business limit |
 | Rate limiting | Coarse limits at the edge; precise per-actor limits in the application via the Redis limiter |
 | Static assets | Compiled Vite bundle served by the proxy with long-lived cache headers and content hashing |
 | Security headers | HSTS, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, Referrer-Policy, and CSP — see `SECURITY_ARCHITECTURE.md` §3 |

@@ -293,6 +293,21 @@ Rate-limit counters, credential-failure counters, and temporary lock state are h
 
 Lock activation is auditable as a login event (`SECURITY_ARCHITECTURE.md` §7) — auditing the *event* is not the same as persisting the *state*.
 
+##### 11.8 Candidate document upload limiter
+
+Approved and frozen 25 August 2026 with the candidate document upload policy.
+
+| Property | Policy |
+| --- | --- |
+| Operation | `POST /candidate/documents` |
+| Limit | **20 upload requests per rolling hour, per authenticated candidate identity** |
+| Counted | Every upload request admitted to the limiter — successful and failed alike — so a rejected file cannot be retried without cost |
+| Limiter key subject | The authenticated **user identifier**, or another deterministic non-sensitive key. **Never a raw email address** (§11.4) |
+| Response | `RATE_LIMITED`, HTTP `429`, `Retry-After` **required** (§11.5) |
+| Storage | Redis runtime state, per §11.7 — no table, no schema change |
+
+No storage quota applies at MVP; a per-candidate storage quota is **DEFERRED** and may be added later without changing this operation, its route, or its payload.
+
 #### 12. Audit and Outbox Notation
 
 Each contract states its **Audit** consequence (a row in `audit_logs`, FR-AUD-001) and its **Notification / Outbox** consequence (`notifications` rows, `email_outbox` rows, FR-NOTIF-002). Both are written **inside** the business transaction; the queue job is dispatched **after commit** (INV-015). "None" means exactly that.
@@ -305,7 +320,7 @@ Candidate Core was originally classified `VERSIONED_API` throughout. That left t
 
 `GET /candidate/saved-vacancies` is **deliberately excluded** — it belongs to the later vacancy-discovery phase and is reconciled with that phase, not this one.
 
-**Surface classification is not implementation authorization.** Two of the twenty-one carry an explicit implementation block that this amendment does not lift: `POST /candidate/verifications` (verification business decision, Part X item 1) and `POST /candidate/documents` (`CANDIDATE_DOCUMENT_UPLOAD_POLICY_REQUIRED`, Part X item 9).
+**Surface classification is not implementation authorization.** `POST /candidate/verifications` carries an explicit implementation block that this amendment does not lift (verification business decision, Part X item 1). `POST /candidate/documents` is **no longer blocked** — its MIME and size policy was approved and frozen on 25 August 2026 (Part X item 9, **CLOSED**; values in this section's contract below) — and it remains **unrouted pending implementation**, which is a delivery state, not a policy block.
 
 ---
 
@@ -1097,12 +1112,16 @@ Clients must therefore read the collection, edit the whole set, and send it back
 > collection sync behaviour, pending vocabularies, error codes, side effects, and audit below
 > are unchanged and apply identically on either surface.
 
-> **IMPLEMENTATION BLOCKED — `CANDIDATE_DOCUMENT_UPLOAD_POLICY_REQUIRED`.**
-> Reclassifying the HTTP surface does **not** unblock this operation. FR-CAN-005 requires MIME
-> and size validation and neither may be dropped, but the exact MIME allowlist, the exact
-> maximum file size, and any per-`document_type` variation remain unapproved (Part X item 9).
-> No values are invented here. Candidate profile, every profile sub-collection, and the other
-> document operations are unaffected and proceed now.
+> **UPLOAD POLICY APPROVED AND FROZEN — 25 August 2026 (Part X item 9, CLOSED).**
+> The MIME allowlist, the maximum file size, and the question of per-`document_type` variation
+> were approved by the product owner and are frozen in the *Validation* and *Business Rules*
+> sections below. FR-CAN-005 still requires MIME and size validation and neither control may
+> ever be dropped; the approved values now fill what BRD/FSD deliberately left to this layer.
+> **BRD and FSD are unchanged** — they require the controls, this contract states the values.
+>
+> **The operation is not yet routed.** `POST /candidate/documents` remains absent from
+> `routes/web.php` until it is implemented. That is a delivery state, not a policy block, and
+> it no longer gates any other candidate contract.
 
 **Purpose:** Upload a private candidate document.
 
@@ -1113,23 +1132,31 @@ Clients must therefore read the collection, edit the whole set, and send it back
 **Request:** `multipart/form-data` — `file` (required), `document_type` (**required**; free-form `varchar` — see Validation), `display_name` (optional; defaults to a sanitized client filename).
 
 **Validation:**
-- **MIME validation and size validation are both MANDATORY — FR-CAN-005 requires them explicitly and neither may be dropped.** The client-declared `Content-Type` and the filename extension are advisory only and are never trusted; the **inspected** content type governs (`SECURITY_ARCHITECTURE.md` §5). The size ceiling is enforced at **both** reverse proxy and application.
-- **The exact MIME allowlist, the exact maximum size, and whether either varies by `document_type` are NOT defined by BRD/FSD and are NOT invented here** — `CANDIDATE_DOCUMENT_UPLOAD_POLICY_REQUIRED` (Part X item 9). **This upload operation is BLOCKED pending that policy.** The block is confined to upload: candidate profile and every profile sub-collection are unaffected and proceed now.
-- `document_type` present, and valid for **type and length only**. **No complete document-type vocabulary is approved** (`DATABASE_SCHEMA.md`: `varchar`, `CHECK` pending; Part X item 7). A controlled vocabulary can be added later without changing this operation, its route, or the candidate-document feature.
+- **MIME validation and size validation are both MANDATORY — FR-CAN-005 requires them explicitly and neither may be dropped.** The client-declared `Content-Type` and the filename extension are **advisory only and are never trusted**; the **inspected** content type governs (`SECURITY_ARCHITECTURE.md` §5).
+- **MIME allowlist — APPROVED AND FROZEN: `application/pdf` only.** Admission requires **both** signals to agree: (1) the **server-side inspected** MIME is `application/pdf`, **and** (2) the file content begins with the PDF signature `%PDF-`. If either check fails, or the inspected type is outside the allowlist, the upload is rejected — `UNSUPPORTED_MEDIA_TYPE` (415) for a type outside the allowlist, `DOCUMENT_TYPE_NOT_ALLOWED` (422) where the declared type, extension, and inspected content disagree. **No other media type is approved**: not DOC, DOCX, XLS, XLSX, ZIP, RAR, 7Z, SVG, images, audio, or video. Widening the allowlist requires a new security and business review.
+- **`mime_type` is persisted as the server-inspected value.** The client-declared media type is never persisted as authoritative and is never echoed back on download.
+- **Maximum file size — APPROVED AND FROZEN: 10 MiB, exactly `10,485,760` bytes.** This is a **single global limit applied to every candidate document**; it does **not** vary by `document_type`. **Application validation is the authoritative enforcement point.** Reverse-proxy and PHP runtime ceilings must be configured **above** this figure so an oversized request reaches the application and receives the frozen `PAYLOAD_TOO_LARGE` (413) envelope rather than a bare transport error (`DEPLOYMENT_ARCHITECTURE.md` §6). A transport ceiling is never the business limit.
+- `document_type` present, and valid for **type and length only** — `varchar(64)`. **The document-type vocabulary remains OPEN and is NOT closed by this policy** (`DATABASE_SCHEMA.md`: `varchar`, `CHECK` pending; Part X item 7 — still open). No closed vocabulary, no `CHECK` constraint, and **no migration** are introduced. A controlled vocabulary can still be added later without changing this operation, its route, or the candidate-document feature.
+- `display_name` optional, sanitized, at most 255 characters — see *Business Rules* for the sanitization requirements.
 
 **Business Rules:**
-- The object is stored under a **generated storage key**; the client filename is retained as display metadata only, so there is no path-traversal surface.
+- The object is stored under a **generated, opaque storage key**; the client filename is retained as display metadata only, so there is no path-traversal surface. **No segment of the client filename may influence the object-storage path**, and `storage_reference` is **never returned to the client** in any response.
+- **Filename sanitization** produces `display_name`: strip path separators and traversal sequences to a bare basename; remove control, `NUL`, and newline characters; normalize Unicode and strip bidirectional override characters used to disguise an extension; truncate within `varchar(255)`; and fall back to a safe server-generated name when sanitization yields empty text. **Duplicate `display_name` values are permitted** — no uniqueness constraint exists and a repeated upload is legitimate.
 - Uploads land in a quarantine prefix and are promoted after an asynchronous scan **where a scanner is configured**. FSD §7.6 and §10.1 make scanning conditional ("bila tersedia"); where none is configured the file is accepted and the gap is a recorded accepted risk, not a silent one. While quarantined the document cannot be shared (`DOCUMENT_SCAN_PENDING`).
 - Files are **private by default**. No public URL is ever produced.
-- The upload happens **before** the metadata transaction, so a rolled-back transaction can only orphan an object (recoverable by cleanup), never leave a row pointing at a missing file.
+- **Frozen sequencing:** validate → authorize → inspect content → generate storage key → write object → database transaction creating the `candidate_documents` row and its audit entry → response. The upload happens **before** the metadata transaction, so a rolled-back transaction can only orphan an object (recoverable by cleanup), never leave a row pointing at a missing file. **A row is never created pointing at an object that was not successfully stored.** On persistence failure after a successful object write, perform **best-effort object cleanup** and leave the remainder to later orphan reconciliation. **No distributed-transaction abstraction is required or implied.**
+- **Abuse control:** the candidate upload limiter in Part I §11.8 applies — 20 upload requests per rolling hour per authenticated candidate identity, `RATE_LIMITED` (429) with `Retry-After`. No storage quota applies at MVP; a quota is **DEFERRED**.
+- **Malware scanning is not required for the PDF-only allowlist at MVP**, consistent with FSD §7.6 and §10.1 ("bila tersedia") and the accepted risk recorded in `SECURITY_ARCHITECTURE.md`. Where a scanner **is** configured, the quarantine-and-promote contract above applies unchanged. A scanner is a prerequisite for any widening of the allowlist beyond `application/pdf`.
 
 **Success Response:** `201 Created` with document metadata and `Location`.
 
-**Error Codes:** `VALIDATION_FAILED` (422) · `DOCUMENT_TYPE_NOT_ALLOWED` (422) · `PAYLOAD_TOO_LARGE` (413) · `UNSUPPORTED_MEDIA_TYPE` (415) · `DOCUMENT_SCAN_FAILED` (422) · `AUTH_EMAIL_NOT_VERIFIED` (403).
+**Error Codes:** `VALIDATION_FAILED` (422) · `DOCUMENT_TYPE_NOT_ALLOWED` (422) · `PAYLOAD_TOO_LARGE` (413) · `UNSUPPORTED_MEDIA_TYPE` (415) · `DOCUMENT_SCAN_PENDING` (409, where a scanner workflow exists) · `DOCUMENT_SCAN_FAILED` (422, where a scanner rejects the file) · `RATE_LIMITED` (429, with `Retry-After`) · `AUTH_EMAIL_NOT_VERIFIED` (403) · `DOCUMENT_NOT_OWNED` (403, where ownership applies).
+
+**No storage-failure error code exists and none is introduced.** A storage-layer failure returns the ordinary sanitized server-error envelope with its correlation id, and **never** leaks the bucket, the storage key, credentials, or backend exception detail.
 
 **Side Effects:** Object stored; `candidate_documents` row created.
 
-**Audit:** `document_uploaded`. Never the file content.
+**Audit:** `document_uploaded`, carrying at most `document_type`, `size`, and the **inspected** `mime_type`, alongside the ordinary actor, object, and correlation fields. **Never** the file content or bytes, `storage_reference`, a signed URL, a storage credential, or any client secret material. `document_metadata_updated`, `document_archived`, and `document_access` are unchanged.
 
 **Notification / Outbox:** None.
 
@@ -3492,7 +3519,7 @@ Returned fields: `host`, `port`, `encryption_mode`, `username`, `from_address`, 
 
 ## Part X — Open Questions Carried by This Contract
 
-Nothing below is resolved by this document. Each affects a specific field or rule, and no unrelated contract is blocked.
+Nothing below is resolved by this document **except where a row is explicitly marked CLOSED with its approval date**; a closed row is retained with its resolution so the decision history stays readable. Each open item affects a specific field or rule, and no unrelated contract is blocked.
 
 | # | Open question | Effect on this contract |
 | --- | --- | --- |
@@ -3504,7 +3531,7 @@ Nothing below is resolved by this document. Each affects a specific field or rul
 | 6 | **First recruiter default role / minimum active Company Admin** | `POST /companies` does **not** assign a default `company_role`. `MEMBER_LAST_ADMIN` is reserved and **not enforced** by the member-revoke route |
 | 7 | **Candidate controlled vocabularies** — work preference values, education level, candidate document type | `PATCH /candidate/profile`, `PUT /candidate/{collection}`, `POST` and `PATCH /candidate/documents` validate these fields for **type, length, and structural validity only**. `DATABASE_SCHEMA.md` holds all three as `varchar` with the `CHECK` **pending approval**; no values are invented here. **The fields and their features remain MVP** — approving a vocabulary later adds a `CHECK` and a membership rule, and changes no route, payload shape, or capability |
 | 8 | **Profile completion criteria** — `DEFERRED POLICY` | FR-CAN-003 requires a completed profile but fixes **no** completion formula or required-field set. `candidate_profiles.profile_completed_at` **stays in the frozen schema**, is returned as stored, and **may remain `null`**. It is **not** automatically recomputed by any operation in this contract. Candidate profile and collection CRUD are **not blocked** by this |
-| 9 | **Candidate document upload policy** — `CANDIDATE_DOCUMENT_UPLOAD_POLICY_REQUIRED` | FR-CAN-005 **requires** MIME and size validation, so neither control may be removed; the exact **allowlist**, the exact **maximum size**, and any **per-document-type variation** are undefined by BRD/FSD. `POST /candidate/documents` is therefore **blocked pending policy approval**. The block is scoped to upload alone — profile, sub-collections, document listing, metadata update, delete, and download contracts are unaffected |
+| 9 | ~~**Candidate document upload policy**~~ | **CLOSED — approved and frozen 25 August 2026.** MIME allowlist: **`application/pdf` only**, admitted on the **server-inspected** type **and** the `%PDF-` signature. Maximum size: **10 MiB / `10,485,760` bytes**, a **single global limit** with **no per-`document_type` variation**; application validation is authoritative and transport ceilings sit above it. Upload rate limit: **20 per hour per candidate** (Part I §11.8). Storage quota: **DEFERRED**. Malware scanner: **not required** for the PDF-only allowlist. `document_type` stays **open-text `varchar(64)`** — see item 7, still open. `CANDIDATE_DOCUMENT_UPLOAD_POLICY_REQUIRED` is retired; **no migration and no API-shape change** resulted. `POST /candidate/documents` remains **unrouted pending implementation** |
 
 **Human-decision items carried from the ERD:**
 

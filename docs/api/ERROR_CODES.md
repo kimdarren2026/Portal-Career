@@ -80,8 +80,8 @@ This mapping is a documented reading of an FSD table explicitly labelled as exam
 | `IDEMPOTENCY_KEY_REUSED` | 409 | Same `Idempotency-Key` replayed with a **different** payload |
 | `IDEMPOTENT_REPLAY_IN_PROGRESS` | 409 | The original request for this key is still executing |
 | `RATE_LIMITED` | 429 | Throttle exceeded. `Retry-After` header returned |
-| `PAYLOAD_TOO_LARGE` | 413 | Upload exceeds the configured limit |
-| `UNSUPPORTED_MEDIA_TYPE` | 415 | Content type not accepted for this endpoint |
+| `PAYLOAD_TOO_LARGE` | 413 | Upload exceeds the configured limit. Candidate documents: **10 MiB / 10,485,760 bytes**, enforced by application validation (`API_CONTRACT.md` Part X item 9) |
+| `UNSUPPORTED_MEDIA_TYPE` | 415 | Content type not accepted for this endpoint. Candidate document upload accepts **`application/pdf` only**, decided on the server-inspected type, never the client header |
 | `MALFORMED_REQUEST` | 400 | Body is unparseable, or a path/query parameter is structurally invalid |
 | `SERVER_ERROR` | 500 | Unhandled failure. `message` is generic; detail exists only in internal logs |
 | `SERVICE_UNAVAILABLE` | 503 | A required dependency is unavailable |
@@ -125,7 +125,7 @@ This mapping is a documented reading of an FSD table explicitly labelled as exam
 | `DOCUMENT_NOT_OWNED` | 403 | Document belongs to another candidate |
 | `DOCUMENT_NOT_SHARED` | 403 | Document exists but was not shared with this application (INV-010, INV-032) |
 | `DOCUMENT_ARCHIVED` | 422 | Document is archived and cannot be shared with a new application |
-| `DOCUMENT_TYPE_NOT_ALLOWED` | 422 | Extension or inspected MIME type not permitted |
+| `DOCUMENT_TYPE_NOT_ALLOWED` | 422 | Extension or inspected MIME type not permitted — including where the declared type, the extension, and the inspected content disagree |
 | `DOCUMENT_SCAN_PENDING` | 409 | Upload is quarantined awaiting scan and cannot yet be used |
 | `DOCUMENT_SCAN_FAILED` | 422 | Scanner rejected the file |
 | `DOCUMENT_IN_USE` | 409 | Cannot hard-delete a document referenced by a live share (INV-032) |

@@ -336,8 +336,8 @@ Short-lived signed URLs are acceptable **after** the Policy check and audit writ
 
 | Concern | Approach |
 | --- | --- |
-| MIME validation | Validate by **inspected content type**, not the client-supplied header or file extension |
-| Size limits | Enforced per document type, at both the proxy and the application |
+| MIME validation | Validate by **inspected content type**, not the client-supplied header or file extension. **Candidate documents: `application/pdf` only**, admitted on the inspected type **and** the `%PDF-` signature; the inspected type is what gets persisted in `mime_type` (frozen 25 August 2026) |
+| Size limits | **Candidate documents: one global 10 MiB / 10,485,760-byte limit**, not varying by `document_type`. Application validation is authoritative; proxy and PHP ceilings are configured **above** it so the application returns the frozen `413 PAYLOAD_TOO_LARGE` envelope. Company and vacancy documents keep their own limits |
 | Filename handling | Client filenames are stored as display metadata only. Storage keys are generated, never derived from user input — no path traversal surface |
 | Malware scanning | FSD §7.6 and §10.1 say "if available". Architecture: uploads land in a quarantine prefix, are scanned asynchronously if a scanner is configured, and are promoted on clean result. If no scanner is configured, files are accepted with the constraint recorded as an accepted risk |
 | Snapshot immutability | INV-032 — `application_documents` captures `snapshot_name`, `snapshot_storage_reference`, and optionally `snapshot_checksum` at share time. Implementation should write an immutable copy or a versioned object reference so later edits to the candidate's source document cannot alter recruitment evidence |
