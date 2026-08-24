@@ -26,17 +26,18 @@ final class PhaseSixDatabaseConstraintsTest extends TestCase
             "SELECT tablename FROM pg_tables WHERE schemaname = current_schema() ORDER BY tablename"
         ))->pluck('tablename')->all();
 
-        $this->assertCount(57, $tables);
-        $this->assertCount(50, array_diff($tables, [
+        $this->assertCount(58, $tables);
+        $this->assertCount(51, array_diff($tables, [
             'migrations', 'sessions', 'cache', 'cache_locks', 'failed_jobs',
             'idempotency_keys', 'export_jobs',
         ]));
         $this->assertContains('idempotency_keys', $tables);
         $this->assertContains('export_jobs', $tables);
 
-        foreach (['user_roles', 'personal_access_tokens', 'jobs', 'job_batches'] as $deferredTable) {
+        foreach (['personal_access_tokens', 'jobs', 'job_batches'] as $deferredTable) {
             $this->assertFalse(DB::getSchemaBuilder()->hasTable($deferredTable));
         }
+        $this->assertTrue(DB::getSchemaBuilder()->hasTable('user_roles'));
     }
 
     public function test_phase_six_primary_keys_are_generated_always_bigints(): void

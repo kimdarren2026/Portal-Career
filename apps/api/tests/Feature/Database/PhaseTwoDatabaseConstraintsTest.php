@@ -50,7 +50,7 @@ final class PhaseTwoDatabaseConstraintsTest extends TestCase
 
         $this->assertTrue(DB::getSchemaBuilder()->hasTable('idempotency_keys'));
         $this->assertTrue(DB::getSchemaBuilder()->hasTable('export_jobs'));
-        $this->assertFalse(DB::getSchemaBuilder()->hasTable('user_roles'));
+        $this->assertTrue(DB::getSchemaBuilder()->hasTable('user_roles'));
         $this->assertFalse(DB::getSchemaBuilder()->hasTable('personal_access_tokens'));
     }
 

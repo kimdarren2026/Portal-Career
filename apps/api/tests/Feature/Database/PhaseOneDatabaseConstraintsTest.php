@@ -19,7 +19,7 @@ final class PhaseOneDatabaseConstraintsTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_phase_one_tables_remain_present_without_deferred_user_roles(): void
+    public function test_phase_one_tables_remain_present_with_phase_seven_user_roles(): void
     {
         $tables = collect(DB::select(
             "SELECT tablename FROM pg_tables WHERE schemaname = current_schema() ORDER BY tablename"
@@ -28,7 +28,7 @@ final class PhaseOneDatabaseConstraintsTest extends TestCase
         $this->assertContains('users', $tables);
         $this->assertContains('password_reset_tokens', $tables);
         $this->assertContains('geographic_areas', $tables);
-        $this->assertFalse(DB::getSchemaBuilder()->hasTable('user_roles'));
+        $this->assertTrue(DB::getSchemaBuilder()->hasTable('user_roles'));
     }
 
     public function test_identity_key_is_a_generated_always_bigint(): void
