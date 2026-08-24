@@ -1,0 +1,7 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+import AuthMessage from '@/components/auth/AuthMessage.vue'; import AuthShell from '@/components/auth/AuthShell.vue'; import PrimaryButton from '@/components/auth/PrimaryButton.vue'; import { authRequest, errorText } from '@/lib/auth'
+const email = ref(''); const loading = ref(false); const message = ref(''); const success = ref(false)
+async function submit() { loading.value = true; const { response, payload } = await authRequest('/auth/forgot-password', { email: email.value }); loading.value = false; success.value = response.ok; message.value = response.ok ? 'Jika alamat tersebut terdaftar, instruksi reset akan dikirimkan.' : errorText(payload) }
+</script>
+<template><AuthShell title="Reset password" subtitle="Masukkan email Anda. Kami akan mengirim instruksi jika akun tersedia."><form class="mt-8" @submit.prevent="submit"><label for="email" class="text-sm font-medium">Email</label><input id="email" v-model="email" type="email" autocomplete="email" required class="mt-2 block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-[#0b355d] focus:ring-[#0b355d]" /><AuthMessage :message="message" :tone="success ? 'success' : 'error'" /><PrimaryButton :loading="loading">Kirim instruksi</PrimaryButton></form><p class="mt-6 text-center text-sm"><a href="/login" class="font-semibold text-[#0b355d] hover:underline">Kembali ke halaman masuk</a></p></AuthShell></template>

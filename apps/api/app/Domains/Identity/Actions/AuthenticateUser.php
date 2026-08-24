@@ -9,6 +9,7 @@ use App\Domains\Identity\Enums\UserStatus;
 use App\Domains\Identity\Models\User;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * Authenticate credentials and establish a session (FR-AUTH-005).
@@ -35,6 +36,13 @@ final class AuthenticateUser
         // validate() checks credentials without establishing a session, so a
         // suspended account never gets one even momentarily.
         if (! $guard->validate(['email' => $email, 'password' => $password])) {
+            // An unknown identity must still pay one adaptive-hash operation.
+            // Without this comparable work, account existence is measurable by
+            // timing even though the outward error is intentionally identical.
+            if (! User::query()->byEmail($email)->exists()) {
+                Hash::make($password);
+            }
+
             return ['outcome' => AuthenticationOutcome::InvalidCredentials, 'user' => null];
         }
 

@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace App\Domains\Identity\Actions;
 
 use App\Domains\Identity\Exceptions\InvalidTokenException;
+use App\Domains\Identity\Exceptions\PasswordPolicyException;
 use App\Domains\Identity\Models\PasswordCredential;
 use App\Domains\Identity\Models\PasswordResetToken;
 use App\Domains\Identity\Models\User;
+use App\Domains\Identity\Support\AuditWriter;
 use App\Domains\Identity\Support\TokenHasher;
+use App\Domains\Identity\Support\PasswordPolicy;
+use App\Domains\Notification\Support\OutboxWriter;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
@@ -24,6 +28,8 @@ use Illuminate\Support\Facades\Hash;
  */
 final class ResetPasswordWithToken
 {
+    public function __construct(private readonly OutboxWriter $outbox, private readonly AuditWriter $audit) {}
+
     public function execute(string $rawToken, string $newPassword): User
     {
         if (! TokenHasher::isWellFormed($rawToken)) {
@@ -55,6 +61,10 @@ final class ResetPasswordWithToken
             /** @var User $user */
             $user = User::query()->whereKey($token->user_id)->lockForUpdate()->firstOrFail();
 
+            if (! PasswordPolicy::passes($newPassword, $user->email)) {
+                throw new PasswordPolicyException();
+            }
+
             $credential = PasswordCredential::query()
                 ->where('user_id', $user->getKey())
                 ->lockForUpdate()
@@ -84,6 +94,20 @@ final class ResetPasswordWithToken
                 ->whereNull('used_at')
                 ->whereNull('revoked_at')
                 ->update(['revoked_at' => now()]);
+
+            // A reset is the recovery path for a compromised credential. There
+            // is no API-token table on the browser MVP; all database sessions
+            // are therefore invalidated here.
+            DB::table('sessions')->where('user_id', $user->getKey())->delete();
+
+            $this->outbox->queue(
+                recipient: $user->email,
+                templateReference: 'identity.password-reset-completed',
+                payload: ['user_name' => $user->name],
+                relatedObjectType: 'user',
+                relatedObjectId: (int) $user->getKey(),
+            );
+            $this->audit->record('password_reset_completed', $user, 'user', (int) $user->getKey());
 
             return $user->refresh();
         });

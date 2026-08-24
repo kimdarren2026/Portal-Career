@@ -41,23 +41,23 @@ final class PasswordResetTest extends IdentityTestCase
         $before = DB::table('password_credentials')->where('user_id', $user->getKey())->value('password_hash');
 
         $raw = app(IssuePasswordResetToken::class)->execute($user->email, queueEmail: false);
-        app(ResetPasswordWithToken::class)->execute($raw, 'new-password-value');
+        app(ResetPasswordWithToken::class)->execute($raw, 'NewPassword1');
 
         $after = DB::table('password_credentials')->where('user_id', $user->getKey())->value('password_hash');
         $this->assertNotSame($before, $after);
-        $this->assertTrue(password_verify('new-password-value', $after));
+        $this->assertTrue(password_verify('NewPassword1', $after));
     }
 
     public function test_old_password_fails_and_new_password_succeeds(): void
     {
         $user = $this->makeUser(password: 'old-password-value');
         $raw = app(IssuePasswordResetToken::class)->execute($user->email, queueEmail: false);
-        app(ResetPasswordWithToken::class)->execute($raw, 'new-password-value');
+        app(ResetPasswordWithToken::class)->execute($raw, 'NewPassword1');
 
         $old = app(AuthenticateUser::class)->execute($user->email, 'old-password-value');
         $this->assertSame(AuthenticationOutcome::InvalidCredentials, $old['outcome']);
 
-        $new = app(AuthenticateUser::class)->execute($user->email, 'new-password-value');
+        $new = app(AuthenticateUser::class)->execute($user->email, 'NewPassword1');
         $this->assertSame(AuthenticationOutcome::Succeeded, $new['outcome']);
     }
 
@@ -65,10 +65,10 @@ final class PasswordResetTest extends IdentityTestCase
     {
         $user = $this->makeUser();
         $raw = app(IssuePasswordResetToken::class)->execute($user->email, queueEmail: false);
-        app(ResetPasswordWithToken::class)->execute($raw, 'new-password-value');
+        app(ResetPasswordWithToken::class)->execute($raw, 'NewPassword1');
 
         try {
-            app(ResetPasswordWithToken::class)->execute($raw, 'another-password');
+            app(ResetPasswordWithToken::class)->execute($raw, 'AnotherPass1');
             $this->fail('Expected the consumed token to be rejected.');
         } catch (InvalidTokenException $e) {
             $this->assertSame('AUTH_TOKEN_ALREADY_USED', $e->errorCode);
@@ -117,7 +117,7 @@ final class PasswordResetTest extends IdentityTestCase
             'created_at' => now(),
         ]);
 
-        app(ResetPasswordWithToken::class)->execute($raw, 'new-password-value');
+        app(ResetPasswordWithToken::class)->execute($raw, 'NewPassword1');
 
         $siblingRevoked = DB::table('password_reset_tokens')
             ->where('user_id', $user->getKey())
@@ -131,7 +131,7 @@ final class PasswordResetTest extends IdentityTestCase
     {
         $user = $this->makeUser();
         $raw = app(IssuePasswordResetToken::class)->execute($user->email, queueEmail: false);
-        app(ResetPasswordWithToken::class)->execute($raw, 'new-password-value');
+        app(ResetPasswordWithToken::class)->execute($raw, 'NewPassword1');
 
         $row = (array) DB::table('users')->where('id', $user->getKey())->first();
         $this->assertArrayNotHasKey('password', $row);

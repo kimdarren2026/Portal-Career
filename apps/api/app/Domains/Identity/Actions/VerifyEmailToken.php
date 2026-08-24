@@ -8,6 +8,7 @@ use App\Domains\Identity\Enums\UserStatus;
 use App\Domains\Identity\Exceptions\InvalidTokenException;
 use App\Domains\Identity\Models\EmailVerificationToken;
 use App\Domains\Identity\Models\User;
+use App\Domains\Identity\Support\AuditWriter;
 use App\Domains\Identity\Support\TokenHasher;
 use Illuminate\Support\Facades\DB;
 
@@ -22,6 +23,8 @@ use Illuminate\Support\Facades\DB;
  */
 final class VerifyEmailToken
 {
+    public function __construct(private readonly AuditWriter $audit) {}
+
     public function execute(string $rawToken): User
     {
         if (! TokenHasher::isWellFormed($rawToken)) {
@@ -73,6 +76,8 @@ final class VerifyEmailToken
             }
 
             $user->forceFill($attributes)->save();
+
+            $this->audit->record('email_verification', $user, 'user', (int) $user->getKey());
 
             return $user->refresh();
         });

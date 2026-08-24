@@ -22,7 +22,11 @@
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="BROADCAST_CONNECTION" value="null"/>
-        <env name="CACHE_STORE" value="array"/>
+        <!-- Isolated Redis database for abuse-control tests; never the runtime
+             rate-limit database. -->
+        <env name="CACHE_STORE" value="redis"/>
+        <env name="REDIS_CACHE_DB" value="15"/>
+        <env name="REDIS_PREFIX" value="portal_karir_test_"/>
         <!-- PostgreSQL, never SQLite. The schema depends on partial unique indexes
              and CHECK constraints that SQLite does not share, so an SQLite run
              would silently skip the guarantees that matter most

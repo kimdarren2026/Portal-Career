@@ -1,7 +1,12 @@
 <?php
 
 use App\Http\Middleware\AssignCorrelationId;
+use App\Http\Middleware\EnforceAuthAbuseControls;
+use App\Http\Middleware\EnsureAccountStatus;
+use App\Http\Middleware\EnsureVerifiedEmail;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Responses\ContractResponse;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -26,9 +31,20 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);
+
+        $middleware->alias([
+            'auth.abuse' => EnforceAuthAbuseControls::class,
+            'account.status' => EnsureAccountStatus::class,
+            'verified.email' => EnsureVerifiedEmail::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+        $exceptions->render(function (AuthenticationException $exception, Request $request) {
+            if (in_array($request->path(), ['me', 'me/password', 'auth/logout'], true)) {
+                return ContractResponse::error($request, 'UNAUTHENTICATED', 401, 'Sesi autentikasi diperlukan.');
+            }
+        });
     })->create();
