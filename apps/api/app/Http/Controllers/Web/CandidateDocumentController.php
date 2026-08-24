@@ -6,12 +6,14 @@ namespace App\Http\Controllers\Web;
 
 use App\Domains\Candidate\Actions\ArchiveCandidateDocument;
 use App\Domains\Candidate\Actions\DownloadCandidateDocument;
+use App\Domains\Candidate\Actions\UploadCandidateDocument;
 use App\Domains\Candidate\Actions\UpdateCandidateDocument;
 use App\Domains\Candidate\Models\CandidateDocument;
 use App\Domains\Candidate\Queries\ListCandidateDocuments;
 use App\Domains\Candidate\Support\CandidatePresenter;
 use App\Http\Requests\Candidate\UpdateCandidateDocumentRequest;
 use App\Http\Requests\Candidate\ListCandidateDocumentsRequest;
+use App\Http\Requests\Candidate\UploadCandidateDocumentRequest;
 use App\Http\Responses\ContractResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -22,12 +24,35 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 /**
  * Candidate private documents (FR-CAN-005).
  *
- * Upload is deliberately absent: POST /candidate/documents stays BLOCKED on
- * CANDIDATE_DOCUMENT_UPLOAD_POLICY_REQUIRED (API_CONTRACT.md Part X item 9), because the
- * MIME allowlist and size ceiling are unapproved and must not be invented.
+ * Upload is implemented under candidate-document-upload-policy-v1.
  */
 final class CandidateDocumentController extends CandidateController
 {
+    public function store(UploadCandidateDocumentRequest $request, UploadCandidateDocument $action): JsonResponse
+    {
+        $profile = $this->ownProfile($request);
+        $actor = $this->actor($request);
+
+        if (Gate::forUser($actor)->denies('create', [CandidateDocument::class, $profile])) {
+            return ContractResponse::error($request, 'AUTH_FORBIDDEN', 403, 'Anda tidak berhak mengunggah dokumen.');
+        }
+
+        /** @var \Illuminate\Http\UploadedFile $file */
+        $file = $request->file('file');
+        $document = $action->execute(
+            $actor,
+            $profile,
+            $file,
+            $request->string('document_type')->toString(),
+            $request->filled('display_name') ? $request->string('display_name')->toString() : null,
+        );
+
+        $response = ContractResponse::success($request, CandidatePresenter::document($document, false), 201);
+        $response->headers->set('Location', route('candidate.documents.index'));
+
+        return $response;
+    }
+
     public function index(ListCandidateDocumentsRequest $request, ListCandidateDocuments $query): JsonResponse
     {
         $profile = $this->ownProfile($request);

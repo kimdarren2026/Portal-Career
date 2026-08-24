@@ -165,7 +165,7 @@ final class CandidateCoreHttpTest extends IdentityTestCase
         $this->actingAs($candidate)->postJson('/candidate/verifications', ['verification_type' => 'ALUMNI'])->assertMethodNotAllowed();
     }
 
-    public function test_document_metadata_is_private_and_upload_is_not_active(): void
+    public function test_document_metadata_is_private_and_upload_requires_a_file(): void
     {
         [$candidate, $profileId] = $this->candidate();
         [, $otherProfile] = $this->candidate();
@@ -180,7 +180,7 @@ final class CandidateCoreHttpTest extends IdentityTestCase
         $this->actingAs($candidate)->patchJson('/candidate/documents/'.$otherDocument, ['display_name' => 'Probe.pdf'])->assertForbidden()->assertJsonPath('error.code', 'DOCUMENT_NOT_OWNED');
         $this->actingAs($candidate)->deleteJson('/candidate/documents/'.$ownDocument)->assertNoContent();
         $this->assertNotNull(DB::table('candidate_documents')->where('id', $ownDocument)->value('archived_at'));
-        $this->actingAs($candidate)->postJson('/candidate/documents', ['document_type' => 'CV'])->assertMethodNotAllowed();
+        $this->actingAs($candidate)->postJson('/candidate/documents', ['document_type' => 'CV'])->assertStatus(422)->assertJsonPath('error.code', 'VALIDATION_FAILED');
         $this->assertSame(0, DB::table('application_documents')->count());
     }
 

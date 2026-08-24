@@ -66,11 +66,10 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
 | Candidate Core — INERTIA_WEB (SPEC-DOC-07, accepted)
 |
 | Session guard + CSRF, OWN authorization, verified-email gate on every mutation.
-| Two inventoried operations are deliberately NOT routed because API_CONTRACT.md
-| blocks their implementation, and a route that guesses their rules would be an
-| invention rather than a contract:
+| POST /candidate/verifications remains deliberately unrouted because API_CONTRACT.md
+| blocks its implementation. Candidate document upload is implemented under
+| candidate-document-upload-policy-v1.
 |   - POST /candidate/verifications  (verification business decision, Part X item 1)
-|   - POST /candidate/documents      (CANDIDATE_DOCUMENT_UPLOAD_POLICY_REQUIRED, item 9)
 */
 Route::middleware(['auth', 'account.status'])->prefix('candidate')->name('candidate.')->group(function (): void {
     $collections = implode('|', CandidateCollectionRegistry::slugs());
@@ -95,5 +94,9 @@ Route::middleware(['auth', 'account.status'])->prefix('candidate')->name('candid
             ->name('documents.update');
         Route::delete('/documents/{document}', [CandidateDocumentController::class, 'destroy'])
             ->name('documents.destroy');
+    });
+
+    Route::middleware(['candidate.document-upload-rate', 'verified.email'])->group(function (): void {
+        Route::post('/documents', [CandidateDocumentController::class, 'store'])->name('documents.store');
     });
 });

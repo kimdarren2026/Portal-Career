@@ -4,10 +4,15 @@ use App\Http\Middleware\AssignCorrelationId;
 use App\Http\Middleware\EnforceAuthAbuseControls;
 use App\Http\Middleware\EnsureAccountStatus;
 use App\Http\Middleware\EnsureVerifiedEmail;
+use App\Http\Middleware\EnforceCandidateDocumentUploadRateLimit;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Responses\ContractResponse;
 use App\Domains\Candidate\Exceptions\CandidateCollectionNotFoundException;
 use App\Domains\Candidate\Exceptions\CandidateDocumentNotOwnedException;
+use App\Domains\Candidate\Exceptions\CandidateDocumentPersistenceException;
+use App\Domains\Candidate\Exceptions\CandidateDocumentSignatureInvalidException;
+use App\Domains\Candidate\Exceptions\CandidateDocumentStorageException;
+use App\Domains\Candidate\Exceptions\CandidateDocumentUnsupportedMediaTypeException;
 use App\Domains\Candidate\Exceptions\CandidateInvalidReferenceException;
 use App\Domains\Candidate\Exceptions\CandidateProfileRequiredException;
 use Illuminate\Auth\AuthenticationException;
@@ -41,6 +46,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'auth.abuse' => EnforceAuthAbuseControls::class,
             'account.status' => EnsureAccountStatus::class,
             'verified.email' => EnsureVerifiedEmail::class,
+            'candidate.document-upload-rate' => EnforceCandidateDocumentUploadRateLimit::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
@@ -55,6 +61,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(fn (CandidateProfileRequiredException $exception, Request $request) => ContractResponse::error($request, 'CANDIDATE_PROFILE_REQUIRED', 422, 'Profil kandidat tidak tersedia.'));
         $exceptions->render(fn (CandidateCollectionNotFoundException $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Data tidak ditemukan.'));
         $exceptions->render(fn (CandidateDocumentNotOwnedException $exception, Request $request) => ContractResponse::error($request, 'DOCUMENT_NOT_OWNED', 403, 'Dokumen bukan milik kandidat ini.'));
+        $exceptions->render(fn (CandidateDocumentUnsupportedMediaTypeException $exception, Request $request) => ContractResponse::error($request, 'UNSUPPORTED_MEDIA_TYPE', 415, 'Dokumen harus berupa PDF.'));
+        $exceptions->render(fn (CandidateDocumentSignatureInvalidException $exception, Request $request) => ContractResponse::error($request, 'DOCUMENT_TYPE_NOT_ALLOWED', 422, 'Konten dokumen tidak valid.'));
+        $exceptions->render(fn (CandidateDocumentStorageException $exception, Request $request) => ContractResponse::error($request, 'SERVER_ERROR', 500, 'Dokumen tidak dapat disimpan saat ini.'));
+        $exceptions->render(fn (CandidateDocumentPersistenceException $exception, Request $request) => ContractResponse::error($request, 'SERVER_ERROR', 500, 'Dokumen tidak dapat disimpan saat ini.'));
         $exceptions->render(fn (CandidateInvalidReferenceException $exception, Request $request) => ContractResponse::error($request, 'VALIDATION_FAILED', 422, 'Referensi yang dikirim tidak valid.'));
         $exceptions->render(function (ModelNotFoundException $exception, Request $request) {
             if ($request->is('candidate/documents/*')) {

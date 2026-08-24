@@ -12,6 +12,7 @@ final class CandidateDocumentPolicy
 {
     public function __construct(private readonly CandidateProfilePolicy $profiles) {}
 
+    public function create(User $user, CandidateProfile $profile): bool { return $this->profiles->manage($user, $profile); }
     public function view(User $user, CandidateDocument $document): bool { return $this->owns($user, $document); }
     public function update(User $user, CandidateDocument $document): bool { return $this->owns($user, $document); }
     public function delete(User $user, CandidateDocument $document): bool { return $this->owns($user, $document); }
