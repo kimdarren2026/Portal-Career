@@ -1,7 +1,7 @@
 # Inertia Web Action Index — Internal Application Surface
 
 **Status:** Proposed — awaiting approval
-**Date:** 24 August 2026
+**Date:** 24 August 2026 · **Amended:** auth HTTP surface (SPEC-DOC-05 accepted)
 **Generated from:** `API_CONTRACT.md` — verified programmatically in both directions.
 
 **This file lists only `INERTIA_WEB` operations.** These are internal Laravel + Inertia application routes:
@@ -10,22 +10,36 @@
 - **not** part of the public backward-compatibility promise — free to change with the application;
 - **they delegate to the same Actions, Form Requests, and Policies as the versioned surface, and must never duplicate business logic.**
 
-Routes are shown **without** the `/api/v1` prefix, which is what distinguishes them at the routing layer. Their **behaviour — validation, invariants, transitions, error codes, audit, outbox, idempotency, and concurrency — is defined by `API_CONTRACT.md` exactly as for versioned endpoints.** Idempotency and concurrency requirements are not relaxed here: business safety does not weaken because an action is reached through a session cookie.
+> **Browser authentication lives here (SPEC-DOC-05, accepted).** The ten authentication and session operations use the **Laravel session guard** with CSRF protection over same-origin, non-versioned routes — not Sanctum bearer tokens. Their `/api/v1` twins remain reserved in `API_ENDPOINTS.md` for future non-browser clients. `personal_access_tokens` is not required for MVP browser authentication.
+
+Routes are shown **without** the `/api/v1` prefix, which is what distinguishes them at the routing layer. Their **behaviour — validation, invariants, transitions, error codes, audit, outbox, idempotency, and concurrency — is defined by `API_CONTRACT.md` exactly as for versioned endpoints.** Idempotency and concurrency requirements are not relaxed here.
+
+**Page-delivery `GET` routes are deliberately absent.** Routes such as `/login`, `/register`, `/forgot-password`, `/reset-password/{token}` and `/verify-email/{token}` render an Inertia page and change nothing; they are UI plumbing, not contract operations (`API_CONTRACT.md` Part I §2b).
 
 Any of these may later be promoted to `VERSIONED_API`. Promotion is additive — a route, a token guard, and a compatibility commitment — and requires no behavioural change.
 
 | Total INERTIA_WEB operations |
 | --- |
-| **91** |
+| **101** |
 
 ## Authentication & Session
 
 | Domain | Method | Route | Purpose / Contract Section | Primary Role |
 | --- | --- | --- | --- | --- |
+| Authentication & Session | `POST` | `/auth/forgot-password` | POST /api/v1/auth/forgot-password | PUBLIC / self |
+| Authentication & Session | `POST` | `/auth/login` | POST /api/v1/auth/login | PUBLIC / self |
+| Authentication & Session | `POST` | `/auth/logout` | POST /api/v1/auth/logout | PUBLIC / self |
+| Authentication & Session | `POST` | `/auth/register/candidate` | POST /api/v1/auth/register/candidate | PUBLIC / self |
+| Authentication & Session | `POST` | `/auth/register/recruiter` | POST /api/v1/auth/register/recruiter | PUBLIC / self |
+| Authentication & Session | `POST` | `/auth/resend-verification` | POST /api/v1/auth/resend-verification | PUBLIC / self |
+| Authentication & Session | `POST` | `/auth/reset-password` | POST /api/v1/auth/reset-password | PUBLIC / self |
+| Authentication & Session | `POST` | `/auth/verify-email` | POST /api/v1/auth/verify-email | PUBLIC / self |
 | Authentication & Session | `GET` | `/companies/{company}/members` | POST /api/v1/companies/{company}/members *(grouped)* | PUBLIC / self |
 | Authentication & Session | `POST` | `/companies/{company}/members` | POST /api/v1/companies/{company}/members | PUBLIC / self |
 | Authentication & Session | `PATCH` | `/companies/{company}/members/{member}` | POST /api/v1/companies/{company}/members *(grouped)* | PUBLIC / self |
 | Authentication & Session | `DELETE` | `/companies/{company}/members/{member}` | POST /api/v1/companies/{company}/members *(grouped)* | PUBLIC / self |
+| Authentication & Session | `GET` | `/me` | GET /api/v1/me | PUBLIC / self |
+| Authentication & Session | `PUT` | `/me/password` | PUT /api/v1/me/password | PUBLIC / self |
 
 ## Company
 
@@ -190,7 +204,7 @@ Any of these may later be promoted to `VERSIONED_API`. Promotion is additive —
 
 | Domain | Operations |
 | --- | --- |
-| Authentication & Session | 4 |
+| Authentication & Session | 14 |
 | Company | 16 |
 | Career Center Verification | 1 |
 | Partnership | 6 |
@@ -205,4 +219,4 @@ Any of these may later be promoted to `VERSIONED_API`. Promotion is additive —
 | Reporting | 8 |
 | Audit | 1 |
 | Administration | 6 |
-| **Total** | **91** |
+| **Total** | **101** |

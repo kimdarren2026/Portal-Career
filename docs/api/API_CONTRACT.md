@@ -4,6 +4,7 @@
 **Date:** 24 August 2026
 **Baselines (frozen):** BRD v1.1 · FSD v1.1 · Stitch canonical baseline · Logical model **1.1-C2** · Architecture **ADR-001 to ADR-017**
 **Revision:** Final semantic correction pass, 24 August 2026 — Career Center vacancy-authoring ruling, company legal-document supersede rule, candidate collection sync, and the VERSIONED_API / INERTIA_WEB surface split.
+**Amendment:** Auth HTTP surface, 24 August 2026 — SPEC-DOC-05 accepted. The ten authentication and session operations are reclassified to `INERTIA_WEB` for MVP browser authentication (Laravel session guard + CSRF). Their `/api/v1` bearer-token twins remain reserved. SPEC-DOC-06 resolved. **No business rule changed.**
 **Companions:** `API_ENDPOINTS.md` (versioned inventory) · `INERTIA_ACTIONS.md` (internal inventory) · `ERROR_CODES.md` · `AUTHORIZATION_MATRIX.md` · `API_SIZE_REVIEW.md` (historical)
 
 **This document is authoritative for behaviour on both surfaces.** Every operation carries a **Surface** classification — `VERSIONED_API` or `INERTIA_WEB` — which governs *where it is routed and whether it carries a compatibility promise*, never *how it behaves*. Both surfaces call the same Actions, Form Requests, Policies, and invariants. **No business rule is ever implemented twice.**
@@ -31,10 +32,12 @@ This contract is written so that implementation requires **no invention of busin
 
 | Surface | Auth | Notes |
 | --- | --- | --- |
-| **Web (Inertia)** | Laravel session cookie + CSRF | The five portals. Not enumerated here — it calls the **same Actions** with the same validation and authorization |
-| **`/api/v1`** | Sanctum bearer token | This contract. Reserved for future clients; thin at MVP (ADR-001, ADR-005) |
+| **Web (Inertia)** | Laravel session cookie + CSRF | The five portals **and all MVP browser authentication**. Every operation is specified in this document; the route inventory is `INERTIA_ACTIONS.md` |
+| **`/api/v1`** | Sanctum bearer token | **Reserved for future non-browser clients and inactive at MVP** (ADR-001, ADR-005). Route inventory: `API_ENDPOINTS.md` |
 
-Both surfaces share Actions, Form Requests, Policies, and invariants. **No rule is implemented twice.** Where this contract states a business rule, it holds identically for the Inertia surface.
+Both surfaces share Actions, Form Requests, Policies, and invariants. **No rule is implemented twice.** Where this contract states a business rule, it holds identically on either surface.
+
+**Both surfaces are fully enumerated.** Every operation appears in exactly one inventory — `API_ENDPOINTS.md` for `VERSIONED_API`, `INERTIA_ACTIONS.md` for `INERTIA_WEB` — and both are generated from this document and verified bidirectionally. *(Resolves SPEC-DOC-06, which recorded a stale claim that the web surface was "not enumerated here".)*
 
 #### 2b. Surface Classification
 
@@ -57,6 +60,42 @@ Every operation below is classified on exactly one surface.
 Promoting an `INERTIA_WEB` operation to `VERSIONED_API` later is additive and requires no behavioural change — only a route, a token guard, and a compatibility commitment.
 
 **Idempotency and concurrency requirements apply identically on both surfaces.** Business safety does not weaken because an action is reached through a session cookie.
+
+##### Browser authentication is `INERTIA_WEB` (SPEC-DOC-05, accepted)
+
+All ten authentication and session operations are `INERTIA_WEB` for MVP. A browser authenticates with the **Laravel session guard** — an `httpOnly`, `Secure`, `SameSite=Lax` encrypted cookie — over **CSRF-protected**, same-origin, non-versioned routes. This follows ADR-005 and `SECURITY_ARCHITECTURE.md` §1 directly.
+
+Routing browser authentication through `/api/v1` was considered and rejected for four reasons, each recorded so the decision is not silently revisited:
+
+| # | Problem with a versioned browser login |
+| --- | --- |
+| 1 | `/api/v1` is specified as stateless and **CSRF-exempt**. A route that establishes a session cookie while exempt from CSRF is a **login-CSRF vulnerability**, and contradicts ADR-005's consequence that "CSRF protection applies to all session-authenticated mutating requests" |
+| 2 | `/api/v1` carries the **Sanctum bearer guard**; browser login needs the session guard |
+| 3 | `VERSIONED_API` carries a **backward-compatibility promise**. Binding internal login plumbing to it prevents the UI evolving with the application — the exact cost the split exists to avoid |
+| 4 | `device_name` is "required to mint a token on the `/api/v1` surface" and is **meaningless for a browser session** |
+
+##### Page delivery is not a contract operation
+
+Two different things reach the browser, and only one is specified here:
+
+| | **Page delivery** | **State-changing operation** |
+| --- | --- | --- |
+| Example | `GET /login` renders the login page | `POST /login` authenticates |
+| Purpose | Render an Inertia page; read-only, no business effect | Executes an Action |
+| Specified in this contract | **No** | **Yes** |
+| Inventory | Neither — it is UI plumbing | `INERTIA_ACTIONS.md` |
+| CSRF | Not applicable (`GET`) | **Required** |
+
+`GET` page routes such as `/login`, `/register`, `/forgot-password`, `/reset-password/{token}` and `/verify-email/{token}` **render** the corresponding page and change nothing. They are deliberately absent from both inventories and from the operation counts: enumerating them would confuse UI routing with business capability. Only the `POST`/`PUT` operations below carry contract behaviour.
+
+##### The reserved `/api/v1` authentication twin
+
+The architectural concept is preserved, not deleted:
+
+- **`/api/v1` bearer authentication remains reserved** for future non-browser and external clients (ADR-001, ADR-005).
+- **Sanctum personal access token support is conditional**, and `personal_access_tokens` is **not required for MVP browser authentication** — the session guard involves no Sanctum component (`DATABASE_SCHEMA.md` §23).
+- Each auth operation's heading remains its **canonical `/api/v1` identifier**, so the twin already has a name.
+- When API authentication is activated, the API adapter **calls the same domain Actions** with the same validation, error codes, and authorization. Promotion is additive: a route, a token guard, a compatibility commitment. **No behavioural change, and no second implementation of any rule.**
 
 #### 3. Success Envelope
 
@@ -186,7 +225,15 @@ Most endpoints have their own `###` section. Five families of structurally ident
 
 ### POST /api/v1/auth/register/candidate
 
-**Surface:** `VERSIONED_API`
+**Surface:** `INERTIA_WEB`  ·  **MVP browser route:** `POST /register/candidate`
+
+> **Reclassified for MVP browser authentication (SPEC-DOC-05, accepted).** Browser
+> authentication uses the Laravel session guard with CSRF protection, per ADR-005 and
+> `SECURITY_ARCHITECTURE.md` §1 — not a Sanctum bearer token. The heading above remains the
+> canonical operation identifier and is the reserved `/api/v1` twin for when token
+> authentication is activated for a non-browser client; promotion is then additive and
+> requires no behavioural change. Business rules, validation, error codes, side effects,
+> audit, and authorization below are unchanged and apply identically on either surface.
 
 **Purpose:** Self-registration of a candidate account (FR-AUTH-002).
 
@@ -239,7 +286,15 @@ Most endpoints have their own `###` section. Five families of structurally ident
 
 ### POST /api/v1/auth/register/recruiter
 
-**Surface:** `VERSIONED_API`
+**Surface:** `INERTIA_WEB`  ·  **MVP browser route:** `POST /register/recruiter`
+
+> **Reclassified for MVP browser authentication (SPEC-DOC-05, accepted).** Browser
+> authentication uses the Laravel session guard with CSRF protection, per ADR-005 and
+> `SECURITY_ARCHITECTURE.md` §1 — not a Sanctum bearer token. The heading above remains the
+> canonical operation identifier and is the reserved `/api/v1` twin for when token
+> authentication is activated for a non-browser client; promotion is then additive and
+> requires no behavioural change. Business rules, validation, error codes, side effects,
+> audit, and authorization below are unchanged and apply identically on either surface.
 
 **Purpose:** Self-registration of a recruiter account, step 1 of FR-ONB-001.
 
@@ -278,7 +333,15 @@ Most endpoints have their own `###` section. Five families of structurally ident
 
 ### POST /api/v1/auth/verify-email
 
-**Surface:** `VERSIONED_API`
+**Surface:** `INERTIA_WEB`  ·  **MVP browser route:** `POST /verify-email`
+
+> **Reclassified for MVP browser authentication (SPEC-DOC-05, accepted).** Browser
+> authentication uses the Laravel session guard with CSRF protection, per ADR-005 and
+> `SECURITY_ARCHITECTURE.md` §1 — not a Sanctum bearer token. The heading above remains the
+> canonical operation identifier and is the reserved `/api/v1` twin for when token
+> authentication is activated for a non-browser client; promotion is then additive and
+> requires no behavioural change. Business rules, validation, error codes, side effects,
+> audit, and authorization below are unchanged and apply identically on either surface.
 
 **Purpose:** Consume a one-time email verification token (FR-AUTH-003).
 
@@ -316,7 +379,15 @@ Most endpoints have their own `###` section. Five families of structurally ident
 
 ### POST /api/v1/auth/resend-verification
 
-**Surface:** `VERSIONED_API`
+**Surface:** `INERTIA_WEB`  ·  **MVP browser route:** `POST /resend-verification`
+
+> **Reclassified for MVP browser authentication (SPEC-DOC-05, accepted).** Browser
+> authentication uses the Laravel session guard with CSRF protection, per ADR-005 and
+> `SECURITY_ARCHITECTURE.md` §1 — not a Sanctum bearer token. The heading above remains the
+> canonical operation identifier and is the reserved `/api/v1` twin for when token
+> authentication is activated for a non-browser client; promotion is then additive and
+> requires no behavioural change. Business rules, validation, error codes, side effects,
+> audit, and authorization below are unchanged and apply identically on either surface.
 
 **Purpose:** Reissue a verification link (FR-AUTH-004).
 
@@ -353,7 +424,15 @@ Most endpoints have their own `###` section. Five families of structurally ident
 
 ### POST /api/v1/auth/login
 
-**Surface:** `VERSIONED_API`
+**Surface:** `INERTIA_WEB`  ·  **MVP browser route:** `POST /login`
+
+> **Reclassified for MVP browser authentication (SPEC-DOC-05, accepted).** Browser
+> authentication uses the Laravel session guard with CSRF protection, per ADR-005 and
+> `SECURITY_ARCHITECTURE.md` §1 — not a Sanctum bearer token. The heading above remains the
+> canonical operation identifier and is the reserved `/api/v1` twin for when token
+> authentication is activated for a non-browser client; promotion is then additive and
+> requires no behavioural change. Business rules, validation, error codes, side effects,
+> audit, and authorization below are unchanged and apply identically on either surface.
 
 **Purpose:** Authenticate (FR-AUTH-005).
 
@@ -393,7 +472,15 @@ Most endpoints have their own `###` section. Five families of structurally ident
 
 ### POST /api/v1/auth/logout
 
-**Surface:** `VERSIONED_API`
+**Surface:** `INERTIA_WEB`  ·  **MVP browser route:** `POST /logout`
+
+> **Reclassified for MVP browser authentication (SPEC-DOC-05, accepted).** Browser
+> authentication uses the Laravel session guard with CSRF protection, per ADR-005 and
+> `SECURITY_ARCHITECTURE.md` §1 — not a Sanctum bearer token. The heading above remains the
+> canonical operation identifier and is the reserved `/api/v1` twin for when token
+> authentication is activated for a non-browser client; promotion is then additive and
+> requires no behavioural change. Business rules, validation, error codes, side effects,
+> audit, and authorization below are unchanged and apply identically on either surface.
 
 **Purpose:** End the current session or revoke the current token.
 
@@ -427,7 +514,15 @@ Most endpoints have their own `###` section. Five families of structurally ident
 
 ### POST /api/v1/auth/forgot-password
 
-**Surface:** `VERSIONED_API`
+**Surface:** `INERTIA_WEB`  ·  **MVP browser route:** `POST /forgot-password`
+
+> **Reclassified for MVP browser authentication (SPEC-DOC-05, accepted).** Browser
+> authentication uses the Laravel session guard with CSRF protection, per ADR-005 and
+> `SECURITY_ARCHITECTURE.md` §1 — not a Sanctum bearer token. The heading above remains the
+> canonical operation identifier and is the reserved `/api/v1` twin for when token
+> authentication is activated for a non-browser client; promotion is then additive and
+> requires no behavioural change. Business rules, validation, error codes, side effects,
+> audit, and authorization below are unchanged and apply identically on either surface.
 
 **Purpose:** Request a password reset link (FR-AUTH-007).
 
@@ -464,7 +559,15 @@ Most endpoints have their own `###` section. Five families of structurally ident
 
 ### POST /api/v1/auth/reset-password
 
-**Surface:** `VERSIONED_API`
+**Surface:** `INERTIA_WEB`  ·  **MVP browser route:** `POST /reset-password`
+
+> **Reclassified for MVP browser authentication (SPEC-DOC-05, accepted).** Browser
+> authentication uses the Laravel session guard with CSRF protection, per ADR-005 and
+> `SECURITY_ARCHITECTURE.md` §1 — not a Sanctum bearer token. The heading above remains the
+> canonical operation identifier and is the reserved `/api/v1` twin for when token
+> authentication is activated for a non-browser client; promotion is then additive and
+> requires no behavioural change. Business rules, validation, error codes, side effects,
+> audit, and authorization below are unchanged and apply identically on either surface.
 
 **Purpose:** Set a new password using a one-time token (FR-AUTH-007).
 
@@ -501,7 +604,15 @@ Most endpoints have their own `###` section. Five families of structurally ident
 
 ### PUT /api/v1/me/password
 
-**Surface:** `VERSIONED_API`
+**Surface:** `INERTIA_WEB`  ·  **MVP browser route:** `PUT /me/password`
+
+> **Reclassified for MVP browser authentication (SPEC-DOC-05, accepted).** Browser
+> authentication uses the Laravel session guard with CSRF protection, per ADR-005 and
+> `SECURITY_ARCHITECTURE.md` §1 — not a Sanctum bearer token. The heading above remains the
+> canonical operation identifier and is the reserved `/api/v1` twin for when token
+> authentication is activated for a non-browser client; promotion is then additive and
+> requires no behavioural change. Business rules, validation, error codes, side effects,
+> audit, and authorization below are unchanged and apply identically on either surface.
 
 **Purpose:** Authenticated self-service password change (Pengaturan Akun, FSD §4.2/§4.3).
 
@@ -535,7 +646,15 @@ Most endpoints have their own `###` section. Five families of structurally ident
 
 ### GET /api/v1/me
 
-**Surface:** `VERSIONED_API`
+**Surface:** `INERTIA_WEB`  ·  **MVP browser route:** `GET /me`
+
+> **Reclassified for MVP browser authentication (SPEC-DOC-05, accepted).** Browser
+> authentication uses the Laravel session guard with CSRF protection, per ADR-005 and
+> `SECURITY_ARCHITECTURE.md` §1 — not a Sanctum bearer token. The heading above remains the
+> canonical operation identifier and is the reserved `/api/v1` twin for when token
+> authentication is activated for a non-browser client; promotion is then additive and
+> requires no behavioural change. Business rules, validation, error codes, side effects,
+> audit, and authorization below are unchanged and apply identically on either surface.
 
 **Purpose:** The authoritative session/role context the frontend needs to render a portal (§5 of the brief).
 

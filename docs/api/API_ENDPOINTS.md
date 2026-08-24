@@ -1,35 +1,22 @@
 # API Endpoint Index — Versioned `/api/v1` Surface
 
 **Status:** Proposed — awaiting approval
-**Date:** 24 August 2026
+**Date:** 24 August 2026 · **Amended:** auth HTTP surface (SPEC-DOC-05 accepted)
 **Generated from:** `API_CONTRACT.md` — verified programmatically in both directions.
 
 **This file lists only `VERSIONED_API` operations.** These live under `/api/v1`, authenticate with a Sanctum bearer token, use the approved response and error envelope, and **carry an explicit backward-compatibility commitment**.
 
-Internal application operations are inventoried separately in `INERTIA_ACTIONS.md`. Behaviour for **both** surfaces is defined by `API_CONTRACT.md`; the split governs routing, authentication, and compatibility — never business rules.
+> **This surface is RESERVED AND INACTIVE at MVP.** No `/api/v1` route is registered, Sanctum token issuance is not activated, and `personal_access_tokens` is deliberately absent (`DATABASE_SCHEMA.md` §23). The inventory below is the specification for when a genuine non-browser client appears; activation is additive and requires no behavioural change.
 
-**Phase-1 scope:** public reads + authentication + the complete candidate capability set. This is a coherent whole rather than an arbitrary slice — the candidate portal is the only channel with a plausible near-term second client, and a candidate API able to log in but not to apply would be worse than either extreme.
+> **Authentication is not on this surface at MVP.** The ten authentication and session operations were reclassified to `INERTIA_WEB` by the accepted amendment SPEC-DOC-05: browsers authenticate with the Laravel session guard and CSRF, per ADR-005 and `SECURITY_ARCHITECTURE.md` §1. Their `/api/v1` bearer-token twins remain reserved here as a future promotion target and are inventoried in `INERTIA_ACTIONS.md` for MVP.
+
+Internal application operations are inventoried in `INERTIA_ACTIONS.md`. Behaviour for **both** surfaces is defined by `API_CONTRACT.md`; the split governs routing, authentication, and compatibility — never business rules.
 
 Two headings in the contract are grouped-contract placeholders, not routable URIs (`PUT /api/v1/candidate/{collection}`, `GET /api/v1/reports/{report}`); the concrete URIs they cover are listed here instead.
 
 | Total VERSIONED_API operations |
 | --- |
-| **57** |
-
-## Authentication & Session
-
-| Domain | Method | URI | Purpose / Contract Section | Primary Role |
-| --- | --- | --- | --- | --- |
-| Authentication & Session | `POST` | `/api/v1/auth/forgot-password` | POST /api/v1/auth/forgot-password | PUBLIC / self |
-| Authentication & Session | `POST` | `/api/v1/auth/login` | POST /api/v1/auth/login | PUBLIC / self |
-| Authentication & Session | `POST` | `/api/v1/auth/logout` | POST /api/v1/auth/logout | PUBLIC / self |
-| Authentication & Session | `POST` | `/api/v1/auth/register/candidate` | POST /api/v1/auth/register/candidate | PUBLIC / self |
-| Authentication & Session | `POST` | `/api/v1/auth/register/recruiter` | POST /api/v1/auth/register/recruiter | PUBLIC / self |
-| Authentication & Session | `POST` | `/api/v1/auth/resend-verification` | POST /api/v1/auth/resend-verification | PUBLIC / self |
-| Authentication & Session | `POST` | `/api/v1/auth/reset-password` | POST /api/v1/auth/reset-password | PUBLIC / self |
-| Authentication & Session | `POST` | `/api/v1/auth/verify-email` | POST /api/v1/auth/verify-email | PUBLIC / self |
-| Authentication & Session | `GET` | `/api/v1/me` | GET /api/v1/me | PUBLIC / self |
-| Authentication & Session | `PUT` | `/api/v1/me/password` | PUT /api/v1/me/password | PUBLIC / self |
+| **47** |
 
 ## Candidate Profile
 
@@ -129,7 +116,6 @@ Two headings in the contract are grouped-contract placeholders, not routable URI
 
 | Domain | Operations |
 | --- | --- |
-| Authentication & Session | 10 |
 | Candidate Profile | 17 |
 | Candidate Documents | 5 |
 | Saved Vacancies | 3 |
@@ -139,4 +125,13 @@ Two headings in the contract are grouped-contract placeholders, not routable URI
 | Selection Schedule | 3 |
 | Offering | 2 |
 | Notifications | 3 |
-| **Total** | **57** |
+| **Total** | **47** |
+
+---
+
+## Reading Notes
+
+- **Base path** is `/api/v1` for every URI listed.
+- **Primary Role** is indicative. The binding definition is `AUTHORIZATION_MATRIX.md`; each endpoint's **Authorization** section in `API_CONTRACT.md` governs.
+- **`OWN`, `COMPANY_SCOPE`, `CAMPUS_SCOPE`, `ASSIGNED_STAGE` are query-scoped**, not merely Policy-checked. An object outside scope returns `404`, never `403`.
+- Endpoints whose contract says **Idempotency: REQUIRED** expect an `Idempotency-Key` header.
