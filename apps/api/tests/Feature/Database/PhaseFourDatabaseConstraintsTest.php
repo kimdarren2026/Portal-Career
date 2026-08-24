@@ -20,7 +20,7 @@ final class PhaseFourDatabaseConstraintsTest extends TestCase
 
     private int $sequence = 0;
 
-    public function test_phase_four_tables_remain_present_without_phase_six_tables(): void
+    public function test_phase_four_tables_remain_present_with_only_later_business_tables_deferred(): void
     {
         $tables = collect(DB::select(
             "SELECT tablename FROM pg_tables WHERE schemaname = current_schema() ORDER BY tablename"
@@ -39,9 +39,10 @@ final class PhaseFourDatabaseConstraintsTest extends TestCase
             $this->assertContains($table, $tables);
         }
 
-        $this->assertFalse(DB::getSchemaBuilder()->hasTable('idempotency_keys'));
-        $this->assertFalse(DB::getSchemaBuilder()->hasTable('export_jobs'));
+        $this->assertTrue(DB::getSchemaBuilder()->hasTable('idempotency_keys'));
+        $this->assertTrue(DB::getSchemaBuilder()->hasTable('export_jobs'));
         $this->assertFalse(DB::getSchemaBuilder()->hasTable('user_roles'));
+        $this->assertFalse(DB::getSchemaBuilder()->hasTable('personal_access_tokens'));
     }
 
     public function test_every_phase_four_primary_key_is_a_generated_always_bigint(): void

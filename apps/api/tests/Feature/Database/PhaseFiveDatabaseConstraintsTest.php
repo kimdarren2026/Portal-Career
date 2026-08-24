@@ -21,20 +21,21 @@ final class PhaseFiveDatabaseConstraintsTest extends TestCase
 
     private int $sequence = 0;
 
-    public function test_only_phase_one_through_five_business_tables_exist(): void
+    public function test_phase_five_tables_remain_present_with_phase_six_operational_tables(): void
     {
         $tables = collect(DB::select(
             "SELECT tablename FROM pg_tables WHERE schemaname = current_schema() ORDER BY tablename"
         ))->pluck('tablename')->all();
 
-        $this->assertCount(55, $tables);
+        $this->assertCount(57, $tables);
         foreach (['notifications', 'email_outbox', 'audit_logs', 'smtp_configurations'] as $table) {
             $this->assertContains($table, $tables);
         }
 
-        $this->assertFalse(DB::getSchemaBuilder()->hasTable('idempotency_keys'));
-        $this->assertFalse(DB::getSchemaBuilder()->hasTable('export_jobs'));
+        $this->assertTrue(DB::getSchemaBuilder()->hasTable('idempotency_keys'));
+        $this->assertTrue(DB::getSchemaBuilder()->hasTable('export_jobs'));
         $this->assertFalse(DB::getSchemaBuilder()->hasTable('user_roles'));
+        $this->assertFalse(DB::getSchemaBuilder()->hasTable('personal_access_tokens'));
     }
 
     public function test_every_phase_five_primary_key_is_a_generated_always_bigint(): void
