@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\User;
+use App\Domains\Identity\Models\User;
 
 return [
 
@@ -62,8 +62,11 @@ return [
     */
 
     'providers' => [
+        // Custom provider: resolves login identity through users.email_normalized
+        // (INV-001) and reads the password hash from password_credentials via
+        // User::getAuthPassword(). See App\Domains\Identity\Support\IdentityUserProvider.
         'users' => [
-            'driver' => 'eloquent',
+            'driver' => 'identity',
             'model' => env('AUTH_MODEL', User::class),
         ],
 
