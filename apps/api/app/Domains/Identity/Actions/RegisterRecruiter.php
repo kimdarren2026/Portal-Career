@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domains\Identity\Actions;
 
-use App\Domains\Identity\Enums\RoleCode;
 use App\Domains\Identity\Enums\UserStatus;
-use App\Domains\Identity\Models\Role;
 use App\Domains\Identity\Models\User;
-use App\Domains\Identity\Models\UserRole;
 use App\Domains\Identity\Support\AuditWriter;
 use App\Domains\Identity\Support\EmailNormalizer;
 use App\Domains\Notification\Support\OutboxWriter;
@@ -51,17 +48,11 @@ final class RegisterRecruiter
                 ])->save();
                 $this->setPassword->execute($user, $password);
 
-                $roleId = Role::query()->where('code', RoleCode::CompanyRecruiter->value)->value('id');
-                if ($roleId === null) {
-                    throw new \LogicException('The required role catalogue has not been seeded.');
-                }
-                (new UserRole())->forceFill([
-                    'user_id' => $user->getKey(),
-                    'role_id' => $roleId,
-                    'assigned_at' => now(),
-                ])->save();
-
-                // No company or company_members row is created in this phase.
+                // FSD v1.1 Open Question #6 leaves the first recruiter's
+                // default company role unresolved. Identity registration must
+                // not pre-empt that business decision by assigning either
+                // COMPANY_RECRUITER or COMPANY_ADMIN here. Company membership
+                // and its role are created by the later company flow.
                 $this->issueVerification->execute($user);
                 $this->audit->record('registration', $user, 'user', (int) $user->getKey(), [
                     'account_type' => 'RECRUITER',

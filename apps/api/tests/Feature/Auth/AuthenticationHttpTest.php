@@ -34,7 +34,13 @@ final class AuthenticationHttpTest extends IdentityTestCase
         $user = DB::table('users')->where('email_normalized', 'candidate@example.test')->first();
         $this->assertSame('PENDING_EMAIL_VERIFICATION', $user->status);
         $this->assertDatabaseHas('candidate_profiles', ['user_id' => $user->id, 'current_candidate_type' => 'EXTERNAL']);
-        $this->assertDatabaseHas('user_roles', ['user_id' => $user->id]);
+        $profile = DB::table('candidate_profiles')->where('user_id', $user->id)->first();
+        $this->assertNull($profile->profile_completed_at);
+        $this->assertSame(0, DB::table('candidate_verifications')->where('candidate_profile_id', $profile->id)->count());
+        $this->assertDatabaseHas('user_roles', [
+            'user_id' => $user->id,
+            'role_id' => DB::table('roles')->where('code', 'CANDIDATE_EXTERNAL')->value('id'),
+        ]);
         $this->assertDatabaseHas('password_credentials', ['user_id' => $user->id]);
         $this->assertDatabaseHas('email_verification_tokens', ['user_id' => $user->id]);
         $this->assertSame(0, DB::table('companies')->count());
@@ -43,12 +49,13 @@ final class AuthenticationHttpTest extends IdentityTestCase
         $this->assertStringNotContainsString((string) DB::table('email_verification_tokens')->where('user_id', $user->id)->value('token_hash'), (string) DB::table('email_outbox')->value('payload_reference'));
     }
 
-    public function test_recruiter_registration_does_not_create_company_or_membership(): void
+    public function test_recruiter_registration_defers_unresolved_first_recruiter_role_and_company_onboarding(): void
     {
         $this->postJson('/auth/register/recruiter', $this->recruiterPayload('recruiter@example.test'))->assertAccepted();
         $userId = DB::table('users')->where('email_normalized', 'recruiter@example.test')->value('id');
 
-        $this->assertDatabaseHas('user_roles', ['user_id' => $userId, 'role_id' => DB::table('roles')->where('code', 'COMPANY_RECRUITER')->value('id')]);
+        $this->assertSame(0, DB::table('user_roles')->where('user_id', $userId)->count());
+        $this->assertDatabaseMissing('user_roles', ['user_id' => $userId, 'role_id' => DB::table('roles')->where('code', 'COMPANY_ADMIN')->value('id')]);
         $this->assertSame(0, DB::table('companies')->count());
         $this->assertSame(0, DB::table('company_members')->count());
     }
@@ -62,6 +69,7 @@ final class AuthenticationHttpTest extends IdentityTestCase
         $this->assertSame($first->json('meta.warnings'), $second->json('meta.warnings'));
         $this->assertSame(1, DB::table('users')->count());
         $this->assertDatabaseHas('email_outbox', ['template_reference' => 'identity.account-already-registered']);
+        $this->assertSame(1, DB::table('candidate_profiles')->count());
     }
 
     public function test_password_policy_is_enforced_by_registration_and_reset(): void
@@ -154,6 +162,29 @@ final class AuthenticationHttpTest extends IdentityTestCase
 
         DB::table('users')->where('id', $user->id)->update(['status' => 'SUSPENDED']);
         $this->actingAs($user)->getJson('/me')->assertForbidden()->assertJsonPath('error.code', 'AUTH_ACCOUNT_SUSPENDED');
+    }
+
+    public function test_me_returns_the_unfinished_candidate_shell_without_fabricated_eligibility(): void
+    {
+        $this->postJson('/auth/register/candidate', $this->candidatePayload('summary@example.test'))->assertAccepted();
+        $user = \App\Domains\Identity\Models\User::query()->byEmail('summary@example.test')->firstOrFail();
+
+        $this->actingAs($user)->getJson('/me')->assertOk()
+            ->assertJsonPath('data.candidate_profile.current_candidate_type', 'EXTERNAL')
+            ->assertJsonPath('data.candidate_profile.profile_completed_at', null)
+            ->assertJsonPath('data.candidate_profile.verified_eligibility', []);
+    }
+
+    public function test_final_year_and_alumni_self_declarations_do_not_create_verification_or_eligibility(): void
+    {
+        foreach (['FINAL_YEAR_STUDENT', 'ALUMNI'] as $type) {
+            $email = strtolower($type).'@example.test';
+            $this->postJson('/auth/register/candidate', array_replace($this->candidatePayload($email), ['candidate_type' => $type]))->assertAccepted();
+            $profile = DB::table('candidate_profiles')->where('user_id', DB::table('users')->where('email_normalized', $email)->value('id'))->first();
+
+            $this->assertNull($profile->profile_completed_at);
+            $this->assertSame(0, DB::table('candidate_verifications')->where('candidate_profile_id', $profile->id)->count());
+        }
     }
 
     public function test_pending_session_is_allowed_but_disabled_session_is_denied_on_next_request(): void
