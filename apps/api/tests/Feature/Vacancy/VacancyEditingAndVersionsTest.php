@@ -19,7 +19,7 @@ final class VacancyEditingAndVersionsTest extends VacancyTestCase
         [$recruiter, $company] = $this->verifiedCompanyWithRecruiter('v1@example.test');
         $id = $this->createVacancy($recruiter, $company, [
             'title' => 'Data Engineer',
-            'requirements' => [['requirement_type' => 'SKILL', 'skill_id' => $this->skill(), 'sort_order' => 0]],
+            'requirements' => [['requirement_type' => 'SKILL', 'skill_id' => $this->skill(), 'required' => true, 'sort_order' => 0]],
             'screening_questions' => [['question_text' => 'Years of SQL?', 'question_type' => 'NUMBER', 'required' => true, 'active' => true, 'sort_order' => 0]],
         ]);
 
@@ -139,7 +139,7 @@ final class VacancyEditingAndVersionsTest extends VacancyTestCase
 
         // A skill reference that does not exist fails validation before any write.
         $this->actingAs($recruiter)->postJson("/companies/{$company->id}/vacancies", $this->payload([
-            'requirements' => [['requirement_type' => 'SKILL', 'skill_id' => 999999, 'sort_order' => 0]],
+            'requirements' => [['requirement_type' => 'SKILL', 'skill_id' => 999999, 'required' => true, 'sort_order' => 0]],
         ]))->assertStatus(422);
 
         $this->assertDatabaseCount('vacancies', 0);

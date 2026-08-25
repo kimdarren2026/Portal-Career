@@ -79,7 +79,8 @@ abstract class VacancyFormRequest extends FormRequest
             'requirements.*.minimum_years_experience' => ['sometimes', 'nullable', 'integer', 'min:0'],
             'requirements.*.value_text' => ['sometimes', 'nullable', 'string', 'max:255'],
             'requirements.*.note' => ['sometimes', 'nullable', 'string'],
-            'requirements.*.required' => ['sometimes', 'boolean'],
+            // VA-5: a NEW requirement states the flag explicitly. No server default.
+            'requirements.*.required' => ['required', 'boolean'],
             'requirements.*.sort_order' => ['sometimes', 'integer', 'min:0'],
         ];
     }

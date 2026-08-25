@@ -176,6 +176,74 @@ final class VacancyRequirementSyncTest extends VacancyTestCase
         self::assertSame([], $this->requirementRows($id));
     }
 
+    public function test_a_new_requirement_must_state_required_explicitly_on_create(): void
+    {
+        [$recruiter, $company] = $this->verifiedCompanyWithRecruiter('req-flag-create@example.test');
+
+        $rejected = $this->actingAs($recruiter)->postJson("/companies/{$company->id}/vacancies", $this->payload([
+            'requirements' => [
+                ['requirement_type' => 'EDUCATION', 'education_level' => 'S1', 'required' => true, 'sort_order' => 0],
+                ['requirement_type' => 'OTHER_QUALIFICATION', 'value_text' => 'SIM C', 'sort_order' => 1],
+            ],
+        ]))->assertStatus(422)->assertJsonPath('error.code', 'VALIDATION_FAILED');
+
+        // Per-entry: the complete one passes, the incomplete one is named.
+        $fields = (array) $rejected->json('error.details.fields');
+        self::assertArrayHasKey('requirements.1.required', $fields);
+        self::assertArrayNotHasKey('requirements.0.required', $fields);
+        self::assertSame(0, DB::table('vacancies')->count(), 'The whole create rolls back.');
+    }
+
+    public function test_a_new_requirement_must_state_required_explicitly_on_patch(): void
+    {
+        [$recruiter, $company] = $this->verifiedCompanyWithRecruiter('req-flag-patch@example.test');
+        $id = $this->createVacancy($recruiter, $company, [
+            'requirements' => [['requirement_type' => 'EDUCATION', 'education_level' => 'D3', 'required' => false, 'sort_order' => 0]],
+        ]);
+        $before = $this->requirementRows($id);
+
+        $rejected = $this->actingAs($recruiter)->patchJson("/vacancies/{$id}", [
+            'requirements' => [['requirement_type' => 'SKILL', 'skill_id' => $this->skillId(), 'sort_order' => 0]],
+        ])->assertStatus(422)->assertJsonPath('error.code', 'VALIDATION_FAILED');
+
+        self::assertArrayHasKey('requirements.0.required', (array) $rejected->json('error.details.fields'));
+        self::assertSame($before, $this->requirementRows($id), 'A rejected sync must not touch the collection.');
+        self::assertSame(1, $this->latestVersion($id));
+    }
+
+    public function test_both_explicit_required_values_are_stored_as_sent_with_no_default(): void
+    {
+        [$recruiter, $company] = $this->verifiedCompanyWithRecruiter('req-flag-values@example.test');
+        $id = $this->createVacancy($recruiter, $company, [
+            'requirements' => [
+                ['requirement_type' => 'EDUCATION', 'education_level' => 'S1', 'required' => true, 'sort_order' => 0],
+                ['requirement_type' => 'EXPERIENCE', 'minimum_years_experience' => 2, 'required' => false, 'sort_order' => 1],
+            ],
+        ]);
+
+        self::assertSame([true, false], array_map(
+            static fn (array $row): bool => (bool) $row['required'],
+            $this->requirementRows($id),
+        ));
+
+        // The same on the PATCH path, with the values swapped.
+        $this->actingAs($recruiter)->patchJson("/vacancies/{$id}", [
+            'requirements' => [
+                ['requirement_type' => 'EDUCATION', 'education_level' => 'S1', 'required' => false, 'sort_order' => 0],
+                ['requirement_type' => 'EXPERIENCE', 'minimum_years_experience' => 2, 'required' => true, 'sort_order' => 1],
+            ],
+        ])->assertOk();
+
+        self::assertSame([false, true], array_map(
+            static fn (array $row): bool => (bool) $row['required'],
+            $this->requirementRows($id),
+        ));
+
+        $snapshot = $this->snapshotOf($id, 2);
+        self::assertFalse($snapshot['requirements'][0]['required']);
+        self::assertTrue($snapshot['requirements'][1]['required']);
+    }
+
     public function test_patch_accepts_requirements_but_not_screening_questions(): void
     {
         [$recruiter, $company] = $this->verifiedCompanyWithRecruiter('req-surface@example.test');

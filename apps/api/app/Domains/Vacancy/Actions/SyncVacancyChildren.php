@@ -36,7 +36,8 @@ final class SyncVacancyChildren
                 // (chk_vacancy_requirements_typed_value).
                 $type->valueColumn() => $requirement[$type->valueColumn()] ?? null,
                 'note' => $requirement['note'] ?? null,
-                'required' => (bool) ($requirement['required'] ?? true),
+                // VA-5: mandatory on the request, so no default is applied here.
+                'required' => (bool) $requirement['required'],
                 'sort_order' => (int) ($requirement['sort_order'] ?? $index),
             ]);
             $row->forceFill(['vacancy_id' => $vacancy->getKey()])->save();
