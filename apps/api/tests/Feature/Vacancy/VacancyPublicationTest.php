@@ -99,25 +99,22 @@ final class VacancyPublicationTest extends VacancyTestCase
         self::assertSame('SCHEDULED', DB::table('vacancies')->where('id', $id)->value('current_status'));
     }
 
-    public function test_no_auto_expire_job_or_event_exists(): void
+    public function test_the_publication_scheduler_never_expires_a_vacancy(): void
     {
-        // O-7 is open: nothing may expire a published vacancy automatically and
-        // no vacancy_expired audit event may exist.
+        // O-7 is a separate system operation with its own command. The
+        // publication scheduler must never transition a published vacancy,
+        // whatever its dates.
         [$recruiter, $company] = $this->verifiedCompanyWithRecruiter('pub-expiry@example.test');
         $id = $this->vacancyAt($recruiter, $company, 'PUBLISHED', [
             'open_at' => now()->subDays(30)->toIso8601String(),
             'close_at' => now()->subDay()->toIso8601String(),
         ]);
 
-        app(PublishScheduledVacancies::class)->execute();
+        self::assertSame(0, app(PublishScheduledVacancies::class)->execute());
         $this->artisan('vacancies:publish-scheduled')->assertSuccessful();
 
         self::assertSame('PUBLISHED', DB::table('vacancies')->where('id', $id)->value('current_status'));
         self::assertSame(0, DB::table('audit_logs')->where('action', 'vacancy_expired')->count());
-        self::assertSame(0, DB::table('vacancies')->where('current_status', 'EXPIRED')->count());
-
-        $commands = array_keys(app(\Illuminate\Contracts\Console\Kernel::class)->all());
-        self::assertNotContains('vacancies:expire', $commands);
     }
 
     public function test_no_public_vacancy_discovery_route_exists(): void
