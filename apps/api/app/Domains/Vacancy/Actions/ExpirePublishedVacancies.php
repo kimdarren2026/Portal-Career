@@ -38,49 +38,61 @@ final class ExpirePublishedVacancies
 {
     public function __construct(private readonly AuditWriter $audit) {}
 
+    private const CHUNK = 100;
+
     /** @return int Number of vacancies expired by this run. */
     public function execute(): int
     {
-        $due = Vacancy::query()
+        $expired = 0;
+
+        // Walked in deterministic id order in bounded chunks: a backlog of due
+        // vacancies must never be materialised in memory at once.
+        Vacancy::query()
+            ->select('id')
             ->where('ownership_type', 'COMPANY')
             ->where('current_status', VacancyStatus::Published->value)
             ->whereNotNull('close_at')
             ->where('close_at', '<=', now())
-            ->orderBy('id')
-            ->pluck('id');
-
-        $expired = 0;
-
-        foreach ($due as $id) {
-            $expired += DB::transaction(function () use ($id): int {
-                /** @var Vacancy|null $locked */
-                $locked = Vacancy::query()->whereKey($id)->lockForUpdate()->first();
-
-                // Re-checked under the lock: a concurrent run, a suspension or a
-                // manual close may have moved this row already.
-                if ($locked === null
-                    || $locked->current_status !== VacancyStatus::Published
-                    || $locked->close_at === null
-                    || $locked->close_at > now()) {
-                    return 0;
+            ->chunkById(self::CHUNK, function ($vacancies) use (&$expired): void {
+                foreach ($vacancies as $vacancy) {
+                    $expired += $this->expireOne((int) $vacancy->getKey());
                 }
-
-                $locked->current_status = VacancyStatus::Expired;
-                $locked->updated_at = now();
-                $locked->save();
-
-                // System actor: the existing no-actor audit representation, never
-                // a synthetic user identity.
-                $this->audit->record('vacancy_expired', null, 'vacancy', (int) $locked->getKey(), [
-                    'from_status' => VacancyStatus::Published->value,
-                    'to_status' => VacancyStatus::Expired->value,
-                    'close_at' => $locked->close_at?->toIso8601String(),
-                ]);
-
-                return 1;
             });
-        }
 
         return $expired;
+    }
+
+    /** @return int 1 when this vacancy transitioned, 0 for any no-op. */
+    private function expireOne(int $id): int
+    {
+        return DB::transaction(function () use ($id): int {
+            /** @var Vacancy|null $locked */
+            $locked = Vacancy::query()->whereKey($id)->lockForUpdate()->first();
+
+            // Re-checked under the lock: a concurrent run, a suspension or a
+            // manual close may have moved this row already. A race is a no-op,
+            // never an error.
+            if ($locked === null
+                || $locked->ownership_type !== 'COMPANY'
+                || $locked->current_status !== VacancyStatus::Published
+                || $locked->close_at === null
+                || $locked->close_at > now()) {
+                return 0;
+            }
+
+            $locked->current_status = VacancyStatus::Expired;
+            $locked->updated_at = now();
+            $locked->save();
+
+            // System actor: the frozen audit model records "Human actor; null
+            // for system action", so no identity is invented.
+            $this->audit->record('vacancy_expired', null, 'vacancy', (int) $locked->getKey(), [
+                'from_status' => VacancyStatus::Published->value,
+                'to_status' => VacancyStatus::Expired->value,
+                'close_at' => $locked->close_at?->toIso8601String(),
+            ]);
+
+            return 1;
+        });
     }
 }

@@ -202,11 +202,80 @@ final class VacancyExpiryTest extends VacancyTestCase
         self::assertSame($before, (array) DB::table('applications')->where('vacancy_id', $id)->first());
     }
 
+    public function test_a_campus_vacancy_is_never_processed_by_the_company_expiry_command(): void
+    {
+        // Fixture row only. Campus vacancy lifecycle is a later phase and is not
+        // implemented here; this proves the query is scoped to COMPANY.
+        [$recruiter, $company] = $this->verifiedCompanyWithRecruiter('expiry-campus@example.test');
+        $close = Carbon::parse('2026-10-01T09:00:00+00:00');
+        $unitId = DB::table('organizational_units')->insertGetId([
+            'code' => 'UNIT-EXP', 'name' => 'Unit Kepegawaian', 'active' => true,
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+        $campusId = DB::table('vacancies')->insertGetId([
+            'vacancy_code' => 'VAC-CAMPUS-EXP', 'slug' => 'campus-expiry-fixture',
+            'vacancy_type' => 'CAMPUS_EMPLOYMENT', 'ownership_type' => 'CAMPUS',
+            'company_id' => null, 'organizational_unit_id' => $unitId,
+            'title' => 'Staf Kampus', 'description' => 'Deskripsi.',
+            'employment_type' => 'FULL_TIME', 'openings_count' => 1,
+            'target_audience' => 'INTERNAL', 'application_method' => 'IN_PORTAL',
+            'current_status' => 'PUBLISHED', 'created_by' => $recruiter->id,
+            'open_at' => $close->copy()->subDays(20), 'close_at' => $close,
+            'published_at' => $close->copy()->subDays(20),
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+
+        Carbon::setTestNow($close->copy()->addDay());
+        self::assertSame(0, app(ExpirePublishedVacancies::class)->execute());
+
+        self::assertSame('PUBLISHED', DB::table('vacancies')->where('id', $campusId)->value('current_status'));
+        self::assertSame(0, $this->auditCount('vacancy_expired', $campusId));
+    }
+
+    public function test_application_data_survives_both_terminal_routes(): void
+    {
+        $close = Carbon::parse('2026-10-01T09:00:00+00:00');
+
+        // Route one: manual close.
+        [$recruiterA, , $closedId] = $this->published('expiry-terminal-close@example.test', $close);
+        $beforeClose = $this->applicationFor($closedId, 'expiry-terminal-close-cand@example.test');
+        $this->actingAs($recruiterA)->postJson("/vacancies/{$closedId}/close")->assertOk();
+        self::assertSame($beforeClose, (array) DB::table('applications')->where('vacancy_id', $closedId)->first());
+        self::assertSame('CLOSED', DB::table('vacancies')->where('id', $closedId)->value('current_status'));
+
+        // Route two: automatic expiry.
+        [, , $expiredId] = $this->published('expiry-terminal-expire@example.test', $close);
+        $beforeExpiry = $this->applicationFor($expiredId, 'expiry-terminal-expire-cand@example.test');
+        Carbon::setTestNow($close->copy()->addDay());
+        app(ExpirePublishedVacancies::class)->execute();
+        self::assertSame($beforeExpiry, (array) DB::table('applications')->where('vacancy_id', $expiredId)->first());
+        self::assertSame('EXPIRED', DB::table('vacancies')->where('id', $expiredId)->value('current_status'));
+    }
+
     public function test_expiry_has_no_route_and_no_user_capability(): void
     {
         $registered = collect(Route::getRoutes())->map(static fn ($route): string => $route->uri());
         self::assertFalse($registered->contains(fn (string $uri): bool => str_contains($uri, 'expire')));
         self::assertNull(Route::getRoutes()->getByName('vacancies.expire'));
+    }
+
+    /** @return array<string, mixed> The application row as stored. */
+    private function applicationFor(int $vacancyId, string $email): array
+    {
+        $candidate = $this->makeUser($email);
+        $profileId = DB::table('candidate_profiles')->insertGetId([
+            'user_id' => $candidate->id, 'current_candidate_type' => 'EXTERNAL',
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+        $this->sequence++;
+        DB::table('applications')->insert([
+            'application_code' => 'APP-TERM-'.$this->sequence.'-'.$vacancyId,
+            'candidate_profile_id' => $profileId, 'vacancy_id' => $vacancyId,
+            'current_status' => 'APPLIED', 'first_applied_at' => now(), 'reopen_count' => 0,
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+
+        return (array) DB::table('applications')->where('vacancy_id', $vacancyId)->first();
     }
 
     /** @return array{\App\Domains\Identity\Models\User, \App\Domains\Company\Models\Company, int} */
