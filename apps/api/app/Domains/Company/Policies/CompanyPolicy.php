@@ -27,13 +27,16 @@ final class CompanyPolicy
 
     public function review(User $user, Company $company): bool
     {
+        // Career Center staff or manager, or Super Admin (approved reconciliation
+        // 25 August 2026; AUTHORIZATION_MATRIX.md §4.4 and every API_CONTRACT.md
+        // review section now agree).
         if (! $this->isCareerCenter($user) && ! $this->superAdmin($user)) {
             return false;
         }
 
-        // A reviewer never reviews a company they belong to: FR-ONB-004's
-        // "a recruiter can never verify their own company" is a conflict-of-
-        // interest rule about the reviewer, not about the role code.
+        // Approved 25 August 2026: an active member of a company may never review
+        // that company, whatever their role. The prohibition follows the reviewer,
+        // not the role code.
         return ! $this->member($user, $company);
     }
 

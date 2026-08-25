@@ -13,6 +13,7 @@ use App\Domains\Company\Support\CompanyScope;
 use App\Domains\Identity\Enums\RoleCode;
 use App\Domains\Identity\Enums\UserStatus;
 use App\Domains\Identity\Models\User;
+use App\Domains\Vacancy\Support\CompanyVacancyEligibility;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Support\Facades\DB;
 use Tests\Feature\Identity\IdentityTestCase;
@@ -155,6 +156,61 @@ final class CompanyOnboardingRegressionTest extends IdentityTestCase
             'official_email' => $recruiter->email, 'address' => 'Address',
             'province_geographic_area_id' => $province, 'city_geographic_area_id' => $city,
         ])->assertOk();
+    }
+
+    public function test_super_admin_may_perform_every_review_action(): void
+    {
+        $superAdmin = $this->makeUser('super-all@example.test', UserStatus::Active);
+        $this->assignRole($superAdmin, RoleCode::SuperAdmin);
+
+        // Approved reconciliation 25 August 2026: all five review actions.
+        foreach ([
+            ['request-revision', 'REVISION_REQUIRED', ['reason_category' => 'X', 'recruiter_visible_note' => 'x']],
+            ['reject', 'REJECTED', ['reason_category' => 'X', 'recruiter_visible_note' => 'x']],
+            ['verify', 'VERIFIED', []],
+        ] as [$action, $expected, $payload]) {
+            [, $company] = $this->companyFor("sa-{$action}@example.test");
+            DB::table('companies')->where('id', $company->id)->update(['verification_status' => CompanyStatus::PendingVerification->value]);
+            $this->actingAs($superAdmin)->postJson("/companies/{$company->id}/{$action}", $payload)
+                ->assertOk()->assertJsonPath('data.verification_status', $expected);
+        }
+
+        [, $company] = $this->companyFor('sa-suspend@example.test');
+        DB::table('companies')->where('id', $company->id)->update(['verification_status' => CompanyStatus::Verified->value]);
+        $this->actingAs($superAdmin)->postJson("/companies/{$company->id}/suspend", ['reason_category' => 'X', 'recruiter_visible_note' => 'x'])
+            ->assertOk()->assertJsonPath('data.verification_status', 'SUSPENDED');
+        $this->actingAs($superAdmin)->postJson("/companies/{$company->id}/restore")
+            ->assertOk()->assertJsonPath('data.verification_status', 'VERIFIED');
+    }
+
+    public function test_suspend_then_restore_moves_the_timestamps_and_the_vacancy_gate(): void
+    {
+        [, $company] = $this->companyFor('suspend-flow@example.test');
+        $reviewer = $this->makeUser('suspend-reviewer@example.test', UserStatus::Active);
+        $this->assignRole($reviewer, RoleCode::CareerCenterStaff);
+        DB::table('companies')->where('id', $company->id)->update(['verification_status' => CompanyStatus::Verified->value]);
+
+        // INV-029: a reason is mandatory for SUSPEND, and not for RESTORE.
+        $this->actingAs($reviewer)->postJson("/companies/{$company->id}/suspend")
+            ->assertStatus(422)->assertJsonPath('error.code', 'REVIEW_REASON_REQUIRED');
+
+        $this->actingAs($reviewer)->postJson("/companies/{$company->id}/suspend", ['reason_category' => 'POLICY', 'recruiter_visible_note' => 'Paused'])
+            ->assertOk()->assertJsonPath('data.verification_status', 'SUSPENDED');
+        $this->assertNotNull(DB::table('companies')->where('id', $company->id)->value('suspended_at'));
+        $this->assertFalse(CompanyVacancyEligibility::allowed(Company::findOrFail($company->id)));
+
+        $this->actingAs($reviewer)->postJson("/companies/{$company->id}/restore")
+            ->assertOk()->assertJsonPath('data.verification_status', 'VERIFIED');
+        $this->assertNull(DB::table('companies')->where('id', $company->id)->value('suspended_at'));
+        $this->assertTrue(CompanyVacancyEligibility::allowed(Company::findOrFail($company->id)));
+
+        // REJECTED and SUSPENDED never merge: restore is legal only from SUSPENDED.
+        $this->actingAs($reviewer)->postJson("/companies/{$company->id}/restore")
+            ->assertStatus(409)->assertJsonPath('error.code', 'COMPANY_INVALID_TRANSITION');
+
+        // Append-only trail records only the two reviews that actually happened:
+        // the rejected reason-less suspend and the illegal restore append nothing.
+        $this->assertSame(2, DB::table('company_verification_reviews')->where('company_id', $company->id)->count());
     }
 
     /** @return array{User, Company} */

@@ -6,6 +6,7 @@ namespace Tests\Feature\Company;
 
 use App\Domains\Company\Models\Company;
 use App\Domains\Company\Models\CompanyMember;
+use App\Domains\Company\Support\CompanyMemberInviteLimiter;
 use App\Domains\Identity\Enums\RoleCode;
 use App\Domains\Identity\Enums\UserStatus;
 use App\Domains\Identity\Models\User;
@@ -54,16 +55,53 @@ final class CompanyMemberManagementTest extends IdentityTestCase
             ->assertStatus(409)->assertJsonPath('error.code', 'MEMBER_ALREADY_ACTIVE');
     }
 
-    public function test_unknown_email_queues_invitation_without_a_membership_row(): void
+    public function test_unknown_email_is_not_supported_and_leaks_no_account_signal(): void
     {
         [$admin, $company] = $this->companyWithAdmin('unknown-admin@example.test');
+        $foreign = $this->user('foreign-for-probe@example.test');
+        $foreignMembership = CompanyMember::query()->where('user_id', $foreign->id)->first();
 
-        $this->actingAs($admin)->postJson("/companies/{$company->id}/members", [
+        // Approved 25 August 2026 (Part X item 10): an address with no account is
+        // NOT SUPPORTED — no membership, no email, no pending invitation.
+        $unknown = $this->actingAs($admin)->postJson("/companies/{$company->id}/members", [
             'email' => 'nobody@example.test', 'company_role' => 'COMPANY_ADMIN',
-        ])->assertStatus(202)->assertJsonPath('data.status', 'MEMBER_INVITATION_QUEUED');
+        ])->assertNotFound()->assertJsonPath('error.code', 'NOT_FOUND');
 
         $this->assertSame(1, DB::table('company_members')->where('company_id', $company->id)->count());
-        $this->assertDatabaseHas('email_outbox', ['recipient' => 'nobody@example.test']);
+        $this->assertDatabaseMissing('email_outbox', ['recipient' => 'nobody@example.test']);
+
+        // The unknown-account answer must be indistinguishable from an
+        // out-of-scope member id, or the route becomes an enumeration oracle.
+        $outOfScope = $this->actingAs($admin)->patchJson(
+            "/companies/{$company->id}/members/".($foreignMembership?->id ?? 999999),
+            ['company_role' => 'COMPANY_RECRUITER'],
+        )->assertNotFound();
+
+        $this->assertSame(
+            $outOfScope->json('error.code'),
+            $unknown->json('error.code'),
+            'Unknown account and out-of-scope member must return the same error code.',
+        );
+    }
+
+    public function test_member_invitation_is_rate_limited_per_admin_identity(): void
+    {
+        [$admin, $company] = $this->companyWithAdmin('rate-admin@example.test');
+        app(CompanyMemberInviteLimiter::class)->clear($admin);
+
+        // Attempts are counted, not successes: a probing loop costs the same.
+        for ($attempt = 0; $attempt < CompanyMemberInviteLimiter::LIMIT; $attempt++) {
+            $this->actingAs($admin)->postJson("/companies/{$company->id}/members", [
+                'email' => "probe{$attempt}@example.test", 'company_role' => 'COMPANY_RECRUITER',
+            ])->assertNotFound();
+        }
+
+        $blocked = $this->actingAs($admin)->postJson("/companies/{$company->id}/members", [
+            'email' => 'probe-final@example.test', 'company_role' => 'COMPANY_RECRUITER',
+        ])->assertStatus(429)->assertJsonPath('error.code', 'RATE_LIMITED');
+        $this->assertNotEmpty($blocked->headers->get('Retry-After'));
+
+        app(CompanyMemberInviteLimiter::class)->clear($admin);
     }
 
     public function test_last_active_company_admin_cannot_be_demoted_or_revoked_over_http(): void
@@ -146,6 +184,7 @@ final class CompanyMemberManagementTest extends IdentityTestCase
     private function companyWithAdmin(string $email): array
     {
         $admin = $this->user($email);
+        app(CompanyMemberInviteLimiter::class)->clear($admin);
         $this->actingAs($admin)->postJson('/companies', ['name' => 'Company '.$this->sequence])->assertCreated();
         $company = Company::query()->where('created_by', $admin->id)->firstOrFail();
 

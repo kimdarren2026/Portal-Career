@@ -2,18 +2,25 @@
 
 declare(strict_types=1);
 
-namespace App\Domains\Candidate\Support;
+namespace App\Domains\Company\Support;
 
 use App\Domains\Identity\Models\User;
 use App\Support\RateLimiting\RollingWindowLimiter;
 
-/** Candidate upload window — API_CONTRACT.md Part I §11.8. Policy values only. */
-final class CandidateDocumentUploadLimiter
+/**
+ * Company member invitation window — API_CONTRACT.md Part I §11.9.
+ *
+ * The subject is the acting Company Admin, not the company, so one admin
+ * cannot spread the same probing budget across several companies they
+ * administer. Attempts are counted, not successes: an account-probing loop
+ * costs exactly what a working invite costs.
+ */
+final class CompanyMemberInviteLimiter
 {
     public const LIMIT = 20;
     public const WINDOW_SECONDS = 3600;
 
-    private const NAMESPACE = 'candidate:document-upload';
+    private const NAMESPACE = 'company:member-invite';
 
     public function __construct(private readonly RollingWindowLimiter $limiter) {}
 

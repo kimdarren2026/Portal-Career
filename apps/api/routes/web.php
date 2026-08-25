@@ -73,7 +73,8 @@ Route::middleware(['auth', 'account.status'])->prefix('companies')->name('compan
         Route::post('/{company}/submit-verification', [CompanyController::class, 'submit'])->name('submit');
         // FR-COMP-004 + closed D-1. The last active COMPANY_ADMIN can never be
         // demoted or revoked; leaving is the member's own act.
-        Route::post('/{company}/members', [CompanyMemberController::class, 'store'])->name('members.store');
+        Route::post('/{company}/members', [CompanyMemberController::class, 'store'])
+            ->middleware('company.member-invite-rate')->name('members.store');
         Route::patch('/{company}/members/{member}', [CompanyMemberController::class, 'update'])->name('members.update');
         Route::delete('/{company}/members/{member}', [CompanyMemberController::class, 'destroy'])->name('members.destroy');
     });

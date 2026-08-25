@@ -59,11 +59,7 @@ final class CompanyMemberController extends Controller
             return ContractResponse::error($request, 'MEMBER_ALREADY_ACTIVE', 409, 'Anggota ini sudah aktif di perusahaan tersebut.');
         }
 
-        // 202 when the address has no account yet: the invitation email is the
-        // only immediate effect and no membership row exists to return.
-        return $member === null
-            ? ContractResponse::success($request, ['status' => 'MEMBER_INVITATION_QUEUED'], 202, ['EMAIL_DELIVERY_PENDING'])
-            : ContractResponse::success($request, CompanyMemberPresenter::present($member), 201);
+        return ContractResponse::success($request, CompanyMemberPresenter::present($member), 201, ['EMAIL_DELIVERY_PENDING']);
     }
 
     public function update(ChangeCompanyMemberRoleRequest $request, int $company, int $member, ChangeCompanyMemberRole $action): JsonResponse

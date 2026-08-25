@@ -5,6 +5,7 @@ use App\Http\Middleware\EnforceAuthAbuseControls;
 use App\Http\Middleware\EnsureAccountStatus;
 use App\Http\Middleware\EnsureVerifiedEmail;
 use App\Http\Middleware\EnforceCandidateDocumentUploadRateLimit;
+use App\Http\Middleware\EnforceCompanyMemberInviteRateLimit;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Responses\ContractResponse;
 use App\Domains\Candidate\Exceptions\CandidateCollectionNotFoundException;
@@ -51,6 +52,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'account.status' => EnsureAccountStatus::class,
             'verified.email' => EnsureVerifiedEmail::class,
             'candidate.document-upload-rate' => EnforceCandidateDocumentUploadRateLimit::class,
+            'company.member-invite-rate' => EnforceCompanyMemberInviteRateLimit::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
