@@ -1878,7 +1878,7 @@ Clients must therefore read the collection, edit the whole set, and send it back
 
 **Authentication:** Required, email verified.
 
-**Authorization:** `COMPANY_SCOPE` — active `company_members` row required (INV-017). **The global `SUPER_ADMIN` role alone confers no company-authoring capability** (PO decision VA-4, approved — CLOSED); see `AUTHORIZATION_MATRIX.md` §4.5 footnote 11.
+**Authorization:** `COMPANY_SCOPE` — active `company_members` row required (INV-017). **The global `SUPER_ADMIN` role alone confers no company-authoring capability** (PO decision VA-4, approved — CLOSED); see `AUTHORIZATION_MATRIX.md` §4.5 footnote 36.
 
 **Request:** `vacancy_type` (`COMPANY_EMPLOYMENT` \| `INTERNSHIP`), `title`, `description`, `responsibilities`, `employment_type`, `workplace_mode`, geography references and `location` fallback, `openings_count`, `minimum_education`, `experience_requirement`, `salary_min`/`salary_max`/`salary_currency`, `target_audience`, `application_method`, `external_ats_url`, `open_at`, `close_at`, `requirements[]`, `screening_questions[]`.
 
@@ -2031,14 +2031,39 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 **Business Rules:**
 - `DRAFT → PENDING_REVIEW` or `REVISION_REQUIRED → PENDING_REVIEW` (FSD §8.3). Otherwise `409 VACANCY_INVALID_TRANSITION`.
 - **Applies to company vacancies only.** A campus vacancy → `409 VACANCY_MODERATION_NOT_APPLICABLE` (INV-018).
-- Re-checks the company gate: still `VERIFIED` (INV-002).
-- Required content complete: `open_at`, `close_at`, and the FR-VAC-003 minimum set.
+- Re-checks the company gate: still `VERIFIED` (INV-002). The company row is re-read at submit; a company that lost verification after the vacancy was drafted cannot submit.
+- **Completeness is enforced here and only here (PO decision B-5, approved — CLOSED).** `DRAFT` and `REVISION_REQUIRED` may be incomplete while editing; the gate runs against the **currently persisted** vacancy, never against the request body, and mutates nothing while validating.
+
+**B-5 — submit completeness (CLOSED):**
+
+| Required category | Stable identifier in `details.missing` |
+| --- | --- |
+| Position title | `title` |
+| Description | `description` |
+| Qualifications | `qualifications` |
+| Employment / job type | `employment_type` |
+| Location | `location` |
+| Work arrangement | `workplace_mode` |
+| Headcount / openings | `openings_count` |
+| Minimum education | `minimum_education` |
+| Experience | `experience_requirement` |
+| Opening date | `open_at` |
+| Closing date | `close_at` |
+| Target audience | `target_audience` |
+| Application method | `application_method` |
+
+- **Dates:** `open_at` and `close_at` are both required, and `close_at` must be strictly after `open_at`. A missing date answers `422 VACANCY_DATES_REQUIRED`; an ordering failure answers `422 VACANCY_CLOSE_BEFORE_OPEN`. These specific codes remain authoritative over the generic completeness code.
+- **Conditional:** `application_method = EXTERNAL_ATS` requires a valid **https** `external_ats_url` → `422 VACANCY_EXTERNAL_ATS_URL_REQUIRED` / `422 VACANCY_EXTERNAL_ATS_URL_INVALID`. `IN_PORTAL` requires no URL.
+- **Salary is OPTIONAL** and is never part of this gate. B-5 closes nothing about salary presentation policy, which stays open (Part X item 3).
+- **Zero is a legal cardinality** for every optional collection: study-program requirements, skill requirements, additional qualification or document requirements, and screening questions. **No minimum-one rule exists for any of them and none may be introduced.** Requirement rows that *do* exist still obey their frozen typed value and their explicit `required` boolean (VA-5).
+- Any other missing category answers `422 VACANCY_PROFILE_INCOMPLETE` with `details.missing` carrying the **stable semantic identifiers** above — never internal column names beyond those identifiers, and never a partial or ordering-dependent list.
+- **A failed submit changes nothing:** no status transition, no `SUBMIT` moderation-review row, no `vacancy_submitted` audit entry, and no notification or outbox row.
 - Appends `vacancy_moderation_reviews` with `action = SUBMIT` (INV-016).
 - **`PENDING_REVIEW` is the stored status. `SUBMITTED`/`DIAJUKAN` never exist** (INV-004).
 
 **Success Response:** `200 OK` at `PENDING_REVIEW`.
 
-**Error Codes:** `VACANCY_INVALID_TRANSITION` (409) · `VACANCY_MODERATION_NOT_APPLICABLE` (409) · `VACANCY_COMPANY_NOT_VERIFIED` (403) · `VACANCY_DATES_REQUIRED` (422) · `COMPANY_ASSOCIATION_FORBIDDEN` (403).
+**Error Codes:** `VACANCY_INVALID_TRANSITION` (409) · `VACANCY_MODERATION_NOT_APPLICABLE` (409) · `VACANCY_COMPANY_NOT_VERIFIED` (403) · `VACANCY_PROFILE_INCOMPLETE` (422) · `VACANCY_DATES_REQUIRED` (422) · `VACANCY_CLOSE_BEFORE_OPEN` (422) · `VACANCY_EXTERNAL_ATS_URL_REQUIRED` (422) · `VACANCY_EXTERNAL_ATS_URL_INVALID` (422) · `COMPANY_ASSOCIATION_FORBIDDEN` (403) · `AUTH_FORBIDDEN` (403).
 
 **Side Effects:** Status + moderation review row + audit + outbox.
 
@@ -2050,7 +2075,7 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 **Concurrency:** Vacancy row locked.
 
-**Source Requirement:** FR-VAC-004, FR-VAC-005, FR-VAC-006 · FSD §8.3 · INV-002, INV-004, INV-016, INV-018
+**Source Requirement:** FR-VAC-004, FR-VAC-005, FR-VAC-006 · FSD §8.3 · INV-002, INV-004, INV-016, INV-018 · PO decision **B-5** (submit completeness), approved 25 August 2026
 
 ---
 
@@ -2060,15 +2085,25 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 **Purpose:** Career Center approves a company vacancy (FR-VAC-006).
 
-**Authentication:** Required. **Authorization:** Career Center only.
+**Authentication:** Required. **Authorization:** Company-vacancy moderators — `CAREER_CENTER_STAFF`, `CAREER_CENTER_MANAGER`, `SUPER_ADMIN` (PO decision B-3, approved — CLOSED). **Conflict of interest: a moderator holding an ACTIVE `company_members` row for the owning company may not moderate that company's vacancy** → `403 AUTH_FORBIDDEN`. Super Admin uses the identical lifecycle checks, reason rules, history rules, audit attribution and notification behaviour — the global role is never a bypass of a source-status rule.
 
 **Request:** Optional `recruiter_visible_note`, `internal_note`.
 
 **Validation:** Note lengths.
 
 **Business Rules:**
-- `PENDING_REVIEW → APPROVED`, `SCHEDULED`, or `PUBLISHED` depending on `open_at` relative to now (FSD §8.3). The server decides which; the client does not choose.
+- **Approve target is deterministic (PO decision B-1, approved — CLOSED).** From `PENDING_REVIEW`, evaluated against `open_at` / `close_at` at execution time:
+
+| Condition | Result |
+| --- | --- |
+| `now < open_at` | **`SCHEDULED`** — `published_at` stays `null`; the scheduler publishes when `open_at` is reached |
+| `open_at <= now < close_at` | **`PUBLISHED`** — publication happens in this same business transaction; `published_at` set exactly once |
+| `now >= close_at` | **Approval must not succeed.** The vacancy stays `PENDING_REVIEW`; answer `409 VACANCY_INVALID_TRANSITION`. No review row, no audit, no notification |
+
+- **`APPROVED` remains part of the frozen status vocabulary and stays in the enum and the schema `CHECK`, but the MVP company moderation flow never emits it.** Approval resolves directly to `SCHEDULED` or `PUBLISHED`.
+- **The recruiter never separately publishes** (PO decision B-4). Where approval yields `PUBLISHED`, publication is part of this operation; where it yields `SCHEDULED`, only the scheduler publishes.
 - Sets `published_at` **only** when the vacancy actually becomes PUBLISHED. `published_at` is the Time-to-Fill start point (INV-013) and must never be set speculatively.
+- Re-checks the company gate: still `VERIFIED` (INV-002).
 - Appends a moderation review with `action = APPROVE`.
 - Campus vacancy → `409 VACANCY_MODERATION_NOT_APPLICABLE`.
 
@@ -2086,7 +2121,7 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 **Concurrency:** Row lock; second approver → `409`.
 
-**Source Requirement:** FR-VAC-005, FR-VAC-006 · FSD §8.3 · INV-013, INV-016, INV-018
+**Source Requirement:** FR-VAC-005, FR-VAC-006 · FSD §8.3 · INV-013, INV-016, INV-018 · PO decisions **B-1** (approve target), **B-3** (moderation authority), **B-4** (publish actor), approved 25 August 2026
 
 ---
 
@@ -2096,7 +2131,7 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 **Purpose:** Career Center returns a company vacancy for revision (FR-VAC-006).
 
-**Authentication:** Required. **Authorization:** Career Center only.
+**Authentication:** Required. **Authorization:** Company-vacancy moderators — `CAREER_CENTER_STAFF`, `CAREER_CENTER_MANAGER`, `SUPER_ADMIN` (PO decision B-3). **A moderator with an ACTIVE membership of the owning company may not moderate that company's vacancy** → `403 AUTH_FORBIDDEN`. Recruiters (`COMPANY_ADMIN`, `COMPANY_RECRUITER`) never moderate; `AUDITOR` is read-only.
 
 **Request:** `reason_category` (**required**), `recruiter_visible_note` (**required**), `internal_note` (optional).
 
@@ -2120,7 +2155,7 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 **Purpose:** Career Center rejects a company vacancy (FR-VAC-006).
 
-**Authentication:** Required. **Authorization:** Career Center only.
+**Authentication:** Required. **Authorization:** Company-vacancy moderators — `CAREER_CENTER_STAFF`, `CAREER_CENTER_MANAGER`, `SUPER_ADMIN` (PO decision B-3). **A moderator with an ACTIVE membership of the owning company may not moderate that company's vacancy** → `403 AUTH_FORBIDDEN`. Recruiters (`COMPANY_ADMIN`, `COMPANY_RECRUITER`) never moderate; `AUDITOR` is read-only.
 
 **Request:** `reason_category` (required), `recruiter_visible_note` (required), `internal_note` (optional).
 
@@ -2144,14 +2179,16 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 **Purpose:** Publish an approved or scheduled vacancy, or publish a campus vacancy directly (FR-VAC-005, FR-HR-004).
 
-**Authentication:** Required. **Authorization:** Career Center or `COMPANY_SCOPE` for company vacancies per approval state · `CAMPUS_SCOPE` (HR_ADMIN) for campus vacancies.
+> **COMPANY VACANCIES — THIS OPERATION IS NOT USER-INVOCABLE AT MVP (PO decision B-4, approved — CLOSED).**
+> A company vacancy publishes through exactly two paths and no other: **APPROVE inside its active window** (publication happens in the approval transaction), or the **system scheduler** when a `SCHEDULED` vacancy reaches `open_at`. There is **no recruiter publish, no Career Center manual publish, and no Super Admin manual publish** — the browser surface exposes no company publish route, so a company vacancy can never bypass moderation.
+> The operation is **retained in this inventory** because the campus flow (`DRAFT → PUBLISHED`, `SCHEDULED → PUBLISHED`, FR-HR-004, FSD §8.4) still requires it; that path is not implemented in this phase. An internal reusable `PublishVacancy` Action may back both approval-time and scheduled publication, but it grants no independent authorization path.
 
 **Request:** Empty body.
 
 **Validation:** None at transport level.
 
 **Business Rules:**
-- Company: `APPROVED → PUBLISHED` or `SCHEDULED → PUBLISHED`. Campus: `DRAFT → PUBLISHED` or `SCHEDULED → PUBLISHED` (FSD §8.3, §8.4).
+- Company: `SCHEDULED → PUBLISHED`, **driven by the scheduler only** (B-4). `APPROVED → PUBLISHED` remains in the frozen vocabulary but is unreachable in the MVP company flow, which never emits `APPROVED` (B-1). Campus: `DRAFT → PUBLISHED` or `SCHEDULED → PUBLISHED` (FSD §8.3, §8.4).
 - **Sets `published_at` if not already set.** This is the Time-to-Fill anchor (INV-013) and is set exactly once.
 - Scheduled publication also occurs automatically when `open_at` is reached, driven by the scheduler dispatching a queued job — not by this endpoint. Both paths converge on the same Action.
 
@@ -2169,7 +2206,7 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 **Concurrency:** Row lock; `published_at` written once.
 
-**Source Requirement:** FR-VAC-005, FR-VAC-008, FR-HR-004 · FSD §8.3, §8.4 · INV-013
+**Source Requirement:** FR-VAC-005, FR-VAC-008, FR-HR-004 · FSD §8.3, §8.4 · INV-013 · PO decision **B-4** (publish actor), approved 25 August 2026
 
 ---
 
@@ -2179,7 +2216,7 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 **Purpose:** Close a published vacancy manually.
 
-**Authentication:** Required. **Authorization:** `COMPANY_SCOPE` or `CAMPUS_SCOPE` owner · Career Center where authorized.
+**Authentication:** Required. **Authorization:** two distinct paths, and the distinction matters. **(a) The owner** — an ACTIVE member of the owning company under `COMPANY_SCOPE`, or the `CAMPUS_SCOPE` owner — closing their own published vacancy. **This is an ownership capability, not moderation**, so the conflict-of-interest rule does not apply to it. **(b) A moderator** — `CAREER_CENTER_STAFF`, `CAREER_CENTER_MANAGER` or `SUPER_ADMIN` (PO decision B-3), subject to the conflict-of-interest rule: an ACTIVE member of the owning company may not close it *as a moderator*, though they may still close it as the owner under (a).
 
 **Request:** Optional `note`. **Validation:** None.
 
@@ -2191,7 +2228,7 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 **Idempotency:** **REQUIRED.** **Concurrency:** Row lock.
 
-**Source Requirement:** FR-VAC-005, FR-VAC-008 · FSD §8.3, §8.4
+**Source Requirement:** FR-VAC-005, FR-VAC-008 · FSD §8.3, §8.4 · PO decision **B-3** (moderation authority), approved 25 August 2026
 
 ---
 
@@ -2201,13 +2238,26 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 **Purpose:** Suspend a published vacancy (FR-VAC-006).
 
-**Authentication:** Required. **Authorization:** Career Center (company vacancies) · HR_ADMIN (campus vacancies).
+**Authentication:** Required. **Authorization:** Company vacancies — `CAREER_CENTER_STAFF`, `CAREER_CENTER_MANAGER`, `SUPER_ADMIN` (PO decision B-3), with the same conflict-of-interest rule: an ACTIVE member of the owning company may not moderate it → `403 AUTH_FORBIDDEN`. Campus vacancies — HR_ADMIN.
 
 **Request:** `reason_category` (required), `recruiter_visible_note` (required), `internal_note` (optional).
 
 **Validation:** Required fields present.
 
-**Business Rules:** `PUBLISHED → SUSPENDED`. Reason mandatory for company-vacancy suspension (INV-029). A suspended vacancy accepts no new applications; existing applications and history are untouched. Paired route `POST /api/v1/vacancies/{vacancy}/restore` returns `SUSPENDED → PUBLISHED` or `CLOSED` as validity allows (FSD §8.3).
+**Business Rules:** `PUBLISHED → SUSPENDED`. Reason mandatory for company-vacancy suspension (INV-029). A suspended vacancy accepts no new applications; existing applications and history are untouched. `published_at` is never rewritten by a suspension.
+
+**Paired route `POST /api/v1/vacancies/{vacancy}/restore` — restore target is deterministic (PO decision B-2, approved — CLOSED):**
+
+| Condition at restore time | Result |
+| --- | --- |
+| `now < close_at` | **`PUBLISHED`** |
+| `now >= close_at` | **`CLOSED`**, with `closed_at` set to the restore execution time |
+
+- Restore **never** returns `APPROVED` and **never** returns `SCHEDULED`.
+- The **original `published_at` is preserved** — restore never rewrites it (INV-013).
+- Restore revises the same vacancy row; it never creates a replacement, and existing applications and history are untouched.
+- Restore appends a `RESTORE` moderation review and audits `vacancy_restored`. **A restore that resolves to `CLOSED` emits `vacancy_restored` only** — no second `vacancy_closed` event, because no frozen contract requires one for this path.
+- This governs explicit RESTORE only. Automatic expiry stays a separate, still-unimplemented concern (Part X item 12).
 
 **Success Response:** `200 OK`. **Error Codes:** `REVIEW_REASON_REQUIRED` (422) · `VACANCY_INVALID_TRANSITION` (409) · `AUTH_FORBIDDEN` (403).
 
@@ -2215,7 +2265,7 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 **Idempotency:** **REQUIRED.** **Concurrency:** Row lock.
 
-**Source Requirement:** FR-VAC-005, FR-VAC-006 · FSD §8.3 · INV-016, INV-029
+**Source Requirement:** FR-VAC-005, FR-VAC-006 · FSD §8.3 · INV-016, INV-029 · PO decisions **B-2** (restore target) and **B-3** (moderation authority), approved 25 August 2026
 
 ---
 
@@ -3583,7 +3633,8 @@ Nothing below is resolved by this document **except where a row is explicitly ma
 | 8 | **Profile completion criteria** — `DEFERRED POLICY` | FR-CAN-003 requires a completed profile but fixes **no** completion formula or required-field set. `candidate_profiles.profile_completed_at` **stays in the frozen schema**, is returned as stored, and **may remain `null`**. It is **not** automatically recomputed by any operation in this contract. Candidate profile and collection CRUD are **not blocked** by this |
 | 9 | ~~**Candidate document upload policy**~~ | **CLOSED — approved and frozen 25 August 2026.** MIME allowlist: **`application/pdf` only**, admitted on the **server-inspected** type **and** the `%PDF-` signature. Maximum size: **10 MiB / `10,485,760` bytes**, a **single global limit** with **no per-`document_type` variation**; application validation is authoritative and transport ceilings sit above it. Upload rate limit: **20 per hour per candidate** (Part I §11.8). Storage quota: **DEFERRED**. Malware scanner: **not required** for the PDF-only allowlist. `document_type` stays **open-text `varchar(64)`** — see item 7, still open. `CANDIDATE_DOCUMENT_UPLOAD_POLICY_REQUIRED` is retired; **no migration and no API-shape change** resulted. `POST /candidate/documents` remains **unrouted pending implementation** |
 | 10 | **Unknown-user company member invitation lifecycle** — `DEFERRED` | Approved 25 August 2026: at MVP `POST /companies/{company}/members` accepts **only an address that already has an account**. An unknown address creates no membership, sends **no email**, records no pending invitation, and returns the generic `NOT_FOUND` envelope. Whether a pre-registration invite is ever offered — and if so whether it is an invitation entity, a nullable-user membership, or a tokenized link — is **not decided**. No schema, route, or response shape anticipates it |
-| 11 | **Vacancy moderation authority** — *moderation portion only* | Which actors may `approve`, `request-revision`, `reject`, `publish`, `close`, `suspend` and `restore` a company vacancy is **unreconciled** between `AUTHORIZATION_MATRIX.md` §4.5 and the review sections of this contract, and is **OPEN**. No moderation operation is implemented, stubbed, or routed while it stands. **The authoring portion of this question is CLOSED** — PO decision **VA-4** (25 August 2026) settles that company authoring (create, edit, screening questions, submit as company owner) never derives from the global `SUPER_ADMIN` role and always derives from an ACTIVE company membership. VA-4 settles **nothing** about moderation |
+| 11 | ~~**Vacancy moderation authority**~~ | **CLOSED for company vacancy moderation — approved 25 August 2026.** PO decisions **B-1** (approve target: `SCHEDULED` before `open_at`, `PUBLISHED` inside the window, refusal at or after `close_at`), **B-2** (restore target: `PUBLISHED` before `close_at`, else `CLOSED` with `closed_at`), **B-3** (moderators are `CAREER_CENTER_STAFF`, `CAREER_CENTER_MANAGER`, `SUPER_ADMIN`, with a conflict-of-interest bar on any ACTIVE member of the owning company; recruiters never moderate; Auditor read-only), **B-4** (no user-facing company publish; publication only through approval-in-window or the scheduler) and **B-5** (submit completeness). **VA-4 is unchanged**: company *authoring* still never derives from the global `SUPER_ADMIN` role. Campus-vacancy authority is untouched by these decisions |
+| 12 | **O-7 — automatic vacancy expiry** | `PUBLISHED → EXPIRED` once `close_at` passes (FSD §8.3, FR-VAC-008) is **OPEN and deliberately unimplemented**. The exact boundary or equality semantics, the audit event name, the notification rule and the scheduler query and batch behaviour are all undetermined by BRD/FSD and the frozen contracts. **No `vacancy_expired` audit event is invented, and no expiry scheduler exists.** Scheduled *publication* is separate, fully determined by B-1 and B-4, and is implemented |
 
 **Human-decision items carried from the ERD:**
 

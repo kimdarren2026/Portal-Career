@@ -174,6 +174,7 @@ This mapping is a documented reading of an FSD table explicitly labelled as exam
 | `VACANCY_TARGET_AUDIENCE_INVALID` | 422 | Value outside the four permitted audiences (INV-006) |
 | `VACANCY_CLOSE_BEFORE_OPEN` | 422 | `close_at` must follow `open_at` (FSD §9.1.4) |
 | `VACANCY_DATES_REQUIRED` | 422 | `open_at` / `close_at` required before leaving DRAFT |
+| `VACANCY_PROFILE_INCOMPLETE` | 422 | Submit-review completeness gate failed (PO decision B-5). `details.missing` lists **stable semantic category identifiers** — `title`, `description`, `qualifications`, `employment_type`, `location`, `workplace_mode`, `openings_count`, `minimum_education`, `experience_requirement`, `open_at`, `close_at`, `target_audience`, `application_method` — never raw internal column names beyond those identifiers. Distinct from `COMPANY_PROFILE_INCOMPLETE`, which governs company onboarding and must never be reused for a vacancy. Date and external-ATS failures keep their own specific codes |
 | `VACANCY_NOT_EDITABLE` | 409 | Current status forbids editing |
 | `VACANCY_HAS_APPLICATIONS` | 409 | Change would invalidate existing applications — e.g. switching `IN_PORTAL` → `EXTERNAL_ATS` while applications exist (INV-024) |
 | `VACANCY_MODERATION_NOT_APPLICABLE` | 409 | Moderation attempted on a campus vacancy. Campus vacancies are not moderated (INV-018) |

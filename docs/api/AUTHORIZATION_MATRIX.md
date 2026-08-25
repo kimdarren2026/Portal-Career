@@ -115,7 +115,7 @@ Two constraints hold absolutely and are **not** waived by this role:
 1. **The SMTP credential is never returned to anyone, including Super Admin** (INV-035). `GET /admin/smtp-configuration` returns `secret_configured: true` — a boolean, never the value, never a mask conveying length. Update accepts a new secret; nothing ever reads one back.
 2. **Every Super Admin bypass is audited**, and audit entries never carry credential material. A break-glass path that is not recorded is indistinguishable from a compromise.
 
-3. **Break-glass is a read capability, not an authoring one.** Company vacancy authoring — create, edit, screening-question management, and submitting as the company owner — is **never** granted by this role (PO decision **VA-4**, 25 August 2026; §4.5 footnote ¹¹). Where a Super Admin also holds an ACTIVE `company_members` row, they author **as that member** and only within that company.
+3. **Break-glass is a read capability, not an authoring one.** Company vacancy authoring — create, edit, screening-question management, and submitting as the company owner — is **never** granted by this role (PO decision **VA-4**, 25 August 2026; §4.5 footnote ³⁶). Where a Super Admin also holds an ACTIVE `company_members` row, they author **as that member** and only within that company.
 
 Super Admin also cannot mutate `audit_logs` — no create, update, or delete endpoint exists for anyone (INV-016).
 
@@ -199,18 +199,18 @@ Super Admin's `ALLOW` on candidate reads is break-glass, audited on every use, a
 | Capability | PUBLIC | CANDIDATE | COMPANY_RECRUITER | COMPANY_ADMIN | CAREER_CENTER | HR_ADMIN | SELECTOR | AUDITOR | SUPER_ADMIN |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Browse public vacancies · public detail · reference data | **A** | **A** | **A** | **A** | **A** | **A** | **A** | **A** | **A** |
-| **Create company vacancy** | D | D | **C** ⁴ | **C** ⁴ | **D** ⁵ | D | D | D | **D** ¹¹ |
-| **Edit company vacancy** | D | D | **C** | **C** | **D** ⁵ | D | D | D | **D** ¹¹ |
+| **Create company vacancy** | D | D | **C** ⁴ | **C** ⁴ | **D** ⁵ | D | D | D | **D** ³⁶ |
+| **Edit company vacancy** | D | D | **C** | **C** | **D** ⁵ | D | D | D | **D** ³⁶ |
 | **Create campus vacancy** | D | D | **D** | **D** | **D** | **K** | D | D | **A** |
 | List / read vacancy (owner view) | D | D | **C** | **C** | **A** ⁶ | **K** | **S** ⁷ | **R** | **A** |
-| Update vacancy (draft / revision) | D | D | **C** | **C** | **D** | **K** | D | D | **A** ¹¹ |
-| **Submit vacancy for review** | D | D | **C** | **C** | D | **D** ⁸ | D | D | **D** ¹¹ |
-| **Approve · reject · request revision** | D | D | **D** | **D** | **A** | **D** ⁸ | D | D | **A** |
-| **Publish vacancy** | D | D | **D** ⁹ | **D** ⁹ | **A** | **K** | D | D | **A** |
-| **Close vacancy** | D | D | **C** | **C** | **A** | **K** | D | D | **A** |
-| **Suspend · restore vacancy** | D | D | D | D | **A** | **K** ¹⁰ | D | D | **A** |
+| Update vacancy (draft / revision) | D | D | **C** | **C** | **D** | **K** | D | D | **A** ³⁶ |
+| **Submit vacancy for review** | D | D | **C** | **C** | D | **D** ⁸ | D | D | **D** ³⁶ |
+| **Approve · reject · request revision** | D | D | **D** | **D** | **A** ³⁷ | **D** ⁸ | D | D | **A** ³⁷ |
+| **Publish vacancy** | D | D | **D** ⁹ | **D** ⁹ | **D** ³⁸ | **K** | D | D | **D** ³⁸ |
+| **Close vacancy** | D | D | **C** | **C** | **A** ³⁷ | **K** | D | D | **A** ³⁷ |
+| **Suspend · restore vacancy** | D | D | D | D | **A** ³⁷ | **K** ¹⁰ | D | D | **A** ³⁷ |
 | Read moderation history · versions | D | D | **C** ¹ | **C** ¹ | **A** | **K** | D | **R** | **A** |
-| Manage screening questions | D | D | **C** | **C** | **D** | **K** | D | D | **A** ¹¹ |
+| Manage screening questions | D | D | **C** | **C** | **D** | **K** | D | D | **A** ³⁶ |
 | Manage recruitment stages · reorder | D | D | **C** | **C** | **D** | **K** | D | D | **A** |
 
 ⁴ Requires `companies.verification_status = VERIFIED` (INV-002). Not verified → `403 VACANCY_COMPANY_NOT_VERIFIED`.
@@ -221,7 +221,11 @@ Super Admin's `ALLOW` on candidate reads is break-glass, audited on every use, a
 ⁹ A company vacancy publishes through moderation approval or the scheduler, not by recruiter action.
 ¹⁰ HR_ADMIN suspends and restores campus vacancies only.
 
-¹¹ **Company authoring never derives from the global role** — PO decision **VA-4**, approved 25 August 2026. Holding `SUPER_ADMIN` **alone** grants **no** capability to create a company vacancy, edit a company vacancy, manage that vacancy's screening questions, or submit it as the company owner. Where the same user separately holds a **valid ACTIVE `company_members` row** for that company, their authoring capability is evaluated **from that membership role** (`COMPANY_ADMIN` or `COMPANY_RECRUITER`) exactly as for any other member — a membership in Company A grants nothing over Company B, and a revoked or inactive membership grants nothing at all regardless of the global role. On the two rows that also cover the campus path (*Update vacancy (draft / revision)*, *Manage screening questions*) VA-4 settles the **company** portion only, which the dedicated company rows above state as `DENY`; the campus portion of those cells is untouched by this decision. **Super Admin READ capability is unchanged** — the read rows in this section and §4.9 stand as frozen, break-glass and audited on every use (OL-9). **VA-4 settles no moderation authority**: approve, request revision, reject, publish, close, suspend and restore remain **OPEN** (`API_CONTRACT.md` Part X item 11).
+³⁶ **Company authoring never derives from the global role** — PO decision **VA-4**, approved 25 August 2026. Holding `SUPER_ADMIN` **alone** grants **no** capability to create a company vacancy, edit a company vacancy, manage that vacancy's screening questions, or submit it as the company owner. Where the same user separately holds a **valid ACTIVE `company_members` row** for that company, their authoring capability is evaluated **from that membership role** (`COMPANY_ADMIN` or `COMPANY_RECRUITER`) exactly as for any other member — a membership in Company A grants nothing over Company B, and a revoked or inactive membership grants nothing at all regardless of the global role. On the two rows that also cover the campus path (*Update vacancy (draft / revision)*, *Manage screening questions*) VA-4 settles the **company** portion only, which the dedicated company rows above state as `DENY`; the campus portion of those cells is untouched by this decision. **Super Admin READ capability is unchanged** — the read rows in this section and §4.9 stand as frozen, break-glass and audited on every use (OL-9). **VA-4 settles no moderation authority**: approve, request revision, reject, publish, close, suspend and restore remain **OPEN** (`API_CONTRACT.md` Part X item 11).
+
+³⁷ **Company vacancy moderation — PO decision B-3, approved 25 August 2026 (CLOSED).** The moderator set is `CAREER_CENTER_STAFF`, `CAREER_CENTER_MANAGER` and `SUPER_ADMIN`, for `REQUEST_REVISION`, `REJECT`, `APPROVE`, `SUSPEND`, `RESTORE` and `CLOSE`, each only where the source status permits. Super Admin runs the **same** lifecycle checks, reason requirements, moderation-history rules, audit attribution and notification behaviour — the global role never bypasses a source-status rule. **Conflict of interest: a moderator holding an ACTIVE `company_members` row for the owning company may not moderate that company's vacancy**, and this bars Career Center and Super Admin alike → `403 AUTH_FORBIDDEN`. Recruiters (`COMPANY_ADMIN`, `COMPANY_RECRUITER`) never moderate; `AUDITOR` stays read-only. **Close is the one row with two paths**: the owner closing their own published vacancy is an ownership capability (`C`) and is not subject to the conflict rule; closing as a moderator is. **VA-4 is untouched** — moderation authority confers no company authoring, and footnote ³⁶ still governs create, edit and screening questions.
+
+³⁸ **No user-facing company publish — PO decision B-4, approved 25 August 2026 (CLOSED).** A company vacancy publishes only through **APPROVE inside its active window** (publication is part of the approval transaction) or through the **system scheduler** when a `SCHEDULED` vacancy reaches `open_at`. No recruiter, Career Center or Super Admin manual publish operation exists on the company path, and no company publish route is registered. `HR_ADMIN` keeps its campus publish capability (`K`), which these decisions do not touch.
 
 ### 4.6 Applications, Documents, Lifecycle
 
@@ -368,5 +372,6 @@ These constraints are not expressible in a matrix cell and must be enforced in c
 | --- | --- | --- |
 | **6** | ~~First recruiter default role, and whether at least one active Company Admin must exist~~ | **CLOSED by approved Product Owner decision:** first creator is active `COMPANY_ADMIN`; minimum one active `COMPANY_ADMIN` and last-admin protection are required; subsequent roles are explicit with no implicit default |
 | ~~Career Center delegated posting~~ | ~~Whether Career Center may post vacancies "atas nama" a company~~ | **RESOLVED 24 August 2026 — DENY.** See §3 and footnote ⁵. Not one of the remaining business open questions |
-| ~~Super Admin **company authoring**~~ | ~~Whether the global `SUPER_ADMIN` role by itself authorizes creating, editing, or screening-question management on a company vacancy~~ | **CLOSED 25 August 2026 — PO decision VA-4: NO.** Company authoring derives only from an ACTIVE `company_members` row; see footnote ¹¹. Super Admin **read** capability is unchanged |
-| **Vacancy moderation authority** | Which actors may approve, request revision, reject, publish, close, suspend, and restore a company vacancy — §4.5 and `API_CONTRACT.md` review sections are unreconciled | **OPEN.** VA-4 settled only the authoring portion. No moderation capability is implemented or routed while this stands (`API_CONTRACT.md` Part X item 11) |
+| ~~Super Admin **company authoring**~~ | ~~Whether the global `SUPER_ADMIN` role by itself authorizes creating, editing, or screening-question management on a company vacancy~~ | **CLOSED 25 August 2026 — PO decision VA-4: NO.** Company authoring derives only from an ACTIVE `company_members` row; see §4.5 footnote ³⁶. Super Admin **read** capability is unchanged |
+| ~~**Vacancy moderation authority**~~ | ~~Which actors may approve, request revision, reject, publish, close, suspend, and restore a company vacancy~~ | **CLOSED 25 August 2026 — PO decisions B-1 to B-5.** Moderators, conflict of interest, approve and restore targets, and the absence of a user-facing publish are settled in footnotes ¹² and ¹³ and in `API_CONTRACT.md` Part X item 11. Campus-vacancy authority is untouched |
+| **O-7 — automatic vacancy expiry** | Whether and how `PUBLISHED → EXPIRED` runs once `close_at` passes | **OPEN.** Boundary semantics, audit event name, notification rule and scheduler behaviour are undetermined; no expiry job exists (`API_CONTRACT.md` Part X item 12) |

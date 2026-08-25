@@ -14,6 +14,8 @@
 
 > **Candidate Core lives here (SPEC-DOC-07, accepted).** Twenty-one Candidate Core operations — profile read and update, the six profile sub-collections, candidate verification request and its paired read, and the five candidate document operations — are served over the same session guard, with `OWN` authorization, the verified-email gate, and CSRF on mutations. Their `/api/v1` twins stay reserved in `API_ENDPOINTS.md`. **Surface classification is not implementation authorization:** `POST /candidate/verifications` remains blocked on the verification business decision (`API_CONTRACT.md` Part X item 1). `POST /candidate/documents` is **no longer policy-blocked** — its MIME allowlist (`application/pdf` only) and maximum size (**10 MiB / 10,485,760 bytes**) were approved and frozen on 25 August 2026 (Part X item 9, CLOSED) — and it stays **unrouted pending implementation**. `/candidate/saved-vacancies` and `/candidate/external-apply-events` belong to later phases and are **not** reclassified.
 
+> **Company vacancy publication is not a user operation (PO decision B-4, 25 August 2026).** The `/vacancies/{vacancy}/publish` row above is retained for the campus flow only; it is **not registered as a company browser route**, and a company vacancy reaches `PUBLISHED` solely through approval inside its active window or through the scheduler.
+
 Routes are shown **without** the `/api/v1` prefix, which is what distinguishes them at the routing layer. Their **behaviour — validation, invariants, transitions, error codes, audit, outbox, idempotency, and concurrency — is defined by `API_CONTRACT.md` exactly as for versioned endpoints.** Idempotency and concurrency requirements are not relaxed here.
 
 **Page-delivery `GET` routes are deliberately absent.** Routes such as `/login`, `/register`, `/forgot-password`, `/reset-password/{token}`, `/verify-email/{token}`, and the Candidate portal's own profile and onboarding pages render an Inertia page and change nothing; they are UI plumbing, not contract operations (`API_CONTRACT.md` Part I §2b).
@@ -123,7 +125,7 @@ Any of these may later be promoted to `VERSIONED_API`. Promotion is additive —
 | Vacancy | `POST` | `/vacancies/{vacancy}/approve` | POST /api/v1/vacancies/{vacancy}/approve | COMPANY_SCOPE / CAMPUS_SCOPE / CAREER_CENTER |
 | Vacancy | `POST` | `/vacancies/{vacancy}/close` | POST /api/v1/vacancies/{vacancy}/close | COMPANY_SCOPE / CAMPUS_SCOPE / CAREER_CENTER |
 | Vacancy | `GET` | `/vacancies/{vacancy}/moderation-history` | GET /api/v1/vacancies/{vacancy} *(grouped)* | COMPANY_SCOPE / CAMPUS_SCOPE / CAREER_CENTER |
-| Vacancy | `POST` | `/vacancies/{vacancy}/publish` | POST /api/v1/vacancies/{vacancy}/publish | COMPANY_SCOPE / CAMPUS_SCOPE / CAREER_CENTER |
+| Vacancy | `POST` | `/vacancies/{vacancy}/publish` | POST /api/v1/vacancies/{vacancy}/publish | CAMPUS_SCOPE — **not company-user-invocable** (B-4) |
 | Vacancy | `POST` | `/vacancies/{vacancy}/reject` | POST /api/v1/vacancies/{vacancy}/reject | COMPANY_SCOPE / CAMPUS_SCOPE / CAREER_CENTER |
 | Vacancy | `POST` | `/vacancies/{vacancy}/request-revision` | POST /api/v1/vacancies/{vacancy}/request-revision | COMPANY_SCOPE / CAMPUS_SCOPE / CAREER_CENTER |
 | Vacancy | `POST` | `/vacancies/{vacancy}/restore` | POST /api/v1/vacancies/{vacancy}/suspend *(grouped)* | COMPANY_SCOPE / CAMPUS_SCOPE / CAREER_CENTER |
