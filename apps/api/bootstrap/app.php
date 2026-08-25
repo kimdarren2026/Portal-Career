@@ -15,6 +15,10 @@ use App\Domains\Candidate\Exceptions\CandidateDocumentStorageException;
 use App\Domains\Candidate\Exceptions\CandidateDocumentUnsupportedMediaTypeException;
 use App\Domains\Candidate\Exceptions\CandidateInvalidReferenceException;
 use App\Domains\Candidate\Exceptions\CandidateProfileRequiredException;
+use App\Domains\Company\Exceptions\CompanyMemberAlreadyActive;
+use App\Domains\Company\Exceptions\CompanyMemberNotFound;
+use App\Domains\Company\Exceptions\CompanyNotFound;
+use App\Domains\Company\Exceptions\LastCompanyAdmin;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
@@ -54,11 +58,17 @@ return Application::configure(basePath: dirname(__DIR__))
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
         $exceptions->render(function (AuthenticationException $exception, Request $request) {
-            if (in_array($request->path(), ['me', 'me/password', 'auth/logout'], true) || $request->is('candidate/*')) {
+            if (in_array($request->path(), ['me', 'me/password', 'auth/logout'], true) || $request->is('candidate/*') || $request->is('companies/*') || $request->is('companies')) {
                 return ContractResponse::error($request, 'UNAUTHENTICATED', 401, 'Sesi autentikasi diperlukan.');
             }
         });
         $exceptions->render(fn (CandidateProfileRequiredException $exception, Request $request) => ContractResponse::error($request, 'CANDIDATE_PROFILE_REQUIRED', 422, 'Profil kandidat tidak tersedia.'));
+        $exceptions->render(fn (LastCompanyAdmin $exception, Request $request) => ContractResponse::error($request, 'MEMBER_LAST_ADMIN', 409, 'Setidaknya satu Company Admin aktif harus dipertahankan.'));
+        $exceptions->render(fn (CompanyMemberAlreadyActive $exception, Request $request) => ContractResponse::error($request, 'MEMBER_ALREADY_ACTIVE', 409, 'Anggota ini sudah aktif di perusahaan tersebut.'));
+        // Out of COMPANY_SCOPE and absent answer identically: 403 would confirm
+        // the row exists to an actor who must not know it does (matrix §1).
+        $exceptions->render(fn (CompanyNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Perusahaan tidak ditemukan.'));
+        $exceptions->render(fn (CompanyMemberNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Anggota perusahaan tidak ditemukan.'));
         $exceptions->render(fn (CandidateCollectionNotFoundException $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Data tidak ditemukan.'));
         $exceptions->render(fn (CandidateDocumentNotOwnedException $exception, Request $request) => ContractResponse::error($request, 'DOCUMENT_NOT_OWNED', 403, 'Dokumen bukan milik kandidat ini.'));
         $exceptions->render(fn (CandidateDocumentUnsupportedMediaTypeException $exception, Request $request) => ContractResponse::error($request, 'UNSUPPORTED_MEDIA_TYPE', 415, 'Dokumen harus berupa PDF.'));

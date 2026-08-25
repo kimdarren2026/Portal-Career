@@ -7,6 +7,8 @@ use App\Http\Controllers\Web\CandidateCollectionController;
 use App\Http\Controllers\Web\CandidateDocumentController;
 use App\Http\Controllers\Web\CandidatePageController;
 use App\Http\Controllers\Web\CandidateProfileController;
+use App\Http\Controllers\Web\CompanyController;
+use App\Http\Controllers\Web\CompanyMemberController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -60,6 +62,24 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
     Route::post('/auth/logout', [AuthenticationController::class, 'logout'])->name('auth.logout');
     Route::get('/me', [AuthenticationController::class, 'me'])->name('auth.me');
     Route::put('/me/password', [AuthenticationController::class, 'changePassword'])->name('auth.password.update');
+});
+
+Route::middleware(['auth', 'account.status'])->prefix('companies')->name('companies.')->group(function (): void {
+    Route::post('/', [CompanyController::class, 'create'])->middleware('verified.email')->name('store');
+    Route::get('/{company}', [CompanyController::class, 'show'])->name('show');
+    Route::get('/{company}/members', [CompanyMemberController::class, 'index'])->name('members.index');
+    Route::middleware('verified.email')->group(function (): void {
+        Route::patch('/{company}', [CompanyController::class, 'update'])->name('update');
+        Route::post('/{company}/submit-verification', [CompanyController::class, 'submit'])->name('submit');
+        // FR-COMP-004 + closed D-1. The last active COMPANY_ADMIN can never be
+        // demoted or revoked; leaving is the member's own act.
+        Route::post('/{company}/members', [CompanyMemberController::class, 'store'])->name('members.store');
+        Route::patch('/{company}/members/{member}', [CompanyMemberController::class, 'update'])->name('members.update');
+        Route::delete('/{company}/members/{member}', [CompanyMemberController::class, 'destroy'])->name('members.destroy');
+    });
+    Route::post('/{company}/{action}', [CompanyController::class, 'review'])
+        ->where('action', 'verify|request-revision|reject|suspend|restore')
+        ->name('review');
 });
 
 /*
