@@ -2210,6 +2210,41 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 ---
 
+### Automatic vacancy expiry (O-7) — system operation, no endpoint
+
+**Surface:** none. **This is not an HTTP operation and has no route**, so no actor of any role invokes it. It is a scheduler-driven system transition (FR-VAC-008, "Scheduler menandai `EXPIRED` setelah `close_at`"; FSD §8.3).
+
+**Rule (PO decision O-7, approved — CLOSED):**
+
+| Source status | Condition | Result |
+| --- | --- | --- |
+| `PUBLISHED` | `now >= close_at` | **`EXPIRED`** |
+| `PUBLISHED` | `now < close_at` | unchanged — still active |
+| `SCHEDULED` · `SUSPENDED` · `CLOSED` · `EXPIRED` · any other | any | **unchanged — never auto-expired by this operation** |
+
+**`close_at` is an exclusive end boundary.** `now < close_at` is still active; `now == close_at` and `now > close_at` both reach expiry eligibility. This is the same boundary B-1 uses to refuse approval at or after `close_at`, and the same one B-2 uses to resolve a restore to `CLOSED`.
+
+**Scope and interaction with other decisions:**
+- **Only `PUBLISHED` company vacancies expire here.** A `SUSPENDED` vacancy past `close_at` is **not** expired by this operation — **B-2 remains authoritative**: an explicit restore at or after `close_at` resolves to `CLOSED`.
+- **`EXPIRED` is terminal for the publication lifecycle.** No restore, reopen or un-expire transition exists or is introduced.
+- **Campus vacancies are out of scope for this phase.** FSD requires campus expiry ultimately; it is wired with the Campus Vacancy lifecycle, not here.
+
+**Side Effects:** `current_status → EXPIRED` and nothing else. Specifically: `published_at` is **preserved** (INV-013), `closed_at` is **not written** — expiry is not a close — `suspended_at` is left as it stands, applications and their history are **untouched**, and **no `vacancy_moderation_reviews` row and no `vacancy_versions` snapshot are appended**, because expiry is neither a moderation decision nor an authored revision.
+
+**Applications:** existing applications and their history are retained in full and continue their own lifecycle. An expired vacancy is past its active period, so no new application may be accepted against it.
+
+**Audit:** `vacancy_expired`, written by the **system**: the actor is recorded through the existing no-actor audit representation (`actor_user_id` null), exactly as scheduled publication does. **No synthetic or impersonated user identity is invented.**
+
+**Notification / Outbox:** **NONE.** FSD v1.1 does not define vacancy expiry as a notification trigger, so no `email_outbox` row and no in-app notification is created solely because a vacancy expired.
+
+**Concurrency:** the scheduler locks each vacancy row and **re-checks status and `close_at` after acquiring the lock**, so two concurrent runs cannot both transition the same vacancy. The operation is **idempotent**: a repeated execution finds nothing eligible and produces no duplicate transition and no duplicate audit entry.
+
+**Operational cadence is an implementation detail, not a business SLA.** Eligibility is defined by `now >= close_at`; how often the job runs affects only latency.
+
+**Source Requirement:** FR-VAC-008 · FSD §8.3 · INV-013 · PO decision **O-7**, approved 25 August 2026
+
+---
+
 ### POST /api/v1/vacancies/{vacancy}/close
 
 **Surface:** `INERTIA_WEB`
@@ -2263,7 +2298,7 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 - The **original `published_at` is preserved** — restore never rewrites it (INV-013).
 - Restore revises the same vacancy row; it never creates a replacement, and existing applications and history are untouched.
 - Restore appends a `RESTORE` moderation review and audits `vacancy_restored`. **A restore that resolves to `CLOSED` emits `vacancy_restored` only** — no second `vacancy_closed` event, because no frozen contract requires one for this path.
-- This governs explicit RESTORE only. Automatic expiry stays a separate, still-unimplemented concern (Part X item 12).
+- This governs explicit RESTORE only. Automatic expiry is a separate system operation (O-7, CLOSED) that never touches a `SUSPENDED` vacancy — see *Automatic vacancy expiry* above.
 
 **Success Response:** `200 OK`. **Error Codes:** `REVIEW_REASON_REQUIRED` (422) · `VACANCY_INVALID_TRANSITION` (409) · `AUTH_FORBIDDEN` (403).
 
@@ -3640,7 +3675,7 @@ Nothing below is resolved by this document **except where a row is explicitly ma
 | 9 | ~~**Candidate document upload policy**~~ | **CLOSED — approved and frozen 25 August 2026.** MIME allowlist: **`application/pdf` only**, admitted on the **server-inspected** type **and** the `%PDF-` signature. Maximum size: **10 MiB / `10,485,760` bytes**, a **single global limit** with **no per-`document_type` variation**; application validation is authoritative and transport ceilings sit above it. Upload rate limit: **20 per hour per candidate** (Part I §11.8). Storage quota: **DEFERRED**. Malware scanner: **not required** for the PDF-only allowlist. `document_type` stays **open-text `varchar(64)`** — see item 7, still open. `CANDIDATE_DOCUMENT_UPLOAD_POLICY_REQUIRED` is retired; **no migration and no API-shape change** resulted. `POST /candidate/documents` remains **unrouted pending implementation** |
 | 10 | **Unknown-user company member invitation lifecycle** — `DEFERRED` | Approved 25 August 2026: at MVP `POST /companies/{company}/members` accepts **only an address that already has an account**. An unknown address creates no membership, sends **no email**, records no pending invitation, and returns the generic `NOT_FOUND` envelope. Whether a pre-registration invite is ever offered — and if so whether it is an invitation entity, a nullable-user membership, or a tokenized link — is **not decided**. No schema, route, or response shape anticipates it |
 | 11 | ~~**Vacancy moderation authority**~~ | **CLOSED for company vacancy moderation — approved 25 August 2026.** PO decisions **B-1** (approve target: `SCHEDULED` before `open_at`, `PUBLISHED` inside the window, refusal at or after `close_at`), **B-2** (restore target: `PUBLISHED` before `close_at`, else `CLOSED` with `closed_at`), **B-3** (moderators are `CAREER_CENTER_STAFF`, `CAREER_CENTER_MANAGER`, `SUPER_ADMIN`, with a conflict-of-interest bar on any ACTIVE member of the owning company; recruiters never moderate; Auditor read-only), **B-4** (no user-facing company publish; publication only through approval-in-window or the scheduler) and **B-5** (submit completeness). **VA-4 is unchanged**: company *authoring* still never derives from the global `SUPER_ADMIN` role. Campus-vacancy authority is untouched by these decisions |
-| 12 | **O-7 — automatic vacancy expiry** | `PUBLISHED → EXPIRED` once `close_at` passes (FSD §8.3, FR-VAC-008) is **OPEN and deliberately unimplemented**. The exact boundary or equality semantics, the audit event name, the notification rule and the scheduler query and batch behaviour are all undetermined by BRD/FSD and the frozen contracts. **No `vacancy_expired` audit event is invented, and no expiry scheduler exists.** Scheduled *publication* is separate, fully determined by B-1 and B-4, and is implemented |
+| 12 | ~~**O-7 — automatic vacancy expiry**~~ | **CLOSED — approved 25 August 2026.** `PUBLISHED` + `now >= close_at` → `EXPIRED`, with `close_at` an **exclusive end boundary**: `now < close_at` is still active, `now == close_at` and `now > close_at` both reach expiry eligibility. System-driven only — see *Automatic vacancy expiry (O-7)* below for the full rule. Company vacancies only in this phase; campus expiry is wired with the Campus Vacancy lifecycle |
 
 **Human-decision items carried from the ERD:**
 
