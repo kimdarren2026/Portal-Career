@@ -181,6 +181,51 @@ final class CompanyMemberManagementTest extends IdentityTestCase
             ->assertNotFound()->assertJsonPath('error.code', 'NOT_FOUND');
     }
 
+    /**
+     * R-9 is an ACCEPTED residual, not an absent one: an authorized admin can
+     * infer account existence. The acceptance is void if any bounding
+     * mitigation is removed, so each one is locked here.
+     */
+    public function test_accepted_account_lookup_stays_bounded_by_every_mitigation(): void
+    {
+        [$admin, $company] = $this->companyWithAdmin('r9-admin@example.test');
+        $known = $this->user('r9-known@example.test');
+
+        // The inference itself — accepted, and deliberately asserted so a future
+        // change cannot claim the mitigations still hold while the shape moved.
+        $this->actingAs($admin)->postJson("/companies/{$company->id}/members", [
+            'email' => 'r9-unknown@example.test', 'company_role' => 'COMPANY_RECRUITER',
+        ])->assertNotFound();
+        $created = $this->actingAs($admin)->postJson("/companies/{$company->id}/members", [
+            'email' => $known->email, 'company_role' => 'COMPANY_RECRUITER',
+        ])->assertCreated();
+
+        // No profile information about the matched user is disclosed.
+        $this->assertSame(
+            ['id', 'user_id', 'company_role', 'status', 'joined_at', 'revoked_at'],
+            array_keys($created->json('data')),
+        );
+        $body = $created->getContent();
+        $this->assertStringNotContainsString($known->email, $body);
+        $this->assertStringNotContainsString($known->name, $body);
+
+        // An admin of another company cannot reach this company at all.
+        [$outsider] = $this->companyWithAdmin('r9-outsider@example.test');
+        $this->actingAs($outsider)->postJson("/companies/{$company->id}/members", [
+            'email' => $known->email, 'company_role' => 'COMPANY_RECRUITER',
+        ])->assertNotFound();
+
+        // An unverified email cannot use the channel.
+        $unverified = $this->user('r9-unverified@example.test', UserStatus::PendingEmailVerification);
+        DB::table('company_members')->insert([
+            'company_id' => $company->id, 'user_id' => $unverified->id,
+            'company_role' => 'COMPANY_ADMIN', 'status' => 'ACTIVE', 'joined_at' => now(),
+        ]);
+        $this->actingAs($unverified)->postJson("/companies/{$company->id}/members", [
+            'email' => $known->email, 'company_role' => 'COMPANY_RECRUITER',
+        ])->assertForbidden()->assertJsonPath('error.code', 'AUTH_EMAIL_NOT_VERIFIED');
+    }
+
     private function companyWithAdmin(string $email): array
     {
         $admin = $this->user($email);

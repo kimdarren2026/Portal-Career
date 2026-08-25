@@ -1804,7 +1804,8 @@ Clients must therefore read the collection, edit the whole set, and send it back
 
 **Business Rules:**
 - **The invitee must already hold an account.** An address with no `users` row is **NOT SUPPORTED at MVP** (approved decision, 25 August 2026): no membership row is created, **no email is sent**, and no pending-invitation record exists anywhere — there is no invitation entity in the schema, and none is introduced.
-- **An unknown address returns the generic `NOT_FOUND` envelope**, identical to the response for a member id outside this company. The response must not distinguish "no such account" from "not visible to you"; a differentiated status or message would turn this route into an account-enumeration oracle for any Company Admin.
+- **An unknown address returns the generic `NOT_FOUND` envelope**, identical to the response for a member id outside this company. The response must not distinguish "no such account" from "not visible to you".
+- **Accepted residual (R-9).** An authorized Company Admin can still infer account existence from `201`/`409` versus `404`; that inference is inherent to admitting a known address and refusing an unknown one. It is **accepted for MVP** by approved decision of 25 August 2026 and is bounded by the eight mitigations in `SECURITY_ARCHITECTURE.md` §9 R-9 — the acceptance is void if any of them is removed. It must never widen to a public or authentication surface: registration, login, and forgot-password answer identically for known and unknown identities.
 - The **unknown-user invitation lifecycle is DEFERRED** — see Part X item 10. Nothing about a future pre-registration invite is implied by this contract.
 - An invited member must verify their email/account through the standard security mechanism before gaining access (FR-COMP-004). **No temporary password is issued.**
 - `company_role` is explicitly selected for every member added after the creator; there is no implicit default role.

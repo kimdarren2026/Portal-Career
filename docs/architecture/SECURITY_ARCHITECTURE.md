@@ -231,3 +231,32 @@ Candidate data is scoped to the vacancy owner and reached only through an applic
 | R-4 | Audit IP/device collection depends on an unmade policy decision (H-4) | Both fields remain optional; collection is configurable |
 | R-5 | Super Admin bypass is broad by nature | Mitigated by mandatory auditing of every use; consider requiring a stated reason for break-glass access to candidate documents |
 | R-6 | Recruiter domain decision (open question 4) affects cookie and CORS posture | Same-origin default is the secure baseline; a separate domain would require an explicit cross-origin review |
+| R-9 | An authorized active `COMPANY_ADMIN` can infer whether an email address has a Portal Career account, by observing that `POST /companies/{company}/members` answers `201`/`409 MEMBER_ALREADY_ACTIVE` for a known address and `404 NOT_FOUND` for an unknown one | **Accepted for MVP by approved Product Owner decision, 25 August 2026.** The inference is inherent to a member-add operation that requires an existing account: any design that admits a known address and refuses an unknown one is observable to the caller. It is not eliminated, it is confined — see the mitigations below |
+
+### R-9 in detail — company member account lookup
+
+**Accepted, not solved.** The observability follows from the MVP rule that an
+unknown address is refused (Part X item 10). It is bounded by every one of the
+following, and the acceptance is void if any is removed:
+
+| Mitigation | Where enforced |
+| --- | --- |
+| Requires an **active `COMPANY_ADMIN`** membership of that company | `CompanyPolicy::manageMembers` |
+| Requires **COMPANY_SCOPE** — an admin of another company gets `404` for the company itself | `CompanyScope::findFor` |
+| Requires a **verified email** | `verified.email` route middleware |
+| **20 attempts per rolling hour per acting admin**, counting attempts rather than successes | `company.member-invite-rate` (Part I §11.9) |
+| **No public lookup endpoint** exists, and none may be added | route inventory — the only unauthenticated routes are page delivery and the throttled auth actions |
+| **No profile information about the matched user** is disclosed — the response carries `user_id` and membership metadata, never name or email | `CompanyMemberPresenter` |
+| An unknown address returns the **generic `NOT_FOUND` envelope**, identical to an out-of-scope member id | `CompanyMemberNotFound` mapping |
+| **No invitation email** is sent to an unknown address | `AddCompanyMember` |
+
+**The public and authentication surfaces must never expose account existence.**
+Registration returns an outwardly identical response for a duplicate address,
+forgot-password returns an identical response for known and unknown identities,
+and login does not distinguish a missing account from a wrong password. R-9 is
+confined to the authenticated, authorized, rate-limited member-add operation and
+must not be allowed to widen to any anonymous surface.
+
+**Revisit** if abuse evidence appears, in which case a privacy-preserving
+invitation workflow — one that neither confirms nor denies account existence —
+replaces the current rule.
