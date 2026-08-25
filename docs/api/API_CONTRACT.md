@@ -308,6 +308,21 @@ Approved and frozen 25 August 2026 with the candidate document upload policy.
 
 No storage quota applies at MVP; a per-candidate storage quota is **DEFERRED** and may be added later without changing this operation, its route, or its payload.
 
+##### 11.9 Company member invitation limiter
+
+Approved 25 August 2026 with the company member invitation MVP decision.
+
+| Property | Policy |
+| --- | --- |
+| Operation | `POST /companies/{company}/members` |
+| Limit | **20 attempts per rolling hour, per authenticated Company Admin identity** |
+| Counted | Every admitted attempt — created, duplicate, and unknown-account alike — so an account-probing loop costs the same as a working invite |
+| Limiter key subject | The authenticated **user identifier**. **Never a raw email address** (§11.4) |
+| Response | `RATE_LIMITED`, HTTP `429`, `Retry-After` **required** (§11.5) |
+| Storage | Redis runtime state, per §11.7 — no table, no schema change |
+
+The subject is the acting admin, not the company: a single admin cannot spread the same probing budget across several companies they administer.
+
 #### 12. Audit and Outbox Notation
 
 Each contract states its **Audit** consequence (a row in `audit_logs`, FR-AUD-001) and its **Notification / Outbox** consequence (`notifications` rows, `email_outbox` rows, FR-NOTIF-002). Both are written **inside** the business transaction; the queue job is dispatched **after commit** (INV-015). "None" means exactly that.
@@ -1333,7 +1348,7 @@ Clients must therefore read the collection, edit the whole set, and send it back
 - Creates `companies` with `verification_status = DRAFT` and one active `company_members` row for the creator.
 - The first member's `company_role` is `COMPANY_ADMIN`, with the existing active membership representation. This is the closed D-1 decision. Subsequent member roles require explicit selection and have no implicit default; at least one active `COMPANY_ADMIN` must remain.
 - `normalized_name` is computed server-side as a **duplicate-detection signal only**. FR-COMP-001 requires flag-and-review across five signals (normalized name, legal identifier, website domain, official email domain, phone) with merge by an authorized role. It is **not unique** and a similar name is never hard-rejected (INV-034).
-- Where a potential duplicate is detected the response carries `meta.warnings` with a duplicate-review signal; creation still succeeds.
+- Where a potential duplicate is detected the response carries `meta.warnings` with **`COMPANY_DUPLICATE_REVIEW_SUGGESTED`** (approved as a non-error signal, 25 August 2026; `ERROR_CODES.md` §9); creation still succeeds and the matched company is never named.
 
 **Success Response:** `201 Created` with the company and `Location`.
 
@@ -1585,7 +1600,9 @@ Clients must therefore read the collection, edit the whole set, and send it back
 
 **Authentication:** Required.
 
-**Authorization:** Career Center staff or manager. **Not** available to recruiters, HR admins, or Auditor.
+**Authorization:** Career Center staff or manager, **or Super Admin** (approved reconciliation, 25 August 2026 — `AUTHORIZATION_MATRIX.md` §4.4 already granted Super Admin `ALLOW`; this section previously named Career Center alone). **Not** available to recruiters, HR admins, or Auditor.
+
+> **An active member of the company under review may never review it** (approved decision, 25 August 2026). The prohibition follows the reviewer, not the role code: it applies to Career Center staff, to Career Center managers, and to Super Admin alike. A reviewer who holds an active `company_members` row for that company receives `403 AUTH_FORBIDDEN`.
 
 **Request:** Optional `recruiter_visible_note`, optional `internal_note`.
 
@@ -1623,7 +1640,7 @@ Clients must therefore read the collection, edit the whole set, and send it back
 
 **Authentication:** Required.
 
-**Authorization:** Career Center staff or manager.
+**Authorization:** Career Center staff or manager, **or Super Admin** (approved reconciliation, 25 August 2026). An **active member of the company under review may never review it**, whatever their role — `403 AUTH_FORBIDDEN`.
 
 **Request:** `reason_category` (**required**), `recruiter_visible_note` (**required**), `internal_note` (optional).
 
@@ -1659,7 +1676,7 @@ Clients must therefore read the collection, edit the whole set, and send it back
 
 **Purpose:** Career Center rejects a company verification (FR-ONB-004).
 
-**Authentication:** Required. **Authorization:** Career Center.
+**Authentication:** Required. **Authorization:** Career Center staff or manager, **or Super Admin** (approved reconciliation, 25 August 2026). An **active member of the company under review may never review it**, whatever their role — `403 AUTH_FORBIDDEN`.
 
 **Request:** `reason_category` (required), `recruiter_visible_note` (required), `internal_note` (optional).
 
@@ -1683,7 +1700,7 @@ Clients must therefore read the collection, edit the whole set, and send it back
 
 **Purpose:** Career Center suspends an active company (FR-ONB-004).
 
-**Authentication:** Required. **Authorization:** Career Center.
+**Authentication:** Required. **Authorization:** Career Center staff or manager, **or Super Admin** (approved reconciliation, 25 August 2026). An **active member of the company under review may never review it**, whatever their role — `403 AUTH_FORBIDDEN`.
 
 **Request:** `reason_category` (required), `recruiter_visible_note` (required), `internal_note` (optional).
 
@@ -1707,7 +1724,7 @@ Clients must therefore read the collection, edit the whole set, and send it back
 
 **Purpose:** Career Center restores a suspended company (FR-ONB-004).
 
-**Authentication:** Required. **Authorization:** Career Center.
+**Authentication:** Required. **Authorization:** Career Center staff or manager, **or Super Admin** (approved reconciliation, 25 August 2026). An **active member of the company under review may never review it**, whatever their role — `403 AUTH_FORBIDDEN`.
 
 **Request:** Optional `recruiter_visible_note`, optional `internal_note`.
 
@@ -1779,22 +1796,27 @@ Clients must therefore read the collection, edit the whole set, and send it back
 
 **Authentication:** Required, email verified. **Authorization:** `COMPANY_SCOPE`, Company Admin capability.
 
+**Rate limit:** **20 attempts per hour per Company Admin identity** (approved MVP decision, 25 August 2026). The window counts attempts, not successes, so a probing loop is throttled the same as a working one. Exceeding it returns `RATE_LIMITED` (429) with `Retry-After`.
+
 **Request:** `email` (required), `company_role` (required — `COMPANY_ADMIN` \| `COMPANY_RECRUITER`).
 
 **Validation:** Email format; enum membership.
 
 **Business Rules:**
+- **The invitee must already hold an account.** An address with no `users` row is **NOT SUPPORTED at MVP** (approved decision, 25 August 2026): no membership row is created, **no email is sent**, and no pending-invitation record exists anywhere — there is no invitation entity in the schema, and none is introduced.
+- **An unknown address returns the generic `NOT_FOUND` envelope**, identical to the response for a member id outside this company. The response must not distinguish "no such account" from "not visible to you"; a differentiated status or message would turn this route into an account-enumeration oracle for any Company Admin.
+- The **unknown-user invitation lifecycle is DEFERRED** — see Part X item 10. Nothing about a future pre-registration invite is implied by this contract.
 - An invited member must verify their email/account through the standard security mechanism before gaining access (FR-COMP-004). **No temporary password is issued.**
 - `company_role` is explicitly selected for every member added after the creator; there is no implicit default role.
 - Rejects a duplicate **active** membership (`MEMBER_ALREADY_ACTIVE`, INV-017).
 - Access requires an **active** membership; a revoked one grants nothing.
 - Revoke, demote, deactivate, or leave operations must not leave zero active `COMPANY_ADMIN` memberships; otherwise they return `MEMBER_LAST_ADMIN` (closed D-1).
 
-**Success Response:** `201 Created` (or `202` where an invitation email is the only immediate effect).
+**Success Response:** `201 Created` with the membership row. **There is no `202` outcome at MVP**, because an invitation email is never the only immediate effect: either a membership is created, or the request is `NOT_FOUND`.
 
-**Error Codes:** `VALIDATION_FAILED` (422) · `MEMBER_ALREADY_ACTIVE` (409) · `COMPANY_ASSOCIATION_FORBIDDEN` (403).
+**Error Codes:** `VALIDATION_FAILED` (422) · `MEMBER_ALREADY_ACTIVE` (409) · `MEMBER_LAST_ADMIN` (409) · `NOT_FOUND` (404, unknown account) · `RATE_LIMITED` (429) · `COMPANY_ASSOCIATION_FORBIDDEN` (403).
 
-**Side Effects:** Membership row (pending/active per the invitation mechanism); outbox row. Paired routes: `GET /api/v1/companies/{company}/members`, `PATCH /api/v1/companies/{company}/members/{member}` (change role), `DELETE /api/v1/companies/{company}/members/{member}` (revoke — sets `revoked_at`, never deletes; FR-COMP-004 "penghapusan membership tidak menghapus audit/history").
+**Side Effects:** One active membership row; outbox row. Paired routes: `GET /api/v1/companies/{company}/members`, `PATCH /api/v1/companies/{company}/members/{member}` (change role), `DELETE /api/v1/companies/{company}/members/{member}` (revoke — sets `revoked_at`, never deletes; FR-COMP-004 "penghapusan membership tidak menghapus audit/history").
 
 **Audit:** `company_member_added` / `_role_changed` / `_revoked`.
 
@@ -3534,6 +3556,7 @@ Nothing below is resolved by this document **except where a row is explicitly ma
 | 7 | **Candidate controlled vocabularies** — work preference values, education level, candidate document type | `PATCH /candidate/profile`, `PUT /candidate/{collection}`, `POST` and `PATCH /candidate/documents` validate these fields for **type, length, and structural validity only**. `DATABASE_SCHEMA.md` holds all three as `varchar` with the `CHECK` **pending approval**; no values are invented here. **The fields and their features remain MVP** — approving a vocabulary later adds a `CHECK` and a membership rule, and changes no route, payload shape, or capability |
 | 8 | **Profile completion criteria** — `DEFERRED POLICY` | FR-CAN-003 requires a completed profile but fixes **no** completion formula or required-field set. `candidate_profiles.profile_completed_at` **stays in the frozen schema**, is returned as stored, and **may remain `null`**. It is **not** automatically recomputed by any operation in this contract. Candidate profile and collection CRUD are **not blocked** by this |
 | 9 | ~~**Candidate document upload policy**~~ | **CLOSED — approved and frozen 25 August 2026.** MIME allowlist: **`application/pdf` only**, admitted on the **server-inspected** type **and** the `%PDF-` signature. Maximum size: **10 MiB / `10,485,760` bytes**, a **single global limit** with **no per-`document_type` variation**; application validation is authoritative and transport ceilings sit above it. Upload rate limit: **20 per hour per candidate** (Part I §11.8). Storage quota: **DEFERRED**. Malware scanner: **not required** for the PDF-only allowlist. `document_type` stays **open-text `varchar(64)`** — see item 7, still open. `CANDIDATE_DOCUMENT_UPLOAD_POLICY_REQUIRED` is retired; **no migration and no API-shape change** resulted. `POST /candidate/documents` remains **unrouted pending implementation** |
+| 10 | **Unknown-user company member invitation lifecycle** — `DEFERRED` | Approved 25 August 2026: at MVP `POST /companies/{company}/members` accepts **only an address that already has an account**. An unknown address creates no membership, sends **no email**, records no pending invitation, and returns the generic `NOT_FOUND` envelope. Whether a pre-registration invite is ever offered — and if so whether it is an invitation entity, a nullable-user membership, or a tokenized link — is **not decided**. No schema, route, or response shape anticipates it |
 
 **Human-decision items carried from the ERD:**
 

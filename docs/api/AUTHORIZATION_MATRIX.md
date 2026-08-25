@@ -190,7 +190,7 @@ Super Admin's `ALLOW` on candidate reads is break-glass, audited on every use, a
 
 ³ A recruiter sees only their own company's partnership record.
 
-**A recruiter can never verify their own company** — that would defeat the entire gate. **Partnership is never a verification substitute**: a VERIFIED company with no partnership creates vacancies normally, and no partnership capability appears in any vacancy-creation path (INV-003, INV-020, FR-ONB-006).
+**A recruiter can never verify their own company** — that would defeat the entire gate. **Generalized by approved decision, 25 August 2026: an active member of a company may never review that company, whatever their role.** The prohibition follows the reviewer, not the role code, and applies to Career Center staff, Career Center managers, and Super Admin alike; such a reviewer receives `403 AUTH_FORBIDDEN`. Super Admin's `ALLOW` on the five review actions below is confirmed and is now stated identically in each `API_CONTRACT.md` review section. **Partnership is never a verification substitute**: a VERIFIED company with no partnership creates vacancies normally, and no partnership capability appears in any vacancy-creation path (INV-003, INV-020, FR-ONB-006).
 
 ### 4.5 Vacancy, Moderation, Stages, Screening
 

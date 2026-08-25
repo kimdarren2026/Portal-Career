@@ -222,6 +222,7 @@ This mapping is a documented reading of an FSD table explicitly labelled as exam
 | Code | HTTP | Meaning |
 | --- | --- | --- |
 | `EMAIL_DELIVERY_PENDING` | **200 / 201** | **Not an error.** The business transaction committed; email delivery is queued (INV-015, FR-NOTIF-001). Returned in `meta.warnings[]` on a success response, never in the `error` envelope |
+| `COMPANY_DUPLICATE_REVIEW_SUGGESTED` | **201** | **Not an error.** `POST /companies` matched one or more of the five FR-COMP-001 duplicate signals — normalized name, legal identifier, website domain, official email domain, phone. Creation **succeeded**; the company is flagged for authorized duplicate review. INV-034 keeps `normalized_name` non-unique and forbids hard rejection. Returned in `meta.warnings[]`; the matched company is never named |
 
 An email failure never turns a committed business action into an HTTP error. If it did, the client would retry an operation that already succeeded.
 
