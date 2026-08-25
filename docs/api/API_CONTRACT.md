@@ -1878,7 +1878,7 @@ Clients must therefore read the collection, edit the whole set, and send it back
 
 **Authentication:** Required, email verified.
 
-**Authorization:** `COMPANY_SCOPE` — active `company_members` row required (INV-017).
+**Authorization:** `COMPANY_SCOPE` — active `company_members` row required (INV-017). **The global `SUPER_ADMIN` role alone confers no company-authoring capability** (PO decision VA-4, approved — CLOSED); see `AUTHORIZATION_MATRIX.md` §4.5 footnote 11.
 
 **Request:** `vacancy_type` (`COMPANY_EMPLOYMENT` \| `INTERNSHIP`), `title`, `description`, `responsibilities`, `employment_type`, `workplace_mode`, geography references and `location` fallback, `openings_count`, `minimum_education`, `experience_requirement`, `salary_min`/`salary_max`/`salary_currency`, `target_audience`, `application_method`, `external_ats_url`, `open_at`, `close_at`, `requirements[]`, `screening_questions[]`.
 
@@ -1888,6 +1888,7 @@ Clients must therefore read the collection, edit the whole set, and send it back
 - `external_ats_url` required when `EXTERNAL_ATS`; **`https` scheme only** (FSD §9.1.5).
 - `close_at` after `open_at` (FSD §9.1.4); both required before leaving DRAFT.
 - `requirements[]` entries carry exactly one typed value per `requirement_type` — `education_level`, `study_program_id`, `skill_id`, `minimum_years_experience`, or `value_text`.
+- **Each inline `screening_questions[]` entry must state `required` and `active` explicitly as booleans** (PO decision VA-3). There is no server default for either flag on a new question.
 - **Salary requirement is PENDING BUSINESS DECISION** (open question 3). Fields are nullable and no mandatory rule is enforced. `SALARY_REQUIRED` is reserved but unused.
 
 **Business Rules:**
@@ -1966,18 +1967,33 @@ Clients must therefore read the collection, edit the whole set, and send it back
 
 **Authentication:** Required, email verified.
 
-**Authorization:** `COMPANY_SCOPE` for company vacancies · `CAMPUS_SCOPE` for campus vacancies. **Career Center is `DENY`** — it moderates vacancy content, it never authors or edits it (final ruling, 24 August 2026). A moderator who could also edit the submission would be reviewing their own work.
+**Authorization:** `COMPANY_SCOPE` for company vacancies · `CAMPUS_SCOPE` for campus vacancies. **The global `SUPER_ADMIN` role alone confers no company-authoring capability** (PO decision VA-4); a Super Admin who also holds an ACTIVE membership of that company edits **as that member**. **Career Center is `DENY`** — it moderates vacancy content, it never authors or edits it (final ruling, 24 August 2026). A moderator who could also edit the submission would be reviewing their own work.
 
-**Request:** Any editable attribute plus `requirements[]` and `screening_questions[]`.
+**Request:** Any editable attribute, plus **optional** `requirements[]`.
 
-**Validation:** As for create.
+> **`screening_questions[]` is NOT part of this request (PO decision VA-2, approved — CLOSED).** Screening questions are mutated **only** through their own frozen routes: `GET`, `POST /vacancies/{vacancy}/screening-questions` and `PATCH /vacancies/{vacancy}/screening-questions/{question}`. There is no `DELETE`. This operation never performs a competing screening-question synchronization; a `screening_questions` key in the payload is an unsupported field and is rejected by the ordinary unsupported-field convention (`VALIDATION_FAILED`), with **no new error code**. Inline `screening_questions[]` on **create** is unaffected and remains supported.
+
+**Validation:** As for create, for every attribute present.
+
+**`requirements[]` semantics (PO decision VA-1, approved — CLOSED):**
+
+| Payload | Meaning |
+| --- | --- |
+| `requirements` **omitted** | The existing requirement collection is **preserved unchanged**. Nothing is read, written, or reordered |
+| `requirements` **present** | The array is the **complete desired collection**. The stored collection is **fully replaced** by it — this is replacement, not an incremental merge, and no per-row identity is matched |
+| `requirements: []` | The collection is **cleared** — every existing requirement row is removed |
+
+Entries are validated exactly as on create: frozen `requirement_type` membership and **exactly one typed value per type** (`chk_vacancy_requirements_typed_value`). **No individual vacancy-requirement CRUD endpoint exists or is introduced** — a requirement is only ever written through its parent vacancy.
 
 **Business Rules:**
 - Editable in `DRAFT` and `REVISION_REQUIRED` (company), `DRAFT` and `SCHEDULED` (campus). Otherwise `409 VACANCY_NOT_EDITABLE`.
 - **Editing never creates a new vacancy** (FR-VAC-007). The same row is revised.
 - **Every accepted edit appends a `vacancy_versions` snapshot** so the before/after state FR-VAC-007 requires is reconstructable. Versions are append-only (INV-016).
-- **`application_method` may not change from `IN_PORTAL` to `EXTERNAL_ATS` while applications exist** → `409 VACANCY_HAS_APPLICATIONS` (INV-024). Allowing it would strand application rows on an external vacancy.
+- **`application_method` may not change from `IN_PORTAL` to `EXTERNAL_ATS` while applications exist** → `409 VACANCY_HAS_APPLICATIONS` (INV-024). Allowing it would strand application rows on an external vacancy. The guard runs **inside** the update transaction, before any mutation: a blocked transition leaves `application_method`, `external_ats_url`, every other attribute and the requirement collection unchanged, appends **no** version, and writes **no** `vacancy_updated` audit entry. The reverse transition `EXTERNAL_ATS` → `IN_PORTAL` is **not** blocked by INV-024.
 - `current_status` is not writable here.
+- **The whole edit is one atomic transaction** in this order: scoped lookup with the vacancy row locked → editable-status check → `If-Match` / stale-version check → INV-024 application-method guard → parent attribute mutation → requirement replacement **if `requirements[]` was supplied** → version allocation → full post-update snapshot → audit. A failure at any step rolls back **everything**: the parent stays as it was, the requirement collection stays as it was, no version is appended and no audit row is written. In particular a **stale `If-Match` is rejected before any destructive requirement synchronization**.
+- **One accepted PATCH appends exactly one `vacancy_versions` row**, whatever combination of attributes and `requirements[]` it carried. A **requirements-only** PATCH is a fully accepted edit and appends exactly one version like any other.
+- **The version snapshot represents the final post-synchronization state**: the replacement collection when `requirements[]` was supplied, and the preserved existing collection when it was omitted.
 
 **Success Response:** `200 OK` with the new version number.
 
@@ -1993,7 +2009,7 @@ Clients must therefore read the collection, edit the whole set, and send it back
 
 **Concurrency:** `If-Match` on version; stale write → `409 STALE_VERSION`.
 
-**Source Requirement:** FR-VAC-007 · INV-016, INV-024
+**Source Requirement:** FR-VAC-007 · INV-016, INV-024 · PO decisions **VA-1** (requirement synchronization) and **VA-2** (screening questions excluded), approved 25 August 2026
 
 ---
 
@@ -2311,11 +2327,17 @@ Clients must therefore read the collection, edit the whole set, and send it back
 
 **Purpose:** Define vacancy screening questions (FR-VAC-003, FR-HR-002).
 
-**Authentication:** Required, email verified. **Authorization:** `COMPANY_SCOPE` or `CAMPUS_SCOPE` owner.
+**Authentication:** Required, email verified. **Authorization:** `COMPANY_SCOPE` or `CAMPUS_SCOPE` owner. For a company vacancy, the **global `SUPER_ADMIN` role alone is not sufficient** (PO decision VA-4) — an ACTIVE company membership is required, and a Super Admin who holds one acts through it.
 
-**Request:** `question_text`, `question_type` (`SHORT_TEXT` \| `LONG_TEXT` \| `YES_NO` \| `SINGLE_CHOICE` \| `NUMBER`), `required` (boolean), `options_definition` (required for `SINGLE_CHOICE`), `sort_order`, `active`.
+**Request:** `question_text`, `question_type` (`SHORT_TEXT` \| `LONG_TEXT` \| `YES_NO` \| `SINGLE_CHOICE` \| `NUMBER`), **`required` (boolean, MANDATORY)**, `options_definition` (required for `SINGLE_CHOICE`), `sort_order`, **`active` (boolean, MANDATORY)**.
 
 **Validation:** Enum membership; `options_definition` present and non-empty **only** for `SINGLE_CHOICE`; rejected for other types.
+
+**`required` and `active` on a NEW question (PO decision VA-3, approved — CLOSED):**
+- Every **new** screening question must state **both** `required` and `active` explicitly, as booleans. A missing value is `422 VALIDATION_FAILED`.
+- **There is no server default.** The former implicit `required = false` / `active = true` fallback was unsourced and is removed. `false` and `true` are both accepted — but only when the client sends them.
+- This applies identically to **inline `screening_questions[]` on `POST /companies/{company}/vacancies`**, which the create contract supports: each inline question must carry both flags.
+- **`PATCH /vacancies/{vacancy}/screening-questions/{question}` stays a partial update.** An omitted `required` leaves the stored value unchanged; an omitted `active` leaves the stored value unchanged. Deactivation is still `PATCH active=false`.
 
 **Business Rules:**
 - Questions belong to one vacancy. A question from another vacancy can never be referenced by an answer (INV-019).
@@ -2332,7 +2354,7 @@ Clients must therefore read the collection, edit the whole set, and send it back
 
 **Idempotency:** Not required. **Concurrency:** Last-write-wins per question.
 
-**Source Requirement:** FR-VAC-003, FR-HR-002 · INV-019
+**Source Requirement:** FR-VAC-003, FR-HR-002 · INV-019 · PO decision **VA-3** (explicit `required` / `active` on new questions), approved 25 August 2026
 
 ---
 
@@ -3558,6 +3580,7 @@ Nothing below is resolved by this document **except where a row is explicitly ma
 | 8 | **Profile completion criteria** — `DEFERRED POLICY` | FR-CAN-003 requires a completed profile but fixes **no** completion formula or required-field set. `candidate_profiles.profile_completed_at` **stays in the frozen schema**, is returned as stored, and **may remain `null`**. It is **not** automatically recomputed by any operation in this contract. Candidate profile and collection CRUD are **not blocked** by this |
 | 9 | ~~**Candidate document upload policy**~~ | **CLOSED — approved and frozen 25 August 2026.** MIME allowlist: **`application/pdf` only**, admitted on the **server-inspected** type **and** the `%PDF-` signature. Maximum size: **10 MiB / `10,485,760` bytes**, a **single global limit** with **no per-`document_type` variation**; application validation is authoritative and transport ceilings sit above it. Upload rate limit: **20 per hour per candidate** (Part I §11.8). Storage quota: **DEFERRED**. Malware scanner: **not required** for the PDF-only allowlist. `document_type` stays **open-text `varchar(64)`** — see item 7, still open. `CANDIDATE_DOCUMENT_UPLOAD_POLICY_REQUIRED` is retired; **no migration and no API-shape change** resulted. `POST /candidate/documents` remains **unrouted pending implementation** |
 | 10 | **Unknown-user company member invitation lifecycle** — `DEFERRED` | Approved 25 August 2026: at MVP `POST /companies/{company}/members` accepts **only an address that already has an account**. An unknown address creates no membership, sends **no email**, records no pending invitation, and returns the generic `NOT_FOUND` envelope. Whether a pre-registration invite is ever offered — and if so whether it is an invitation entity, a nullable-user membership, or a tokenized link — is **not decided**. No schema, route, or response shape anticipates it |
+| 11 | **Vacancy moderation authority** — *moderation portion only* | Which actors may `approve`, `request-revision`, `reject`, `publish`, `close`, `suspend` and `restore` a company vacancy is **unreconciled** between `AUTHORIZATION_MATRIX.md` §4.5 and the review sections of this contract, and is **OPEN**. No moderation operation is implemented, stubbed, or routed while it stands. **The authoring portion of this question is CLOSED** — PO decision **VA-4** (25 August 2026) settles that company authoring (create, edit, screening questions, submit as company owner) never derives from the global `SUPER_ADMIN` role and always derives from an ACTIVE company membership. VA-4 settles **nothing** about moderation |
 
 **Human-decision items carried from the ERD:**
 
