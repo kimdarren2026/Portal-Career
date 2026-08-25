@@ -8,6 +8,8 @@ use App\Domains\Candidate\Policies\CandidateDocumentPolicy;
 use App\Domains\Candidate\Policies\CandidateProfilePolicy;
 use App\Domains\Company\Models\Company;
 use App\Domains\Company\Policies\CompanyPolicy;
+use App\Domains\Vacancy\Models\Vacancy;
+use App\Domains\Vacancy\Policies\VacancyPolicy;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -29,5 +31,6 @@ class AppServiceProvider extends ServiceProvider
         $gate->policy(CandidateProfile::class, CandidateProfilePolicy::class);
         $gate->policy(CandidateDocument::class, CandidateDocumentPolicy::class);
         $gate->policy(Company::class, CompanyPolicy::class);
+        $gate->policy(Vacancy::class, VacancyPolicy::class);
     }
 }

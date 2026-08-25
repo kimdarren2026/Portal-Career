@@ -9,6 +9,8 @@ use App\Http\Controllers\Web\CandidatePageController;
 use App\Http\Controllers\Web\CandidateProfileController;
 use App\Http\Controllers\Web\CompanyController;
 use App\Http\Controllers\Web\CompanyMemberController;
+use App\Http\Controllers\Web\VacancyController;
+use App\Http\Controllers\Web\VacancyScreeningQuestionController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -119,5 +121,36 @@ Route::middleware(['auth', 'account.status'])->prefix('candidate')->name('candid
 
     Route::middleware(['candidate.document-upload-rate', 'verified.email'])->group(function (): void {
         Route::post('/documents', [CandidateDocumentController::class, 'store'])->name('documents.store');
+    });
+});
+
+/*
+| Company Vacancy Authoring Foundation — INERTIA_WEB
+|
+| Authoring only: create, edit, owner list/read, append-only version history and
+| the screening-question surface. Every lifecycle transition beyond DRAFT
+| authoring is deliberately unrouted, because each depends on an unresolved
+| decision: approve target state, restore target state, the Super Admin
+| moderation actor set, the publish actor, and the submit completeness gate.
+| No placeholder route exists for any of them.
+*/
+Route::middleware(['auth', 'account.status'])->group(function (): void {
+    Route::post('/companies/{company}/vacancies', [VacancyController::class, 'store'])
+        ->middleware('verified.email')->name('companies.vacancies.store');
+
+    Route::prefix('vacancies')->name('vacancies.')->group(function (): void {
+        Route::get('/', [VacancyController::class, 'index'])->name('index');
+        Route::get('/{vacancy}', [VacancyController::class, 'show'])->whereNumber('vacancy')->name('show');
+        Route::get('/{vacancy}/versions', [VacancyController::class, 'versions'])->whereNumber('vacancy')->name('versions');
+        Route::get('/{vacancy}/screening-questions', [VacancyScreeningQuestionController::class, 'index'])
+            ->whereNumber('vacancy')->name('screening-questions.index');
+
+        Route::middleware('verified.email')->group(function (): void {
+            Route::patch('/{vacancy}', [VacancyController::class, 'update'])->whereNumber('vacancy')->name('update');
+            Route::post('/{vacancy}/screening-questions', [VacancyScreeningQuestionController::class, 'store'])
+                ->whereNumber('vacancy')->name('screening-questions.store');
+            Route::patch('/{vacancy}/screening-questions/{question}', [VacancyScreeningQuestionController::class, 'update'])
+                ->whereNumber('vacancy')->whereNumber('question')->name('screening-questions.update');
+        });
     });
 });
