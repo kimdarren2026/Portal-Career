@@ -1888,6 +1888,7 @@ Clients must therefore read the collection, edit the whole set, and send it back
 - `external_ats_url` required when `EXTERNAL_ATS`; **`https` scheme only** (FSD §9.1.5).
 - `close_at` after `open_at` (FSD §9.1.4); both required before leaving DRAFT.
 - `requirements[]` entries carry exactly one typed value per `requirement_type` — `education_level`, `study_program_id`, `skill_id`, `minimum_years_experience`, or `value_text`.
+- **Each `requirements[]` entry must state `required` explicitly as a boolean** (PO decision VA-5, approved — CLOSED). `true` means the candidate must satisfy or provide that requirement under its existing downstream semantics; `false` means it is optional under those same semantics. **Omitted → `422 VALIDATION_FAILED`.** There is no server default, and neither `true` nor `false` is ever supplied silently.
 - **Each inline `screening_questions[]` entry must state `required` and `active` explicitly as booleans** (PO decision VA-3). There is no server default for either flag on a new question.
 - **Salary requirement is PENDING BUSINESS DECISION** (open question 3). Fields are nullable and no mandatory rule is enforced. `SALARY_REQUIRED` is reserved but unused.
 
@@ -1983,7 +1984,9 @@ Clients must therefore read the collection, edit the whole set, and send it back
 | `requirements` **present** | The array is the **complete desired collection**. The stored collection is **fully replaced** by it — this is replacement, not an incremental merge, and no per-row identity is matched |
 | `requirements: []` | The collection is **cleared** — every existing requirement row is removed |
 
-Entries are validated exactly as on create: frozen `requirement_type` membership and **exactly one typed value per type** (`chk_vacancy_requirements_typed_value`). **No individual vacancy-requirement CRUD endpoint exists or is introduced** — a requirement is only ever written through its parent vacancy.
+Entries are validated exactly as on create: frozen `requirement_type` membership, **exactly one typed value per type** (`chk_vacancy_requirements_typed_value`), and **an explicit boolean `required` on every entry** (PO decision VA-5 — omitted is `422 VALIDATION_FAILED`, with no server default in either direction). **No individual vacancy-requirement CRUD endpoint exists or is introduced** — a requirement is only ever written through its parent vacancy.
+
+**VA-5 changes nothing else.** The requirement-type vocabulary, the typed-value mapping, the VA-1 atomic replacement semantics, the B-5 submit-completeness question, and candidate eligibility and application logic are all untouched by it.
 
 **Business Rules:**
 - Editable in `DRAFT` and `REVISION_REQUIRED` (company), `DRAFT` and `SCHEDULED` (campus). Otherwise `409 VACANCY_NOT_EDITABLE`.
@@ -2009,7 +2012,7 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 **Concurrency:** `If-Match` on version; stale write → `409 STALE_VERSION`.
 
-**Source Requirement:** FR-VAC-007 · INV-016, INV-024 · PO decisions **VA-1** (requirement synchronization) and **VA-2** (screening questions excluded), approved 25 August 2026
+**Source Requirement:** FR-VAC-007 · INV-016, INV-024 · PO decisions **VA-1** (requirement synchronization), **VA-2** (screening questions excluded) and **VA-5** (explicit `required` per requirement), approved 25 August 2026
 
 ---
 
