@@ -10,6 +10,7 @@ use App\Http\Controllers\Web\CandidateProfileController;
 use App\Http\Controllers\Web\CompanyController;
 use App\Http\Controllers\Web\CompanyMemberController;
 use App\Http\Controllers\Web\VacancyController;
+use App\Http\Controllers\Web\VacancyLifecycleController;
 use App\Http\Controllers\Web\VacancyScreeningQuestionController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -151,6 +152,34 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
                 ->whereNumber('vacancy')->name('screening-questions.store');
             Route::patch('/{vacancy}/screening-questions/{question}', [VacancyScreeningQuestionController::class, 'update'])
                 ->whereNumber('vacancy')->whereNumber('question')->name('screening-questions.update');
+
+            // Submit's contract requires a verified email; it is an owner action.
+            Route::post('/{vacancy}/submit-review', [VacancyLifecycleController::class, 'submit'])
+                ->whereNumber('vacancy')->name('submit-review');
+
         });
+
+        /*
+        | Moderation and manual close (B-1 … B-4). Their contracts state
+        | "Authentication: Required" without an email-verified gate, so none is
+        | added here.
+        |
+        | There is deliberately NO publish route: a company vacancy reaches
+        | PUBLISHED only through approval inside its active window or through the
+        | scheduler (B-4), so no actor publishes one directly and no company
+        | vacancy can bypass moderation.
+        */
+        Route::post('/{vacancy}/request-revision', [VacancyLifecycleController::class, 'requestRevision'])
+            ->whereNumber('vacancy')->name('request-revision');
+        Route::post('/{vacancy}/reject', [VacancyLifecycleController::class, 'reject'])
+            ->whereNumber('vacancy')->name('reject');
+        Route::post('/{vacancy}/approve', [VacancyLifecycleController::class, 'approve'])
+            ->whereNumber('vacancy')->name('approve');
+        Route::post('/{vacancy}/suspend', [VacancyLifecycleController::class, 'suspend'])
+            ->whereNumber('vacancy')->name('suspend');
+        Route::post('/{vacancy}/restore', [VacancyLifecycleController::class, 'restore'])
+            ->whereNumber('vacancy')->name('restore');
+        Route::post('/{vacancy}/close', [VacancyLifecycleController::class, 'close'])
+            ->whereNumber('vacancy')->name('close');
     });
 });

@@ -18,9 +18,14 @@ use App\Domains\Vacancy\Models\Vacancy;
  * AUTHORIZATION_MATRIX.md §4.5 footnote 5). Auditor is READ_ONLY: no Policy
  * grants it any write ability anywhere.
  *
- * Moderation abilities are deliberately absent from this class: the moderation
- * actor set is unreconciled between AUTHORIZATION_MATRIX.md §4.5 and the
- * API_CONTRACT.md review sections, and is not decided here.
+ * Moderation (B-3, approved 25 August 2026) belongs to CAREER_CENTER_STAFF,
+ * CAREER_CENTER_MANAGER and SUPER_ADMIN, and is barred for any of them who
+ * holds an ACTIVE membership of the owning company — a moderator must not
+ * review their own company's submission. Recruiters never moderate; Auditor
+ * stays read-only.
+ *
+ * VA-4 is unchanged: moderation authority grants no authoring capability, and
+ * the global SUPER_ADMIN role still confers no company authoring.
  */
 final class VacancyPolicy
 {
@@ -45,6 +50,41 @@ final class VacancyPolicy
     public function manageScreeningQuestions(User $user, Vacancy $vacancy): bool
     {
         return $this->update($user, $vacancy);
+    }
+
+    /** Submit is an owner capability, not moderation (FR-VAC-004). */
+    public function submitForReview(User $user, Vacancy $vacancy): bool
+    {
+        return $this->update($user, $vacancy);
+    }
+
+    /** B-3: moderator role, company vacancy, and no membership of the owning company. */
+    public function moderate(User $user, Vacancy $vacancy): bool
+    {
+        return $vacancy->isCompanyOwned()
+            && $this->isModerator($user)
+            && ! $this->activeMemberOf($user, (int) $vacancy->company_id);
+    }
+
+    /**
+     * Close has two independent paths (B-3): the owner closing their own
+     * published vacancy — an ownership capability the conflict rule does not
+     * touch — or a moderator closing it under the conflict rule.
+     */
+    public function close(User $user, Vacancy $vacancy): bool
+    {
+        return $this->update($user, $vacancy) || $this->moderate($user, $vacancy);
+    }
+
+    private function isModerator(User $user): bool
+    {
+        foreach ([RoleCode::CareerCenterStaff, RoleCode::CareerCenterManager, RoleCode::SuperAdmin] as $role) {
+            if ($user->hasActiveRole($role)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function activeMemberOf(User $user, int $companyId): bool

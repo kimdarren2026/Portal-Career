@@ -63,6 +63,59 @@ abstract class VacancyTestCase extends IdentityTestCase
         ], $overrides);
     }
 
+    /** A vacancy whose persisted state satisfies every B-5 category. */
+    protected function submittablePayload(array $overrides = []): array
+    {
+        return $this->payload(array_merge([
+            'description' => 'Membangun dan memelihara layanan backend.',
+            'responsibilities' => 'S1 Teknik Informatika, menguasai PHP dan PostgreSQL.',
+            'location' => 'Jakarta Selatan',
+            'workplace_mode' => 'HYBRID',
+            'minimum_education' => 'S1',
+            'experience_requirement' => 'Minimal 2 tahun',
+            'open_at' => now()->addDay()->toIso8601String(),
+            'close_at' => now()->addDays(30)->toIso8601String(),
+        ], $overrides));
+    }
+
+    /** Creates a vacancy that can be submitted, then moves it to the wanted status. */
+    protected function vacancyAt(User $recruiter, Company $company, string $status, array $overrides = []): int
+    {
+        $id = $this->createVacancy($recruiter, $company, $this->submittablePayload($overrides));
+        if ($status !== 'DRAFT') {
+            DB::table('vacancies')->where('id', $id)->update(['current_status' => $status]);
+        }
+
+        return $id;
+    }
+
+    /** @return array{User, Company} A moderator with no membership of any company. */
+    protected function moderator(string $email, RoleCode $role = RoleCode::CareerCenterStaff): User
+    {
+        $user = $this->makeUser($email, UserStatus::Active);
+        $this->assignRole($user, $role);
+
+        return $user;
+    }
+
+    protected function reviewRows(int $vacancyId): array
+    {
+        return DB::table('vacancy_moderation_reviews')->where('vacancy_id', $vacancyId)
+            ->orderBy('id')->get()->map(static fn ($r): array => (array) $r)->all();
+    }
+
+    protected function auditCount(string $action, int $vacancyId): int
+    {
+        return DB::table('audit_logs')->where('action', $action)
+            ->where('object_type', 'vacancy')->where('object_id', $vacancyId)->count();
+    }
+
+    protected function outboxCount(int $vacancyId): int
+    {
+        return DB::table('email_outbox')->where('related_object_type', 'vacancy')
+            ->where('related_object_id', $vacancyId)->count();
+    }
+
     /** Master-data skill for typed SKILL requirements. */
     protected function skillId(): int
     {

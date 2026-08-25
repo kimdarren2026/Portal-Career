@@ -73,6 +73,7 @@ final class Vacancy extends Model
     public function requirements(): HasMany { return $this->hasMany(VacancyRequirement::class); }
     public function screeningQuestions(): HasMany { return $this->hasMany(VacancyScreeningQuestion::class); }
     public function versions(): HasMany { return $this->hasMany(VacancyVersion::class); }
+    public function moderationReviews(): HasMany { return $this->hasMany(VacancyModerationReview::class); }
 
     public function isCompanyOwned(): bool
     {

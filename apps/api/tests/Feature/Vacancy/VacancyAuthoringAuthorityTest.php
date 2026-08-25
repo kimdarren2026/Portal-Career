@@ -98,10 +98,12 @@ final class VacancyAuthoringAuthorityTest extends VacancyTestCase
         $this->actingAs($superAdmin)->patchJson("/vacancies/{$id}", ['title' => 'Recruiter Member Edit'])->assertOk();
 
         // The frozen authoring capability is identical for both membership
-        // roles; neither gains moderation, which is unrouted for everyone.
+        // roles. Moderation is a separate capability neither of them gains:
+        // the moderation routes exist now, but a company member is barred from
+        // them by the B-3 conflict-of-interest rule.
         self::assertSame('Recruiter Member Edit', DB::table('vacancies')->where('id', $id)->value('title'));
-        self::assertNull(Route::getRoutes()->getByName('vacancies.approve'));
-        self::assertNull(Route::getRoutes()->getByName('vacancies.submit-review'));
+        $this->actingAs($superAdmin)->postJson("/vacancies/{$id}/approve")
+            ->assertForbidden()->assertJsonPath('error.code', 'AUTH_FORBIDDEN');
     }
 
     public function test_membership_in_one_company_grants_nothing_over_another_company(): void

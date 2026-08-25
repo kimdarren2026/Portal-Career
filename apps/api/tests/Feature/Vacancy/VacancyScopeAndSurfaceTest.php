@@ -137,16 +137,19 @@ final class VacancyScopeAndSurfaceTest extends VacancyTestCase
         // The contract defines no DELETE for screening questions.
         $this->assertFalse($registered->contains(fn (string $r): bool => str_contains($r, 'DELETE') && str_contains($r, 'screening-questions')));
 
-        // Nothing beyond authoring is routed: each depends on an unresolved decision.
-        foreach (['submit-review', 'approve', 'request-revision', 'reject', 'publish', 'close', 'suspend', 'restore', 'moderation-history'] as $absent) {
+        // B-4: a company vacancy publishes only through approval-in-window or
+        // the scheduler, so no publish route exists for any actor. Moderation
+        // history has no read route in this phase, and public discovery is a
+        // later phase.
+        foreach (['publish', 'moderation-history', 'public/vacanc'] as $absent) {
             $this->assertFalse(
                 $registered->contains(fn (string $r): bool => str_contains($r, $absent)),
                 "No route may exist for {$absent} in this phase.",
             );
         }
 
-        $this->assertSame(8, $registered->filter(
+        $this->assertSame(15, $registered->filter(
             static fn (string $r): bool => str_contains($r, 'vacanc'),
-        )->count(), 'Exactly the eight authoring routes.');
+        )->count(), 'The eight authoring routes plus the seven lifecycle routes.');
     }
 }
