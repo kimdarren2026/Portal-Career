@@ -22,7 +22,9 @@ final class VacancySnapshot
     /** @return array<string, mixed> */
     public static function of(Vacancy $vacancy): array
     {
-        $vacancy->loadMissing(['requirements', 'screeningQuestions']);
+        // Reloaded, never loadMissing: after a requirement replacement a cached
+        // relation would snapshot the pre-sync collection (VA-1).
+        $vacancy->load(['requirements', 'screeningQuestions']);
 
         return [
             'vacancy' => [

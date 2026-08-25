@@ -9,6 +9,7 @@ use App\Domains\Identity\Models\User;
 use App\Domains\Vacancy\Actions\CreateCompanyVacancy;
 use App\Domains\Vacancy\Actions\UpdateVacancy;
 use App\Domains\Vacancy\Exceptions\VacancyCompanyNotVerified;
+use App\Domains\Vacancy\Exceptions\VacancyHasApplications;
 use App\Domains\Vacancy\Exceptions\VacancyNotEditable;
 use App\Domains\Vacancy\Exceptions\VacancyNotFound;
 use App\Domains\Vacancy\Exceptions\VacancyStaleVersion;
@@ -115,11 +116,14 @@ final class VacancyController extends Controller
             $updated = $action->execute($actor, $model, $request->validated(), $this->expectedVersion($request));
         } catch (VacancyNotEditable) {
             return ContractResponse::error($request, 'VACANCY_NOT_EDITABLE', 409, 'Lowongan tidak dapat diubah pada status ini.');
+        } catch (VacancyHasApplications) {
+            // INV-024. The frozen code already exists; none is invented here.
+            return ContractResponse::error($request, 'VACANCY_HAS_APPLICATIONS', 409, 'Lowongan sudah memiliki lamaran sehingga metode lamaran tidak dapat diubah ke ATS eksternal.');
         } catch (VacancyStaleVersion) {
             return ContractResponse::error($request, 'STALE_VERSION', 409, 'Versi lowongan sudah berubah. Muat ulang sebelum menyimpan.');
         }
 
-        return ContractResponse::success($request, VacancyPresenter::detail($updated));
+        return ContractResponse::success($request, VacancyPresenter::detail($updated, ['requirements']));
     }
 
     public function versions(Request $request, int $vacancy, ListVacancyVersions $query): JsonResponse

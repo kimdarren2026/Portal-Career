@@ -8,7 +8,13 @@ use App\Domains\Vacancy\Enums\ScreeningQuestionType;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\Rule;
 
-/** POST and PATCH /vacancies/{vacancy}/screening-questions. There is no DELETE. */
+/**
+ * POST and PATCH /vacancies/{vacancy}/screening-questions. There is no DELETE.
+ *
+ * VA-3: a NEW question must state `required` and `active` explicitly as
+ * booleans — there is no server default for either. PATCH stays a partial
+ * update, so an omitted flag leaves the stored value unchanged.
+ */
 final class SaveScreeningQuestionRequest extends VacancyFormRequest
 {
     public function rules(): array
@@ -18,10 +24,10 @@ final class SaveScreeningQuestionRequest extends VacancyFormRequest
         return [
             'question_text' => [$required, 'string'],
             'question_type' => [$required, 'string', Rule::in(ScreeningQuestionType::values())],
-            'required' => ['sometimes', 'boolean'],
+            'required' => [$required, 'boolean'],
             'options_definition' => ['sometimes', 'nullable', 'array'],
             'sort_order' => [$this->isMethod('POST') ? 'required' : 'sometimes', 'integer', 'min:0'],
-            'active' => ['sometimes', 'boolean'],
+            'active' => [$required, 'boolean'],
         ];
     }
 

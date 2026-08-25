@@ -30,11 +30,10 @@ final class SaveScreeningQuestion
             $locked = $this->lockEditable($vacancy);
 
             $question = new VacancyScreeningQuestion();
-            // `required` and `active` are NOT NULL in the frozen schema and the
-            // contract leaves them optional on the request. A new question is
-            // created active and not-required unless the caller says otherwise;
-            // the same defaults the inline create path applies.
-            $question->fill($attributes + ['required' => false, 'active' => true]);
+            // VA-3: `required` and `active` are mandatory on a new question and
+            // the Form Request has already enforced both. No server default is
+            // applied here or anywhere else.
+            $question->fill($attributes);
             $question->forceFill(['vacancy_id' => $locked->getKey()])->save();
 
             $this->audit->record('vacancy_screening_question_changed', $actor, 'vacancy', (int) $locked->getKey(), [

@@ -68,7 +68,7 @@ final class VacancyScopeAndSurfaceTest extends VacancyTestCase
 
         $created = $this->actingAs($recruiter)->postJson("/vacancies/{$id}/screening-questions", [
             'question_text' => 'Do you have a work permit?', 'question_type' => 'YES_NO',
-            'required' => true, 'sort_order' => 0,
+            'required' => true, 'active' => true, 'sort_order' => 0,
         ])->assertCreated()->assertJsonPath('data.active', true);
         $questionId = (int) $created->json('data.id');
 
@@ -85,16 +85,17 @@ final class VacancyScopeAndSurfaceTest extends VacancyTestCase
 
         $this->actingAs($recruiter)->postJson("/vacancies/{$id}/screening-questions", [
             'question_text' => 'Preferred site?', 'question_type' => 'SINGLE_CHOICE', 'sort_order' => 0,
+            'required' => false, 'active' => true,
         ])->assertStatus(422);
 
         $this->actingAs($recruiter)->postJson("/vacancies/{$id}/screening-questions", [
             'question_text' => 'Years?', 'question_type' => 'NUMBER', 'sort_order' => 0,
-            'options_definition' => ['a', 'b'],
+            'required' => false, 'active' => true, 'options_definition' => ['a', 'b'],
         ])->assertStatus(422);
 
         $this->actingAs($recruiter)->postJson("/vacancies/{$id}/screening-questions", [
             'question_text' => 'Preferred site?', 'question_type' => 'SINGLE_CHOICE', 'sort_order' => 0,
-            'options_definition' => ['Jakarta', 'Bandung'],
+            'required' => false, 'active' => true, 'options_definition' => ['Jakarta', 'Bandung'],
         ])->assertCreated();
     }
 
@@ -107,6 +108,7 @@ final class VacancyScopeAndSurfaceTest extends VacancyTestCase
 
         $foreignQuestion = (int) $this->actingAs($recruiterB)->postJson("/vacancies/{$vacancyB}/screening-questions", [
             'question_text' => 'B question', 'question_type' => 'SHORT_TEXT', 'sort_order' => 0,
+            'required' => false, 'active' => true,
         ])->assertCreated()->json('data.id');
 
         // INV-019: a question from another vacancy can never be reached here.
@@ -122,6 +124,7 @@ final class VacancyScopeAndSurfaceTest extends VacancyTestCase
 
         $this->actingAs($recruiter)->postJson("/vacancies/{$id}/screening-questions", [
             'question_text' => 'Late question', 'question_type' => 'SHORT_TEXT', 'sort_order' => 0,
+            'required' => false, 'active' => true,
         ])->assertStatus(409)->assertJsonPath('error.code', 'VACANCY_NOT_EDITABLE');
     }
 

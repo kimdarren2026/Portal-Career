@@ -91,10 +91,11 @@ abstract class VacancyFormRequest extends FormRequest
             'screening_questions' => ['sometimes', 'array'],
             'screening_questions.*.question_text' => ['required', 'string'],
             'screening_questions.*.question_type' => ['required', 'string', Rule::in(ScreeningQuestionType::values())],
-            'screening_questions.*.required' => ['sometimes', 'boolean'],
+            // VA-3: a NEW question states both flags explicitly. No server default.
+            'screening_questions.*.required' => ['required', 'boolean'],
             'screening_questions.*.options_definition' => ['sometimes', 'nullable', 'array'],
             'screening_questions.*.sort_order' => ['sometimes', 'integer', 'min:0'],
-            'screening_questions.*.active' => ['sometimes', 'boolean'],
+            'screening_questions.*.active' => ['required', 'boolean'],
         ];
     }
 

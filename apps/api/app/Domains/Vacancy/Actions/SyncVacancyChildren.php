@@ -10,19 +10,22 @@ use App\Domains\Vacancy\Models\VacancyRequirement;
 use App\Domains\Vacancy\Models\VacancyScreeningQuestion;
 
 /**
- * Writes the inline child collections the create contract accepts alongside a
- * new vacancy. The caller supplies the transaction, so a child failure rolls
- * the parent and its version back with it.
+ * Writes vacancy child collections. The caller supplies the transaction, so a
+ * child failure rolls the parent and its version back with it.
  *
- * Used on creation only. The contract does not define how an inline collection
- * interacts with rows that already exist, and that interaction is not invented
- * here — see the phase report.
+ * `replaceRequirements` is a **full collection replacement** (PO decision
+ * VA-1): the stored rows are removed and the supplied array becomes the whole
+ * collection, so an empty array clears it. There is no merge-by-id, because
+ * the decision is replacement and no frozen representation carries a stable
+ * per-row client identity.
  */
 final class SyncVacancyChildren
 {
     /** @param list<array<string, mixed>> $requirements */
     public function replaceRequirements(Vacancy $vacancy, array $requirements): void
     {
+        VacancyRequirement::query()->where('vacancy_id', $vacancy->getKey())->delete();
+
         foreach (array_values($requirements) as $index => $requirement) {
             $type = RequirementType::from((string) $requirement['requirement_type']);
 
@@ -48,10 +51,12 @@ final class SyncVacancyChildren
             $row->fill([
                 'question_text' => $question['question_text'],
                 'question_type' => $question['question_type'],
-                'required' => (bool) ($question['required'] ?? false),
+                // VA-3: both flags are mandatory on a new question, so the
+                // request has already supplied them. No default is applied.
+                'required' => (bool) $question['required'],
                 'options_definition' => $question['options_definition'] ?? null,
                 'sort_order' => (int) ($question['sort_order'] ?? $index),
-                'active' => (bool) ($question['active'] ?? true),
+                'active' => (bool) $question['active'],
             ]);
             $row->forceFill(['vacancy_id' => $vacancy->getKey()])->save();
         }

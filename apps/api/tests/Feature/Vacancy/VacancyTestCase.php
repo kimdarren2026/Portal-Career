@@ -63,6 +63,52 @@ abstract class VacancyTestCase extends IdentityTestCase
         ], $overrides);
     }
 
+    /** Master-data skill for typed SKILL requirements. */
+    protected function skillId(): int
+    {
+        $this->sequence++;
+
+        return (int) DB::table('skills')->insertGetId([
+            'name' => 'Skill '.$this->sequence, 'normalized_name' => 'skill-'.$this->sequence, 'active' => true,
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+    }
+
+    /** Membership row for an existing user on an existing company. */
+    protected function addMember(int $companyId, User $user, string $companyRole = 'COMPANY_ADMIN', string $status = 'ACTIVE'): void
+    {
+        DB::table('company_members')->insert([
+            'company_id' => $companyId,
+            'user_id' => $user->id,
+            'company_role' => $companyRole,
+            'status' => $status,
+            'joined_at' => now(),
+            'revoked_at' => $status === 'ACTIVE' ? null : now(),
+        ]);
+    }
+
+    /** @return list<array<string, mixed>> Current requirement rows, ordered as stored. */
+    protected function requirementRows(int $vacancyId): array
+    {
+        return DB::table('vacancy_requirements')->where('vacancy_id', $vacancyId)
+            ->orderBy('sort_order')->orderBy('id')->get()
+            ->map(static fn ($row): array => (array) $row)->all();
+    }
+
+    protected function latestVersion(int $vacancyId): int
+    {
+        return (int) DB::table('vacancy_versions')->where('vacancy_id', $vacancyId)->max('version_number');
+    }
+
+    /** @return array<string, mixed> */
+    protected function snapshotOf(int $vacancyId, int $versionNumber): array
+    {
+        $snapshot = DB::table('vacancy_versions')->where('vacancy_id', $vacancyId)
+            ->where('version_number', $versionNumber)->value('snapshot');
+
+        return json_decode((string) $snapshot, true, flags: JSON_THROW_ON_ERROR);
+    }
+
     protected function createVacancy(User $recruiter, Company $company, array $overrides = []): int
     {
         $response = $this->actingAs($recruiter)

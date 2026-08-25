@@ -20,7 +20,7 @@ final class VacancyEditingAndVersionsTest extends VacancyTestCase
         $id = $this->createVacancy($recruiter, $company, [
             'title' => 'Data Engineer',
             'requirements' => [['requirement_type' => 'SKILL', 'skill_id' => $this->skill(), 'sort_order' => 0]],
-            'screening_questions' => [['question_text' => 'Years of SQL?', 'question_type' => 'NUMBER', 'sort_order' => 0]],
+            'screening_questions' => [['question_text' => 'Years of SQL?', 'question_type' => 'NUMBER', 'required' => true, 'active' => true, 'sort_order' => 0]],
         ]);
 
         $versions = DB::table('vacancy_versions')->where('vacancy_id', $id)->get();
