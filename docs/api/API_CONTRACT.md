@@ -2224,11 +2224,17 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 **Success Response:** `200 OK`. **Error Codes:** `VACANCY_INVALID_TRANSITION` (409) · `AUTH_FORBIDDEN` (403).
 
-**Side Effects:** Status + `closed_at` + audit + outbox. **Audit:** `vacancy_closed`. **Notification / Outbox:** Owner notification.
+**Side Effects:** Status transition `PUBLISHED → CLOSED` · `closed_at` set to the execution time · **exactly one `vacancy_moderation_reviews` row** with `action = CLOSE`, `from_status = PUBLISHED`, `to_status = CLOSED` and `reviewer_user_id` = the authenticated actor who executed the close · audit · outbox.
+
+> **CLOSE lifecycle-history semantics (PO decision M-1, approved — CLOSED).** Both authorization paths append the **same single** history row, and the row records **whoever executed the action**: the company member on an owner close, the Career Center or Super Admin actor on a moderator close. The physical column name `reviewer_user_id` does **not** require the actor to be Career Center personnel — the same is already true of the `SUBMIT` row, which only a company owner ever writes.
+>
+> This row is append-only lifecycle evidence and nothing more. It does **not** convert an owner close into moderation, grant any moderation authority, or alter the conflict-of-interest rule, B-3, or the owner-close authorization above. Exactly one CLOSE row exists per accepted close; a refused close appends none.
+
+**Audit:** `vacancy_closed` on both paths. **Notification / Outbox:** Owner notification.
 
 **Idempotency:** **REQUIRED.** **Concurrency:** Row lock.
 
-**Source Requirement:** FR-VAC-005, FR-VAC-008 · FSD §8.3, §8.4 · PO decision **B-3** (moderation authority), approved 25 August 2026
+**Source Requirement:** FR-VAC-005, FR-VAC-008 · FSD §8.3, §8.4 · PO decisions **B-3** (moderation authority) and **M-1** (close history semantics), approved 25 August 2026
 
 ---
 

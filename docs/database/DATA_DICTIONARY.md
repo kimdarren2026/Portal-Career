@@ -389,7 +389,7 @@ Reason fields are **conditionally required** (INV-029): mandatory when `action` 
 | --- | --- | --- | --- | --- | --- |
 | id | Identifier | Yes | Primary key | Review identity. | BRD/FSD Required |
 | company_id | Reference | Yes | companies.id | Reviewed company. | BRD/FSD Required |
-| reviewer_user_id | Reference | Yes | users.id | Authorized Career Center reviewer. | BRD/FSD Required |
+| reviewer_user_id | Reference | Yes | users.id | Authenticated actor responsible for the lifecycle/moderation action. Usually an authorized Career Center or Super Admin reviewer; it is a **company actor** for the owner actions the contract permits — `SUBMIT`, and `CLOSE` when the owner closes their own vacancy (M-1). The column name implies no role restriction, and this record grants no authority. | BRD/FSD Required |
 | action | Enum | Yes |  | SUBMIT, REQUEST_REVISION, VERIFY, REJECT, SUSPEND, or RESTORE. | BRD/FSD Required |
 | from_status | Enum | Yes |  | Company status immediately before review action. | BRD/FSD Required |
 | to_status | Enum | Yes |  | Resulting company status. | BRD/FSD Required |
@@ -998,7 +998,7 @@ Reason fields are **conditionally required** (INV-029): mandatory when `action` 
 | id | Identifier | Yes | Primary key | Moderation review identity. | BRD/FSD Required |
 | vacancy_id | Reference | Yes | vacancies.id | Reviewed vacancy. | BRD/FSD Required |
 | reviewer_user_id | Reference | Yes | users.id | Authorized Career Center reviewer. | BRD/FSD Required |
-| action | Enum | Yes |  | SUBMIT, REQUEST_REVISION, APPROVE, REJECT, SUSPEND, RESTORE, or applicable CLOSE. | BRD/FSD Required |
+| action | Enum | Yes |  | SUBMIT, REQUEST_REVISION, APPROVE, REJECT, SUSPEND, RESTORE, or CLOSE. Every accepted CLOSE appends exactly one row, whether the actor closed as owner or as moderator (M-1). | BRD/FSD Required |
 | from_status | Enum | Yes |  | Status before action. | BRD/FSD Required |
 | to_status | Enum | Yes |  | Status after action. | BRD/FSD Required |
 | reason_category | Enum | Conditional | Required when action is REQUEST_REVISION, REJECT, or SUSPEND | Controlled policy reason. Category vocabulary is a pending policy decision; presence is required by FR-VAC-006. | BRD/FSD Required |
