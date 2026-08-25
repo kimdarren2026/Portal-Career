@@ -75,7 +75,7 @@ Cannot reach another company's objects under any circumstance (INV-017). Cannot 
 ### COMPANY_ADMIN
 Everything `COMPANY_RECRUITER` has, **within the same company scope**, plus member management for that company. It is a company-level role, **not** a platform-level one. A Company Admin has no visibility outside their own company.
 
-> Whether the first recruiter of a company becomes `COMPANY_ADMIN`, and whether at least one active Company Admin must always exist, is **PENDING BUSINESS DECISION** (open question 6). Neither is enforced.
+> **D-1 CLOSED by approved Product Owner decision:** the first company creator is the active `COMPANY_ADMIN`; the company must retain at least one active `COMPANY_ADMIN`; last-admin protection is enforced for membership mutations. Subsequent member roles are explicitly selected and have no implicit default.
 
 ### CAREER_CENTER
 **Verification and moderation scope — explicitly not recruiter candidate-selection scope.**
@@ -169,7 +169,7 @@ Super Admin's `ALLOW` on candidate reads is break-glass, audited on every use, a
 | Public company summary | **A** | **A** | **A** | **A** | **A** | **A** | **A** | **A** | **A** |
 
 ¹ Recruiters see verification history **without `internal_note`**. Internal notes are visible only to Career Center, Auditor, and Super Admin (FR-ONB-004).
-² Member management is a Company Admin capability. Whether an ordinary recruiter may invite is bounded by open question 6.
+² Member management is a Company Admin capability. Subsequent member roles must be explicitly selected; no implicit role default exists.
 
 **Career Center cannot edit a company's profile.** It reviews and decides; the recruiter corrects (FR-ONB-005).
 
@@ -360,9 +360,7 @@ These constraints are not expressible in a matrix cell and must be enforced in c
 
 ## 7. Open Questions Affecting This Matrix
 
-Neither is resolved here.
-
 | # | Question | Effect |
 | --- | --- | --- |
-| **6** | First recruiter default role, and whether at least one active Company Admin must exist | The `COMPANY_ADMIN` versus `COMPANY_RECRUITER` split in §4.3 member management is **not enforced** until decided. `MEMBER_LAST_ADMIN` is reserved and unused |
-| ~~Career Center delegated posting~~ | ~~Whether Career Center may post vacancies "atas nama" a company~~ | **RESOLVED 24 August 2026 — DENY.** See §3 and footnote ⁵. Not one of the six business open questions |
+| **6** | ~~First recruiter default role, and whether at least one active Company Admin must exist~~ | **CLOSED by approved Product Owner decision:** first creator is active `COMPANY_ADMIN`; minimum one active `COMPANY_ADMIN` and last-admin protection are required; subsequent roles are explicit with no implicit default |
+| ~~Career Center delegated posting~~ | ~~Whether Career Center may post vacancies "atas nama" a company~~ | **RESOLVED 24 August 2026 — DENY.** See §3 and footnote ⁵. Not one of the remaining business open questions |

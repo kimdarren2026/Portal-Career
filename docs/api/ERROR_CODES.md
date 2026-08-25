@@ -151,7 +151,7 @@ This mapping is a documented reading of an FSD table explicitly labelled as exam
 | `MEMBER_ALREADY_ACTIVE` | 409 | An active membership already exists for this user and company |
 | `COMPANY_DOCUMENT_IS_VERIFICATION_EVIDENCE` | 409 | Destructive deletion refused: the document has formed part of a submitted verification package and is now evidence. The response names `POST …/supersede` as the correct action |
 | `COMPANY_VACANCY_AUTHORING_FORBIDDEN` | 403 | Career Center attempted to create or edit a company vacancy. Authoring belongs to active verified company members; Career Center moderates. Delegated posting, if introduced, must be a separate explicitly authorized capability |
-| `MEMBER_LAST_ADMIN` | 409 | **PENDING BUSINESS DECISION** (open question 6). Reserved for a minimum-active-Company-Admin rule. Not enforced until decided |
+| `MEMBER_LAST_ADMIN` | 409 | Membership mutation would leave the company with zero active `COMPANY_ADMIN` memberships (D-1) |
 | `PARTNERSHIP_INVALID_TRANSITION` | 409 | Partnership activate/end not legal from the current status |
 | `PARTNERSHIP_OVERLAPPING_PERIOD` | 409 | An active partnership already covers this period for this company |
 
@@ -246,7 +246,6 @@ These codes exist so contracts can reference them, but **no endpoint enforces th
 
 | Code | Blocked on |
 | --- | --- |
-| `MEMBER_LAST_ADMIN` | Open question 6 — first recruiter default role and minimum active Company Admin |
 | `SALARY_REQUIRED` | Open question 3 — whether salary is mandatory, optional, or hidden per vacancy type |
 | `COMPANY_DOCUMENT_TYPE_REQUIRED` | Open question 2 — minimum legal documents per organization type |
 | `VERIFICATION_SOURCE_UNAVAILABLE` | Open question 1 — alumni verification integration source |

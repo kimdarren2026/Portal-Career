@@ -418,7 +418,7 @@ FR-REP-001 to FR-REP-003 describe dashboards over data this model already holds;
 
 ## 12. Open Questions and Deferred Decisions
 
-### The six business open questions — all preserved
+### The five remaining business open questions — all preserved
 
 | # | Question | Architectural impact | Must resolve before |
 | --- | --- | --- | --- |
@@ -445,7 +445,7 @@ FR-REP-001 to FR-REP-003 describe dashboards over data this model already holds;
 | ~~**A-1**~~ | ~~FR-NOTIF-005 SMTP configuration has no home in the frozen ERD~~ | **RESOLVED (ADR-015, revision 1.1-C2).** Runtime-managed configuration with an application-encrypted, write-only secret in `smtp_configurations`, governed by INV-035 and INV-036. See §6 |
 | **A-2** | **Laravel's stock email-verification flow conflicts with the frozen ERD.** Laravel's default verification uses signed URLs and stores no token; the ERD requires `email_verification_tokens` rows with `token_hash`, `expires_at`, `used_at`, `revoked_at`. The ERD wins — custom token issuance is required rather than framework defaults | **Resolved in favour of the ERD.** Recorded so it is not "fixed" later by reverting to the framework default |
 
-**The six business open questions remain open and undecided.** Of the architectural items, H-1 and A-1 are now resolved by the approved change request; H-2, H-3, and H-4 remain open and are not decided here.
+**The five remaining business open questions remain open and undecided.** D-1 is closed by approved Product Owner decision: the first company creator is active `COMPANY_ADMIN`, at least one active admin must remain, last-admin protection is required, and subsequent roles are explicit with no implicit default. Of the architectural items, H-1 and A-1 are now resolved by the approved change request; H-2, H-3, and H-4 remain open and are not decided here.
 
 ---
 

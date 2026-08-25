@@ -198,7 +198,7 @@ Verified counts, all in agreement: **49** Mermaid entity blocks, **49** dictiona
 
 ## Open Questions Preserved
 
-All six remain open and unanswered. Verified field by field against the corrected model.
+The five remaining questions remain open and unanswered. D-1 was subsequently closed by approved Product Owner decision. Verified field by field against the corrected model.
 
 | # | Open question | Status | Verification |
 | --- | --- | --- | --- |
@@ -207,7 +207,7 @@ All six remain open and unanswered. Verified field by field against the correcte
 | 3 | Salary mandatory/optional/display policy | **Open** | `salary_min`, `salary_max`, `salary_currency` remain nullable and classified "Optional / Pending Decision". No display-policy field was added. |
 | 4 | Recruiter domain/subdomain | **Open** | `users` and `password_credentials` remain channel-neutral; no portal, tenant, or origin-domain field exists anywhere. |
 | 5 | WhatsApp notification phase | **Open** | Only `notifications` and `email_outbox` exist. `users.phone` and `candidate_profiles.phone` are annotated as contact data implying no delivery channel. |
-| 6 | Default first recruiter role / minimum active Company Admin | **Open** | `company_members.company_role` still has no default and no minimum-count rule. INV-025's role-history fix does not assign or imply any default. |
+| 6 | Default first recruiter role / minimum active Company Admin | **Closed by approved Product Owner decision after this report** | First creator is active `COMPANY_ADMIN`; runtime last-admin protection enforces at least one active admin; subsequent roles remain explicit with no implicit default. |
 
 **No correction introduced a field that assumes an answer to any of the six.** Four separate human-decision items (H-1 selector stage assignment, H-2 vacancy-level outcome, H-3 shared-document revocation, H-4 audit metadata collection) were likewise recorded in `ERD.md` and left unresolved.
 
@@ -239,7 +239,7 @@ All six remain open and unanswered. Verified field by field against the correcte
 | 18 | Time-to-Fill remains `published_at → offer_accepted_at` | **PASS** — no onboarding, contract, start-date, or first-working-day field exists in any of the 49 entities |
 | 19 | No SQL, DDL, or vendor type introduced | **PASS** — no `VARCHAR`, `BIGINT`, `CREATE TABLE`, `SERIAL`, `jsonb`, or equivalent anywhere |
 | 20 | No Laravel implementation code introduced | **PASS** — no `Schema::`, `$table->`, `Illuminate\`, model class, or artisan reference anywhere |
-| 21 | All six open questions still open | **PASS** |
+| 21 | All five remaining open questions still open; D-1 closed subsequently by approved Product Owner decision | **PASS** |
 
 No field or entity carries contradictory rules across the three documents.
 

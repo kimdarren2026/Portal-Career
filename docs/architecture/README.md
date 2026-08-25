@@ -59,7 +59,7 @@ This architecture sits below the requirements and the data model. Where a framew
 
 ## Still open
 
-The **six BRD/FSD business open questions** remain open and undecided: alumni verification source · minimum company legal documents · salary policy · recruiter domain/subdomain · WhatsApp phase · first recruiter default role. **H-2, H-3, and H-4** also remain open. All are listed in `TECHNICAL_DECISIONS.md`. None is decided by these documents.
+The **five remaining BRD/FSD business open questions** are: alumni verification source · minimum company legal documents (D-6) · salary policy · recruiter domain/subdomain · WhatsApp phase. **D-1 is CLOSED** by approved Product Owner decision: the first company creator is active `COMPANY_ADMIN`, at least one active admin must remain, last-admin protection is required, and subsequent roles are explicit with no implicit default. **H-2, H-3, and H-4** also remain open. All are listed in `TECHNICAL_DECISIONS.md`.
 
 ## Not yet written
 

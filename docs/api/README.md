@@ -99,7 +99,7 @@ Neither is a business-model change, so **neither requires an ERD change request*
 
 ## Still open
 
-The **six business open questions** remain open and unanswered by this contract: alumni verification integration source · minimum company legal documents per organization type · salary mandatory/display policy · recruiter domain or subdomain · WhatsApp notification phase · first recruiter default role and minimum active Company Admin.
+The **five remaining business open questions** remain open and unanswered by this contract: alumni verification integration source · minimum company legal documents per organization type (D-6) · salary mandatory/display policy · recruiter domain or subdomain · WhatsApp notification phase. **D-1 is CLOSED:** the first company creator is active `COMPANY_ADMIN`, the company must retain at least one active `COMPANY_ADMIN`, last-admin protection is required, and subsequent roles are explicit with no implicit default.
 
 Where an operation cannot be fully fixed because of one, the affected field or rule is marked **PENDING BUSINESS DECISION** rather than guessed, and no unrelated operation is blocked.
 

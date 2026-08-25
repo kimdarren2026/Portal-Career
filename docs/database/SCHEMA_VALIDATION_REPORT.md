@@ -130,7 +130,7 @@ None is decided by the physical schema.
 | 3 | Salary policy | All three salary columns nullable; the only guard is `salary_max >= salary_min` when both are present — arithmetic, not policy |
 | 4 | Recruiter domain / subdomain | No schema impact |
 | 5 | WhatsApp phase | No channel, provider, template, or delivery table |
-| 6 | First recruiter default role / minimum Company Admin | `company_members.company_role` has **no default value** and no minimum-count constraint |
+| 6 | First recruiter default role / minimum Company Admin | **D-1 CLOSED:** first creator is active `COMPANY_ADMIN`; runtime last-admin protection enforces at least one active admin. The schema retains no implicit default for subsequent members and needs no migration |
 | **H-2** | Vacancy-level outcome | `recruitment_outcomes` stays candidate-level via its source XOR; **no vacancy-level column added** |
 | **H-3** | Candidate revocation of a shared document | `application_documents.revoked_at` exists and is honoured on read; no candidate-facing path |
 | **H-4** | Audit IP / device collection | `ip_address inet NULL`, `user_agent_device_metadata jsonb NULL` — both optional |

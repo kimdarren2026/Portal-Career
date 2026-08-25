@@ -166,7 +166,7 @@ A separate evidence or version entity was considered and rejected (decision D-9)
 | 3 | Salary mandatory / display policy | **Open** |
 | 4 | Recruiter domain / subdomain | **Open** |
 | 5 | WhatsApp notification phase | **Open** |
-| 6 | First recruiter default role / minimum Company Admin | **Open** |
+| 6 | First recruiter default role / minimum Company Admin | **Closed by approved Product Owner decision after this report:** first creator is active `COMPANY_ADMIN`; minimum one active admin and last-admin protection are required; subsequent roles are explicit with no implicit default |
 | **H-2** | Vacancy-level outcome | **Open** |
 | **H-3** | Candidate revocation of a shared document | **Open** — unaffected; INV-038 concerns *company* documents, INV-032 concerns *candidate* documents |
 | **H-4** | Audit IP / device metadata collection | **Open** |

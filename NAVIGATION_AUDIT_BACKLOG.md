@@ -10,7 +10,7 @@
 
 ## Open decisions
 
-- **D-1 — First recruiter default role / minimum active Company Admin.** Affects only Anggota Perusahaan visibility and action rules.
+- ~~**D-1 — First recruiter default role / minimum active Company Admin.**~~ **CLOSED.** The first company creator is the active `COMPANY_ADMIN`; company + initial membership are atomic; at least one active `COMPANY_ADMIN` is required; last-admin protection is required; subsequent member roles are explicit with no implicit default. D-6 remains open.
 - **D-2 — External-apply activity final information-architecture placement.** Authenticated Candidate chrome is canonical; do not add a tenth Candidate global menu item.
 - **D-3 — Alumni verification integration/source.** `POST /candidate/verifications` remains unrouted.
 - ~~**D-4 — Candidate document-upload MIME and size policy.**~~ **CLOSED 25 August 2026.** Frozen: MIME allowlist **`application/pdf` only** (server-inspected type **and** `%PDF-` signature); maximum **10 MiB / 10,485,760 bytes** as a **single global limit**, no per-`document_type` variation; upload rate limit **20 per hour per candidate**; storage quota **DEFERRED**; malware scanner **not required** for the PDF-only allowlist. No migration, no API-shape change, no schema change. `POST /candidate/documents` remains **unrouted pending implementation**. See `API_CONTRACT.md` Part X item 9 and Part I §11.8.

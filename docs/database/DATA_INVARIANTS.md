@@ -493,4 +493,4 @@ Rules marked as requiring a model-level or service-level guard must be enforced 
 | Selector cannot reach unassigned stages or vacancies | Yes — INV-037 scope rules. |
 | SMTP credential manageable at runtime without plaintext exposure | Yes — INV-035 and INV-036. |
 | SMTP credential absent from outbox, logs, and audit payloads | Yes — INV-015 and INV-035. |
-| Open questions remain open | Yes — documented in ERD.md; none is answered by any invariant here. |
+| Remaining open questions remain open | Yes — documented in ERD.md; D-1 is closed separately by approved Product Owner decision and no remaining open question is answered by any invariant here. |

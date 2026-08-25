@@ -335,7 +335,7 @@ The SSR renderer is **not a microservice**. It holds no business logic, no datab
 | 3 | Salary mandatory / display policy | **Open** — validation and view configuration |
 | 4 | Recruiter domain / subdomain | **Open** — architecture supports all three shapes; must be settled before production DNS/TLS |
 | 5 | WhatsApp notification phase | **Open** — no provider abstraction built |
-| 6 | First recruiter default role / minimum Company Admin | **Open** — affects onboarding Action and a Policy guard |
+| 6 | First recruiter default role / minimum Company Admin | **Closed by approved Product Owner decision** — first creator is active `COMPANY_ADMIN`; minimum one active admin and last-admin protection are required; subsequent roles are explicit with no implicit default |
 
 ## Human-Decision Items Carried from the ERD
 

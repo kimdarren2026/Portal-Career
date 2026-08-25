@@ -215,7 +215,7 @@ ZIP integrity re-verified: `unzip -t` clean, 229/229 files present.
 
 ## Remaining Open Questions
 
-### The six business open questions — all preserved, none decided
+### The five remaining business open questions — all preserved, D-1 closed subsequently
 
 | # | Question | Status |
 | --- | --- | --- |
@@ -224,7 +224,7 @@ ZIP integrity re-verified: `unzip -t` clean, 229/229 files present.
 | 3 | Salary mandatory / display policy | **Open** — validation and view configuration |
 | 4 | Recruiter domain / subdomain | **Open** — topology supports all three shapes; settle before production DNS/TLS |
 | 5 | WhatsApp notification phase | **Open** — no provider abstraction built |
-| 6 | First recruiter default role / minimum Company Admin | **Open** — affects onboarding Action and a Policy guard |
+| 6 | First recruiter default role / minimum Company Admin | **Closed by approved Product Owner decision after this report:** first creator is active `COMPANY_ADMIN`; minimum one active admin and last-admin protection are required; subsequent roles are explicit with no implicit default |
 
 Nothing in this change request touches any of the six. `smtp_configurations` concerns email transport, not the WhatsApp phase decision (5): no channel abstraction, provider adapter, or delivery entity for WhatsApp was introduced.
 
@@ -276,7 +276,7 @@ Both items that previously blocked implementation are resolved, and no new block
 - **H-1 → ADR-016.** Selector authorization has a concrete assignment relation that Laravel Policies can enforce, and the list-scoping requirement is documented so the usual failure mode is pre-empted.
 - **The SSR inconsistency is closed.** The Node renderer is declared, justified against the rejected SPA architecture, and given health, restart, and monitoring requirements.
 
-The six business open questions do not block architecture freeze. Each is a validation rule, a configuration value, a future phase, or a DNS decision — none changes the topology, the data model, or the module boundaries. H-2, H-3, and H-4 are similarly non-blocking.
+The five remaining business open questions do not block architecture freeze. Each is a validation rule, a configuration value, a future phase, or a DNS decision — none changes the topology, the data model, or the module boundaries. D-1 was subsequently closed by approved Product Owner decision without changing the architecture. H-2, H-3, and H-4 are similarly non-blocking.
 
 **Recommended freeze scope:** BRD v1.1 · FSD v1.1 · Stitch functional baseline · **logical model revision 1.1-C2** · **architecture ADR-001 to ADR-017**.
 

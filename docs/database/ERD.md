@@ -563,7 +563,7 @@ Stored KPI totals, database views, materialized reporting, and refresh strategy 
 
 ## Open Questions Affecting Physical Schema
 
-All six remain open and none is answered by this model.
+The five remaining questions remain open and none is answered by this model. D-1 is closed separately by approved Product Owner decision.
 
 | Open question | Flexible logical design |
 | --- | --- |
@@ -572,7 +572,7 @@ All six remain open and none is answered by this model.
 | Salary mandatory/optional/display policy | Vacancy salary fields are nullable and policy is not encoded as a universal requirement. |
 | Recruiter domain/subdomain | users and password_credentials remain channel-neutral; no portal, tenant, or origin-domain field exists. |
 | WhatsApp notification in a later phase | notifications and email_outbox do not imply a WhatsApp delivery entity. Contact phone fields exist only because FR-CAN-003 requires contact data. |
-| First recruiter role and minimum active Company Admin rule | company_members records a company_role without assigning a default or enforcing a minimum rule. |
+| First recruiter role and minimum active Company Admin rule | **D-1 CLOSED:** the first creator is active `COMPANY_ADMIN`; runtime last-admin protection enforces at least one active admin; subsequent roles are explicit with no implicit default. |
 
 ## Recorded Design Decisions
 
@@ -600,7 +600,7 @@ Payroll, attendance, performance management, full onboarding, digital contracts,
 
 ## Items Referred for Human Decision
 
-Recorded by `ERD_REVIEW.md`. H-1 was resolved by the approved change request applied in revision 1.1-C2; H-2, H-3, and H-4 remain unresolved and are **not** decided here. They are distinct from the six open questions above, all of which remain open.
+Recorded by `ERD_REVIEW.md`. H-1 was resolved by the approved change request applied in revision 1.1-C2; H-2, H-3, and H-4 remain unresolved and are **not** decided here. They are distinct from the five remaining open questions above; D-1 is closed separately by approved Product Owner decision.
 
 | # | Item | Current logical treatment |
 | --- | --- | --- |

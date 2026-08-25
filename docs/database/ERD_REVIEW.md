@@ -586,7 +586,7 @@ The model maps cleanly to Laravel overall. Ordinary Eloquent relationships, migr
 
 ## Open Questions Preserved
 
-All six remain unresolved and are **not** answered by this review. Verified against FSD §14, which lists exactly these six.
+The five remaining questions are unresolved and are **not** answered by this review. D-1 was subsequently closed by approved Product Owner decision. Verified against the current FSD open-question section.
 
 | # | Open question | Still open | Does any schema field assume an answer? |
 | --- | --- | --- | --- |
@@ -595,7 +595,7 @@ All six remain unresolved and are **not** answered by this review. Verified agai
 | 3 | Whether salary range is mandatory, optional, or hidden per vacancy type | ✔ Open | **No.** `salary_min`, `salary_max`, `salary_currency` are all nullable and classified "Optional / Pending Decision". No display-policy field exists — correctly, since that is a policy not a datum. |
 | 4 | Same or separate domain/subdomain for the recruiter portal | ✔ Open | **No.** `users` and `password_credentials` are channel-neutral; nothing records an origin domain, tenant, or portal discriminator. |
 | 5 | Whether WhatsApp notification enters a later phase | ✔ Open | **No.** Only `notifications` and `email_outbox` exist; no WhatsApp channel, template, or delivery entity. `users.phone` and `candidate_profiles.phone` are ordinary contact fields required independently by FR-CAN-003, not a channel assumption. |
-| 6 | Default role of the first recruiter, and minimum-one-active-Company-Admin policy | ✔ Open | **No.** `company_members.company_role` records COMPANY_ADMIN or COMPANY_RECRUITER with no default value and no minimum-count rule. The dictionary states "First-member default remains open". |
+| 6 | Default role of the first recruiter, and minimum-one-active-Company-Admin policy | ✔ **Closed by approved Product Owner decision after this review** | **Yes.** The first creator is active `COMPANY_ADMIN`; runtime last-admin protection enforces at least one active admin; subsequent roles remain explicit with no implicit default. |
 
 **Conclusion: no schema field accidentally assumes an answer to any of the six.** This is a genuine strength of the current model and should be preserved through the corrections — in particular, RC-5 must not introduce a mandatory certification/organisation structure that pre-empts question 1, and RC-6 must not make `study_program_id` mandatory on requirements in a way that pre-empts question 2's document policy.
 

@@ -203,7 +203,7 @@ All checks executed programmatically against the generated documents.
 | 14 | Offer concurrency and idempotency defined (INV-031) | **PASS** |
 | 15 | Time-to-Fill remains `published_at → offer_accepted_at` (INV-013) | **PASS** |
 | 16 | SMTP secret never returned or logged (INV-035) | **PASS** |
-| 17 | All six business open questions remain open | **PASS** |
+| 17 | All five remaining business open questions remain open; D-1 is closed by subsequent approved Product Owner decision | **PASS** |
 | 18 | DB-1 and DB-2 carried to `DATABASE_SCHEMA.md` | **PASS** |
 | 19 | No Laravel or SQL implementation file created | **PASS** |
 | 20 | Every contract section carries a `Surface` classification | **PASS** — 82/82 |
@@ -220,7 +220,7 @@ All checks executed programmatically against the generated documents.
 | 3 | Salary mandatory / display policy | **Open** — fields nullable, no rule encoded, `SALARY_REQUIRED` reserved and unused |
 | 4 | Recruiter domain / subdomain | **Open** — affects cookie scope, CORS, CSP; no URI or payload in this contract |
 | 5 | WhatsApp notification phase | **Open** — no channel, provider, template, or adapter anywhere |
-| 6 | First recruiter default role / minimum active Company Admin | **Open** — no default assigned, `MEMBER_LAST_ADMIN` reserved and unenforced |
+| 6 | First recruiter default role / minimum active Company Admin | **Closed by approved Product Owner decision:** first creator is active `COMPANY_ADMIN`; minimum one active `COMPANY_ADMIN` and last-admin protection are required; subsequent roles are explicit with no implicit default |
 
 **Human-decision items:** H-2 (vacancy-level outcome), H-3 (candidate revocation of a shared document), and H-4 (audit IP/device collection) remain open. H-1 was resolved by ADR-016.
 

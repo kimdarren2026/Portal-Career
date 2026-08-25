@@ -104,7 +104,7 @@ The named zone is retained because the *intent* ("09:00 Jakarta time") survives 
 | Option | Assessment |
 | --- | --- |
 | **`varchar(n)` + `CHECK` — RECOMMENDED** | Adding a value is `ALTER TABLE … DROP CONSTRAINT` + `ADD CONSTRAINT` — **transactional, reversible, and reviewable in a diff**. Laravel expresses it with `->check()` or raw `DB::statement` in `up()` and `down()`, and rollback is symmetric. Values read as plain strings in every client and export |
-| PostgreSQL native `ENUM` | Rejected. `ALTER TYPE … ADD VALUE` **could not run inside a transaction block before PG12** and still cannot be rolled back cleanly; **removing** a value requires recreating the type and rewriting every dependent column. For a system whose states are still evolving under six open business questions, that is a rollback trap. Ordering semantics are also a trap — enum comparison follows declaration order, which silently makes `status > 'DRAFT'` meaningful and wrong |
+| PostgreSQL native `ENUM` | Rejected. `ALTER TYPE … ADD VALUE` **could not run inside a transaction block before PG12** and still cannot be rolled back cleanly; **removing** a value requires recreating the type and rewriting every dependent column. For a system whose states are still evolving under remaining open business questions, that is a rollback trap. Ordering semantics are also a trap — enum comparison follows declaration order, which silently makes `status > 'DRAFT'` meaningful and wrong |
 | Lookup/master table | Rejected **for these enums**. The logical model deliberately distinguishes enums from master data: `industries`, `organization_types`, `study_programs`, `skills`, `geographic_areas`, and `organizational_units` **are** lookup tables because they are institution-managed reference data. `applications.current_status` is not — it is a behaviour-bearing state whose value set is fixed by FSD §8.5, and turning it into rows would let an administrator invent a status no state machine handles |
 
 **Constraint naming:** `chk_<table>_<column>`. Every constraint is named explicitly so migrations can drop it deterministically.
@@ -627,7 +627,7 @@ The schema supports every possible answer and decides none.
 | 3 | Salary policy | All three salary columns nullable; no `NOT NULL`, no required-`CHECK` (§11) |
 | 4 | Recruiter domain / subdomain | No schema impact — cookie scope and CORS only |
 | 5 | WhatsApp phase | No channel, provider, template, or delivery table. Phone columns are contact data (FR-CAN-003) |
-| 6 | First recruiter default role / minimum Company Admin | `company_members.company_role` has **no default**; no minimum-count constraint |
+| 6 | First recruiter default role / minimum Company Admin | **D-1 CLOSED:** first creator is active `COMPANY_ADMIN`; runtime last-admin protection enforces at least one active admin. The schema intentionally has no implicit default for subsequent members and no migration is required |
 | **H-2** | Vacancy-level outcome | `recruitment_outcomes` remains candidate-level via its source XOR. **No vacancy-level column added** |
 | **H-3** | Candidate revocation of a shared document | `application_documents.revoked_at` exists and is honoured on read; no candidate-facing path |
 | **H-4** | Audit IP / device collection | `ip_address inet NULL` and `user_agent_device_metadata jsonb NULL` — both optional, collection configurable |

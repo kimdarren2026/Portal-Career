@@ -349,7 +349,7 @@ Active and historic user-company membership. Object-level authorization uses act
 | id | Identifier | Yes | Primary key | Membership identity. | BRD/FSD Required |
 | company_id | Reference | Yes | companies.id | Company membership context. | BRD/FSD Required |
 | user_id | Reference | Yes | users.id | Member user. | BRD/FSD Required |
-| company_role | Enum | Yes |  | COMPANY_ADMIN or COMPANY_RECRUITER logical company role. First-member default remains open. | BRD/FSD Required |
+| company_role | Enum | Yes |  | COMPANY_ADMIN or COMPANY_RECRUITER logical company role. The first creator is active COMPANY_ADMIN; subsequent roles are explicitly selected with no implicit default. | BRD/FSD / approved D-1 |
 | status | Enum | Yes |  | Membership lifecycle state; active membership is required for company-object access. | BRD/FSD Required |
 | joined_at | Timestamp | Yes |  | Membership activation time. | BRD/FSD Required |
 | invited_by | Reference | No | users.id | Inviter when invitation is used; invitation mechanics remain flexible. | BRD/FSD Required |

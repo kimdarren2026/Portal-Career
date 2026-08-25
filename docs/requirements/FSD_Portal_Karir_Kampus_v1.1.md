@@ -1493,9 +1493,9 @@ Keputusan berikut **belum dikunci oleh revisi 1.1** dan tidak boleh diasumsikan 
 3. Apakah rentang gaji wajib, opsional, atau tidak ditampilkan pada jenis vacancy tertentu.
 4. Apakah portal recruiter menggunakan domain/subdomain yang sama atau terpisah.
 5. Apakah notifikasi WhatsApp masuk fase berikutnya.
-6. Detail default role recruiter pertama (`COMPANY_ADMIN` atau assignment lain) dan kebijakan minimal satu Company Admin aktif.
+6. **D-1 CLOSED:** recruiter pertama yang membuat company menjadi member aktif `COMPANY_ADMIN`; company wajib mempertahankan minimal satu active `COMPANY_ADMIN`, dengan perlindungan last-admin. Role member berikutnya harus dipilih eksplisit tanpa default implisit.
 
-Hal yang sudah diputuskan seperti perusahaan nonmitra, retention default, approval kampus MVP, External Apply, reapply, target kandidat, dan Time-to-Fill **tidak lagi termasuk Open Questions**.
+Hal yang sudah diputuskan seperti D-1, perusahaan nonmitra, retention default, approval kampus MVP, External Apply, reapply, target kandidat, dan Time-to-Fill **tidak lagi termasuk Open Questions**. D-6 (matriks dokumen legalitas per organisasi) tetap terbuka.
 
 ---
 

@@ -419,7 +419,7 @@ Most endpoints have their own `###` section. Five families of structurally ident
 - Creates `users` (`PENDING_EMAIL_VERIFICATION`), `password_credentials`, and a recruiter role assignment. **No company is created here.**
 - The mandatory flow is **Register → Verify Email → Complete Company Profile → Submit Verification → VERIFIED → vacancy creation available** (FR-ONB-001). No step may be skipped.
 - **No temporary password.** Recruiters self-register exactly like candidates.
-- Which company role the first recruiter receives is **PENDING BUSINESS DECISION** (open question 6). Until decided, the assignment happens at company creation, not here.
+- The recruiter role assignment created during registration is global identity context only. At company creation, the authenticated creator receives the first active company membership as `COMPANY_ADMIN` under closed D-1; subsequent membership roles are explicit and have no implicit default.
 - Identical-response rule for existing addresses, as above.
 
 **Success Response:** `202 Accepted`, same body shape as candidate registration.
@@ -436,7 +436,7 @@ Most endpoints have their own `###` section. Five families of structurally ident
 
 **Concurrency:** As above.
 
-**Source Requirement:** FR-AUTH-002, FR-ONB-001 · INV-001, INV-021 · Open question 6
+**Source Requirement:** FR-AUTH-002, FR-ONB-001 · INV-001, INV-021 · **D-1 CLOSED by approved Product Owner decision**
 
 ---
 
@@ -1323,7 +1323,7 @@ Clients must therefore read the collection, edit the whole set, and send it back
 
 **Authentication:** Required, **email verified** — FR-ONB-001 forbids skipping verification.
 
-**Authorization:** Recruiter role. The creator becomes an active `company_members` row.
+**Authorization:** Recruiter role. The authenticated creator becomes the first active `COMPANY_ADMIN` `company_members` row; the company and initial membership are one atomic transaction.
 
 **Request:** `name` (required), `organization_type_id`, `industry_id`, `website`, `official_email`, `official_phone`, `address`, `province_geographic_area_id`, `city_geographic_area_id`, `legal_identifier`, `logo` (upload reference).
 
@@ -1331,7 +1331,7 @@ Clients must therefore read the collection, edit the whole set, and send it back
 
 **Business Rules:**
 - Creates `companies` with `verification_status = DRAFT` and one active `company_members` row for the creator.
-- **`company_role` of that first member is PENDING BUSINESS DECISION** (open question 6). The contract does not assign a default; implementation must read the decision, not guess.
+- The first member's `company_role` is `COMPANY_ADMIN`, with the existing active membership representation. This is the closed D-1 decision. Subsequent member roles require explicit selection and have no implicit default; at least one active `COMPANY_ADMIN` must remain.
 - `normalized_name` is computed server-side as a **duplicate-detection signal only**. FR-COMP-001 requires flag-and-review across five signals (normalized name, legal identifier, website domain, official email domain, phone) with merge by an authorized role. It is **not unique** and a similar name is never hard-rejected (INV-034).
 - Where a potential duplicate is detected the response carries `meta.warnings` with a duplicate-review signal; creation still succeeds.
 
@@ -1349,7 +1349,7 @@ Clients must therefore read the collection, edit the whole set, and send it back
 
 **Concurrency:** Uniqueness of active membership per (company, user) is enforced.
 
-**Source Requirement:** FR-ONB-001, FR-ONB-002, FR-COMP-001, FR-COMP-004 · INV-017, INV-030, INV-034 · **Open question 6**
+**Source Requirement:** FR-ONB-001, FR-ONB-002, FR-COMP-001, FR-COMP-004 · INV-017, INV-030, INV-034 · **D-1 CLOSED by approved Product Owner decision**
 
 ---
 
@@ -1785,8 +1785,10 @@ Clients must therefore read the collection, edit the whole set, and send it back
 
 **Business Rules:**
 - An invited member must verify their email/account through the standard security mechanism before gaining access (FR-COMP-004). **No temporary password is issued.**
+- `company_role` is explicitly selected for every member added after the creator; there is no implicit default role.
 - Rejects a duplicate **active** membership (`MEMBER_ALREADY_ACTIVE`, INV-017).
 - Access requires an **active** membership; a revoked one grants nothing.
+- Revoke, demote, deactivate, or leave operations must not leave zero active `COMPANY_ADMIN` memberships; otherwise they return `MEMBER_LAST_ADMIN` (closed D-1).
 
 **Success Response:** `201 Created` (or `202` where an invitation email is the only immediate effect).
 
@@ -1802,7 +1804,7 @@ Clients must therefore read the collection, edit the whole set, and send it back
 
 **Concurrency:** Active-membership uniqueness enforced by a conditional constraint.
 
-**Source Requirement:** FR-COMP-004 · INV-017 · **Open question 6** (`MEMBER_LAST_ADMIN` reserved, not enforced)
+**Source Requirement:** FR-COMP-004 · INV-017 · **D-1 CLOSED by approved Product Owner decision**
 
 ---
 
@@ -3528,7 +3530,7 @@ Nothing below is resolved by this document **except where a row is explicitly ma
 | 3 | **Salary mandatory / display policy** | Vacancy create and update — `salary_min`, `salary_max`, `salary_currency` are nullable with **no mandatory rule and no display policy encoded**. `SALARY_REQUIRED` is reserved and unused |
 | 4 | **Recruiter domain / subdomain** | Affects cookie scope, CORS posture, and CSP, **not any URI or payload in this contract**. Same-origin is the default; a separate domain would require a cross-origin review before production DNS/TLS |
 | 5 | **WhatsApp notification phase** | **No WhatsApp channel, provider, template, adapter, or delivery field appears anywhere.** Notification endpoints cover in-app and email only |
-| 6 | **First recruiter default role / minimum active Company Admin** | `POST /companies` does **not** assign a default `company_role`. `MEMBER_LAST_ADMIN` is reserved and **not enforced** by the member-revoke route |
+| 6 | ~~**First recruiter default role / minimum active Company Admin**~~ | **CLOSED by approved Product Owner decision:** `POST /companies` creates the creator's active `COMPANY_ADMIN` membership atomically; at least one active `COMPANY_ADMIN` must remain; last-admin protection is required; subsequent roles are explicit with no implicit default |
 | 7 | **Candidate controlled vocabularies** — work preference values, education level, candidate document type | `PATCH /candidate/profile`, `PUT /candidate/{collection}`, `POST` and `PATCH /candidate/documents` validate these fields for **type, length, and structural validity only**. `DATABASE_SCHEMA.md` holds all three as `varchar` with the `CHECK` **pending approval**; no values are invented here. **The fields and their features remain MVP** — approving a vocabulary later adds a `CHECK` and a membership rule, and changes no route, payload shape, or capability |
 | 8 | **Profile completion criteria** — `DEFERRED POLICY` | FR-CAN-003 requires a completed profile but fixes **no** completion formula or required-field set. `candidate_profiles.profile_completed_at` **stays in the frozen schema**, is returned as stored, and **may remain `null`**. It is **not** automatically recomputed by any operation in this contract. Candidate profile and collection CRUD are **not blocked** by this |
 | 9 | ~~**Candidate document upload policy**~~ | **CLOSED — approved and frozen 25 August 2026.** MIME allowlist: **`application/pdf` only**, admitted on the **server-inspected** type **and** the `%PDF-` signature. Maximum size: **10 MiB / `10,485,760` bytes**, a **single global limit** with **no per-`document_type` variation**; application validation is authoritative and transport ceilings sit above it. Upload rate limit: **20 per hour per candidate** (Part I §11.8). Storage quota: **DEFERRED**. Malware scanner: **not required** for the PDF-only allowlist. `document_type` stays **open-text `varchar(64)`** — see item 7, still open. `CANDIDATE_DOCUMENT_UPLOAD_POLICY_REQUIRED` is retired; **no migration and no API-shape change** resulted. `POST /candidate/documents` remains **unrouted pending implementation** |
