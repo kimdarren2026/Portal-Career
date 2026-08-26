@@ -2703,7 +2703,15 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 ### POST /api/v1/applications/{application}/transition
 
-**Surface:** `INERTIA_WEB`
+**Surface:** `INERTIA_WEB`  ·  **Active MVP route:** `POST /applications/{application}/transition`
+
+> **Recruiter Applicant Management Foundation v1 (RA-1, RA-2 — approved and CLOSED, 26 August 2026) narrows this operation for its first milestone.** The full transition graph and full actor set below remain the long-run contract; Foundation v1 activates only the subset RA-1/RA-2 define. Nothing below is redefined — only narrowed for what is actually routed today.
+>
+> **RA-1 — Foundation v1 transition graph.** Exactly these edges are legal in this milestone: `APPLIED → UNDER_REVIEW`, `APPLIED → REJECTED`, `UNDER_REVIEW → SHORTLISTED`, `UNDER_REVIEW → REJECTED`, `SHORTLISTED → REJECTED`. Every other edge — including any target of `ASSESSMENT`, `INTERVIEW`, `OFFERED`, `HIRED`, `NO_SHOW`, any backward edge, and same-status no-ops — is `409 APPLICATION_INVALID_TRANSITION` in this milestone, reserved for later Selection/Interview/Offering phases. `WITHDRAWN` remains unreachable here per the existing rule. `REJECTED` and `WITHDRAWN` are terminal for Foundation v1 and cannot be left through this endpoint (`409 APPLICATION_TERMINAL`) — reactivation is `reopen`, which AD-2 leaves open and unimplemented.
+>
+> **RA-2 — existing-applicant processing gate.** Beyond the `COMPANY_SCOPE` object-authorization check, a successful transition additionally requires, inside the same transaction: the owning company's `verification_status = VERIFIED` (else `403 VACANCY_COMPANY_NOT_VERIFIED` — the same code AD-1 already established for the submit gate, reused rather than duplicated), **and** the vacancy's `current_status` ∈ `{PUBLISHED, CLOSED, EXPIRED}` (else `409 APPLICATION_VACANCY_NOT_PROCESSABLE` — new, see `ERROR_CODES.md` §8; no existing code expresses "vacancy in a non-processing state" without contradicting `VACANCY_NOT_OPEN`'s meaning, which governs *new-submission* eligibility and would incorrectly reject the allowed `CLOSED`/`EXPIRED` processing states). `CLOSED`/`EXPIRED` stop new intake but do not block processing candidates who applied while intake was valid; `SUSPENDED` (and any vacancy state outside the allow-list) blocks processing entirely. Reads (list/detail) are unaffected by either gate. Neither gate mutates the vacancy, the company, or any application on denial. `SUPER_ADMIN`'s broad object authorization is a separate layer from this business-legality gate — Foundation v1 applies RA-2 identically to `SUPER_ADMIN`, since no source exempts it.
+>
+> **Actor set active in Foundation v1:** `COMPANY_RECRUITER`, `COMPANY_ADMIN` (`COMPANY_SCOPE`), `SUPER_ADMIN` (`ALLOW`). `CAMPUS_SCOPE` (`HR_ADMIN`) and `ASSIGNED_STAGE` (`SELECTOR`) are **not** activated — `SELECTOR` requires `recruitment_stages` runtime that does not exist yet; no fallback to role-alone or company-wide selector access is implemented. Career Center remains `DENY`, unchanged.
 
 **Purpose:** Move an application's **lifecycle status** (FR-APP-004, FSD §8.5).
 
@@ -2711,18 +2719,18 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 **Request:** `to_status` (required, enum), `reason` (optional), `candidate_visibility` (required — whether the candidate sees this event), `candidate_visible_note` (optional).
 
-**Validation:** `to_status` ∈ `APPLIED`, `UNDER_REVIEW`, `SHORTLISTED`, `ASSESSMENT`, `INTERVIEW`, `OFFERED`, `HIRED`, `REJECTED`, `WITHDRAWN`, `NO_SHOW`. **`candidate_visibility` is required because FR-APP-005 mandates a visibility note on every status change.**
+**Validation:** `to_status` ∈ `APPLIED`, `UNDER_REVIEW`, `SHORTLISTED`, `ASSESSMENT`, `INTERVIEW`, `OFFERED`, `HIRED`, `REJECTED`, `WITHDRAWN`, `NO_SHOW`. **`candidate_visibility` is required because FR-APP-005 mandates a visibility note on every status change.** Foundation v1 additionally rejects, at the RA-1 graph check, any syntactically valid `to_status` that is not one of this milestone's five edges.
 
 **Business Rules:**
 - The **server** validates that the transition is legal from the current status. An illegal move → `409 APPLICATION_INVALID_TRANSITION` with `details.from` and `details.attempted`. **A client can never assert an arbitrary status** — this endpoint accepts a requested target and independently verifies it.
-- Terminal states are `HIRED`, `REJECTED`, `WITHDRAWN`, `NO_SHOW` (FSD §8.5). Leaving a terminal state happens only through `reopen`.
+- Terminal states are `HIRED`, `REJECTED`, `WITHDRAWN`, `NO_SHOW` (FSD §8.5). Leaving a terminal state happens only through `reopen`. Foundation v1 can only ever reach `REJECTED` as a terminal state through its own writes; `WITHDRAWN` is reachable only through the candidate's own withdraw action.
 - `WITHDRAWN` is **not** reachable here — withdrawal is the candidate's own action.
-- `HIRED` is normally reached through offer acceptance, which sets it atomically (INV-031). Setting it directly is permitted only where the workflow allows and is audited identically.
-- Atomically: updates `current_status`, appends `application_status_histories` with from/to status, actor, reason, visibility, and `occurred_at`, writes audit, writes outbox. **Cache and history are written together** (INV-026).
+- `HIRED` is normally reached through offer acceptance, which sets it atomically (INV-031). Setting it directly is permitted only where the workflow allows and is audited identically. **Not reachable in Foundation v1** (RA-1).
+- Atomically: updates `current_status`, appends `application_status_histories` with from/to status, actor, reason, visibility, and `occurred_at`, writes audit, writes outbox. **Cache and history are written together** (INV-026). `event_type` is `REJECTED` when `to_status = REJECTED` (the vocabulary's own dedicated case, the same "dedicated status → dedicated event_type" pattern `WITHDRAWN` already uses) and `STATUS_CHANGED` otherwise.
 
 **Success Response:** `200 OK` with the application and its new status.
 
-**Error Codes:** `APPLICATION_INVALID_TRANSITION` (409) · `APPLICATION_TERMINAL` (409) · `VALIDATION_FAILED` (422) · `AUTH_FORBIDDEN` (403) · `NOT_FOUND` (404) · `STALE_VERSION` (409).
+**Error Codes:** `APPLICATION_INVALID_TRANSITION` (409) · `APPLICATION_TERMINAL` (409) · `VALIDATION_FAILED` (422) · `AUTH_FORBIDDEN` (403) · `NOT_FOUND` (404) · `STALE_VERSION` (409) · `VACANCY_COMPANY_NOT_VERIFIED` (403, RA-2) · `APPLICATION_VACANCY_NOT_PROCESSABLE` (409, RA-2).
 
 **Side Effects:** Status + history + audit + outbox.
 
@@ -2812,7 +2820,9 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 **Surface:** `INERTIA_WEB` for the candidate `OWN` scope  ·  **Reserved `/api/v1` twin:** `GET /api/v1/applications`
 
-> **Candidate `OWN` scope reclassified for the MVP browser Candidate portal (SPEC-DOC-08, accepted).** See the Part VI note above. `COMPANY_SCOPE`, `CAMPUS_SCOPE`, `ASSIGNED_STAGE`, and Auditor scopes below are **not** implemented by Candidate Application Foundation v1 and are not reclassified by this amendment — they remain specified here for the later Recruiter Applicant Management phase.
+> **Candidate `OWN` scope reclassified for the MVP browser Candidate portal (SPEC-DOC-08, accepted).** See the Part VI note above.
+>
+> **`COMPANY_SCOPE` (`COMPANY_RECRUITER`, `COMPANY_ADMIN`) and `SUPER_ADMIN`'s `ALLOW` are active as of Recruiter Applicant Management Foundation v1.** Filters/sort below are unchanged; `vacancy_id` narrowing is available to recruiter scope the same as any other filter. `CAMPUS_SCOPE`, `ASSIGNED_STAGE`, and Auditor remain **not** implemented — `CAMPUS_SCOPE` awaits Campus recruitment, `ASSIGNED_STAGE` awaits `recruitment_stages` runtime (see the transition section's RA-1/RA-2 note above), Auditor awaits its reporting phase.
 
 **Purpose:** Scoped application list — *Lamaran Saya* for candidates, applicant lists for owners (FSD §4.2, FR-HR-005).
 
@@ -2849,7 +2859,9 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 **Surface:** `INERTIA_WEB` for the candidate `OWN` scope  ·  **Reserved `/api/v1` twin:** `GET /api/v1/applications/{application}`
 
-> **Candidate `OWN` scope reclassified for the MVP browser Candidate portal (SPEC-DOC-08, accepted).** See the Part VI note above. `COMPANY_SCOPE`, `CAMPUS_SCOPE`, `ASSIGNED_STAGE`, and Auditor scopes below are **not** implemented by Candidate Application Foundation v1 and are not reclassified by this amendment.
+> **Candidate `OWN` scope reclassified for the MVP browser Candidate portal (SPEC-DOC-08, accepted).** See the Part VI note above.
+>
+> **`COMPANY_SCOPE` and `SUPER_ADMIN` are active as of Recruiter Applicant Management Foundation v1.** Recruiter/company/Super Admin detail may include the full authorized subset: application summary, a source-backed candidate profile summary, screening answers, shared application-document **metadata** (RA-3 — download is deferred; no `snapshot_storage_reference`/`snapshot_checksum`/direct URL is ever returned), and the **full** application history (`reason` included, not filtered to `candidate_visibility = VISIBLE`) — the candidate-side visibility filter belongs only to the candidate's own detail read and is unchanged. `evaluations`, `schedules`, and `offers` remain absent from the recruiter response the same way they are absent from the candidate's — no placeholder or empty-array key is invented for domains that do not exist yet. `CAMPUS_SCOPE` and `ASSIGNED_STAGE` remain **not** implemented, for the same reasons as the list above.
 
 **Purpose:** Application detail (FSD §4.2 Detail Lamaran).
 
@@ -3754,6 +3766,9 @@ Nothing below is resolved by this document **except where a row is explicitly ma
 | 17 | **AD-2 — reopen / reapply** — `OPEN, DEFERRED` | `POST /applications/{application}/reopen` (documented above) has **no runtime implementation, route, or side effect** in Candidate Application Foundation v1. Its business conditions (who may trigger it, and under what vacancy/application state) remain undecided; nothing in Foundation v1 anticipates or forecloses an answer |
 | 18 | **AD-3 — `INTERNAL` audience eligibility** — `OPEN, DEFERRED` | `target_audience = INTERNAL` is not a supported audience for `POST /vacancies/{vacancy}/applications` in Foundation v1. A submit against an `INTERNAL`-audience vacancy is rejected via the existing `CANDIDATE_NOT_ELIGIBLE` (403) contract (rule 3 above) — no "internal candidate" eligibility concept is invented. What would make a candidate eligible for an `INTERNAL` vacancy is undecided |
 | 19 | ~~**SPEC-DOC-08 — Candidate Application MVP transport**~~ | **CLOSED — approved 26 August 2026.** The four candidate-facing Candidate Application Foundation v1 operations (submit, candidate `OWN` list, candidate `OWN` detail, withdraw) are reclassified `INERTIA_WEB` for MVP, the same pattern already accepted for browser authentication (SPEC-DOC-05) and Candidate Core (SPEC-DOC-07): Laravel session guard + CSRF, no Sanctum, no `personal_access_tokens`. Their `/api/v1` twins remain reserved and inactive. `POST /applications/{application}/reopen` is **not** reclassified (AD-2 open/deferred, no runtime); `COMPANY_SCOPE`/`CAMPUS_SCOPE`/`ASSIGNED_STAGE`/Auditor scopes on list/detail are **not** reclassified (unimplemented, later phase). Transport classification only — no business rule for AD-1, AD-4, consent, documents, screening, history, audit, notifications, idempotency, or concurrency changed |
+| 20 | ~~**RA-1 — Recruiter Applicant Management transition graph v1**~~ | **CLOSED — approved 26 August 2026.** `POST /applications/{application}/transition` supports exactly five edges in Foundation v1: `APPLIED → UNDER_REVIEW`, `APPLIED → REJECTED`, `UNDER_REVIEW → SHORTLISTED`, `UNDER_REVIEW → REJECTED`, `SHORTLISTED → REJECTED`. Every other target (`ASSESSMENT`, `INTERVIEW`, `OFFERED`, `HIRED`, `NO_SHOW`), every backward edge, and same-status no-ops are `409 APPLICATION_INVALID_TRANSITION`. `REJECTED` and `WITHDRAWN` are terminal for this milestone and cannot be left through `/transition` (`409 APPLICATION_TERMINAL`) — reactivation remains `reopen`, which AD-2 leaves open. `WITHDRAWN` stays unreachable via `/transition` (candidate-only action, unchanged). See the transition section above for the full rule |
+| 21 | ~~**RA-2 — existing-applicant processing gate**~~ | **CLOSED — approved 26 August 2026.** A successful `/transition` additionally requires, inside the transaction: the owning company `verification_status = VERIFIED` (else `403 VACANCY_COMPANY_NOT_VERIFIED`, reused from AD-1) and the vacancy `current_status` ∈ `{PUBLISHED, CLOSED, EXPIRED}` (else `409 APPLICATION_VACANCY_NOT_PROCESSABLE`, new — see `ERROR_CODES.md` §8). `CLOSED`/`EXPIRED` stop new intake but permit continued processing of applicants who applied while intake was valid; `SUSPENDED` and any other vacancy state block processing entirely. Reads are unaffected. No mutation of vacancy/company/application on denial. Applies identically to `SUPER_ADMIN` — object authorization and transition business-legality are separate checks, and no source exempts `SUPER_ADMIN` from the latter. See the transition section above for the full rule |
+| 22 | ~~**RA-3 — recruiter application-document download**~~ | **CLOSED / DEFERRED — approved 26 August 2026.** Recruiter/company/Super Admin application detail may expose shared `application_documents` **metadata only** (`id`, `snapshot_name`, `shared_at`) for documents actually shared with that application. No download route, private object streaming, signed URL, or direct storage reference is implemented in this milestone; `snapshot_storage_reference` and `snapshot_checksum` are never returned. `GET /api/v1/application-documents/{applicationDocument}/download` stays listed in `API_ENDPOINTS.md`, reserved and inactive |
 
 **Human-decision items carried from the ERD:**
 

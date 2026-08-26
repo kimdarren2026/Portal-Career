@@ -192,6 +192,7 @@ This mapping is a documented reading of an FSD table explicitly labelled as exam
 | `APPLICATION_NOT_IN_PORTAL_VACANCY` | 422 | Vacancy uses `EXTERNAL_ATS`; an application row may not exist for it (**INV-024**) |
 | `APPLICATION_INVALID_TRANSITION` | 409 | Status change not legal from the current state (FSD §8.5) |
 | `APPLICATION_TERMINAL` | 409 | Application is in a terminal state and the action is not permitted |
+| `APPLICATION_VACANCY_NOT_PROCESSABLE` | 409 | The owning vacancy is not in a state that permits processing existing applicants (RA-2) — distinct from `VACANCY_NOT_OPEN`, which governs new-submission eligibility only |
 | `APPLICATION_NOT_REOPENABLE` | 409 | Reopen conditions not met (FR-APP-003) |
 | `APPLICATION_DOCUMENT_REQUIRED` | 422 | A required document type was not selected |
 | `APPLICATION_SCREENING_INCOMPLETE` | 422 | A required screening question is unanswered |
