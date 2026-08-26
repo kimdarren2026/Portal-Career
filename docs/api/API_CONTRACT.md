@@ -2758,34 +2758,49 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 ### POST /api/v1/applications/{application}/move-stage
 
-**Surface:** `INERTIA_WEB`
+**Surface:** `INERTIA_WEB`  ·  **Active MVP route:** `POST /applications/{application}/move-stage`
+
+> **Application Stage Movement Foundation v1 (MS-3, MS-4 — approved and CLOSED, 27 August 2026) activates this operation.** Application Stage Movement authorization is a separate capability from Recruitment Stage Authoring's RS-6 grant — it is not inherited from it, but independently sourced from `AUTHORIZATION_MATRIX.md`'s own "Move recruitment stage" row.
+>
+> **MS-3 — same-stage movement.** A request where `to_stage_id == applications.current_stage_id` is rejected with `422 VALIDATION_FAILED`. The application is not mutated; no history event is appended; no audit, notification, or outbox row is written. This is not treated as a successful no-op, and no `STAGE_CHANGED` history row with `from_stage_id == to_stage_id` is ever created.
+>
+> **MS-4 — stage movement adjacency.** A recruiter may move an eligible application to **any active recruitment stage belonging to the same vacancy** — forward, backward, skipping stages, or lateral movement are all permitted. `sort_order` remains an authoring/display concern only (unchanged from RS-1/RS-2) and is never compared for movement legality. The only target-stage constraints are: the target exists, belongs to the application's vacancy, is `active`, and differs from `current_stage_id`.
+>
+> **RA-2 — existing-applicant processing gate, reused.** Beyond the `COMPANY_SCOPE` object-authorization check, a successful move additionally requires, inside the same transaction, the same gate `/transition` already enforces: the owning company's `verification_status = VERIFIED` (else `403 VACANCY_COMPANY_NOT_VERIFIED`) and the vacancy's `current_status` ∈ `{PUBLISHED, CLOSED, EXPIRED}` (else `409 APPLICATION_VACANCY_NOT_PROCESSABLE`). This is the same `ApplicationProcessingGate` used by `/transition`, not a second processing-state policy. Applies identically to `SUPER_ADMIN` — no source exempts it.
+>
+> **Actor set active in Foundation v1:** `COMPANY_RECRUITER`, `COMPANY_ADMIN` (`COMPANY_SCOPE`), `SUPER_ADMIN` (`ALLOW`). `CAMPUS_SCOPE` (`HR_ADMIN`) is **not** activated — no Campus vacancy runtime exists. Career Center remains `DENY` (footnote 13/18 both name move-stage explicitly: "It cannot list, read, transition, or move applications for company vacancies"). Selectors remain `DENY` (footnote 18: "No transition or stage-move capability, at any scope").
 
 **Purpose:** Move an application to a different **recruitment stage** — an operational step, distinct from lifecycle status.
 
-**Authentication:** Required. **Authorization:** Vacancy owner (`COMPANY_SCOPE` / `CAMPUS_SCOPE`).
+**Authentication:** Required. **Authorization:** Vacancy owner — `COMPANY_SCOPE` for company vacancies, `CAMPUS_SCOPE` for campus vacancies (inert, no Campus runtime). **Career Center cannot move applications between stages**, same rationale as `/transition` (FSD §3.3). Selectors cannot move stages either — they evaluate.
 
 **Request:** `to_stage_id` (required), `reason` (optional), `candidate_visibility` (required).
 
-**Validation:** `to_stage_id` exists and is `active`.
+**Validation:** `to_stage_id` exists, is `active`, belongs to the same vacancy as the application, and differs from the application's current `current_stage_id`.
 
 **Business Rules:**
 - **`to_stage_id` must belong to the same vacancy as the application** → else `422 STAGE_NOT_IN_VACANCY` (INV-019). A foreign key alone cannot prove this, so it is checked in the Action on every write path.
+- **`to_stage_id` equal to the application's current stage is rejected** → `422 VALIDATION_FAILED` (MS-3). No mutation, no history, no audit, no notification.
 - **Stage movement does not imply a status change and never triggers one implicitly.** A candidate may move "Wawancara HR" → "Wawancara Dekan" while `current_status` stays `INTERVIEW`. FR-APP-004 and FR-HR-007 both require an explicit transition action to change candidate-facing status.
-- Appends a `STAGE_CHANGED` history event carrying `from_stage_id` and `to_stage_id`; updates `current_stage_id` in the same transaction (INV-026).
+- **No adjacency or ordering restriction** (MS-4): forward, backward, skipped, and lateral movement between active same-vacancy stages are all permitted. `sort_order` never gates movement legality.
+- `applications.current_stage_id` is nullable; `NULL → active target` is permitted and is the natural first movement, recorded with `from_stage_id = NULL`.
+- A disabled (`active = false`) stage may remain an application's current stage (RS-1/RS-2); moving **away** from it is permitted, moving **to** an inactive stage is denied.
+- **Terminal applications cannot move stage** → `409 APPLICATION_TERMINAL`. Terminal statuses are `HIRED`, `REJECTED`, `WITHDRAWN`, `NO_SHOW` (FSD §8.5), the same set `/transition` and `/reopen` already use.
+- Appends a `STAGE_CHANGED` history event carrying `from_stage_id` and `to_stage_id` (`from_status`/`to_status`/`candidate_visible_note` all `NULL` — this is a pure stage-only event); updates `current_stage_id` in the same transaction (INV-026).
 
 **Success Response:** `200 OK`.
 
-**Error Codes:** `STAGE_NOT_IN_VACANCY` (422) · `APPLICATION_TERMINAL` (409) · `AUTH_FORBIDDEN` (403) · `NOT_FOUND` (404).
+**Error Codes:** `STAGE_NOT_IN_VACANCY` (422) · `VALIDATION_FAILED` (422, MS-3 same-stage and request validation) · `APPLICATION_TERMINAL` (409) · `AUTH_FORBIDDEN` (403) · `NOT_FOUND` (404) · `VACANCY_COMPANY_NOT_VERIFIED` (403, RA-2) · `APPLICATION_VACANCY_NOT_PROCESSABLE` (409, RA-2).
 
 **Side Effects:** `current_stage_id` + history + audit + outbox.
 
-**Audit:** `application_stage_changed`.
+**Audit:** `application_stage_changed`, emitted only after a genuine successful movement — a rejected same-stage request produces no audit entry.
 
-**Notification / Outbox:** Per `candidate_visibility`; the candidate sees `candidate_visible_label` where set, not the internal stage name.
+**Notification / Outbox:** Per `candidate_visibility`; the candidate sees `candidate_visible_label` where set, not the internal stage name. `candidate_visibility = INTERNAL` writes no candidate notification and no outbox row. No recruiter self-notification.
 
 **Idempotency:** **REQUIRED.**
 
-**Concurrency:** Application row locked.
+**Concurrency:** Application row locked, then vacancy, then target stage, then company (deterministic order avoiding deadlock with `/transition`, `SaveRecruitmentStage`, and `ReorderRecruitmentStages`). After locks, eligibility, RA-2, and target-stage `active`/vacancy-membership are all rechecked against the freshly locked rows, so a concurrent stage-disable cannot admit movement into a now-inactive stage.
 
 **Source Requirement:** FR-APP-004, FR-HR-005, FR-HR-007 · **INV-019, INV-026**
 
@@ -3782,7 +3797,9 @@ Nothing below is resolved by this document **except where a row is explicitly ma
 | 23 | ~~**RS-2 — recruitment stage administration state policy**~~ | **CLOSED — approved 26 August 2026.** Stage list/create/update/reorder/deactivate authorization is determined only by actor capability (`COMPANY_SCOPE`/`SUPER_ADMIN`), vacancy ownership, and the stage belonging to that vacancy — **no additional gate on `vacancy.current_status` or `company.verification_status`**. A stage may be administered regardless of vacancy lifecycle state or company verification status, as long as the actor is authorized against the vacancy. Neither `VACANCY_NOT_EDITABLE` nor a new company-verification error is used for Stage Authoring v1. Stage mutation never changes vacancy status, never writes `applications.current_stage_id`, never moves a candidate, never reopens intake, and never bypasses RA-2 — a `SUSPENDED` company or vacancy still cannot process applicants where RA-2 forbids it; RS-2 governs stage configuration only |
 | 24 | ~~**RS-6 — Super Admin stage authorization**~~ | **CLOSED — approved 26 August 2026.** `SUPER_ADMIN` has unconditional `ALLOW` for recruitment stage management, distinct from VA-4 (which requires an active `company_members` row for company vacancy editing and screening questions). The "Manage recruitment stages · reorder" row in `AUTHORIZATION_MATRIX.md` carries no VA-4 footnote; RS-6 confirms this is a deliberate, separate grant, not an omission — Super Admin needs no company membership to author stages for any `COMPANY` vacancy |
 | 25 | **Selector assignment for `COMPANY` vacancies** — `OUT OF SCOPE, DEFERRED` | Unchanged from the frozen matrix (footnote 23): "not defined for company vacancies... a change request." No selector-assignment runtime of any kind is implemented for `COMPANY` vacancies by Recruitment Stage Authoring Foundation v1. `HR_ADMIN`'s Campus-only selector-assignment authority is untouched and remains unimplemented, since no Campus vacancy runtime exists |
-| 26 | **move-stage** — `DEFERRED` | `POST /applications/{application}/move-stage` remains unrouted. Recruitment Stage Authoring Foundation v1 configures a vacancy's available stages; it never assigns or moves an application onto one. `applications.current_stage_id` stays `null` for every application created in this milestone, unchanged from Candidate Application Foundation v1 |
+| 26 | ~~**move-stage**~~ | **CLOSED — approved 27 August 2026.** `POST /applications/{application}/move-stage` is routed by Application Stage Movement Foundation v1. See the move-stage section above and rows 27–28 below for the full rule |
+| 27 | ~~**MS-3 — same-stage movement**~~ | **CLOSED — approved 27 August 2026 (Decision A — REJECT).** `to_stage_id == applications.current_stage_id` → `422 VALIDATION_FAILED`, no mutation, no history, no audit, no notification. Not treated as a successful no-op; no `STAGE_CHANGED` row with `from_stage_id == to_stage_id` is ever written |
+| 28 | ~~**MS-4 — stage movement adjacency**~~ | **CLOSED — approved 27 August 2026 (Decision A — arbitrary active same-vacancy target).** Forward, backward, skipped, and lateral movement between active same-vacancy stages are all permitted. `sort_order` is authoring/display only and never gates movement legality. No forward-only rule, adjacency rule, or backward-movement permission/reason requirement exists |
 
 **Human-decision items carried from the ERD:**
 
