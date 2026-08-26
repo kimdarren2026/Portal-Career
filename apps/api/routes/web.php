@@ -3,6 +3,7 @@
 use App\Domains\Candidate\Support\CandidateCollectionRegistry;
 use App\Http\Controllers\Auth\AuthenticationController;
 use App\Http\Controllers\Auth\AuthPageController;
+use App\Http\Controllers\Web\ApplicationController;
 use App\Http\Controllers\Web\CandidateCollectionController;
 use App\Http\Controllers\Web\CandidateDocumentController;
 use App\Http\Controllers\Web\CandidatePageController;
@@ -137,6 +138,32 @@ Route::middleware(['auth', 'account.status'])->prefix('candidate')->name('candid
 
     Route::middleware(['candidate.document-upload-rate', 'verified.email'])->group(function (): void {
         Route::post('/documents', [CandidateDocumentController::class, 'store'])->name('documents.store');
+    });
+});
+
+/*
+| Candidate Application Foundation v1 — INERTIA_WEB
+|
+| Session guard + CSRF, candidate OWN authorization, verified-email gate on
+| every mutation — the same pattern already established for Candidate Core.
+| API_CONTRACT.md documents these operations as VERSIONED_API, but the
+| Sanctum-authenticated /api/v1 surface remains BOOTSTRAP PHASE / intentionally
+| empty (routes/api.php) exactly as it does for every other business domain
+| (Company Onboarding, Vacancy Authoring/Moderation) — this is a transport
+| mapping, not a business-behaviour change, and follows the identical
+| precedent those domains already set.
+|
+| reopen is deliberately NOT routed: AD-2 remains OPEN and deferred.
+*/
+Route::middleware(['auth', 'account.status'])->group(function (): void {
+    Route::post('/vacancies/{vacancy}/applications', [ApplicationController::class, 'store'])
+        ->whereNumber('vacancy')->middleware('verified.email')->name('vacancies.applications.store');
+
+    Route::prefix('applications')->name('applications.')->group(function (): void {
+        Route::get('/', [ApplicationController::class, 'index'])->name('index');
+        Route::get('/{application}', [ApplicationController::class, 'show'])->whereNumber('application')->name('show');
+        Route::post('/{application}/withdraw', [ApplicationController::class, 'withdraw'])
+            ->whereNumber('application')->middleware('verified.email')->name('withdraw');
     });
 });
 

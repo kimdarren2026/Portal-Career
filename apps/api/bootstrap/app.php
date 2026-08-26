@@ -9,6 +9,19 @@ use App\Http\Middleware\EnforceCompanyMemberInviteRateLimit;
 use App\Http\Middleware\EnforcePublicDiscoveryRateLimit;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Responses\ContractResponse;
+use App\Domains\Application\Exceptions\ApplicationAlreadyExists;
+use App\Domains\Application\Exceptions\ApplicationAlreadyWithdrawn;
+use App\Domains\Application\Exceptions\ApplicationConsentRequired;
+use App\Domains\Application\Exceptions\ApplicationDocumentArchived;
+use App\Domains\Application\Exceptions\ApplicationDocumentRequired;
+use App\Domains\Application\Exceptions\ApplicationNotFound;
+use App\Domains\Application\Exceptions\ApplicationNotInPortalVacancy;
+use App\Domains\Application\Exceptions\ApplicationScreeningIncomplete;
+use App\Domains\Application\Exceptions\ApplicationScreeningInvalid;
+use App\Domains\Application\Exceptions\CandidateNotEligible;
+use App\Domains\Application\Exceptions\ConsentReceiverMismatch;
+use App\Domains\Application\Exceptions\ConsentVersionUnknown;
+use App\Domains\Application\Exceptions\VacancyNotOpenForApplication;
 use App\Domains\Candidate\Exceptions\CandidateCollectionNotFoundException;
 use App\Domains\Candidate\Exceptions\CandidateDocumentNotOwnedException;
 use App\Domains\Candidate\Exceptions\CandidateDocumentPersistenceException;
@@ -75,7 +88,7 @@ return Application::configure(basePath: dirname(__DIR__))
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
         $exceptions->render(function (AuthenticationException $exception, Request $request) {
-            if (in_array($request->path(), ['me', 'me/password', 'auth/logout'], true) || $request->is('candidate/*') || $request->is('companies/*') || $request->is('companies') || $request->is('vacancies') || $request->is('vacancies/*')) {
+            if (in_array($request->path(), ['me', 'me/password', 'auth/logout'], true) || $request->is('candidate/*') || $request->is('companies/*') || $request->is('companies') || $request->is('vacancies') || $request->is('vacancies/*') || $request->is('applications') || $request->is('applications/*')) {
                 return ContractResponse::error($request, 'UNAUTHENTICATED', 401, 'Sesi autentikasi diperlukan.');
             }
         });
@@ -104,6 +117,21 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(fn (VacancyExternalUrlInvalid $exception, Request $request) => ContractResponse::error($request, 'VACANCY_EXTERNAL_ATS_URL_INVALID', 422, 'URL ATS eksternal harus menggunakan HTTPS.'));
         $exceptions->render(fn (VacancyCompanyNotVerified $exception, Request $request) => ContractResponse::error($request, 'VACANCY_COMPANY_NOT_VERIFIED', 403, 'Perusahaan harus terverifikasi.'));
         $exceptions->render(fn (ScreeningQuestionNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Pertanyaan seleksi tidak ditemukan.'));
+        // Candidate Application Foundation v1. AD-1 reuses the existing
+        // VACANCY_COMPANY_NOT_VERIFIED mapping above — no separate code.
+        $exceptions->render(fn (ApplicationNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Lamaran tidak ditemukan.'));
+        $exceptions->render(fn (VacancyNotOpenForApplication $exception, Request $request) => ContractResponse::error($request, 'VACANCY_NOT_OPEN', 409, 'Lowongan belum dibuka atau sudah ditutup.'));
+        $exceptions->render(fn (ApplicationNotInPortalVacancy $exception, Request $request) => ContractResponse::error($request, 'APPLICATION_NOT_IN_PORTAL_VACANCY', 422, 'Lowongan ini tidak menggunakan lamaran dalam portal.'));
+        $exceptions->render(fn (CandidateNotEligible $exception, Request $request) => ContractResponse::error($request, 'CANDIDATE_NOT_ELIGIBLE', 403, 'Anda tidak memenuhi syarat target kandidat lowongan ini.'));
+        $exceptions->render(fn (ApplicationAlreadyExists $exception, Request $request) => ContractResponse::error($request, 'APPLICATION_ALREADY_EXISTS', 409, 'Anda sudah melamar lowongan ini.', ['application_id' => $exception->applicationId]));
+        $exceptions->render(fn (ApplicationConsentRequired $exception, Request $request) => ContractResponse::error($request, 'APPLICATION_CONSENT_REQUIRED', 422, 'Persetujuan pembagian data diperlukan.'));
+        $exceptions->render(fn (ConsentVersionUnknown $exception, Request $request) => ContractResponse::error($request, 'CONSENT_VERSION_UNKNOWN', 422, 'Versi persetujuan tidak dikenali.'));
+        $exceptions->render(fn (ConsentReceiverMismatch $exception, Request $request) => ContractResponse::error($request, 'CONSENT_RECEIVER_MISMATCH', 422, 'Penerima persetujuan tidak sah.'));
+        $exceptions->render(fn (ApplicationDocumentRequired $exception, Request $request) => ContractResponse::error($request, 'APPLICATION_DOCUMENT_REQUIRED', 422, 'Lengkapi dokumen wajib.'));
+        $exceptions->render(fn (ApplicationDocumentArchived $exception, Request $request) => ContractResponse::error($request, 'DOCUMENT_ARCHIVED', 422, 'Dokumen ini sudah diarsipkan.'));
+        $exceptions->render(fn (ApplicationScreeningIncomplete $exception, Request $request) => ContractResponse::error($request, 'APPLICATION_SCREENING_INCOMPLETE', 422, 'Lengkapi pertanyaan seleksi yang wajib dijawab.'));
+        $exceptions->render(fn (ApplicationScreeningInvalid $exception, Request $request) => ContractResponse::error($request, 'APPLICATION_SCREENING_INVALID', 422, 'Jawaban seleksi tidak valid.'));
+        $exceptions->render(fn (ApplicationAlreadyWithdrawn $exception, Request $request) => ContractResponse::error($request, 'APPLICATION_ALREADY_WITHDRAWN', 409, 'Lamaran ini sudah ditarik.'));
         $exceptions->render(fn (CandidateCollectionNotFoundException $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Data tidak ditemukan.'));
         $exceptions->render(fn (CandidateDocumentNotOwnedException $exception, Request $request) => ContractResponse::error($request, 'DOCUMENT_NOT_OWNED', 403, 'Dokumen bukan milik kandidat ini.'));
         $exceptions->render(fn (CandidateDocumentUnsupportedMediaTypeException $exception, Request $request) => ContractResponse::error($request, 'UNSUPPORTED_MEDIA_TYPE', 415, 'Dokumen harus berupa PDF.'));
