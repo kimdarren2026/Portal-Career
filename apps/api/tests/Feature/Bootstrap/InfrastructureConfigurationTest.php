@@ -136,6 +136,26 @@ final class InfrastructureConfigurationTest extends TestCase
         $this->assertSame($expected, $migrations->all());
     }
 
+    /**
+     * A migration must remain runnable and reproducible independent of any
+     * `App\Domains\*` runtime class's future evolution or removal. Every
+     * migration file is a historical snapshot; none may import application
+     * business code, however convenient that would be at write time.
+     */
+    public function test_no_migration_imports_an_app_domain_runtime_class(): void
+    {
+        // Checks for an actual `use App\Domains\...` import statement, not
+        // mere prose mention — a migration's docblock may reference a runtime
+        // class by name for context (e.g. explaining why it does NOT call it)
+        // without importing or calling it.
+        $offenders = collect(glob(database_path('migrations/*.php')))
+            ->filter(fn (string $path): bool => preg_match('/^use\s+App\\\\Domains\\\\/m', file_get_contents($path)) === 1)
+            ->map(fn (string $path) => basename($path))
+            ->values();
+
+        self::assertSame([], $offenders->all(), 'Migrations must be self-contained: '.$offenders->implode(', '));
+    }
+
     public function test_queue_and_job_tables_are_not_created_in_database(): void
     {
         // The queue is Redis (ADR-006); `jobs` and `job_batches` must not exist.
