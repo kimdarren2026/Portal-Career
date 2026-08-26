@@ -21,7 +21,7 @@ final class RecruitmentStageAuthoringTest extends VacancyTestCase
     // Routes
     // ---------------------------------------------------------------
 
-    public function test_stage_routes_exist_no_delete_no_selector_no_move_stage(): void
+    public function test_stage_routes_exist_no_delete_no_selector(): void
     {
         $registered = collect(Route::getRoutes())->map(
             static fn ($route): string => strtoupper(implode('|', $route->methods())).' '.$route->uri(),
@@ -34,7 +34,10 @@ final class RecruitmentStageAuthoringTest extends VacancyTestCase
 
         self::assertFalse($registered->contains(fn (string $r): bool => str_contains($r, 'DELETE') && str_contains($r, 'stages')));
         self::assertFalse($registered->contains(fn (string $r): bool => str_contains($r, 'selector-assignment')));
-        self::assertFalse($registered->contains(fn (string $r): bool => str_contains($r, 'move-stage')));
+        // move-stage is now routed — Application Stage Movement Foundation v1
+        // (MS-3, MS-4) — see ApplicationStageMovementTest for its own
+        // route-existence assertion. It is an Application-domain route, not
+        // a stage-authoring route, so it is deliberately excluded here.
         self::assertFalse($registered->contains(fn (string $r): bool => str_contains($r, 'api/v1') && str_contains($r, 'stage')));
     }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Web;
 
+use App\Domains\Application\Actions\MoveApplicationStage;
 use App\Domains\Application\Actions\SubmitApplication;
 use App\Domains\Application\Actions\TransitionApplication;
 use App\Domains\Application\Actions\WithdrawApplication;
@@ -22,6 +23,7 @@ use App\Domains\Candidate\Support\CandidateProfileResolver;
 use App\Domains\Identity\Models\User;
 use App\Domains\Shared\Support\IdempotencyGuard;
 use App\Http\Requests\Application\ListApplicationsRequest;
+use App\Http\Requests\Application\MoveApplicationStageRequest;
 use App\Http\Requests\Application\SubmitApplicationRequest;
 use App\Http\Requests\Application\TransitionApplicationRequest;
 use App\Http\Requests\Application\WithdrawApplicationRequest;
@@ -32,7 +34,8 @@ use Throwable;
 
 /**
  * Candidate Application Foundation v1, extended by Recruiter Applicant
- * Management Foundation v1 (RA-1, RA-2, both approved and CLOSED).
+ * Management Foundation v1 (RA-1, RA-2) and Application Stage Movement
+ * Foundation v1 (MS-3, MS-4, both approved and CLOSED).
  *
  * `index()`/`show()` serve the one frozen `GET /applications(/{application})`
  * operation for every actor type (AUTHORIZATION_MATRIX.md §4.6), routed by
@@ -52,10 +55,9 @@ use Throwable;
  * precedent). `CAMPUS_SCOPE` and `ASSIGNED_STAGE` are not implemented — no
  * fallback exists for them.
  *
- * `reopen`, `move-stage`, `bulk-transition`, and document download remain
- * deliberately absent: AD-2 stays OPEN and deferred, and move-stage/bulk/
- * download are explicitly out of Recruiter Applicant Management Foundation
- * v1's scope (RA-3 defers download).
+ * `reopen` and `bulk-transition` remain deliberately absent: AD-2 stays OPEN
+ * and deferred, and bulk/download are explicitly out of scope (RA-3 defers
+ * download).
  */
 final class ApplicationController extends CandidateController
 {
@@ -162,6 +164,29 @@ final class ApplicationController extends CandidateController
             );
 
             return RecruiterApplicationPresenter::summary($transitioned);
+        });
+    }
+
+    public function moveStage(MoveApplicationStageRequest $request, int $application, MoveApplicationStage $action): JsonResponse
+    {
+        $actor = $this->actor($request);
+
+        if (! $this->isRecruiterActor($actor)) {
+            return ContractResponse::error($request, 'AUTH_FORBIDDEN', 403, 'Anda tidak berhak melakukan tindakan ini.');
+        }
+
+        $model = RecruiterApplicationScope::findFor($actor, $application) ?? throw new ApplicationNotFound();
+
+        return $this->idempotent($request, $actor, 'application.move_stage', $application, function () use ($actor, $model, $request, $action): array {
+            $moved = $action->execute(
+                $actor,
+                $model,
+                (int) $request->integer('to_stage_id'),
+                $request->string('candidate_visibility')->toString(),
+                $request->filled('reason') ? $request->string('reason')->toString() : null,
+            );
+
+            return RecruiterApplicationPresenter::summary($moved);
         });
     }
 

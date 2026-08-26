@@ -15,8 +15,10 @@ use Tests\Feature\Vacancy\VacancyTestCase;
 /**
  * Recruiter Applicant Management Foundation v1 — list, detail, transition.
  * RA-1 (transition graph) and RA-2 (processing gate) are approved and
- * CLOSED. move-stage, bulk-transition, document download, evaluations,
- * schedules, offers, reopen, and SELECTOR remain deliberately unimplemented.
+ * CLOSED. move-stage is activated separately by Application Stage Movement
+ * Foundation v1 — see `ApplicationStageMovementTest`. bulk-transition,
+ * document download, evaluations, schedules, offers, reopen, and SELECTOR
+ * remain deliberately unimplemented.
  */
 final class RecruiterApplicantManagementTest extends VacancyTestCase
 {
@@ -30,7 +32,7 @@ final class RecruiterApplicantManagementTest extends VacancyTestCase
     // Routes
     // ---------------------------------------------------------------
 
-    public function test_transition_route_exists_move_stage_bulk_download_reopen_absent(): void
+    public function test_transition_route_exists_bulk_download_reopen_absent(): void
     {
         $registered = collect(Route::getRoutes())->map(
             static fn ($route): string => strtoupper(implode('|', $route->methods())).' '.$route->uri(),
@@ -38,7 +40,10 @@ final class RecruiterApplicantManagementTest extends VacancyTestCase
 
         self::assertTrue($registered->contains('POST applications/{application}/transition'));
 
-        foreach (['move-stage', 'bulk-transition', 'application-documents', 'reopen'] as $absent) {
+        // move-stage is now routed — Application Stage Movement Foundation
+        // v1 (MS-3, MS-4) — see ApplicationStageMovementTest for its own
+        // route-existence assertion.
+        foreach (['bulk-transition', 'application-documents', 'reopen'] as $absent) {
             self::assertFalse(
                 $registered->contains(fn (string $r): bool => str_contains($r, $absent)),
                 "No route may exist for {$absent} in this milestone.",

@@ -19,6 +19,8 @@ use App\Domains\Application\Exceptions\ApplicationNotFound;
 use App\Domains\Application\Exceptions\ApplicationNotInPortalVacancy;
 use App\Domains\Application\Exceptions\ApplicationScreeningIncomplete;
 use App\Domains\Application\Exceptions\ApplicationScreeningInvalid;
+use App\Domains\Application\Exceptions\ApplicationStageAlreadyCurrent;
+use App\Domains\Application\Exceptions\ApplicationStageTargetInactive;
 use App\Domains\Application\Exceptions\ApplicationStaleVersion;
 use App\Domains\Application\Exceptions\ApplicationTerminal;
 use App\Domains\Application\Exceptions\CandidateNotEligible;
@@ -39,6 +41,7 @@ use App\Domains\Company\Exceptions\CompanyNotFound;
 use App\Domains\Company\Exceptions\CompanyNotPublic;
 use App\Domains\Company\Exceptions\LastCompanyAdmin;
 use App\Domains\Vacancy\Exceptions\RecruitmentStageNotFound;
+use App\Domains\Vacancy\Exceptions\RecruitmentStageNotInVacancy;
 use App\Domains\Vacancy\Exceptions\ScreeningQuestionNotFound;
 use App\Domains\Vacancy\Exceptions\ReviewReasonRequired as VacancyReviewReasonRequired;
 use App\Domains\Vacancy\Exceptions\VacancyCloseBeforeOpen;
@@ -145,6 +148,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(fn (ApplicationTerminal $exception, Request $request) => ContractResponse::error($request, 'APPLICATION_TERMINAL', 409, 'Lamaran berada pada status akhir dan tidak dapat diubah.'));
         $exceptions->render(fn (ApplicationStaleVersion $exception, Request $request) => ContractResponse::error($request, 'STALE_VERSION', 409, 'Versi lamaran sudah berubah. Muat ulang sebelum menyimpan.'));
         $exceptions->render(fn (VacancyNotProcessable $exception, Request $request) => ContractResponse::error($request, 'APPLICATION_VACANCY_NOT_PROCESSABLE', 409, 'Lowongan tidak dalam status yang mengizinkan pemrosesan lamaran.'));
+        // Application Stage Movement Foundation v1 (MS-3, MS-4). Wrong-vacancy
+        // target reuses STAGE_NOT_IN_VACANCY (INV-019), the same code and
+        // exception Recruitment Stage Authoring's reorder already established.
+        $exceptions->render(fn (RecruitmentStageNotInVacancy $exception, Request $request) => ContractResponse::error($request, 'STAGE_NOT_IN_VACANCY', 422, 'Susunan tahap tidak sesuai dengan tahap lowongan ini.'));
+        $exceptions->render(fn (ApplicationStageTargetInactive $exception, Request $request) => ContractResponse::error($request, 'VALIDATION_FAILED', 422, 'Tahap tujuan tidak aktif.'));
+        $exceptions->render(fn (ApplicationStageAlreadyCurrent $exception, Request $request) => ContractResponse::error($request, 'VALIDATION_FAILED', 422, 'Aplikasi sudah berada pada tahap ini.'));
         $exceptions->render(fn (CandidateCollectionNotFoundException $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Data tidak ditemukan.'));
         $exceptions->render(fn (CandidateDocumentNotOwnedException $exception, Request $request) => ContractResponse::error($request, 'DOCUMENT_NOT_OWNED', 403, 'Dokumen bukan milik kandidat ini.'));
         $exceptions->render(fn (CandidateDocumentUnsupportedMediaTypeException $exception, Request $request) => ContractResponse::error($request, 'UNSUPPORTED_MEDIA_TYPE', 415, 'Dokumen harus berupa PDF.'));

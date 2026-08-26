@@ -174,6 +174,8 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
             ->whereNumber('application')->middleware('verified.email')->name('withdraw');
         Route::post('/{application}/transition', [ApplicationController::class, 'transition'])
             ->whereNumber('application')->name('transition');
+        Route::post('/{application}/move-stage', [ApplicationController::class, 'moveStage'])
+            ->whereNumber('application')->name('move-stage');
     });
 });
 
