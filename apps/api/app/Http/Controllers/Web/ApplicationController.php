@@ -35,11 +35,22 @@ use Throwable;
  * Management Foundation v1 (RA-1, RA-2, both approved and CLOSED).
  *
  * `index()`/`show()` serve the one frozen `GET /applications(/{application})`
- * operation for every actor type (AUTHORIZATION_MATRIX.md §4.6): a
- * `COMPANY_RECRUITER`/`COMPANY_ADMIN`/`SUPER_ADMIN` actor is routed to the
- * `COMPANY_SCOPE`/`ALLOW` recruiter path; every other actor falls through to
- * the original, unmodified candidate `OWN` path. `CAMPUS_SCOPE` and
- * `ASSIGNED_STAGE` are not implemented — no fallback exists for them.
+ * operation for every actor type (AUTHORIZATION_MATRIX.md §4.6), routed by
+ * explicit capability, never by the incidental presence or absence of a
+ * `candidate_profiles` row: a `COMPANY_RECRUITER`/`COMPANY_ADMIN`/
+ * `SUPER_ADMIN` actor gets the `COMPANY_SCOPE`/`ALLOW` recruiter path; an
+ * actor holding one of the three candidate role codes
+ * (`ApplicationScope::isCandidateActor()`) gets the original, unmodified
+ * candidate `OWN` path — `CandidateProfileResolver` only ever resolves
+ * *whose* application list once that capability is already established, and
+ * still raises `CANDIDATE_PROFILE_REQUIRED` for a candidate with no profile
+ * row. Every other actor (Career Center, Selector, or any role holding
+ * neither capability) gets `403 AUTH_FORBIDDEN` directly — never a
+ * `candidate_profiles`-driven side effect. Holding a candidate role
+ * alongside an unrelated role does not remove candidate capability; the two
+ * grants are independent (`CandidateProfilePolicy` already establishes this
+ * precedent). `CAMPUS_SCOPE` and `ASSIGNED_STAGE` are not implemented — no
+ * fallback exists for them.
  *
  * `reopen`, `move-stage`, `bulk-transition`, and document download remain
  * deliberately absent: AD-2 stays OPEN and deferred, and move-stage/bulk/
@@ -85,13 +96,15 @@ final class ApplicationController extends CandidateController
                 $request->string('sort', 'first_applied_at')->toString(),
                 $request->string('direction', 'desc')->toString(),
             );
-        } else {
+        } elseif (ApplicationScope::isCandidateActor($actor)) {
             $applications = $candidateQuery->execute(
                 $actor,
                 array_intersect_key($request->query(), array_flip(ListCandidateApplications::FILTERS)),
                 $request->string('sort', 'first_applied_at')->toString(),
                 $request->string('direction', 'desc')->toString(),
             );
+        } else {
+            return ContractResponse::error($request, 'AUTH_FORBIDDEN', 403, 'Anda tidak berhak melakukan tindakan ini.');
         }
 
         return ContractResponse::success($request, [
@@ -113,6 +126,10 @@ final class ApplicationController extends CandidateController
             $model = RecruiterApplicationScope::findFor($actor, $application) ?? throw new ApplicationNotFound();
 
             return ContractResponse::success($request, $companyQuery->execute($model));
+        }
+
+        if (! ApplicationScope::isCandidateActor($actor)) {
+            return ContractResponse::error($request, 'AUTH_FORBIDDEN', 403, 'Anda tidak berhak melakukan tindakan ini.');
         }
 
         $model = $this->scoped($actor, $application);

@@ -6,6 +6,7 @@ namespace App\Domains\Application\Support;
 
 use App\Domains\Application\Models\Application;
 use App\Domains\Candidate\Support\CandidateProfileResolver;
+use App\Domains\Identity\Enums\RoleCode;
 use App\Domains\Identity\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -19,6 +20,28 @@ use Illuminate\Database\Eloquent\Builder;
 final class ApplicationScope
 {
     public function __construct(private readonly CandidateProfileResolver $profiles) {}
+
+    /**
+     * The Candidate OWN capability gate — the same three-role check
+     * `CandidateProfilePolicy::ownsCandidateProfile()` already uses.
+     * `candidate_profiles` existence is never the gate: a `candidate_profile`
+     * row proves *whose* application list to resolve, not *whether* the
+     * actor may reach Candidate OWN scope at all. Holding a candidate role
+     * alongside an unrelated role (e.g. Career Center) does not remove this
+     * capability — the two are independent grants — but holding no candidate
+     * role at all never falls through to this scope, however the actor's
+     * `candidate_profiles` table happens to look.
+     */
+    public static function isCandidateActor(User $user): bool
+    {
+        foreach ([RoleCode::CandidateExternal, RoleCode::CandidateStudentFinalYear, RoleCode::CandidateAlumni] as $role) {
+            if ($user->hasActiveRole($role)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     public function queryFor(User $user): Builder
     {

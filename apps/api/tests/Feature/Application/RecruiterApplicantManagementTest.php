@@ -97,20 +97,81 @@ final class RecruiterApplicantManagementTest extends VacancyTestCase
         $selector = $this->moderator('ra-deny-selector@example.test', RoleCode::Selector);
 
         foreach ([$careerCenter, $careerCenterManager, $selector] as $actor) {
-            $list = $this->actingAs($actor)->getJson('/applications');
-            $listGrantedCompanyData = $list->status() === 200 && $list->json('data.items') !== [];
-            self::assertFalse($listGrantedCompanyData, 'A denied actor must never see company applications.');
+            $this->actingAs($actor)->getJson('/applications')
+                ->assertStatus(403)->assertJsonPath('error.code', 'AUTH_FORBIDDEN');
 
-            $detail = $this->actingAs($actor)->getJson("/applications/{$applicationId}");
-            self::assertNotSame(200, $detail->status(), 'A denied actor must never read a company application.');
+            $this->actingAs($actor)->getJson("/applications/{$applicationId}")
+                ->assertStatus(403)->assertJsonPath('error.code', 'AUTH_FORBIDDEN');
 
-            $transition = $this->actingAs($actor)->postJson("/applications/{$applicationId}/transition", [
+            $this->actingAs($actor)->postJson("/applications/{$applicationId}/transition", [
                 'to_status' => 'UNDER_REVIEW', 'candidate_visibility' => 'VISIBLE',
-            ]);
-            self::assertNotSame(200, $transition->status());
+            ])->assertStatus(403)->assertJsonPath('error.code', 'AUTH_FORBIDDEN');
         }
 
         self::assertSame('APPLIED', DB::table('applications')->where('id', $applicationId)->value('current_status'));
+    }
+
+    /**
+     * The core regression for the authorization correction: denial must be
+     * caused by the actor lacking recruiter/candidate capability, never by
+     * the incidental absence of a candidate_profiles row. Each actor here
+     * explicitly holds a candidate_profile and must still be denied.
+     */
+    public function test_career_center_and_selector_are_denied_even_when_a_candidate_profile_exists(): void
+    {
+        [, , $vacancyId] = $this->openVacancy('ra-deny-profile@example.test');
+        [$candidate] = $this->candidate('ra-deny-profile-c@example.test');
+        $applicationId = $this->submitApplication($candidate, $vacancyId);
+
+        $careerCenter = $this->moderator('ra-deny-profile-cc@example.test', RoleCode::CareerCenterStaff);
+        $this->giveCandidateProfile($careerCenter);
+        $careerCenterManager = $this->moderator('ra-deny-profile-ccm@example.test', RoleCode::CareerCenterManager);
+        $this->giveCandidateProfile($careerCenterManager);
+        $selector = $this->moderator('ra-deny-profile-selector@example.test', RoleCode::Selector);
+        $this->giveCandidateProfile($selector);
+
+        foreach ([$careerCenter, $careerCenterManager, $selector] as $actor) {
+            self::assertNotNull(DB::table('candidate_profiles')->where('user_id', $actor->id)->value('id'), 'Fixture must actually hold a candidate_profile.');
+
+            $this->actingAs($actor)->getJson('/applications')
+                ->assertStatus(403)->assertJsonPath('error.code', 'AUTH_FORBIDDEN');
+
+            $this->actingAs($actor)->getJson("/applications/{$applicationId}")
+                ->assertStatus(403)->assertJsonPath('error.code', 'AUTH_FORBIDDEN');
+
+            $this->actingAs($actor)->postJson("/applications/{$applicationId}/transition", [
+                'to_status' => 'UNDER_REVIEW', 'candidate_visibility' => 'VISIBLE',
+            ])->assertStatus(403)->assertJsonPath('error.code', 'AUTH_FORBIDDEN');
+        }
+
+        self::assertSame('APPLIED', DB::table('applications')->where('id', $applicationId)->value('current_status'));
+    }
+
+    public function test_candidate_without_a_profile_still_gets_candidate_profile_required(): void
+    {
+        $candidateUser = $this->makeUser('ra-noprofile-c@example.test', UserStatus::Active);
+        $this->assignRole($candidateUser, RoleCode::CandidateExternal);
+
+        $this->actingAs($candidateUser)->getJson('/applications')
+            ->assertStatus(422)->assertJsonPath('error.code', 'CANDIDATE_PROFILE_REQUIRED');
+        $this->actingAs($candidateUser)->getJson('/applications/1')
+            ->assertStatus(422)->assertJsonPath('error.code', 'CANDIDATE_PROFILE_REQUIRED');
+    }
+
+    public function test_recruiter_with_a_candidate_profile_still_gets_company_scope_not_own(): void
+    {
+        [$admin, $company, $vacancyId] = $this->openVacancy('ra-multirole@example.test');
+        $this->giveCandidateProfile($admin);
+
+        [$candidate] = $this->candidate('ra-multirole-c@example.test');
+        $applicationId = $this->submitApplication($candidate, $vacancyId);
+
+        $list = $this->actingAs($admin)->getJson('/applications')->assertOk();
+        self::assertSame([$applicationId], $list->json('data.items.*.id'));
+        self::assertArrayHasKey('candidate', $list->json('data.items.0'));
+
+        $detail = $this->actingAs($admin)->getJson("/applications/{$applicationId}")->assertOk();
+        self::assertArrayHasKey('history', $detail->json('data'));
     }
 
     public function test_super_admin_can_list_and_read_any_company_application(): void
@@ -571,6 +632,14 @@ final class RecruiterApplicantManagementTest extends VacancyTestCase
         ]);
 
         return [$user, $profileId];
+    }
+
+    /** Gives an existing (non-candidate-role) user a candidate_profiles row, to prove profile existence alone grants nothing. */
+    private function giveCandidateProfile(User $user): int
+    {
+        return (int) DB::table('candidate_profiles')->insertGetId([
+            'user_id' => $user->id, 'current_candidate_type' => 'EXTERNAL', 'created_at' => now(), 'updated_at' => now(),
+        ]);
     }
 
     private function candidateDocument(int $profileId, string $displayName): int
