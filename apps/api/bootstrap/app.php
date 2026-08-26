@@ -6,6 +6,7 @@ use App\Http\Middleware\EnsureAccountStatus;
 use App\Http\Middleware\EnsureVerifiedEmail;
 use App\Http\Middleware\EnforceCandidateDocumentUploadRateLimit;
 use App\Http\Middleware\EnforceCompanyMemberInviteRateLimit;
+use App\Http\Middleware\EnforcePublicDiscoveryRateLimit;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Responses\ContractResponse;
 use App\Domains\Candidate\Exceptions\CandidateCollectionNotFoundException;
@@ -30,6 +31,7 @@ use App\Domains\Vacancy\Exceptions\VacancyExternalUrlRequired;
 use App\Domains\Vacancy\Exceptions\VacancyInvalidTransition;
 use App\Domains\Vacancy\Exceptions\VacancyModerationNotApplicable;
 use App\Domains\Vacancy\Exceptions\VacancyNotFound;
+use App\Domains\Vacancy\Exceptions\VacancyNotPublic;
 use App\Domains\Vacancy\Exceptions\VacancyProfileIncomplete;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -64,6 +66,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'verified.email' => EnsureVerifiedEmail::class,
             'candidate.document-upload-rate' => EnforceCandidateDocumentUploadRateLimit::class,
             'company.member-invite-rate' => EnforceCompanyMemberInviteRateLimit::class,
+            'public-discovery.rate-limit' => EnforcePublicDiscoveryRateLimit::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
@@ -83,6 +86,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(fn (CompanyNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Perusahaan tidak ditemukan.'));
         $exceptions->render(fn (CompanyMemberNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Anggota perusahaan tidak ditemukan.'));
         $exceptions->render(fn (VacancyNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Lowongan tidak ditemukan.'));
+        // Public discovery (§10): a non-existent slug and a slug that fails any
+        // one visibility condition are indistinguishable — both are VACANCY_NOT_PUBLIC.
+        $exceptions->render(fn (VacancyNotPublic $exception, Request $request) => ContractResponse::error($request, 'VACANCY_NOT_PUBLIC', 404, 'Lowongan tidak ditemukan.'));
         // Lifecycle (B-1 … B-5). Every code below is already frozen in ERROR_CODES.md.
         $exceptions->render(fn (VacancyInvalidTransition $exception, Request $request) => ContractResponse::error($request, 'VACANCY_INVALID_TRANSITION', 409, 'Aksi tidak sah dari status lowongan saat ini.'));
         $exceptions->render(fn (VacancyModerationNotApplicable $exception, Request $request) => ContractResponse::error($request, 'VACANCY_MODERATION_NOT_APPLICABLE', 409, 'Lowongan kampus tidak melalui moderasi.'));

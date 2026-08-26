@@ -48,15 +48,19 @@ final class ApplicationBootTest extends TestCase
         $this->assertSame('test-correlation-id', $response->headers->get('X-Request-Id'));
     }
 
-    public function test_versioned_api_surface_is_not_yet_exposed(): void
+    public function test_sanctum_authenticated_api_surface_is_not_yet_exposed(): void
     {
-        // /api/v1 is reserved and activated in a later phase. Declaring routes
-        // before their Actions exist would create a compatibility promise we
-        // cannot keep (API_CONTRACT.md Part I §2b).
-        $this->assertEmpty(
-            collect(Route::getRoutes()->getRoutes())
-                ->filter(fn ($route) => str_starts_with($route->uri(), 'api/v1'))
-                ->all()
-        );
+        // The Sanctum bearer-token authenticated /api/v1 surface (57 endpoints,
+        // API_ENDPOINTS.md) is reserved and activates in a later phase together
+        // with Sanctum and its personal_access_tokens table. Declaring those
+        // routes before their Actions exist would create a compatibility
+        // promise we cannot keep. Only the frozen, unauthenticated public
+        // discovery routes (routes/api.php) are active in this phase.
+        $authenticatedApiRoutes = collect(Route::getRoutes()->getRoutes())
+            ->filter(fn ($route) => str_starts_with($route->uri(), 'api/v1'))
+            ->reject(fn ($route) => str_starts_with($route->uri(), 'api/v1/public'))
+            ->all();
+
+        $this->assertEmpty($authenticatedApiRoutes);
     }
 }

@@ -139,9 +139,11 @@ final class VacancyScopeAndSurfaceTest extends VacancyTestCase
 
         // B-4: a company vacancy publishes only through approval-in-window or
         // the scheduler, so no publish route exists for any actor. Moderation
-        // history has no read route in this phase, and public discovery is a
-        // later phase.
-        foreach (['publish', 'moderation-history', 'public/vacanc'] as $absent) {
+        // history has no read route in this phase. Public discovery
+        // (api/v1/public/vacancies) is intentionally now active — see
+        // PublicVacancyDiscoveryTest — and is deliberately excluded from this
+        // absence check.
+        foreach (['publish', 'moderation-history'] as $absent) {
             $this->assertFalse(
                 $registered->contains(fn (string $r): bool => str_contains($r, $absent)),
                 "No route may exist for {$absent} in this phase.",
@@ -149,7 +151,13 @@ final class VacancyScopeAndSurfaceTest extends VacancyTestCase
         }
 
         $this->assertSame(15, $registered->filter(
-            static fn (string $r): bool => str_contains($r, 'vacanc'),
+            static fn (string $r): bool => str_contains($r, 'vacanc') && ! str_contains($r, 'api/v1/public'),
         )->count(), 'The eight authoring routes plus the seven lifecycle routes.');
+
+        // Public Vacancy Discovery Foundation: exactly the two frozen public
+        // vacancy routes (listing and detail-by-slug), no more.
+        $this->assertSame(2, $registered->filter(
+            static fn (string $r): bool => str_contains($r, 'api/v1/public') && str_contains($r, 'vacanc'),
+        )->count(), 'Only GET public/vacancies and GET public/vacancies/{slug} may exist.');
     }
 }
