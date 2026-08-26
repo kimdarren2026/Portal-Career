@@ -1,7 +1,7 @@
 # Inertia Web Action Index — Internal Application Surface
 
 **Status:** Proposed — awaiting approval
-**Date:** 24 August 2026 · **Amended:** Candidate Core HTTP surface (SPEC-DOC-07 accepted)
+**Date:** 24 August 2026 · **Amended:** Candidate Core HTTP surface (SPEC-DOC-07 accepted) · Candidate Application MVP transport (SPEC-DOC-08 accepted, 26 August 2026)
 **Generated from:** `API_CONTRACT.md` — verified programmatically in both directions.
 
 **This file lists only `INERTIA_WEB` operations.** These are internal Laravel + Inertia application routes:
@@ -14,6 +14,8 @@
 
 > **Candidate Core lives here (SPEC-DOC-07, accepted).** Twenty-one Candidate Core operations — profile read and update, the six profile sub-collections, candidate verification request and its paired read, and the five candidate document operations — are served over the same session guard, with `OWN` authorization, the verified-email gate, and CSRF on mutations. Their `/api/v1` twins stay reserved in `API_ENDPOINTS.md`. **Surface classification is not implementation authorization:** `POST /candidate/verifications` remains blocked on the verification business decision (`API_CONTRACT.md` Part X item 1). `POST /candidate/documents` is **no longer policy-blocked** — its MIME allowlist (`application/pdf` only) and maximum size (**10 MiB / 10,485,760 bytes**) were approved and frozen on 25 August 2026 (Part X item 9, CLOSED) — and it stays **unrouted pending implementation**. `/candidate/saved-vacancies` and `/candidate/external-apply-events` belong to later phases and are **not** reclassified.
 
+> **Candidate Application Foundation v1 submit/list/detail/withdraw live here (SPEC-DOC-08, accepted, 26 August 2026).** `POST /vacancies/{vacancy}/applications`, `GET /applications` (candidate `OWN` scope), `GET /applications/{application}` (candidate `OWN` scope), and `POST /applications/{application}/withdraw` are served over the same session guard, with `OWN` authorization and CSRF on mutations. Their `/api/v1` twins stay reserved in `API_ENDPOINTS.md`. AD-1 (company `VERIFIED` recheck at submit) and AD-4 (no profile-completeness formula) are business rules, unaffected by this transport amendment. **`POST /applications/{application}/reopen` is not reclassified** — AD-2 remains open/deferred and this route has no runtime. The `COMPANY_SCOPE`/`CAMPUS_SCOPE`/`ASSIGNED_STAGE`/Auditor scopes on list/detail are **not** reclassified — unimplemented, later phase; only the candidate `OWN` scope is active here.
+
 > **Company vacancy publication is not a user operation (PO decision B-4, 25 August 2026).** The `/vacancies/{vacancy}/publish` row above is retained for the campus flow only; it is **not registered as a company browser route**, and a company vacancy reaches `PUBLISHED` solely through approval inside its active window or through the scheduler.
 
 Routes are shown **without** the `/api/v1` prefix, which is what distinguishes them at the routing layer. Their **behaviour — validation, invariants, transitions, error codes, audit, outbox, idempotency, and concurrency — is defined by `API_CONTRACT.md` exactly as for versioned endpoints.** Idempotency and concurrency requirements are not relaxed here.
@@ -24,7 +26,7 @@ Any of these may later be promoted to `VERSIONED_API`. Promotion is additive —
 
 | Total INERTIA_WEB operations |
 | --- |
-| **122** |
+| **126** |
 
 ## Authentication & Session
 
@@ -142,13 +144,17 @@ Any of these may later be promoted to `VERSIONED_API`. Promotion is additive —
 
 | Domain | Method | Route | Purpose / Contract Section | Primary Role |
 | --- | --- | --- | --- | --- |
+| Application | `GET` | `/applications` | GET /api/v1/applications | CANDIDATE (OWN) |
 | Application | `POST` | `/applications/bulk-transition` | POST /api/v1/applications/bulk-transition | OWN / COMPANY_SCOPE / CAMPUS_SCOPE / ASSIGNED_STAGE |
+| Application | `GET` | `/applications/{application}` | GET /api/v1/applications/{application} | CANDIDATE (OWN) |
 | Application | `GET` | `/applications/{application}/evaluations` | POST /api/v1/applications/{application}/evaluations *(grouped)* | OWN / COMPANY_SCOPE / CAMPUS_SCOPE / ASSIGNED_STAGE |
 | Application | `POST` | `/applications/{application}/evaluations` | POST /api/v1/applications/{application}/evaluations | OWN / COMPANY_SCOPE / CAMPUS_SCOPE / ASSIGNED_STAGE |
 | Application | `POST` | `/applications/{application}/move-stage` | POST /api/v1/applications/{application}/move-stage | OWN / COMPANY_SCOPE / CAMPUS_SCOPE / ASSIGNED_STAGE |
 | Application | `POST` | `/applications/{application}/offers` | POST /api/v1/applications/{application}/offers | OWN / COMPANY_SCOPE / CAMPUS_SCOPE / ASSIGNED_STAGE |
 | Application | `POST` | `/applications/{application}/schedules` | POST /api/v1/applications/{application}/schedules | OWN / COMPANY_SCOPE / CAMPUS_SCOPE / ASSIGNED_STAGE |
 | Application | `POST` | `/applications/{application}/transition` | POST /api/v1/applications/{application}/transition | OWN / COMPANY_SCOPE / CAMPUS_SCOPE / ASSIGNED_STAGE |
+| Application | `POST` | `/applications/{application}/withdraw` | POST /api/v1/applications/{application}/withdraw | CANDIDATE (OWN) |
+| Application | `POST` | `/vacancies/{vacancy}/applications` | POST /api/v1/vacancies/{vacancy}/applications | CANDIDATE (OWN) |
 
 ## Selector Assignment
 
@@ -246,7 +252,7 @@ Any of these may later be promoted to `VERSIONED_API`. Promotion is additive —
 | Career Center Verification | 1 |
 | Partnership | 6 |
 | Vacancy | 19 |
-| Application | 7 |
+| Application | 11 |
 | Selector Assignment | 5 |
 | Selection Schedule | 4 |
 | Evaluation | 3 |
@@ -256,4 +262,4 @@ Any of these may later be promoted to `VERSIONED_API`. Promotion is additive —
 | Reporting | 8 |
 | Audit | 1 |
 | Administration | 6 |
-| **Total** | **122** |
+| **Total** | **126** |

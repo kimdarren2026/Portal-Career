@@ -1,14 +1,14 @@
 # API Endpoint Index — Versioned `/api/v1` Surface
 
 **Status:** Proposed — awaiting approval
-**Date:** 24 August 2026 · **Amended:** Candidate Core HTTP surface (SPEC-DOC-07 accepted)
+**Date:** 24 August 2026 · **Amended:** Candidate Core HTTP surface (SPEC-DOC-07 accepted) · Candidate Application MVP transport (SPEC-DOC-08 accepted, 26 August 2026)
 **Generated from:** `API_CONTRACT.md` — verified programmatically in both directions.
 
 **This file lists only `VERSIONED_API` operations.** These live under `/api/v1`, authenticate with a Sanctum bearer token, use the approved response and error envelope, and **carry an explicit backward-compatibility commitment**.
 
 > **This surface is RESERVED AND INACTIVE at MVP.** No `/api/v1` route is registered, Sanctum token issuance is not activated, and `personal_access_tokens` is deliberately absent (`DATABASE_SCHEMA.md` §23). The inventory below is the specification for when a genuine non-browser client appears; activation is additive and requires no behavioural change.
 
-> **Neither authentication nor Candidate Core is on this surface at MVP.** Browser authentication moved to `INERTIA_WEB` under SPEC-DOC-05, and the twenty-one Candidate Core operations followed under SPEC-DOC-07 — both because the MVP portals are browsers using the Laravel session guard with CSRF (ADR-005, `SECURITY_ARCHITECTURE.md` §1). Their `/api/v1` twins remain reserved here as future promotion targets; a future adapter calls the same domain Actions and Queries. For MVP they are inventoried in `INERTIA_ACTIONS.md`.
+> **Neither authentication, Candidate Core, nor the four Candidate Application Foundation v1 operations are on this surface at MVP.** Browser authentication moved to `INERTIA_WEB` under SPEC-DOC-05, the twenty-one Candidate Core operations followed under SPEC-DOC-07, and application submit / candidate `OWN` list / candidate `OWN` detail / withdraw followed under SPEC-DOC-08 — all because the MVP portals are browsers using the Laravel session guard with CSRF (ADR-005, `SECURITY_ARCHITECTURE.md` §1). Their `/api/v1` twins remain reserved here as future promotion targets; a future adapter calls the same domain Actions and Queries. For MVP they are inventoried in `INERTIA_ACTIONS.md`. `POST /api/v1/applications/{application}/reopen` is **not** reclassified (AD-2 open/deferred) and stays below; the `COMPANY_SCOPE`/`CAMPUS_SCOPE`/`ASSIGNED_STAGE`/Auditor scopes on list/detail are **not** reclassified either — unimplemented, later phase.
 
 Internal application operations are inventoried in `INERTIA_ACTIONS.md`. Behaviour for **both** surfaces is defined by `API_CONTRACT.md`; the split governs routing, authentication, and compatibility — never business rules.
 
@@ -16,7 +16,7 @@ Two headings in the contract are grouped-contract placeholders, not routable URI
 
 | Total VERSIONED_API operations |
 | --- |
-| **26** |
+| **22** |
 
 ## Candidate Profile
 
@@ -46,13 +46,11 @@ Two headings in the contract are grouped-contract placeholders, not routable URI
 | Domain | Method | URI | Purpose / Contract Section | Primary Role |
 | --- | --- | --- | --- | --- |
 | Application | `GET` | `/api/v1/application-documents/{applicationDocument}/download` | GET /api/v1/application-documents/{applicationDocument}/download | OWN / COMPANY_SCOPE / CAMPUS_SCOPE / ASSIGNED_STAGE |
-| Application | `GET` | `/api/v1/applications` | GET /api/v1/applications | OWN / COMPANY_SCOPE / CAMPUS_SCOPE / ASSIGNED_STAGE |
-| Application | `GET` | `/api/v1/applications/{application}` | GET /api/v1/applications/{application} | OWN / COMPANY_SCOPE / CAMPUS_SCOPE / ASSIGNED_STAGE |
-| Application | `GET` | `/api/v1/applications/{application}/documents` | GET /api/v1/applications/{application} *(grouped)* | OWN / COMPANY_SCOPE / CAMPUS_SCOPE / ASSIGNED_STAGE |
-| Application | `GET` | `/api/v1/applications/{application}/history` | GET /api/v1/applications/{application} *(grouped)* | OWN / COMPANY_SCOPE / CAMPUS_SCOPE / ASSIGNED_STAGE |
+| Application | `GET` | `/api/v1/applications/{application}/documents` | GET /applications/{application} *(grouped)* | OWN / COMPANY_SCOPE / CAMPUS_SCOPE / ASSIGNED_STAGE |
+| Application | `GET` | `/api/v1/applications/{application}/history` | GET /applications/{application} *(grouped)* | OWN / COMPANY_SCOPE / CAMPUS_SCOPE / ASSIGNED_STAGE |
 | Application | `POST` | `/api/v1/applications/{application}/reopen` | POST /api/v1/applications/{application}/reopen | OWN / COMPANY_SCOPE / CAMPUS_SCOPE / ASSIGNED_STAGE |
-| Application | `POST` | `/api/v1/applications/{application}/withdraw` | POST /api/v1/applications/{application}/withdraw | OWN / COMPANY_SCOPE / CAMPUS_SCOPE / ASSIGNED_STAGE |
-| Application | `POST` | `/api/v1/vacancies/{vacancy}/applications` | POST /api/v1/vacancies/{vacancy}/applications | OWN / COMPANY_SCOPE / CAMPUS_SCOPE / ASSIGNED_STAGE |
+
+> **Submit, candidate `OWN` list, candidate `OWN` detail, and withdraw moved to `INERTIA_ACTIONS.md` (SPEC-DOC-08, accepted).** Their reserved `/api/v1` twins are `POST /api/v1/vacancies/{vacancy}/applications`, `GET /api/v1/applications`, `GET /api/v1/applications/{application}`, and `POST /api/v1/applications/{application}/withdraw` — see `API_CONTRACT.md` Part VI. `COMPANY_SCOPE`/`CAMPUS_SCOPE`/`ASSIGNED_STAGE`/Auditor list and detail scopes remain unimplemented and stay specified in this file's governing contract sections, not reclassified.
 
 ## External Apply
 
@@ -93,12 +91,12 @@ Two headings in the contract are grouped-contract placeholders, not routable URI
 | Candidate Profile | 1 |
 | Saved Vacancies | 3 |
 | Public | 4 |
-| Application | 8 |
+| Application | 4 |
 | External Apply | 2 |
 | Selection Schedule | 3 |
 | Offering | 2 |
 | Notifications | 3 |
-| **Total** | **26** |
+| **Total** | **22** |
 
 ---
 

@@ -6,6 +6,7 @@
 **Revision:** Final semantic correction pass, 24 August 2026 — Career Center vacancy-authoring ruling, company legal-document supersede rule, candidate collection sync, and the VERSIONED_API / INERTIA_WEB surface split.
 **Amendment:** Auth HTTP surface, 24 August 2026 — SPEC-DOC-05 accepted. The ten authentication and session operations are reclassified to `INERTIA_WEB` for MVP browser authentication (Laravel session guard + CSRF). Their `/api/v1` bearer-token twins remain reserved. SPEC-DOC-06 resolved. **No business rule changed.**
 **Amendment:** Candidate Core HTTP surface, 24 August 2026 — SPEC-DOC-07 accepted. The twenty-one Candidate Core operations — profile read and update, the six profile sub-collections, candidate verification request and its paired read, and the five candidate document operations — are reclassified to `INERTIA_WEB` for the MVP browser Candidate portal (Laravel session guard + CSRF, `OWN` authorization, verified-email gate). Their `/api/v1` bearer-token twins remain reserved. `GET /api/v1/candidate/saved-vacancies` is excluded and stays with the vacancy-discovery phase. **No business rule changed, and no implementation block is lifted.**
+**Amendment:** Candidate Application MVP transport, 26 August 2026 — SPEC-DOC-08 accepted. The four candidate-facing Candidate Application Foundation v1 operations — submit, candidate's own list, candidate's own detail, and withdraw — are reclassified to `INERTIA_WEB` for the MVP browser Candidate portal (Laravel session guard + CSRF, authenticated candidate, existing account/email gates), the same pattern SPEC-DOC-05 and SPEC-DOC-07 already established. Their `/api/v1` bearer-token twins remain reserved. `POST /api/v1/applications/{application}/reopen` is **not** reclassified — AD-2 (reopen/reapply) remains open and deferred, so it stays `VERSIONED_API`/reserved with no runtime of any kind. The `COMPANY_SCOPE`/`CAMPUS_SCOPE`/`ASSIGNED_STAGE`/Auditor scopes on list/detail belong to the Recruiter Applicant Management phase and are untouched. **No business rule changed** — AD-1, AD-4, consent, documents, screening, history, audit, notifications, idempotency, and concurrency behave identically regardless of surface.
 **Companions:** `API_ENDPOINTS.md` (versioned inventory) · `INERTIA_ACTIONS.md` (internal inventory) · `ERROR_CODES.md` · `AUTHORIZATION_MATRIX.md` · `API_SIZE_REVIEW.md` (historical)
 
 **This document is authoritative for behaviour on both surfaces.** Every operation carries a **Surface** classification — `VERSIONED_API` or `INERTIA_WEB` — which governs *where it is routed and whether it carries a compatibility promise*, never *how it behaves*. Both surfaces call the same Actions, Form Requests, Policies, and invariants. **No business rule is ever implemented twice.**
@@ -58,7 +59,7 @@ Every operation below is classified on exactly one surface.
 
 **The reserved versioned surface is candidate-facing: public reads, authentication, and the complete candidate capability set.** That boundary is chosen because it is a *coherent whole* rather than an arbitrary slice: the candidate portal is the only channel with a plausible near-term second client, and a half-versioned candidate API — able to log in but not to apply — would be worse than either extreme. Back-office operations (recruiter, Career Center, Kepegawaian, Selector, Auditor, Super Admin) have no plausible non-web consumer and are `INERTIA_WEB` at MVP.
 
-**Reserved is not active, and what an MVP browser calls is `INERTIA_WEB`.** `/api/v1` is inactive at MVP, so every operation an MVP browser portal actually depends on is routed on the session-guard surface: authentication and session by SPEC-DOC-05, Candidate Core by SPEC-DOC-07. Neither amendment shrinks the boundary above — each keeps its `/api/v1` twin reserved as a promotion target — but for MVP those twins are inventoried in `INERTIA_ACTIONS.md` against their active browser routes rather than in `API_ENDPOINTS.md`. The versioned inventory holds the remainder: public reads, and the candidate-facing operations belonging to later phases.
+**Reserved is not active, and what an MVP browser calls is `INERTIA_WEB`.** `/api/v1` is inactive at MVP, so every operation an MVP browser portal actually depends on is routed on the session-guard surface: authentication and session by SPEC-DOC-05, Candidate Core by SPEC-DOC-07, and the four Candidate Application Foundation v1 operations (submit, own list, own detail, withdraw) by SPEC-DOC-08. Neither amendment shrinks the boundary above — each keeps its `/api/v1` twin reserved as a promotion target — but for MVP those twins are inventoried in `INERTIA_ACTIONS.md` against their active browser routes rather than in `API_ENDPOINTS.md`. The versioned inventory holds the remainder: public reads, `reopen` (AD-2 open/deferred), and the candidate-facing operations belonging to later phases.
 
 Promoting an `INERTIA_WEB` operation to `VERSIONED_API` later is additive and requires no behavioural change — only a route, a token guard, and a compatibility commitment.
 
@@ -2546,9 +2547,13 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 > This part carries the model's densest invariant cluster. Every rule below is enforced server-side inside one transaction, backed by a database constraint wherever one can express it.
 
-### POST /api/v1/vacancies/{vacancy}/applications
+> **The four candidate-facing operations below are `INERTIA_WEB` for MVP (SPEC-DOC-08, accepted).** Submit, the candidate's own list, the candidate's own detail read, and withdraw are served over the **Laravel session guard with CSRF protection on mutations**, the same reasoning already applied to browser authentication (SPEC-DOC-05) and Candidate Core (SPEC-DOC-07): the MVP Candidate portal is a browser, and `/api/v1` is inactive at MVP. Each heading below remains the canonical operation identifier and the reserved `/api/v1` twin for when the versioned API is explicitly activated for a non-browser client; a future adapter calls the same `SubmitApplication`/`WithdrawApplication`/`ApplicationScope` Actions and Queries, so promotion is additive and requires no behavioural change. **No business rule changed by this amendment** — AD-1, AD-4, eligibility, consent, documents, screening, history, audit, notifications, idempotency, and concurrency are identical on either surface. `POST /applications/{application}/reopen` is **not** part of this amendment and stays `VERSIONED_API`/reserved, with no runtime — AD-2 remains open and deferred. The `COMPANY_SCOPE`/`CAMPUS_SCOPE`/`ASSIGNED_STAGE`/Auditor scopes on list and detail belong to a later Recruiter Applicant Management phase and are untouched.
 
-**Surface:** `VERSIONED_API`
+### POST /vacancies/{vacancy}/applications
+
+**Surface:** `INERTIA_WEB`  ·  **Reserved `/api/v1` twin:** `POST /api/v1/vacancies/{vacancy}/applications`
+
+> **Reclassified for the MVP browser Candidate portal (SPEC-DOC-08, accepted).** See the Part VI note above.
 
 **Purpose:** Submit an in-portal application (FR-APP-001). **The single most invariant-dense endpoint in the system.**
 
@@ -2657,9 +2662,11 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 ---
 
-### POST /api/v1/applications/{application}/withdraw
+### POST /applications/{application}/withdraw
 
-**Surface:** `VERSIONED_API`
+**Surface:** `INERTIA_WEB`  ·  **Reserved `/api/v1` twin:** `POST /api/v1/applications/{application}/withdraw`
+
+> **Reclassified for the MVP browser Candidate portal (SPEC-DOC-08, accepted).** See the Part VI note above.
 
 **Purpose:** Candidate withdraws an application (FR-APP-006).
 
@@ -2801,9 +2808,11 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 ---
 
-### GET /api/v1/applications
+### GET /applications
 
-**Surface:** `VERSIONED_API`
+**Surface:** `INERTIA_WEB` for the candidate `OWN` scope  ·  **Reserved `/api/v1` twin:** `GET /api/v1/applications`
+
+> **Candidate `OWN` scope reclassified for the MVP browser Candidate portal (SPEC-DOC-08, accepted).** See the Part VI note above. `COMPANY_SCOPE`, `CAMPUS_SCOPE`, `ASSIGNED_STAGE`, and Auditor scopes below are **not** implemented by Candidate Application Foundation v1 and are not reclassified by this amendment — they remain specified here for the later Recruiter Applicant Management phase.
 
 **Purpose:** Scoped application list — *Lamaran Saya* for candidates, applicant lists for owners (FSD §4.2, FR-HR-005).
 
@@ -2836,9 +2845,11 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 ---
 
-### GET /api/v1/applications/{application}
+### GET /applications/{application}
 
-**Surface:** `VERSIONED_API`
+**Surface:** `INERTIA_WEB` for the candidate `OWN` scope  ·  **Reserved `/api/v1` twin:** `GET /api/v1/applications/{application}`
+
+> **Candidate `OWN` scope reclassified for the MVP browser Candidate portal (SPEC-DOC-08, accepted).** See the Part VI note above. `COMPANY_SCOPE`, `CAMPUS_SCOPE`, `ASSIGNED_STAGE`, and Auditor scopes below are **not** implemented by Candidate Application Foundation v1 and are not reclassified by this amendment.
 
 **Purpose:** Application detail (FSD §4.2 Detail Lamaran).
 
@@ -3742,6 +3753,7 @@ Nothing below is resolved by this document **except where a row is explicitly ma
 | 16 | ~~**AD-4 — application profile-completeness gate for Foundation v1**~~ | **CLOSED — approved 26 August 2026.** `POST /vacancies/{vacancy}/applications` does **not** enforce a completeness formula on `candidate_profiles` in this milestone. `CANDIDATE_PROFILE_INCOMPLETE` (row 8 above) **stays RESERVED and is not emitted** by this endpoint; it is not deleted from the vocabulary and the broader profile-completion policy (row 8) is **not** closed by this decision. The candidate must still have a `candidate_profiles` row at all — that pre-existing `CANDIDATE_PROFILE_REQUIRED` check is unaffected and unrelated to this decision |
 | 17 | **AD-2 — reopen / reapply** — `OPEN, DEFERRED` | `POST /applications/{application}/reopen` (documented above) has **no runtime implementation, route, or side effect** in Candidate Application Foundation v1. Its business conditions (who may trigger it, and under what vacancy/application state) remain undecided; nothing in Foundation v1 anticipates or forecloses an answer |
 | 18 | **AD-3 — `INTERNAL` audience eligibility** — `OPEN, DEFERRED` | `target_audience = INTERNAL` is not a supported audience for `POST /vacancies/{vacancy}/applications` in Foundation v1. A submit against an `INTERNAL`-audience vacancy is rejected via the existing `CANDIDATE_NOT_ELIGIBLE` (403) contract (rule 3 above) — no "internal candidate" eligibility concept is invented. What would make a candidate eligible for an `INTERNAL` vacancy is undecided |
+| 19 | ~~**SPEC-DOC-08 — Candidate Application MVP transport**~~ | **CLOSED — approved 26 August 2026.** The four candidate-facing Candidate Application Foundation v1 operations (submit, candidate `OWN` list, candidate `OWN` detail, withdraw) are reclassified `INERTIA_WEB` for MVP, the same pattern already accepted for browser authentication (SPEC-DOC-05) and Candidate Core (SPEC-DOC-07): Laravel session guard + CSRF, no Sanctum, no `personal_access_tokens`. Their `/api/v1` twins remain reserved and inactive. `POST /applications/{application}/reopen` is **not** reclassified (AD-2 open/deferred, no runtime); `COMPANY_SCOPE`/`CAMPUS_SCOPE`/`ASSIGNED_STAGE`/Auditor scopes on list/detail are **not** reclassified (unimplemented, later phase). Transport classification only — no business rule for AD-1, AD-4, consent, documents, screening, history, audit, notifications, idempotency, or concurrency changed |
 
 **Human-decision items carried from the ERD:**
 
