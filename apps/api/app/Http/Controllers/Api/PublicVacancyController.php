@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Domains\Vacancy\Queries\GetPublicVacancy;
 use App\Domains\Vacancy\Queries\ListPublicVacancies;
+use App\Domains\Vacancy\Support\PublicVacancyRequestFilters;
 use App\Http\Controllers\Controller;
 use App\Http\Responses\ContractResponse;
 use Illuminate\Http\JsonResponse;
@@ -20,30 +21,24 @@ final class PublicVacancyController extends Controller
 {
     public function index(Request $request, ListPublicVacancies $query): JsonResponse
     {
-        foreach (array_keys($request->query()) as $parameter) {
-            if (! in_array($parameter, [...ListPublicVacancies::FILTERS, 'sort', 'direction', 'page', 'per_page', 'cursor'], true)) {
-                return ContractResponse::error($request, 'VALIDATION_FAILED', 422, 'Filter tidak didukung.', [
-                    'fields' => [$parameter => ['Filter tidak didukung.']],
-                ]);
-            }
+        if (($unsupported = PublicVacancyRequestFilters::hasUnsupportedParameter($request)) !== null) {
+            return ContractResponse::error($request, 'VALIDATION_FAILED', 422, 'Filter tidak didukung.', [
+                'fields' => [$unsupported => ['Filter tidak didukung.']],
+            ]);
         }
-
-        $sort = $request->string('sort', 'published_at')->toString();
-        if (! in_array($sort, ListPublicVacancies::SORTABLE, true)) {
+        if (PublicVacancyRequestFilters::hasInvalidSort($request)) {
             return ContractResponse::error($request, 'VALIDATION_FAILED', 422, 'Sort tidak didukung.', [
                 'fields' => ['sort' => ['Sort tidak didukung.']],
             ]);
         }
 
-        $perPage = $request->integer('per_page', 20);
-        $cursor = $request->string('cursor')->toString();
-
+        $parsed = PublicVacancyRequestFilters::parse($request);
         $vacancies = $query->execute(
-            array_intersect_key($request->query(), array_flip(ListPublicVacancies::FILTERS)),
-            $sort,
-            $request->string('direction', 'desc')->toString(),
-            $perPage > 0 ? $perPage : 20,
-            $cursor === '' ? null : $cursor,
+            $parsed['filters'],
+            $parsed['sort'],
+            $parsed['direction'],
+            $parsed['perPage'],
+            $parsed['cursor'],
         );
 
         $pagination = method_exists($vacancies, 'currentPage')

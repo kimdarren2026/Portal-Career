@@ -9,6 +9,7 @@ use App\Http\Controllers\Web\CandidatePageController;
 use App\Http\Controllers\Web\CandidateProfileController;
 use App\Http\Controllers\Web\CompanyController;
 use App\Http\Controllers\Web\CompanyMemberController;
+use App\Http\Controllers\Web\PublicVacancyController;
 use App\Http\Controllers\Web\VacancyController;
 use App\Http\Controllers\Web\VacancyLifecycleController;
 use App\Http\Controllers\Web\VacancyScreeningQuestionController;
@@ -36,6 +37,20 @@ Route::get('/', function () {
         'environment' => app()->environment(),
     ]);
 })->name('bootstrap.health');
+
+/*
+| Public Vacancy Discovery — browser-facing, Inertia SSR (ADR-017).
+| Anonymous: no auth, no verified.email. Consumes the same read layer as the
+| VERSIONED_API public surface (routes/api.php) — never a loopback call to
+| it. `/lowongan` mirrors the canonical Stitch screen names
+| (design/stitch/public/daftar-lowongan, .../detail-lowongan) and the site's
+| established Indonesian-language public vocabulary; the path itself is a
+| technical routing choice — FSD/Stitch fix the terminology and screens, not
+| a URL shape, and no existing route claims this prefix.
+*/
+Route::get('/lowongan', [PublicVacancyController::class, 'index'])->name('lowongan.index');
+Route::get('/lowongan/{slug}', [PublicVacancyController::class, 'show'])
+    ->where('slug', '[a-z0-9-]+')->name('lowongan.show');
 
 // Page delivery only: these routes do not consume a verification or reset token.
 Route::get('/login', [AuthPageController::class, 'login'])->name('auth.login.page');

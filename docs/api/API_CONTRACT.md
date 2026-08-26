@@ -2364,7 +2364,7 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 **Surface:** `VERSIONED_API`
 
-**Purpose:** Public vacancy discovery (FSD §4.1). Backs the SSR-rendered public listing.
+**Purpose:** Public vacancy discovery (FSD §4.1). Backs the SSR-rendered public listing at browser route `GET /lowongan` (`Web\PublicVacancyController@index`, Inertia component `public/VacancyList`) — a technical routing choice (no URL shape is frozen by FSD/Stitch, only the terminology and screens are), mirroring the canonical Stitch screen names (`design/stitch/public/daftar-lowongan`). The web controller consumes `ListPublicVacancies`/`PublicVacancyScope` directly — never a loopback call to this API route.
 
 **Authentication:** **None.** Optional — an authenticated candidate receives eligibility hints, never additional records.
 
@@ -2427,7 +2427,7 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 **Surface:** `VERSIONED_API`
 
-**Purpose:** Public vacancy detail, SEO-indexable through Inertia SSR (ADR-017).
+**Purpose:** Public vacancy detail, SEO-indexable through Inertia SSR (ADR-017). Browser route `GET /lowongan/{slug}` (`Web\PublicVacancyController@show`, Inertia component `public/VacancyDetail`) renders the same predicate through `GetPublicVacancy`/`PublicVacancyScope` directly, with the identical public-not-found behaviour described below.
 
 **Authentication:** None. **Authorization:** `PUBLIC`.
 
