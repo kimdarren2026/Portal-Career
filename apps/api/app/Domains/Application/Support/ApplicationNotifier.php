@@ -14,11 +14,13 @@ use Illuminate\Support\Facades\DB;
  * transaction (INV-015). No SMTP is performed here; the worker sends after
  * commit, so SMTP failure never rolls back the application (FR-NOTIF-002).
  *
- * Recipients are exactly the vacancy owner — for a COMPANY vacancy, every
- * active member of the owning company — the same recipient-set rule already
- * established by `VacancyLifecycleNotifier`. The candidate is the actor
- * performing the action, not a separate recipient; self-notifying the actor
- * is not part of that established contract and is not invented here.
+ * Recipients are the candidate **and** the vacancy owner — for a COMPANY
+ * vacancy, every active member of the owning company. This is governed by
+ * FSD FR-NOTIF-002 ("Application berhasil -> Kandidat dan owner lowongan")
+ * and `API_CONTRACT.md`'s submit/withdraw sections, which name both parties
+ * explicitly. `VacancyLifecycleNotifier`'s owner-only recipient set answers a
+ * different FR-NOTIF-002 trigger row (vacancy lifecycle, where the recruiter
+ * is the actor) and is not authoritative for Application recipients.
  */
 final class ApplicationNotifier
 {
@@ -26,15 +28,15 @@ final class ApplicationNotifier
 
     public function submitted(Application $application, User $candidateUser, int $companyId): void
     {
-        $this->queueOwner($application, $companyId, 'APPLICATION_SUBMITTED', 'application.submitted');
+        $this->queueBoth($application, $candidateUser, $companyId, 'APPLICATION_SUBMITTED', 'application.submitted');
     }
 
     public function withdrawn(Application $application, User $candidateUser, int $companyId): void
     {
-        $this->queueOwner($application, $companyId, 'APPLICATION_WITHDRAWN', 'application.withdrawn');
+        $this->queueBoth($application, $candidateUser, $companyId, 'APPLICATION_WITHDRAWN', 'application.withdrawn');
     }
 
-    private function queueOwner(Application $application, int $companyId, string $type, string $templatePrefix): void
+    private function queueBoth(Application $application, User $candidateUser, int $companyId, string $type, string $templatePrefix): void
     {
         $payload = [
             'application_id' => (int) $application->getKey(),
@@ -43,18 +45,26 @@ final class ApplicationNotifier
             'current_status' => $application->current_status?->value,
         ];
 
+        $this->queueOne((string) $candidateUser->email, (int) $candidateUser->getKey(), $application, $type, $templatePrefix.'.candidate', $payload);
+
         foreach ($this->companyMemberEmails($companyId) as $userId => $email) {
-            $this->outbox->queue((string) $email, $templatePrefix.'.owner', $payload, 'application', (int) $application->getKey());
-            DB::table('notifications')->insert([
-                'user_id' => $userId,
-                'type' => $type,
-                'title' => $type,
-                'body_reference' => $templatePrefix.'.owner',
-                'related_object_type' => 'application',
-                'related_object_id' => $application->getKey(),
-                'created_at' => now(),
-            ]);
+            $this->queueOne((string) $email, (int) $userId, $application, $type, $templatePrefix.'.owner', $payload);
         }
+    }
+
+    /** @param array<string, mixed> $payload */
+    private function queueOne(string $email, int $userId, Application $application, string $type, string $bodyReference, array $payload): void
+    {
+        $this->outbox->queue($email, $bodyReference, $payload, 'application', (int) $application->getKey());
+        DB::table('notifications')->insert([
+            'user_id' => $userId,
+            'type' => $type,
+            'title' => $type,
+            'body_reference' => $bodyReference,
+            'related_object_type' => 'application',
+            'related_object_id' => $application->getKey(),
+            'created_at' => now(),
+        ]);
     }
 
     /** @return \Illuminate\Support\Collection<int, string> */

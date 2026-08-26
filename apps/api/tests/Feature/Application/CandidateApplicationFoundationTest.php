@@ -43,6 +43,29 @@ final class CandidateApplicationFoundationTest extends VacancyTestCase
         $this->postJson('/applications/1/withdraw')->assertUnauthorized();
     }
 
+    /** SPEC-DOC-08: submit/list/detail/withdraw are INERTIA_WEB (session guard), with no active /api/v1 twin. */
+    public function test_transport_is_inertia_web_with_no_active_api_v1_twin(): void
+    {
+        $routes = collect(Route::getRoutes())->keyBy(static fn ($route): string => strtoupper(implode('|', $route->methods())).' '.$route->uri());
+
+        foreach ([
+            'POST vacancies/{vacancy}/applications',
+            'GET|HEAD applications',
+            'GET|HEAD applications/{application}',
+            'POST applications/{application}/withdraw',
+        ] as $expected) {
+            self::assertTrue($routes->has($expected), "Expected INERTIA_WEB route missing: {$expected}");
+            $middleware = $routes->get($expected)->middleware();
+            self::assertContains('web', $middleware);
+            self::assertContains('auth', $middleware);
+            self::assertNotContains('auth:sanctum', $middleware);
+        }
+
+        self::assertFalse($routes->keys()->contains(fn (string $uri): bool => str_starts_with($uri, 'GET|HEAD api/v1/applications')
+            || str_starts_with($uri, 'POST api/v1/applications')
+            || str_starts_with($uri, 'POST api/v1/vacancies/{vacancy}/applications')));
+    }
+
     public function test_no_reopen_route_exists(): void
     {
         $uris = collect(Route::getRoutes())->map(static fn ($route): string => strtoupper(implode('|', $route->methods())).' '.$route->uri());
@@ -82,8 +105,19 @@ final class CandidateApplicationFoundationTest extends VacancyTestCase
         self::assertSame($company->id, (int) $consent->receiving_company_id);
         self::assertNull($consent->receiving_organizational_unit_id);
 
-        self::assertSame(1, DB::table('notifications')->where('related_object_type', 'application')->where('related_object_id', $applicationId)->count());
-        self::assertGreaterThanOrEqual(1, DB::table('email_outbox')->where('related_object_type', 'application')->where('related_object_id', $applicationId)->count());
+        // FSD FR-NOTIF-002 ("Application berhasil -> Kandidat dan owner
+        // lowongan"): the candidate and the vacancy owner are both notified —
+        // exactly one row each, never zero, never duplicated.
+        $notifications = DB::table('notifications')->where('related_object_type', 'application')->where('related_object_id', $applicationId)->get();
+        self::assertCount(2, $notifications);
+        self::assertSame(1, $notifications->where('user_id', $candidate->id)->where('body_reference', 'application.submitted.candidate')->count());
+        self::assertSame(1, $notifications->where('user_id', $recruiter->id)->where('body_reference', 'application.submitted.owner')->count());
+        self::assertTrue($notifications->every(fn ($n): bool => $n->type === 'APPLICATION_SUBMITTED'));
+
+        $outbox = DB::table('email_outbox')->where('related_object_type', 'application')->where('related_object_id', $applicationId)->get();
+        self::assertCount(2, $outbox);
+        self::assertSame(1, $outbox->where('recipient', $candidate->email)->where('template_reference', 'application.submitted.candidate')->count());
+        self::assertSame(1, $outbox->where('recipient', $recruiter->email)->where('template_reference', 'application.submitted.owner')->count());
     }
 
     // ---------------------------------------------------------------
@@ -331,6 +365,11 @@ final class CandidateApplicationFoundationTest extends VacancyTestCase
         self::assertSame(1, DB::table('applications')->where('vacancy_id', $id)->count());
         self::assertSame(1, DB::table('application_status_histories')->where('application_id', $firstId)->where('event_type', 'APPLICATION_CREATED')->count());
         self::assertSame(1, DB::table('consents')->where('application_id', $firstId)->count());
+
+        // The rejected duplicate submit enqueues nothing — only the winning
+        // lifecycle's original notifications/outbox rows exist.
+        self::assertSame(2, DB::table('notifications')->where('related_object_type', 'application')->where('related_object_id', $firstId)->count());
+        self::assertSame(2, DB::table('email_outbox')->where('related_object_type', 'application')->where('related_object_id', $firstId)->count());
     }
 
     // ---------------------------------------------------------------
@@ -352,7 +391,17 @@ final class CandidateApplicationFoundationTest extends VacancyTestCase
         self::assertSame(1, DB::table('applications')->where('vacancy_id', $id)->count());
         self::assertSame(1, DB::table('application_status_histories')->where('application_id', $applicationId)->count());
         self::assertSame(1, DB::table('consents')->where('application_id', $applicationId)->count());
-        self::assertSame(1, DB::table('notifications')->where('related_object_type', 'application')->where('related_object_id', $applicationId)->count());
+
+        // A replay must not duplicate either recipient's notification or outbox row.
+        $notifications = DB::table('notifications')->where('related_object_type', 'application')->where('related_object_id', $applicationId)->get();
+        self::assertCount(2, $notifications);
+        self::assertSame(1, $notifications->where('user_id', $candidate->id)->count());
+        self::assertSame(1, $notifications->where('user_id', $recruiter->id)->count());
+
+        $outbox = DB::table('email_outbox')->where('related_object_type', 'application')->where('related_object_id', $applicationId)->get();
+        self::assertCount(2, $outbox);
+        self::assertSame(1, $outbox->where('recipient', $candidate->email)->count());
+        self::assertSame(1, $outbox->where('recipient', $recruiter->email)->count());
     }
 
     public function test_idempotency_key_reused_with_different_payload_is_rejected(): void
@@ -636,8 +685,26 @@ final class CandidateApplicationFoundationTest extends VacancyTestCase
         self::assertSame(1, DB::table('application_documents')->where('application_id', $applicationId)->count());
         self::assertSame(1, DB::table('consents')->where('application_id', $applicationId)->count());
 
+        // Submit already produced 1 candidate + 1 owner notification/outbox
+        // row; withdraw must add exactly one more of each — a confirmation to
+        // the candidate and a withdrawal notice to the vacancy owner.
+        $notifications = DB::table('notifications')->where('related_object_type', 'application')->where('related_object_id', $applicationId)->get();
+        self::assertCount(4, $notifications);
+        self::assertSame(1, $notifications->where('user_id', $candidate->id)->where('body_reference', 'application.withdrawn.candidate')->count());
+        self::assertSame(1, $notifications->where('user_id', $recruiter->id)->where('body_reference', 'application.withdrawn.owner')->count());
+        self::assertTrue($notifications->where('body_reference', 'application.withdrawn.candidate')->every(fn ($n): bool => $n->type === 'APPLICATION_WITHDRAWN'));
+
+        $outbox = DB::table('email_outbox')->where('related_object_type', 'application')->where('related_object_id', $applicationId)->get();
+        self::assertCount(4, $outbox);
+        self::assertSame(1, $outbox->where('recipient', $candidate->email)->where('template_reference', 'application.withdrawn.candidate')->count());
+        self::assertSame(1, $outbox->where('recipient', $recruiter->email)->where('template_reference', 'application.withdrawn.owner')->count());
+
         $this->actingAs($candidate)->postJson("/applications/{$applicationId}/withdraw")
             ->assertStatus(409)->assertJsonPath('error.code', 'APPLICATION_ALREADY_WITHDRAWN');
+
+        // The already-withdrawn 409 must not enqueue any additional recipient.
+        self::assertCount(4, DB::table('notifications')->where('related_object_type', 'application')->where('related_object_id', $applicationId)->get());
+        self::assertCount(4, DB::table('email_outbox')->where('related_object_type', 'application')->where('related_object_id', $applicationId)->get());
     }
 
     public function test_other_candidate_cannot_withdraw(): void
