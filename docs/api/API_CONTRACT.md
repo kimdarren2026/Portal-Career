@@ -2529,7 +2529,7 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 **Authentication:** Required, email verified. **Authorization:** `COMPANY_SCOPE` or `CAMPUS_SCOPE` owner.
 
-**Request:** `name`, `stage_type`, `sort_order`, `active`, `candidate_visible_label` (optional).
+**Request:** `name`, `stage_type`, `sort_order` (create only — see the ordering rule below), `active`, `candidate_visible_label` (optional). `PATCH` accepts `name`, `stage_type`, `active`, `candidate_visible_label` only.
 
 **Validation:** Enum membership; `sort_order` integer.
 
@@ -2537,8 +2537,9 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 - **Recruitment stage is not application status.** Status is the fixed, system-wide lifecycle vocabulary of FR-APP-004; a stage is this vacancy's configurable operational step. Neither is derived from the other.
 - `candidate_visible_label` lets the candidate-facing label stay simpler than the internal stage name (FR-APP-004: internal stages are not automatically exposed).
 - **A stage referenced by live applications, schedules, evaluations, or selector assignments cannot be deleted** → `409 STAGE_IN_USE`. Deactivate instead. This protects `applications.current_stage_id` and existing history from being orphaned.
+- **`sort_order` is create-only.** `POST .../stages/reorder` is the **sole** post-creation operation permitted to change `sort_order` — a whole-set, atomic, lock-serialized write (see below). `PATCH /vacancies/{vacancy}/stages/{stage}` **rejects** a supplied `sort_order` outright (`422 VALIDATION_FAILED`), never silently discarding it. `recruitment_stages` carries no unique constraint on `(vacancy_id, sort_order)`, so allowing `PATCH` to also carry `sort_order` would reopen exactly the risk the dedicated reorder endpoint exists to close.
 - Reordering (`POST /api/v1/vacancies/{vacancy}/stages/reorder`) changes `sort_order` only; it never rewrites which stage an application currently sits in.
-- Reordering is a **whole-set atomic operation** (`API_SIZE_REVIEW.md` Q-4): the client submits the complete new ordering in one request, never N individual `sort_order` edits, so no transient duplicate position or partial-failure state is ever observable.
+- Reordering is a **whole-set atomic operation** (`API_SIZE_REVIEW.md` Q-4): the client submits the complete new ordering in one request, never N individual `sort_order` edits, so no transient duplicate position or partial-failure state is ever observable. This is why `PATCH` never carries `sort_order` — an individual `PATCH` is exactly the pattern Q-4 reasons against.
 
 **Success Response:** `201 Created`. Paired routes: `GET /vacancies/{vacancy}/stages`, `PATCH /vacancies/{vacancy}/stages/{stage}`, `POST /vacancies/{vacancy}/stages/reorder` — all `INERTIA_WEB`, same authorization and RS-2/RS-6 scope as above.
 
