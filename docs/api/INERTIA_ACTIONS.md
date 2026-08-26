@@ -1,7 +1,7 @@
 # Inertia Web Action Index — Internal Application Surface
 
 **Status:** Proposed — awaiting approval
-**Date:** 24 August 2026 · **Amended:** Candidate Core HTTP surface (SPEC-DOC-07 accepted) · Candidate Application MVP transport (SPEC-DOC-08 accepted, 26 August 2026)
+**Date:** 24 August 2026 · **Amended:** Candidate Core HTTP surface (SPEC-DOC-07 accepted) · Candidate Application MVP transport (SPEC-DOC-08 accepted, 26 August 2026) · Recruitment Stage Authoring role-grouping correction (RS-2, RS-6 accepted, 26 August 2026)
 **Generated from:** `API_CONTRACT.md` — verified programmatically in both directions.
 
 **This file lists only `INERTIA_WEB` operations.** These are internal Laravel + Inertia application routes:
@@ -17,6 +17,8 @@
 > **Candidate Application Foundation v1 submit/list/detail/withdraw live here (SPEC-DOC-08, accepted, 26 August 2026).** `POST /vacancies/{vacancy}/applications`, `GET /applications` (candidate `OWN` scope), `GET /applications/{application}` (candidate `OWN` scope), and `POST /applications/{application}/withdraw` are served over the same session guard, with `OWN` authorization and CSRF on mutations. Their `/api/v1` twins stay reserved in `API_ENDPOINTS.md`. AD-1 (company `VERIFIED` recheck at submit) and AD-4 (no profile-completeness formula) are business rules, unaffected by this transport amendment. **`POST /applications/{application}/reopen` is not reclassified** — AD-2 remains open/deferred and this route has no runtime. The `COMPANY_SCOPE`/`CAMPUS_SCOPE`/`ASSIGNED_STAGE`/Auditor scopes on list/detail are **not** reclassified — unimplemented, later phase; only the candidate `OWN` scope is active here.
 
 > **Company vacancy publication is not a user operation (PO decision B-4, 25 August 2026).** The `/vacancies/{vacancy}/publish` row above is retained for the campus flow only; it is **not registered as a company browser route**, and a company vacancy reaches `PUBLISHED` solely through approval inside its active window or through the scheduler.
+
+> **Recruitment stage authoring lives here, corrected (RS-2, RS-6, accepted, 26 August 2026).** `GET`/`POST`/`PATCH /vacancies/{vacancy}/stages` and `POST /vacancies/{vacancy}/stages/reorder` are grouped under **Vacancy** — `COMPANY_SCOPE`/`CAMPUS_SCOPE`/`SUPER_ADMIN` (RS-6: Super Admin unconditional, no company membership required). They were previously mis-grouped under **Selector Assignment** with `HR_ADMIN` as the only listed role, and the `GET` row incorrectly listed `CAREER_CENTER` — both were route-inventory grouping artifacts, not authorization grants; `AUTHORIZATION_MATRIX.md`'s single combined "Manage recruitment stages · reorder" row denies Career Center for both read and write. RS-2 adds no vacancy-status or company-verification gate to any of these four routes. Selector-assignment routes (`POST`/`GET /stages/{stage}/selector-assignments`, `POST /selector-assignments/{assignment}/revoke`) remain `HR_ADMIN`-only and unimplemented — selector assignment is not defined for `COMPANY` vacancies (matrix footnote 23) and stays out of scope pending a future change request.
 
 Routes are shown **without** the `/api/v1` prefix, which is what distinguishes them at the routing layer. Their **behaviour — validation, invariants, transitions, error codes, audit, outbox, idempotency, and concurrency — is defined by `API_CONTRACT.md` exactly as for versioned endpoints.** Idempotency and concurrency requirements are not relaxed here.
 
@@ -134,8 +136,10 @@ Any of these may later be promoted to `VERSIONED_API`. Promotion is additive —
 | Vacancy | `GET` | `/vacancies/{vacancy}/screening-questions` | POST /api/v1/vacancies/{vacancy}/screening-questions *(grouped)* | COMPANY_SCOPE / CAMPUS_SCOPE / CAREER_CENTER |
 | Vacancy | `POST` | `/vacancies/{vacancy}/screening-questions` | POST /api/v1/vacancies/{vacancy}/screening-questions | COMPANY_SCOPE / CAMPUS_SCOPE / CAREER_CENTER |
 | Vacancy | `PATCH` | `/vacancies/{vacancy}/screening-questions/{question}` | POST /api/v1/vacancies/{vacancy}/screening-questions *(grouped)* | COMPANY_SCOPE / CAMPUS_SCOPE / CAREER_CENTER |
-| Vacancy | `GET` | `/vacancies/{vacancy}/stages` | POST /api/v1/vacancies/{vacancy}/stages *(grouped)* | COMPANY_SCOPE / CAMPUS_SCOPE / CAREER_CENTER |
-| Vacancy | `POST` | `/vacancies/{vacancy}/stages` | POST /api/v1/vacancies/{vacancy}/stages | COMPANY_SCOPE / CAMPUS_SCOPE / CAREER_CENTER |
+| Vacancy | `GET` | `/vacancies/{vacancy}/stages` | POST /api/v1/vacancies/{vacancy}/stages *(grouped)* | COMPANY_SCOPE / CAMPUS_SCOPE / SUPER_ADMIN |
+| Vacancy | `PATCH` | `/vacancies/{vacancy}/stages/{stage}` | POST /api/v1/vacancies/{vacancy}/stages *(grouped)* | COMPANY_SCOPE / CAMPUS_SCOPE / SUPER_ADMIN |
+| Vacancy | `POST` | `/vacancies/{vacancy}/stages` | POST /api/v1/vacancies/{vacancy}/stages | COMPANY_SCOPE / CAMPUS_SCOPE / SUPER_ADMIN |
+| Vacancy | `POST` | `/vacancies/{vacancy}/stages/reorder` | POST /api/v1/vacancies/{vacancy}/stages *(grouped)* | COMPANY_SCOPE / CAMPUS_SCOPE / SUPER_ADMIN |
 | Vacancy | `POST` | `/vacancies/{vacancy}/submit-review` | POST /api/v1/vacancies/{vacancy}/submit-review | COMPANY_SCOPE / CAMPUS_SCOPE / CAREER_CENTER |
 | Vacancy | `POST` | `/vacancies/{vacancy}/suspend` | POST /api/v1/vacancies/{vacancy}/suspend | COMPANY_SCOPE / CAMPUS_SCOPE / CAREER_CENTER |
 | Vacancy | `GET` | `/vacancies/{vacancy}/versions` | GET /api/v1/vacancies/{vacancy} *(grouped)* | COMPANY_SCOPE / CAMPUS_SCOPE / CAREER_CENTER |
@@ -163,8 +167,6 @@ Any of these may later be promoted to `VERSIONED_API`. Promotion is additive —
 | Selector Assignment | `POST` | `/selector-assignments/{assignment}/revoke` | POST /api/v1/stages/{stage}/selector-assignments *(grouped)* | HR_ADMIN |
 | Selector Assignment | `GET` | `/stages/{stage}/selector-assignments` | POST /api/v1/stages/{stage}/selector-assignments *(grouped)* | HR_ADMIN |
 | Selector Assignment | `POST` | `/stages/{stage}/selector-assignments` | POST /api/v1/stages/{stage}/selector-assignments | HR_ADMIN |
-| Selector Assignment | `POST` | `/vacancies/{vacancy}/stages/reorder` | POST /api/v1/vacancies/{vacancy}/stages *(grouped)* | HR_ADMIN |
-| Selector Assignment | `PATCH` | `/vacancies/{vacancy}/stages/{stage}` | POST /api/v1/vacancies/{vacancy}/stages *(grouped)* | HR_ADMIN |
 
 ## Selection Schedule
 
@@ -251,9 +253,9 @@ Any of these may later be promoted to `VERSIONED_API`. Promotion is additive —
 | Company | 16 |
 | Career Center Verification | 1 |
 | Partnership | 6 |
-| Vacancy | 19 |
+| Vacancy | 21 |
 | Application | 11 |
-| Selector Assignment | 5 |
+| Selector Assignment | 3 |
 | Selection Schedule | 4 |
 | Evaluation | 3 |
 | Offering | 4 |
