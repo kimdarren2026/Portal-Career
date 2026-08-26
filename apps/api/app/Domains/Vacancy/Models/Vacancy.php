@@ -72,6 +72,7 @@ final class Vacancy extends Model
     public function creator(): BelongsTo { return $this->belongsTo(User::class, 'created_by'); }
     public function requirements(): HasMany { return $this->hasMany(VacancyRequirement::class); }
     public function screeningQuestions(): HasMany { return $this->hasMany(VacancyScreeningQuestion::class); }
+    public function stages(): HasMany { return $this->hasMany(RecruitmentStage::class, 'vacancy_id'); }
     public function versions(): HasMany { return $this->hasMany(VacancyVersion::class); }
     public function moderationReviews(): HasMany { return $this->hasMany(VacancyModerationReview::class); }
 

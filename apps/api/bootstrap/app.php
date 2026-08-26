@@ -38,6 +38,7 @@ use App\Domains\Company\Exceptions\CompanyMemberNotFound;
 use App\Domains\Company\Exceptions\CompanyNotFound;
 use App\Domains\Company\Exceptions\CompanyNotPublic;
 use App\Domains\Company\Exceptions\LastCompanyAdmin;
+use App\Domains\Vacancy\Exceptions\RecruitmentStageNotFound;
 use App\Domains\Vacancy\Exceptions\ScreeningQuestionNotFound;
 use App\Domains\Vacancy\Exceptions\ReviewReasonRequired as VacancyReviewReasonRequired;
 use App\Domains\Vacancy\Exceptions\VacancyCloseBeforeOpen;
@@ -121,6 +122,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(fn (VacancyExternalUrlInvalid $exception, Request $request) => ContractResponse::error($request, 'VACANCY_EXTERNAL_ATS_URL_INVALID', 422, 'URL ATS eksternal harus menggunakan HTTPS.'));
         $exceptions->render(fn (VacancyCompanyNotVerified $exception, Request $request) => ContractResponse::error($request, 'VACANCY_COMPANY_NOT_VERIFIED', 403, 'Perusahaan harus terverifikasi.'));
         $exceptions->render(fn (ScreeningQuestionNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Pertanyaan seleksi tidak ditemukan.'));
+        // Recruitment Stage Authoring Foundation v1 (RS-2, RS-6).
+        $exceptions->render(fn (RecruitmentStageNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Tahap seleksi tidak ditemukan.'));
         // Candidate Application Foundation v1. AD-1 reuses the existing
         // VACANCY_COMPANY_NOT_VERIFIED mapping above — no separate code.
         $exceptions->render(fn (ApplicationNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Lamaran tidak ditemukan.'));

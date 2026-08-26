@@ -11,6 +11,7 @@ use App\Http\Controllers\Web\CandidateProfileController;
 use App\Http\Controllers\Web\CompanyController;
 use App\Http\Controllers\Web\CompanyMemberController;
 use App\Http\Controllers\Web\PublicVacancyController;
+use App\Http\Controllers\Web\RecruitmentStageController;
 use App\Http\Controllers\Web\VacancyController;
 use App\Http\Controllers\Web\VacancyLifecycleController;
 use App\Http\Controllers\Web\VacancyScreeningQuestionController;
@@ -196,6 +197,8 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
         Route::get('/{vacancy}/versions', [VacancyController::class, 'versions'])->whereNumber('vacancy')->name('versions');
         Route::get('/{vacancy}/screening-questions', [VacancyScreeningQuestionController::class, 'index'])
             ->whereNumber('vacancy')->name('screening-questions.index');
+        Route::get('/{vacancy}/stages', [RecruitmentStageController::class, 'index'])
+            ->whereNumber('vacancy')->name('stages.index');
 
         Route::middleware('verified.email')->group(function (): void {
             Route::patch('/{vacancy}', [VacancyController::class, 'update'])->whereNumber('vacancy')->name('update');
@@ -203,6 +206,16 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
                 ->whereNumber('vacancy')->name('screening-questions.store');
             Route::patch('/{vacancy}/screening-questions/{question}', [VacancyScreeningQuestionController::class, 'update'])
                 ->whereNumber('vacancy')->whereNumber('question')->name('screening-questions.update');
+
+            // Recruitment Stage Authoring Foundation v1 (RS-2, RS-6 — approved
+            // and CLOSED). No vacancy-status/company-verification gate; only
+            // VacancyPolicy::manageStages governs every action here.
+            Route::post('/{vacancy}/stages', [RecruitmentStageController::class, 'store'])
+                ->whereNumber('vacancy')->name('stages.store');
+            Route::patch('/{vacancy}/stages/{stage}', [RecruitmentStageController::class, 'update'])
+                ->whereNumber('vacancy')->whereNumber('stage')->name('stages.update');
+            Route::post('/{vacancy}/stages/reorder', [RecruitmentStageController::class, 'reorder'])
+                ->whereNumber('vacancy')->name('stages.reorder');
 
             // Submit's contract requires a verified email; it is an owner action.
             Route::post('/{vacancy}/submit-review', [VacancyLifecycleController::class, 'submit'])

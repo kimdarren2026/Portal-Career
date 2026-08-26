@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domains\Vacancy\Support;
 
+use App\Domains\Vacancy\Models\RecruitmentStage;
 use App\Domains\Vacancy\Models\Vacancy;
 use App\Domains\Vacancy\Models\VacancyRequirement;
 use App\Domains\Vacancy\Models\VacancyScreeningQuestion;
@@ -109,6 +110,19 @@ final class VacancyPresenter
             'options_definition' => $question->options_definition,
             'sort_order' => $question->sort_order,
             'active' => $question->active,
+        ];
+    }
+
+    /** @return array<string, mixed> */
+    public static function stage(RecruitmentStage $stage): array
+    {
+        return [
+            'id' => (int) $stage->getKey(),
+            'name' => $stage->name,
+            'stage_type' => $stage->stage_type,
+            'sort_order' => $stage->sort_order,
+            'active' => $stage->active,
+            'candidate_visible_label' => $stage->candidate_visible_label,
         ];
     }
 

@@ -153,8 +153,13 @@ final class VacancyScopeAndSurfaceTest extends VacancyTestCase
         // Candidate Application Foundation v1 adds POST /vacancies/{vacancy}/applications
         // — a candidate-submission route, not a vacancy authoring/lifecycle
         // route — and is deliberately excluded from this count.
+        //
+        // Recruitment Stage Authoring Foundation v1 adds GET/POST/PATCH
+        // .../stages and POST .../stages/reorder — a distinct stage-configuration
+        // route family (RS-2, RS-6), not a vacancy authoring/lifecycle route —
+        // and is deliberately excluded from this count.
         $this->assertSame(15, $registered->filter(
-            static fn (string $r): bool => str_contains($r, 'vacanc') && ! str_contains($r, 'api/v1/public') && ! str_contains($r, 'applications'),
+            static fn (string $r): bool => str_contains($r, 'vacanc') && ! str_contains($r, 'api/v1/public') && ! str_contains($r, 'applications') && ! str_contains($r, 'stages'),
         )->count(), 'The eight authoring routes plus the seven lifecycle routes.');
 
         // Public Vacancy Discovery Foundation: exactly the two frozen public

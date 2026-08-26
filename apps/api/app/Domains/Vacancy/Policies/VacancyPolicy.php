@@ -52,6 +52,19 @@ final class VacancyPolicy
         return $this->update($user, $vacancy);
     }
 
+    /**
+     * RS-6, approved and CLOSED: unlike screening questions and vacancy
+     * editing (VA-4), Super Admin holds an unconditional grant here — no
+     * active company membership is required. The frozen matrix's "Manage
+     * recruitment stages · reorder" row carries no VA-4 footnote, and RS-6
+     * confirms this is a deliberate, separate grant rather than an omission.
+     * RS-2 adds no vacancy-status or company-verification gate.
+     */
+    public function manageStages(User $user, Vacancy $vacancy): bool
+    {
+        return $this->update($user, $vacancy) || $user->hasActiveRole(RoleCode::SuperAdmin);
+    }
+
     /** Submit is an owner capability, not moderation (FR-VAC-004). */
     public function submitForReview(User $user, Vacancy $vacancy): bool
     {
