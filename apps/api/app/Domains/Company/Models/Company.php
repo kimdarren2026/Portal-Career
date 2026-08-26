@@ -14,6 +14,11 @@ final class Company extends Model
 {
     protected $table = 'companies';
 
+    /**
+     * @var list<string> Client-writable attributes only. `slug` (PD-2) is
+     * server-resolved at creation and written only by CreateCompany through
+     * forceFill(), exactly like `normalized_name`.
+     */
     protected $fillable = [
         'name', 'normalized_name', 'organization_type_id', 'industry_id', 'website',
         'official_email', 'official_phone', 'address', 'province_geographic_area_id',

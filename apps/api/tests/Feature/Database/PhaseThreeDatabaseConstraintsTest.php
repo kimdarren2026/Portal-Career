@@ -588,6 +588,7 @@ final class PhaseThreeDatabaseConstraintsTest extends TestCase
         return (int) DB::table('companies')->insertGetId([
             'name' => "Phase Three Company {$suffix}",
             'normalized_name' => "phase-three-company-{$suffix}",
+            'slug' => "phase-three-company-{$suffix}-".\Illuminate\Support\Str::lower(\Illuminate\Support\Str::random(6)),
             'verification_status' => 'DRAFT',
             'created_by' => $creatorId,
         ]);

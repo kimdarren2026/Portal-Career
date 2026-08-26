@@ -60,10 +60,12 @@ final class InfrastructureConfigurationTest extends TestCase
         $this->assertSame('pgsql', DB::connection()->getDriverName());
     }
 
-    public function test_only_framework_and_approved_phase_one_through_seven_migrations_exist(): void
+    public function test_only_framework_and_approved_migrations_exist(): void
     {
         // Phase 6 adds operational infrastructure only. Every later business phase
-        // remains absent at this checkpoint.
+        // remains absent at this checkpoint, except the single narrowly scoped
+        // PD-2 migration (companies.slug — public route identifier only, no
+        // verification/membership semantics change).
         $migrations = collect(glob(database_path('migrations/*.php')))
             ->map(fn (string $path) => basename($path))
             ->values();
@@ -128,6 +130,7 @@ final class InfrastructureConfigurationTest extends TestCase
             '2026_08_24_000602_rename_sessions_last_activity_index.php',
             '2026_08_24_000700_create_user_roles_table.php',
             '2026_08_24_000701_revoke_append_only_table_mutations.php',
+            '2026_08_26_000100_add_slug_to_companies_table.php',
         ];
 
         $this->assertSame($expected, $migrations->all());

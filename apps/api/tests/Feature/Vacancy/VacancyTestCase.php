@@ -37,6 +37,7 @@ abstract class VacancyTestCase extends IdentityTestCase
         $id = DB::table('companies')->insertGetId([
             'name' => 'Vacancy Co '.$this->sequence,
             'normalized_name' => 'vacancy co '.$this->sequence,
+            'slug' => \App\Domains\Company\Support\CompanyIdentifier::slug('Vacancy Co '.$this->sequence),
             'verification_status' => $status->value,
             'created_by' => $recruiter->id,
             'created_at' => now(), 'updated_at' => now(),

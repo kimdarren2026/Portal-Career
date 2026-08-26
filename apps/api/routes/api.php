@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\PublicCompanyController;
 use App\Http\Controllers\Api\PublicReferenceDataController;
 use App\Http\Controllers\Api\PublicVacancyController;
 use Illuminate\Support\Facades\Route;
@@ -25,16 +26,16 @@ use Illuminate\Support\Facades\Route;
 |      exist, would create a compatibility promise this repository cannot
 |      keep yet.
 |
-| GET /api/v1/public/companies/{slug} is deliberately NOT declared here: the
-| frozen `companies` table has no `slug` column (DATA_DICTIONARY.md), so the
-| endpoint as literally specified cannot be implemented without a schema
-| change. See docs/api/API_CONTRACT.md for the recorded gap. Vacancy cards and
-| detail carry an embedded public company summary instead, which needs no
-| company slug lookup.
+| GET /api/v1/public/companies/{slug} resolves by `companies.slug` (PD-2,
+| approved 26 August 2026) — a narrowly scoped, backfilled column added
+| specifically to make this already-frozen route resolvable. It returns a
+| single company's public summary only, never a directory.
 */
 Route::prefix('public')->name('public.')->middleware('public-discovery.rate-limit')->group(function (): void {
     Route::get('/vacancies', [PublicVacancyController::class, 'index'])->name('vacancies.index');
     Route::get('/vacancies/{slug}', [PublicVacancyController::class, 'show'])
         ->where('slug', '[a-z0-9-]+')->name('vacancies.show');
+    Route::get('/companies/{slug}', [PublicCompanyController::class, 'show'])
+        ->where('slug', '[a-z0-9-]+')->name('companies.show');
     Route::get('/reference-data', [PublicReferenceDataController::class, 'index'])->name('reference-data');
 });

@@ -203,6 +203,7 @@ final class CompanyLastAdminConcurrencyTest extends TestCase
 
         $companyId = DB::table('companies')->insertGetId([
             'name' => 'Concurrency Co', 'normalized_name' => 'concurrency co',
+            'slug' => \App\Domains\Company\Support\CompanyIdentifier::slug('Concurrency Co'),
             'verification_status' => 'DRAFT', 'created_by' => $adminA->id,
             'created_at' => now(), 'updated_at' => now(),
         ]);

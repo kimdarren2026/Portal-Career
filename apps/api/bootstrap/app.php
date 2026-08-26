@@ -20,6 +20,7 @@ use App\Domains\Candidate\Exceptions\CandidateProfileRequiredException;
 use App\Domains\Company\Exceptions\CompanyMemberAlreadyActive;
 use App\Domains\Company\Exceptions\CompanyMemberNotFound;
 use App\Domains\Company\Exceptions\CompanyNotFound;
+use App\Domains\Company\Exceptions\CompanyNotPublic;
 use App\Domains\Company\Exceptions\LastCompanyAdmin;
 use App\Domains\Vacancy\Exceptions\ScreeningQuestionNotFound;
 use App\Domains\Vacancy\Exceptions\ReviewReasonRequired as VacancyReviewReasonRequired;
@@ -84,6 +85,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // Out of COMPANY_SCOPE and absent answer identically: 403 would confirm
         // the row exists to an actor who must not know it does (matrix §1).
         $exceptions->render(fn (CompanyNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Perusahaan tidak ditemukan.'));
+        // PD-2 public company detail: a nonexistent slug and a non-VERIFIED
+        // company are indistinguishable — both are a plain 404.
+        $exceptions->render(fn (CompanyNotPublic $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Perusahaan tidak ditemukan.'));
         $exceptions->render(fn (CompanyMemberNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Anggota perusahaan tidak ditemukan.'));
         $exceptions->render(fn (VacancyNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Lowongan tidak ditemukan.'));
         // Public discovery (§10): a non-existent slug and a slug that fails any

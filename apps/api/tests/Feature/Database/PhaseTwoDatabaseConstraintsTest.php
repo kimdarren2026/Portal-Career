@@ -283,6 +283,7 @@ final class PhaseTwoDatabaseConstraintsTest extends TestCase
             DB::table('companies')->insert([
                 'name' => 'Invalid Company',
                 'normalized_name' => 'invalid-company',
+                'slug' => 'invalid-company-'.\Illuminate\Support\Str::lower(\Illuminate\Support\Str::random(6)),
                 'verification_status' => 'APPROVED',
                 'created_by' => $creatorId,
             ])
@@ -538,6 +539,7 @@ final class PhaseTwoDatabaseConstraintsTest extends TestCase
         return (int) DB::table('companies')->insertGetId([
             'name' => $name,
             'normalized_name' => $normalizedName,
+            'slug' => $normalizedName.'-'.\Illuminate\Support\Str::lower(\Illuminate\Support\Str::random(6)),
             'verification_status' => 'DRAFT',
             'created_by' => $creatorId,
         ]);

@@ -54,8 +54,11 @@ final class PublicVacancyDiscoveryTest extends VacancyTestCase
         self::assertFalse($uris->contains(fn (string $u): bool => str_contains($u, 'public/vacancies/') && str_contains($u, 'expire')));
         self::assertFalse($uris->contains(fn (string $u): bool => str_contains($u, 'public') && str_contains($u, 'report')));
         self::assertNull(Route::getRoutes()->getByName('public.vacancies.publish'));
+        // PD-2 makes the single-company endpoint resolvable but explicitly does
+        // NOT create a Public Company Directory — the bare, slug-less listing
+        // route must never exist, while the single-company route now does.
         self::assertFalse($uris->contains('api/v1/public/companies'));
-        self::assertFalse($uris->contains('api/v1/public/companies/{slug}'));
+        self::assertTrue($uris->contains('api/v1/public/companies/{slug}'));
     }
 
     // ---------------------------------------------------------------
@@ -580,7 +583,10 @@ final class PublicVacancyDiscoveryTest extends VacancyTestCase
             ->filter(static fn ($route): bool => str_starts_with($route->uri(), 'api/v1/public'))
             ->map(static fn ($route): string => $route->uri());
         self::assertFalse($publicUris->contains(fn (string $u): bool => str_contains($u, 'saved-vacanc')));
-        self::assertFalse($publicUris->contains(fn (string $u): bool => str_contains($u, 'companies')));
+        // PD-2 adds the single-company endpoint; it must never become a
+        // directory/listing route.
+        self::assertFalse($publicUris->contains('api/v1/public/companies'));
+        self::assertTrue($publicUris->contains('api/v1/public/companies/{slug}'));
         self::assertFalse($publicUris->contains(fn (string $u): bool => str_contains($u, 'sitemap')));
     }
 

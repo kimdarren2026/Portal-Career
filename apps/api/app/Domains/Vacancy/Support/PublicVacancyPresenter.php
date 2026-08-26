@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Domains\Vacancy\Support;
 
+use App\Domains\Partnership\Support\PartnershipStatus;
 use App\Domains\Vacancy\Models\Vacancy;
 use App\Domains\Vacancy\Models\VacancyRequirement;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Public read model for anonymous vacancy discovery (FSD §4.1, API_CONTRACT.md
@@ -84,8 +84,8 @@ final class PublicVacancyPresenter
     /**
      * Exactly the frozen public company summary (API_CONTRACT.md line 2381):
      * name, logo, industry, city, and derived `mitra_kampus_active`. No
-     * `verification_status` field — PD-2 leaves that unsourced; VERIFIED is
-     * already required for visibility, it is never itself displayed.
+     * `verification_status` field is exposed — VERIFIED is already required
+     * for visibility (PD-1); the status value itself is never displayed.
      *
      * @param array<int, bool>|null $mitraLookup
      * @return array<string, mixed>
@@ -108,7 +108,7 @@ final class PublicVacancyPresenter
             'logo_url' => null,
             'industry_id' => self::nullableInt($company->industry_id),
             'city_geographic_area_id' => self::nullableInt($company->city_geographic_area_id),
-            'mitra_kampus_active' => $mitraLookup[$companyId] ?? self::mitraKampusActive($companyId),
+            'mitra_kampus_active' => $mitraLookup[$companyId] ?? PartnershipStatus::isActiveFor($companyId),
         ];
     }
 
@@ -121,41 +121,7 @@ final class PublicVacancyPresenter
      */
     public static function batchMitraKampusActive(array $companyIds): array
     {
-        if ($companyIds === []) {
-            return [];
-        }
-
-        $active = DB::table('partnerships')
-            ->select('company_id')
-            ->whereIn('company_id', $companyIds)
-            ->where('status', 'ACTIVE')
-            ->where('start_date', '<=', now()->toDateString())
-            ->where(function ($q): void {
-                $q->whereNull('end_date')->orWhere('end_date', '>=', now()->toDateString());
-            })
-            ->distinct()
-            ->pluck('company_id')
-            ->all();
-
-        $activeSet = array_flip(array_map('intval', $active));
-
-        return array_reduce($companyIds, static function (array $carry, int $id) use ($activeSet): array {
-            $carry[$id] = isset($activeSet[$id]);
-
-            return $carry;
-        }, []);
-    }
-
-    private static function mitraKampusActive(int $companyId): bool
-    {
-        return DB::table('partnerships')
-            ->where('company_id', $companyId)
-            ->where('status', 'ACTIVE')
-            ->where('start_date', '<=', now()->toDateString())
-            ->where(function ($q): void {
-                $q->whereNull('end_date')->orWhere('end_date', '>=', now()->toDateString());
-            })
-            ->exists();
+        return PartnershipStatus::batchActive($companyIds);
     }
 
     private static function nullableInt(mixed $value): ?int

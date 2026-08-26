@@ -543,6 +543,7 @@ final class PhaseFourDatabaseConstraintsTest extends TestCase
         return (int) DB::table('companies')->insertGetId([
             'name' => "Phase Four Company {$suffix}",
             'normalized_name' => "phase-four-company-{$suffix}",
+            'slug' => "phase-four-company-{$suffix}-".\Illuminate\Support\Str::lower(\Illuminate\Support\Str::random(6)),
             'verification_status' => 'DRAFT',
             'created_by' => $creatorId,
         ]);

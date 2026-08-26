@@ -352,6 +352,7 @@ final class PhaseFiveDatabaseConstraintsTest extends TestCase
         $companyId = (int) DB::table('companies')->insertGetId([
             'name' => "Phase Five Company {$suffix}",
             'normalized_name' => "phase-five-company-{$suffix}",
+            'slug' => "phase-five-company-{$suffix}-".\Illuminate\Support\Str::lower(\Illuminate\Support\Str::random(6)),
             'verification_status' => 'DRAFT',
             'created_by' => $creatorId,
         ]);

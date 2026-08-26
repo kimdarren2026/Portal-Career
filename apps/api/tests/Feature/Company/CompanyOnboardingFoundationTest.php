@@ -155,7 +155,8 @@ final class CompanyOnboardingFoundationTest extends IdentityTestCase
         $province = DB::table('geographic_areas')->insertGetId(['name' => 'Province', 'area_type' => 'PROVINCE', 'active' => true, 'created_at' => now(), 'updated_at' => now()]);
         $city = DB::table('geographic_areas')->insertGetId(['name' => 'City', 'area_type' => 'CITY', 'parent_geographic_area_id' => $province, 'active' => true, 'created_at' => now(), 'updated_at' => now()]);
         $id = DB::table('companies')->insertGetId([
-            'name' => $name, 'normalized_name' => strtolower($name), 'organization_type_id' => $organizationType, 'industry_id' => $industry,
+            'name' => $name, 'normalized_name' => strtolower($name), 'slug' => \App\Domains\Company\Support\CompanyIdentifier::slug($name),
+            'organization_type_id' => $organizationType, 'industry_id' => $industry,
             'official_email' => $user->email, 'address' => 'Address', 'province_geographic_area_id' => $province, 'city_geographic_area_id' => $city,
             'verification_status' => 'DRAFT', 'created_by' => $user->id, 'created_at' => now(), 'updated_at' => now(),
         ]);
