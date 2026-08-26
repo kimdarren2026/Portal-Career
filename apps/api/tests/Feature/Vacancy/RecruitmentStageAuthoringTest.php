@@ -71,6 +71,52 @@ final class RecruitmentStageAuthoringTest extends VacancyTestCase
         self::assertSame(3, DB::table('audit_logs')->where('action', 'vacancy_stage_changed')->where('object_id', $vacancyId)->count());
     }
 
+    /**
+     * `sort_order` is create-only. `POST .../stages/reorder` is the sole
+     * post-creation ordering path (API_SIZE_REVIEW.md Q-4) -- a PATCH
+     * carrying `sort_order` must be rejected outright, never silently
+     * dropped, so it can never open a second, non-atomic ordering path.
+     */
+    public function test_patch_rejects_sort_order_with_zero_mutation_and_zero_audit(): void
+    {
+        [$admin, $company] = $this->verifiedCompanyWithRecruiter('stage-patch-order@example.test');
+        $vacancyId = $this->createVacancy($admin, $company);
+
+        $stageA = (int) $this->actingAs($admin)->postJson("/vacancies/{$vacancyId}/stages", [
+            'name' => 'Stage A', 'stage_type' => 'GENERAL', 'sort_order' => 1, 'active' => true,
+        ])->assertCreated()->json('data.id');
+        $stageB = (int) $this->actingAs($admin)->postJson("/vacancies/{$vacancyId}/stages", [
+            'name' => 'Stage B', 'stage_type' => 'GENERAL', 'sort_order' => 2, 'active' => true,
+        ])->assertCreated()->json('data.id');
+
+        $auditBefore = DB::table('audit_logs')->where('action', 'vacancy_stage_changed')->where('object_id', $vacancyId)->count();
+        $notifBefore = DB::table('notifications')->count();
+        $outboxBefore = DB::table('email_outbox')->count();
+
+        $this->actingAs($admin)->patchJson("/vacancies/{$vacancyId}/stages/{$stageB}", ['sort_order' => 1])
+            ->assertStatus(422)->assertJsonPath('error.code', 'VALIDATION_FAILED');
+
+        self::assertSame(1, (int) DB::table('recruitment_stages')->where('id', $stageA)->value('sort_order'));
+        self::assertSame(2, (int) DB::table('recruitment_stages')->where('id', $stageB)->value('sort_order'));
+        self::assertSame($auditBefore, DB::table('audit_logs')->where('action', 'vacancy_stage_changed')->where('object_id', $vacancyId)->count());
+        self::assertSame($notifBefore, DB::table('notifications')->count());
+        self::assertSame($outboxBefore, DB::table('email_outbox')->count());
+        self::assertSame(0, DB::table('applications')->count());
+    }
+
+    public function test_create_still_accepts_explicit_sort_order(): void
+    {
+        [$admin, $company] = $this->verifiedCompanyWithRecruiter('stage-create-order@example.test');
+        $vacancyId = $this->createVacancy($admin, $company);
+
+        $created = $this->actingAs($admin)->postJson("/vacancies/{$vacancyId}/stages", [
+            'name' => 'Stage', 'stage_type' => 'GENERAL', 'sort_order' => 5, 'active' => true,
+        ])->assertCreated();
+
+        self::assertSame(5, $created->json('data.sort_order'));
+        self::assertSame(5, (int) DB::table('recruitment_stages')->where('id', $created->json('data.id'))->value('sort_order'));
+    }
+
     // ---------------------------------------------------------------
     // Cross-company / authorization
     // ---------------------------------------------------------------
@@ -223,7 +269,7 @@ final class RecruitmentStageAuthoringTest extends VacancyTestCase
         $stageId = (int) $this->actingAs($admin)->postJson("/vacancies/{$vacancyId}/stages", [
             'name' => 'Screening', 'stage_type' => 'SCREENING', 'sort_order' => 0, 'active' => true,
         ])->assertCreated()->json('data.id');
-        $this->actingAs($admin)->patchJson("/vacancies/{$vacancyId}/stages/{$stageId}", ['sort_order' => 1])->assertOk();
+        $this->actingAs($admin)->patchJson("/vacancies/{$vacancyId}/stages/{$stageId}", ['name' => 'Screening (revised)'])->assertOk();
 
         self::assertSame('PUBLISHED', DB::table('vacancies')->where('id', $vacancyId)->value('current_status'));
         self::assertSame(0, DB::table('applications')->where('current_stage_id', $stageId)->count());
