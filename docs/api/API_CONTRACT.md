@@ -2375,10 +2375,10 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 **Validation:** Allow-listed filters and sort fields only.
 
 **Business Rules:**
-- **Returns only vacancies that are `PUBLISHED` and within `open_at`…`close_at`.** DRAFT, PENDING_REVIEW, REVISION_REQUIRED, APPROVED, SCHEDULED, REJECTED, CLOSED, EXPIRED, and SUSPENDED are never exposed.
+- **Returns only vacancies that are `PUBLISHED` and within `open_at`…`close_at`, AND whose owning company is `VERIFIED` (PD-1, approved — CLOSED).** DRAFT, PENDING_REVIEW, REVISION_REQUIRED, APPROVED, SCHEDULED, REJECTED, CLOSED, EXPIRED, and SUSPENDED are never exposed, and neither is a `PUBLISHED`, in-window vacancy whose company is not currently `VERIFIED`. See *Public visibility and company verification (PD-1)* below.
 - **`INTERNAL` audience vacancies are excluded from public results entirely.** `ALUMNI_ONLY` and `FINAL_YEAR_AND_ALUMNI` may be listed as discoverable, but applying is gated by verified eligibility at submit time (INV-028) — visibility is not permission.
 - **Never returned:** moderation notes of any kind, `internal_note`, company documents, applicant data or counts, recruiter identities or contact details, `created_by`, or any private field. A public payload leaking applicant volume would disclose a company's hiring position.
-- Company data limited to a public summary — name, logo, industry, city, and derived `mitra_kampus_active`.
+- Company data limited to a public summary — name, logo, industry, city, and derived `mitra_kampus_active`. **Partnership (`mitra_kampus_active`) is never part of the visibility predicate** — only `verification_status` gates visibility (PD-1); a VERIFIED non-partner company's vacancies remain fully public.
 
 **Success Response:** `200 OK`, paginated. **Error Codes:** `VALIDATION_FAILED` (422) · `RATE_LIMITED` (429).
 
@@ -2386,7 +2386,40 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 **Idempotency:** Safe method. **Concurrency:** Cacheable with a short TTL, invalidated on publish, close, suspend, and expire. **No authorization-sensitive record is cached** (ADR-006).
 
-**Source Requirement:** FR-VAC-002, FR-VAC-005 · FSD §4.1, §10.2, §10.4 · INV-006, INV-028
+**Source Requirement:** FR-VAC-002, FR-VAC-005 · FSD §4.1, §10.2, §10.4 · INV-006, INV-028 · PO decision **PD-1**, approved 26 August 2026
+
+---
+
+### Public visibility and company verification (PD-1)
+
+**This is not an HTTP operation.** It documents the shared predicate both `GET /api/v1/public/vacancies` and `GET /api/v1/public/vacancies/{slug}` apply, identically and exclusively — neither route implements or weakens it independently.
+
+**Rule (PO decision PD-1, approved 26 August 2026 — CLOSED):** a `COMPANY`-owned vacancy is publicly discoverable only when **all** of the following hold simultaneously:
+
+| Condition | Source |
+| --- | --- |
+| `ownership_type = COMPANY` | This phase is company-vacancy discovery only; campus is a separate future phase |
+| `current_status = PUBLISHED` | FR-VAC-005 |
+| `open_at <= now` | FSD §4.1, §10.2 — independently enforced here, never assumed from the B-4 scheduled-publication job |
+| `now < close_at` | Same exclusive boundary O-7 uses for expiry eligibility |
+| `target_audience <> INTERNAL` | INV-006 |
+| the owning company's `verification_status = VERIFIED` | **PD-1** |
+
+**Why this decision was needed:** the frozen company-suspend operation (`POST /api/v1/companies/{company}/suspend`) states only that a suspended company cannot *create* new vacancies — it says nothing about the public visibility of vacancies that company already published before suspension. Left unresolved, a company suspended for cause (e.g. a fraud complaint) could keep an already-`PUBLISHED` vacancy fully public and discoverable. PD-1 closes that gap by making public visibility itself conditional on the owning company's *current* verification state, re-evaluated on every read — not a one-time check at publish time.
+
+**Partnership is explicitly not part of this predicate.** `mitra_kampus_active` (derived from an ACTIVE `partnerships` row) has no bearing on visibility in either direction — a VERIFIED non-partner company's vacancies are exactly as publicly visible as a VERIFIED partner company's (RULE-004, PD-1). Activating or ending a partnership never changes what is publicly visible.
+
+**No cascading side effect.** Evaluating PD-1 is a pure read filter. A company transitioning to a non-`VERIFIED` state (`SUSPENDED`, or any state other than `VERIFIED`) never mutates, on its own:
+- the vacancy's `current_status` — it remains exactly what it was (typically `PUBLISHED`);
+- `vacancy_moderation_reviews` — no row is appended;
+- any vacancy lifecycle audit event — none is written;
+- `applications`, their history, offers, or consents — all untouched.
+
+**Restoration is symmetric and automatic, without being a vacancy transition.** If the company later returns to `VERIFIED`, an existing vacancy becomes publicly visible again automatically — the moment the read predicate next evaluates true — **provided it still independently satisfies every other condition** (`PUBLISHED`, within the date window, non-`INTERNAL`). This is **not** a republish, a restore, a reapprove, or any other vacancy-state action; no vacancy row is touched and no moderation or lifecycle event is written. If the vacancy reached `EXPIRED`, `CLOSED`, `SUSPENDED`, or any other non-public state while the company was non-`VERIFIED`, restoring the company to `VERIFIED` does **not** revive it — that vacancy remains hidden exactly as any other vacancy in that state would.
+
+**Failure disclosure.** On direct detail lookup, a `PUBLISHED`, in-window, non-`INTERNAL` vacancy whose company fails the `VERIFIED` condition returns the identical **`404 VACANCY_NOT_PUBLIC`** as every other failed visibility condition (§10) — never a distinguishable error, and never `403`, which would confirm the row's existence to an anonymous caller.
+
+**Source Requirement:** FSD §4.1, §10.2 · PO decision **PD-1**, approved 26 August 2026 (recorded as Part X item 13 below)
 
 ---
 
@@ -2401,7 +2434,7 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 **Request:** None. **Validation:** Slug format.
 
 **Business Rules:**
-- Same visibility rule as the listing. A non-public vacancy returns **`404 VACANCY_NOT_PUBLIC`**, never `403` — a `403` would confirm the vacancy exists.
+- Same visibility rule as the listing, including the company-verification condition (PD-1) — see *Public visibility and company verification (PD-1)* above. A non-public vacancy returns **`404 VACANCY_NOT_PUBLIC`**, never `403` — a `403` would confirm the vacancy exists.
 - Returns public content plus public company summary, requirements, and — for `EXTERNAL_ATS` vacancies — the fact that applying happens externally. **The external URL is returned only through the external-apply start endpoint**, which records the event and applies the FR-EXT-001 warning; the raw URL is not published in the detail payload as a bare link for crawlers to follow.
 - Screening questions are **not** exposed publicly; they are returned to an authenticated, eligible candidate during the apply flow.
 
@@ -2409,7 +2442,9 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 **Side Effects:** None. **Audit:** None. **Notification / Outbox:** None.
 
-**Idempotency:** Safe method. **Concurrency:** Short-TTL cache. Paired public route: `GET /api/v1/public/companies/{slug}` (public company summary only — never documents, never members, never applicants) and `GET /api/v1/public/reference-data` (master data for filters: study programs, industries, organization types, geographic areas, skills — active entries only).
+**Idempotency:** Safe method. **Concurrency:** Short-TTL cache.
+
+**`GET /api/v1/public/companies/{slug}` is NOT implemented in this phase.** `companies` has no `slug` column in the frozen schema (`DATABASE_SCHEMA.md`, `DATA_DICTIONARY.md`) — the route as literally specified here cannot resolve a company without one, and neither a schema change nor a silent substitution (e.g. looking up by `id` instead) is made without an explicit decision. Vacancy list and detail carry the public company summary (name, logo, industry, city, `mitra_kampus_active`) embedded directly via `company_id` instead, which needs no company slug lookup and is unaffected by this gap. `GET /api/v1/public/reference-data` (master data for filters: study programs, industries, organization types, geographic areas, skills — active entries only) is implemented and unaffected.
 
 **Source Requirement:** FR-VAC-005, FR-EXT-001 · FSD §4.1, §10.4 · ADR-017
 
@@ -3676,6 +3711,7 @@ Nothing below is resolved by this document **except where a row is explicitly ma
 | 10 | **Unknown-user company member invitation lifecycle** — `DEFERRED` | Approved 25 August 2026: at MVP `POST /companies/{company}/members` accepts **only an address that already has an account**. An unknown address creates no membership, sends **no email**, records no pending invitation, and returns the generic `NOT_FOUND` envelope. Whether a pre-registration invite is ever offered — and if so whether it is an invitation entity, a nullable-user membership, or a tokenized link — is **not decided**. No schema, route, or response shape anticipates it |
 | 11 | ~~**Vacancy moderation authority**~~ | **CLOSED for company vacancy moderation — approved 25 August 2026.** PO decisions **B-1** (approve target: `SCHEDULED` before `open_at`, `PUBLISHED` inside the window, refusal at or after `close_at`), **B-2** (restore target: `PUBLISHED` before `close_at`, else `CLOSED` with `closed_at`), **B-3** (moderators are `CAREER_CENTER_STAFF`, `CAREER_CENTER_MANAGER`, `SUPER_ADMIN`, with a conflict-of-interest bar on any ACTIVE member of the owning company; recruiters never moderate; Auditor read-only), **B-4** (no user-facing company publish; publication only through approval-in-window or the scheduler) and **B-5** (submit completeness). **VA-4 is unchanged**: company *authoring* still never derives from the global `SUPER_ADMIN` role. Campus-vacancy authority is untouched by these decisions |
 | 12 | ~~**O-7 — automatic vacancy expiry**~~ | **CLOSED — approved 25 August 2026.** `PUBLISHED` + `now >= close_at` → `EXPIRED`, with `close_at` an **exclusive end boundary**: `now < close_at` is still active, `now == close_at` and `now > close_at` both reach expiry eligibility. System-driven only — see *Automatic vacancy expiry (O-7)* below for the full rule. Company vacancies only in this phase; campus expiry is wired with the Campus Vacancy lifecycle |
+| 13 | ~~**PD-1 — public visibility after company suspension**~~ | **CLOSED — approved 26 August 2026.** A `PUBLISHED`, in-window, non-`INTERNAL` company vacancy is publicly discoverable only while its owning company is currently `VERIFIED`; this is re-evaluated on every public read, not fixed at publish time. Partnership is not part of the predicate. No vacancy state, moderation history, audit event, or application is mutated by a company's verification-status change. See *Public visibility and company verification (PD-1)* above for the full rule |
 
 **Human-decision items carried from the ERD:**
 
