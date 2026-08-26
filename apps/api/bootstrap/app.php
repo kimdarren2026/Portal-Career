@@ -14,10 +14,13 @@ use App\Domains\Application\Exceptions\ApplicationAlreadyWithdrawn;
 use App\Domains\Application\Exceptions\ApplicationConsentRequired;
 use App\Domains\Application\Exceptions\ApplicationDocumentArchived;
 use App\Domains\Application\Exceptions\ApplicationDocumentRequired;
+use App\Domains\Application\Exceptions\ApplicationInvalidTransition;
 use App\Domains\Application\Exceptions\ApplicationNotFound;
 use App\Domains\Application\Exceptions\ApplicationNotInPortalVacancy;
 use App\Domains\Application\Exceptions\ApplicationScreeningIncomplete;
 use App\Domains\Application\Exceptions\ApplicationScreeningInvalid;
+use App\Domains\Application\Exceptions\ApplicationStaleVersion;
+use App\Domains\Application\Exceptions\ApplicationTerminal;
 use App\Domains\Application\Exceptions\CandidateNotEligible;
 use App\Domains\Application\Exceptions\ConsentReceiverMismatch;
 use App\Domains\Application\Exceptions\ConsentVersionUnknown;
@@ -45,6 +48,7 @@ use App\Domains\Vacancy\Exceptions\VacancyExternalUrlRequired;
 use App\Domains\Vacancy\Exceptions\VacancyInvalidTransition;
 use App\Domains\Vacancy\Exceptions\VacancyModerationNotApplicable;
 use App\Domains\Vacancy\Exceptions\VacancyNotFound;
+use App\Domains\Vacancy\Exceptions\VacancyNotProcessable;
 use App\Domains\Vacancy\Exceptions\VacancyNotPublic;
 use App\Domains\Vacancy\Exceptions\VacancyProfileIncomplete;
 use Illuminate\Auth\AuthenticationException;
@@ -132,6 +136,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(fn (ApplicationScreeningIncomplete $exception, Request $request) => ContractResponse::error($request, 'APPLICATION_SCREENING_INCOMPLETE', 422, 'Lengkapi pertanyaan seleksi yang wajib dijawab.'));
         $exceptions->render(fn (ApplicationScreeningInvalid $exception, Request $request) => ContractResponse::error($request, 'APPLICATION_SCREENING_INVALID', 422, 'Jawaban seleksi tidak valid.'));
         $exceptions->render(fn (ApplicationAlreadyWithdrawn $exception, Request $request) => ContractResponse::error($request, 'APPLICATION_ALREADY_WITHDRAWN', 409, 'Lamaran ini sudah ditarik.'));
+        // Recruiter Applicant Management Foundation v1 (RA-1, RA-2). RA-2's
+        // company gate reuses VACANCY_COMPANY_NOT_VERIFIED above — no separate code.
+        $exceptions->render(fn (ApplicationInvalidTransition $exception, Request $request) => ContractResponse::error($request, 'APPLICATION_INVALID_TRANSITION', 409, 'Perubahan status tidak sah dari status saat ini.', ['from' => $exception->from, 'attempted' => $exception->attempted]));
+        $exceptions->render(fn (ApplicationTerminal $exception, Request $request) => ContractResponse::error($request, 'APPLICATION_TERMINAL', 409, 'Lamaran berada pada status akhir dan tidak dapat diubah.'));
+        $exceptions->render(fn (ApplicationStaleVersion $exception, Request $request) => ContractResponse::error($request, 'STALE_VERSION', 409, 'Versi lamaran sudah berubah. Muat ulang sebelum menyimpan.'));
+        $exceptions->render(fn (VacancyNotProcessable $exception, Request $request) => ContractResponse::error($request, 'APPLICATION_VACANCY_NOT_PROCESSABLE', 409, 'Lowongan tidak dalam status yang mengizinkan pemrosesan lamaran.'));
         $exceptions->render(fn (CandidateCollectionNotFoundException $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Data tidak ditemukan.'));
         $exceptions->render(fn (CandidateDocumentNotOwnedException $exception, Request $request) => ContractResponse::error($request, 'DOCUMENT_NOT_OWNED', 403, 'Dokumen bukan milik kandidat ini.'));
         $exceptions->render(fn (CandidateDocumentUnsupportedMediaTypeException $exception, Request $request) => ContractResponse::error($request, 'UNSUPPORTED_MEDIA_TYPE', 415, 'Dokumen harus berupa PDF.'));

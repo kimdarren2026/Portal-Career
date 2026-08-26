@@ -154,6 +154,13 @@ Route::middleware(['auth', 'account.status'])->prefix('candidate')->name('candid
 | precedent those domains already set.
 |
 | reopen is deliberately NOT routed: AD-2 remains OPEN and deferred.
+|
+| Recruiter Applicant Management Foundation v1 (RA-1, RA-2, approved and
+| CLOSED) extends index/show to COMPANY_SCOPE and SUPER_ADMIN and adds
+| transition. No email-verified gate on transition: its contract states
+| "Authentication: Required" without one, the same as vacancy moderation.
+| move-stage, bulk-transition, and document download are deliberately NOT
+| routed — out of this milestone's scope (RA-3 defers download).
 */
 Route::middleware(['auth', 'account.status'])->group(function (): void {
     Route::post('/vacancies/{vacancy}/applications', [ApplicationController::class, 'store'])
@@ -164,6 +171,8 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
         Route::get('/{application}', [ApplicationController::class, 'show'])->whereNumber('application')->name('show');
         Route::post('/{application}/withdraw', [ApplicationController::class, 'withdraw'])
             ->whereNumber('application')->middleware('verified.email')->name('withdraw');
+        Route::post('/{application}/transition', [ApplicationController::class, 'transition'])
+            ->whereNumber('application')->name('transition');
     });
 });
 
