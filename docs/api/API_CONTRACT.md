@@ -3280,34 +3280,48 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 ### POST /api/v1/applications/{application}/offers
 
-**Surface:** `INERTIA_WEB`
+**Surface:** `INERTIA_WEB`  ·  **Active MVP route:** `POST /applications/{application}/offers`
+
+> **Offering Foundation v1 (OF-1, OF-2, RC-1 — approved and CLOSED, 27 August 2026) activates create, update, send, accept, and reject.**
+>
+> **OF-1 — Offering / application status independence.** Create, update, and send never mutate `applications.current_status` or `applications.current_stage_id` — no new RA-1 edge is added merely to make `OFFERED` reachable; the offer lifecycle is represented entirely by `offers.status`. The already-frozen candidate **accept** side effect (`applications.current_status = HIRED`, `hired_at` set, an `application_status_histories` row with `event_type = OFFER_ACCEPTED`) is preserved exactly as this section already specified — OF-1 does not remove it. **Reject** does not mutate application status either, exactly as already specified below.
+>
+> **RC-1 — RA-2 applies to the recruiter-side operations only.** Create, update (`PATCH`), and send all additionally require, inside the same transaction, the same gate `/transition`, `/move-stage`, Selection Schedule, and Evaluation already enforce: the owning company's `verification_status = VERIFIED` (else `403 VACANCY_COMPANY_NOT_VERIFIED`) and the vacancy's `current_status` ∈ `{PUBLISHED, CLOSED, EXPIRED}` (else `409 APPLICATION_VACANCY_NOT_PROCESSABLE`). Applies identically to `SUPER_ADMIN` — no source exempts it. **Candidate accept/reject are explicitly RA-2-exempt** — once a valid offer has been sent, the candidate's right to respond is governed by offer ownership, offer lifecycle, and the response deadline, never by later recruiter/company processing eligibility.
+>
+> **Actor set active in Foundation v1 (recruiter-side):** `COMPANY_RECRUITER`, `COMPANY_ADMIN` (`COMPANY_SCOPE`), `SUPER_ADMIN` (`ALLOW`). `CAMPUS_SCOPE` (`HR_ADMIN`) is **not** activated. Career Center, Selector, and Auditor are `DENY`.
+>
+> **Document reference amendment (Offering Foundation v1).** Same gap and same resolution already established for Selection Schedule's `attachment` field: no MIME allowlist, size limit, or storage/download convention has ever been approved for offer documents, and no generic private-upload infrastructure exists in this codebase to reuse safely (`UploadCandidateDocument` is narrowly bound to its own explicitly-approved PDF/10 MiB policy, not transferable by analogy). `document_reference` remains in the frozen schema, is accepted as `null` by every write path in this milestone, and is not populated by any route. Activating a real upload path is future scope, gated on the same kind of explicit policy decision.
+>
+> **`note` is candidate-facing offer content**, not an internal recruiter-only field — it is part of what `send` delivers to the candidate, distinct from evaluation `comments`, which are internal-only.
 
 **Purpose:** Create an offering (FR-SEL-003).
 
-**Authentication:** Required. **Authorization:** Vacancy owner — `COMPANY_SCOPE` or `CAMPUS_SCOPE`. Selectors cannot create offers.
+**Authentication:** Required. **Authorization:** Vacancy owner — `COMPANY_SCOPE` for company vacancies, `CAMPUS_SCOPE` for campus vacancies (inert, no Campus runtime). Selectors, Career Center, and Auditor cannot create, update, or send offers.
 
-**Request:** `response_deadline`, `note`, `document_reference` (optional upload), `send_now` (boolean, default false).
+**Request:** `response_deadline`, `note`, `document_reference` (optional upload — **not activated in Foundation v1**; see the amendment note above), `send_now` (boolean, default false).
 
 **Validation:** `response_deadline` in the future where supplied.
 
 **Business Rules:**
+- Terminal applications may not receive a new offer → `409 APPLICATION_TERMINAL`.
 - Created at `status = DRAFT`, or `SENT` when `send_now` is true. FR-SEL-003 stores application, offering date, response deadline, note, and document.
 - **Contains no onboarding date, contract-signing date, start date, or first-working-day field.** No such field exists anywhere in the model, which is what makes the Time-to-Fill definition unfalsifiable.
 - Rejects creation when another offer on this application is already `ACCEPTED` → `409 OFFER_ALREADY_ACCEPTED_FOR_APPLICATION` (INV-031).
+- Never mutates `applications.current_status` or `applications.current_stage_id` (OF-1).
 
 **Success Response:** `201 Created`.
 
-**Error Codes:** `OFFER_ALREADY_ACCEPTED_FOR_APPLICATION` (409) · `APPLICATION_TERMINAL` (409) · `VALIDATION_FAILED` (422) · `AUTH_FORBIDDEN` (403).
+**Error Codes:** `OFFER_ALREADY_ACCEPTED_FOR_APPLICATION` (409) · `APPLICATION_TERMINAL` (409) · `VALIDATION_FAILED` (422) · `AUTH_FORBIDDEN` (403) · `NOT_FOUND` (404) · `VACANCY_COMPANY_NOT_VERIFIED` (403, RC-1/RA-2) · `APPLICATION_VACANCY_NOT_PROCESSABLE` (409, RC-1/RA-2). `PATCH`/`send` additionally use `OFFER_INVALID_TRANSITION` (409) when the offer is not `DRAFT`.
 
-**Side Effects:** Offer row + audit; outbox only when sent. Paired routes: `PATCH /api/v1/offers/{offer}` (DRAFT only), `POST /api/v1/offers/{offer}/send` (`DRAFT → SENT`, sets `sent_at`, notifies candidate), `GET /api/v1/offers/{offer}`, `GET /api/v1/offers` (scoped list).
+**Side Effects:** Offer row + audit; outbox only when sent. Paired routes: `PATCH /api/v1/offers/{offer}` (DRAFT only; mutable fields in Foundation v1: `response_deadline`, `note`, `document_reference` — `application_id` and `offered_by_user_id` are never mutable), `POST /api/v1/offers/{offer}/send` (`DRAFT → SENT`, sets `sent_at`, notifies candidate; **REQUIRED** `Idempotency-Key`).
 
-**Audit:** `offer_created` / `_sent`.
+**Audit:** `offer_created` / `_sent` / `_updated`.
 
-**Notification / Outbox:** On send — candidate notification and email (FR-NOTIF-002 "Offering diterbitkan").
+**Notification / Outbox:** On send — candidate notification and email (FR-NOTIF-002 "Offering diterbitkan"). No candidate notification on plain `DRAFT` create or on `PATCH`.
 
-**Idempotency:** **REQUIRED** on send.
+**Idempotency:** **REQUIRED** on send. Not required on create (including `send_now = true`) or update.
 
-**Concurrency:** Application row locked for the accepted-offer check.
+**Concurrency:** Application row locked (for the accepted-offer check and RA-2), then vacancy, then company, for create. `PATCH`/send lock application, then the target offer, then vacancy, then company — the deterministic order this whole domain uses, chosen specifically so accept's own application-first lock (needed for INV-031 correctness across different offer rows) can never invert against send/update on the same or a different offer.
 
 **Source Requirement:** FR-SEL-003 · INV-031
 
@@ -3315,7 +3329,9 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 ### POST /api/v1/offers/{offer}/accept
 
-**Surface:** `VERSIONED_API`
+**Surface:** `INERTIA_WEB`  ·  **Active MVP route:** `POST /offers/{offer}/accept`
+
+> **OF-2 — candidate offer response transport (approved and CLOSED, 27 August 2026).** This operation and `POST /offers/{offer}/reject` are reclassified from the reserved `VERSIONED_API` surface to `INERTIA_WEB`, the same SPEC-DOC-05/-07/-08/SS-9 pattern — session guard, CSRF, no Sanctum, no `personal_access_tokens`. Their `/api/v1` twins stay reserved. **No proxy response exists for either operation, for any actor** — `SUPER_ADMIN`'s unconditional recruiter-side `ALLOW` does **not** extend here; this is an explicit Offering-specific exception, the same shape already established for `/transition`'s and `/move-stage`'s "candidate's own act" rule. `COMPANY_RECRUITER`, `COMPANY_ADMIN`, `SUPER_ADMIN`, `CAREER_CENTER`, `SELECTOR`, and `AUDITOR` are all `DENY`.
 
 **Purpose:** Candidate accepts an offering (FR-SEL-004). **The Time-to-Fill anchor.**
 
@@ -3363,7 +3379,9 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 ### POST /api/v1/offers/{offer}/reject
 
-**Surface:** `VERSIONED_API`
+**Surface:** `INERTIA_WEB`  ·  **Active MVP route:** `POST /offers/{offer}/reject`
+
+> **OF-2 — see the accept section's amendment note above for the full transport and authorization rule; identical here.** Reject never mutates `applications.current_status` (OF-1) — the application does not automatically become `REJECTED`, confirmed by this section's own pre-existing text below.
 
 **Purpose:** Candidate declines an offering (FR-SEL-005).
 
@@ -3859,6 +3877,10 @@ Nothing below is resolved by this document **except where a row is explicitly ma
 | 37 | ~~**EV-2 — evaluation stage alignment**~~ | **CLOSED — approved 27 August 2026.** `recruitment_stage_id` need not equal `applications.current_stage_id`; create/update may target any `active` same-vacancy stage, with no adjacency or `sort_order` rule. **Submit is exempt from the active-stage requirement** — a draft created against a then-active stage remains submittable even if that stage is later disabled, so a valid draft is never stranded by a later Stage Authoring action. Evaluation never mutates `applications.current_stage_id` |
 | 38 | ~~**RC-1 — RA-2 applicability to Evaluation**~~ | **CLOSED — approved 27 August 2026.** Create, update, and submit all require the existing RA-2 processing gate (`ApplicationProcessingGate`, reused unmodified): owning company `VERIFIED` and vacancy ∈ `{PUBLISHED, CLOSED, EXPIRED}`, with no `SUPER_ADMIN` bypass. This closes the same shared cross-cutting question RC-1 already identified for Offering — this decision resolves it for Evaluation only; Offering's own RA-2 applicability remains a separate, not-yet-closed decision |
 | 39 | **Evaluation / Scoring Foundation v1 deferred scope** — `DEFERRED` | Item-set mutation via `PATCH` (see the create section's PATCH-scope amendment note), company-side selector assignment/revocation, selector applicant evaluation runtime, schedule `complete`/`no-show`, offering, offer accept/reject, recruitment outcome, reopen, Campus recruitment runtime, External Apply, bulk evaluation, AI/automatic scoring, and any weighted-average or pass/fail formula are all explicitly out of this milestone's scope. None are implemented merely because this document already describes them |
+| 40 | ~~**OF-1 — Offering / application status independence**~~ | **CLOSED — approved 27 August 2026.** Create, update, and send never mutate `applications.current_status`/`current_stage_id`; no new RA-1 edge is added to make `OFFERED` reachable. The already-frozen accept side effect (`current_status = HIRED`, `hired_at`, `OFFER_ACCEPTED` history event) is preserved exactly as originally specified — this decision narrows nothing already active. Reject does not mutate application status either |
+| 41 | ~~**OF-2 — candidate offer response transport**~~ | **CLOSED — approved 27 August 2026.** `POST /offers/{offer}/accept` and `POST /offers/{offer}/reject` are reclassified `INERTIA_WEB` for the MVP browser portal, the same SPEC-DOC-05/-07/-08/SS-9 pattern. Their `/api/v1` twins remain reserved and inactive. No Sanctum/PAT activation. `OWN` only — no proxy response exists for any other actor, including `SUPER_ADMIN`, which is `DENY` here despite its unconditional recruiter-side `ALLOW` |
+| 42 | ~~**RC-1 — RA-2 applicability to Offering**~~ | **CLOSED — approved 27 August 2026.** Create, update, and send all require the existing RA-2 processing gate (`ApplicationProcessingGate`, reused unmodified): owning company `VERIFIED` and vacancy ∈ `{PUBLISHED, CLOSED, EXPIRED}`, with no `SUPER_ADMIN` bypass. Candidate accept/reject are explicitly RA-2-exempt — this closes the RC-1 question Evaluation's own closure (row 38) explicitly left open for Offering |
+| 43 | **Offering Foundation v1 deferred scope** — `DEFERRED` | Offer revoke/withdraw/resend, the offer-expiry scheduler job, bulk offer, salary/currency/benefits/start-date fields (none exist in the schema), counter-offer, digital signature, document generation, payroll/onboarding/employment-contract workflow, Evaluation coupling, automatic Outcome creation, Campus recruitment runtime, External Apply, Selector offering capability, and the offer document upload mechanism (see the create section's amendment note) are all explicitly out of this milestone's scope. `PENDING_RESPONSE` remains a dormant, unproduced frozen status value — no trigger for it is invented. None of the deferred items are implemented merely because this document already describes them |
 
 **Human-decision items carried from the ERD:**
 

@@ -1,7 +1,7 @@
 # Inertia Web Action Index — Internal Application Surface
 
 **Status:** Proposed — awaiting approval
-**Date:** 24 August 2026 · **Amended:** Candidate Core HTTP surface (SPEC-DOC-07 accepted) · Candidate Application MVP transport (SPEC-DOC-08 accepted, 26 August 2026) · Recruitment Stage Authoring role-grouping correction (RS-2, RS-6 accepted, 26 August 2026) · Selection Schedule read transport (SS-9 accepted, 27 August 2026)
+**Date:** 24 August 2026 · **Amended:** Candidate Core HTTP surface (SPEC-DOC-07 accepted) · Candidate Application MVP transport (SPEC-DOC-08 accepted, 26 August 2026) · Recruitment Stage Authoring role-grouping correction (RS-2, RS-6 accepted, 26 August 2026) · Selection Schedule read transport (SS-9 accepted, 27 August 2026) · Evaluation COMPANY_SCOPE correction (accepted, 27 August 2026) · Candidate offer response transport (OF-2 accepted, 27 August 2026)
 **Generated from:** `API_CONTRACT.md` — verified programmatically in both directions.
 
 **This file lists only `INERTIA_WEB` operations.** These are internal Laravel + Inertia application routes:
@@ -22,6 +22,8 @@
 
 > **Selection Schedule reads live here (SS-9, accepted, 27 August 2026).** `GET /schedules`, `GET /schedules/{schedule}`, and `GET /schedules/{schedule}/history` are reclassified from the reserved `VERSIONED_API` surface to `INERTIA_WEB`, the same SPEC-DOC-05/-07/-08 pattern — session guard, CSRF, no Sanctum, no `personal_access_tokens`. Their `/api/v1` twins stay reserved in `API_ENDPOINTS.md`. Authorization is unchanged: `COMPANY_SCOPE` (recruiter/admin), `ALLOW` (Super Admin), `READ_ONLY` (Auditor), `OWN` (candidate), `DENY` (Career Center); `HR_ADMIN`/`CAMPUS_SCOPE` stays deferred (no Campus runtime); `SELECTOR`/`ASSIGNED_STAGE` stays inert (company-side selector assignment remains deferred — no `selection_stage_assignments` runtime is fabricated to activate it). `POST /applications/{application}/schedules`, `PATCH /schedules/{schedule}`, and `POST /schedules/{schedule}/cancel` are activated by the same Selection Schedule Foundation v1 milestone (SS-1, SS-2, SS-3, SS-5, SS-8, both accepted 27 August 2026); `complete` and `no-show` remain listed here as the frozen long-run contract's paired actions but carry **no runtime** in this milestone.
 
+> **Candidate offer response lives here (OF-2, accepted, 27 August 2026).** `POST /offers/{offer}/accept` and `POST /offers/{offer}/reject` are reclassified from the reserved `VERSIONED_API` surface to `INERTIA_WEB`, the same SPEC-DOC pattern. Their `/api/v1` twins stay reserved in `API_ENDPOINTS.md`. `OWN` only, for the candidate of the offer's application — no proxy response exists for any other actor, including `SUPER_ADMIN`, which is explicitly `DENY` here despite its unconditional recruiter-side offer-management `ALLOW`. `POST /applications/{application}/offers`, `PATCH /offers/{offer}`, and `POST /offers/{offer}/send` are activated by the same Offering Foundation v1 milestone (OF-1, RC-1, both accepted 27 August 2026). `GET /offers` and `GET /offers/{offer}` remain listed here as the frozen long-run contract's paired read routes but carry **no runtime** in this milestone.
+
 Routes are shown **without** the `/api/v1` prefix, which is what distinguishes them at the routing layer. Their **behaviour — validation, invariants, transitions, error codes, audit, outbox, idempotency, and concurrency — is defined by `API_CONTRACT.md` exactly as for versioned endpoints.** Idempotency and concurrency requirements are not relaxed here.
 
 **Page-delivery `GET` routes are deliberately absent.** Routes such as `/login`, `/register`, `/forgot-password`, `/reset-password/{token}`, `/verify-email/{token}`, and the Candidate portal's own profile and onboarding pages render an Inertia page and change nothing; they are UI plumbing, not contract operations (`API_CONTRACT.md` Part I §2b).
@@ -30,7 +32,7 @@ Any of these may later be promoted to `VERSIONED_API`. Promotion is additive —
 
 | Total INERTIA_WEB operations |
 | --- |
-| **129** |
+| **131** |
 
 ## Authentication & Session
 
@@ -198,6 +200,8 @@ Any of these may later be promoted to `VERSIONED_API`. Promotion is additive —
 | Offering | `GET` | `/offers/{offer}` | POST /api/v1/applications/{application}/offers *(grouped)* | COMPANY_SCOPE / CAMPUS_SCOPE / OWN |
 | Offering | `PATCH` | `/offers/{offer}` | POST /api/v1/applications/{application}/offers *(grouped)* | COMPANY_SCOPE / CAMPUS_SCOPE / OWN |
 | Offering | `POST` | `/offers/{offer}/send` | POST /api/v1/applications/{application}/offers *(grouped)* | COMPANY_SCOPE / CAMPUS_SCOPE / OWN |
+| Offering | `POST` | `/offers/{offer}/accept` | POST /api/v1/offers/{offer}/accept | CANDIDATE (OWN) |
+| Offering | `POST` | `/offers/{offer}/reject` | POST /api/v1/offers/{offer}/reject | CANDIDATE (OWN) |
 
 ## Recruitment Outcome
 
@@ -263,10 +267,10 @@ Any of these may later be promoted to `VERSIONED_API`. Promotion is additive —
 | Selector Assignment | 3 |
 | Selection Schedule | 7 |
 | Evaluation | 3 |
-| Offering | 4 |
+| Offering | 6 |
 | Recruitment Outcome | 4 |
 | SMTP Configuration | 3 |
 | Reporting | 8 |
 | Audit | 1 |
 | Administration | 6 |
-| **Total** | **129** |
+| **Total** | **131** |

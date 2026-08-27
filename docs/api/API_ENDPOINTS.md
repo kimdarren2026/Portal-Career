@@ -59,13 +59,6 @@ Two headings in the contract are grouped-contract placeholders, not routable URI
 | External Apply | `POST` | `/api/v1/external-apply-events/{event}/confirm` | POST /api/v1/external-apply-events/{event}/confirm | CANDIDATE (OWN) |
 | External Apply | `POST` | `/api/v1/vacancies/{vacancy}/external-apply/start` | POST /api/v1/vacancies/{vacancy}/external-apply/start | CANDIDATE (OWN) |
 
-## Offering
-
-| Domain | Method | URI | Purpose / Contract Section | Primary Role |
-| --- | --- | --- | --- | --- |
-| Offering | `POST` | `/api/v1/offers/{offer}/accept` | POST /api/v1/offers/{offer}/accept | COMPANY_SCOPE / CAMPUS_SCOPE / OWN |
-| Offering | `POST` | `/api/v1/offers/{offer}/reject` | POST /api/v1/offers/{offer}/reject | COMPANY_SCOPE / CAMPUS_SCOPE / OWN |
-
 ## Notifications
 
 | Domain | Method | URI | Purpose / Contract Section | Primary Role |
@@ -85,9 +78,8 @@ Two headings in the contract are grouped-contract placeholders, not routable URI
 | Public | 4 |
 | Application | 4 |
 | External Apply | 2 |
-| Offering | 2 |
 | Notifications | 3 |
-| **Total** | **19** |
+| **Total** | **17** |
 
 ---
 
