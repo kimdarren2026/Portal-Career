@@ -43,7 +43,11 @@ final class EvaluationTest extends VacancyTestCase
         self::assertTrue($registered->contains('PATCH evaluations/{evaluation}'));
         self::assertTrue($registered->contains('POST evaluations/{evaluation}/submit'));
 
-        foreach (['bulk-evaluation', 'selector-assignment', 'offers', 'recruitment-outcomes'] as $absent) {
+        // 'offers' is deliberately excluded here: Offering Foundation v1
+        // (OF-1/OF-2/RC-1, approved and CLOSED) is a separately frozen
+        // milestone that legitimately registers offers routes after this
+        // one. The remaining entries are still unshipped in any milestone.
+        foreach (['bulk-evaluation', 'selector-assignment', 'recruitment-outcomes'] as $absent) {
             self::assertFalse(
                 $registered->contains(fn (string $r): bool => str_contains($r, $absent)),
                 "No route may exist for {$absent} in this milestone.",

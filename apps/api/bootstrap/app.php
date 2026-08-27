@@ -44,6 +44,12 @@ use App\Domains\Recruitment\Evaluation\Exceptions\EvaluationAlreadySubmitted;
 use App\Domains\Recruitment\Evaluation\Exceptions\EvaluationNotFound;
 use App\Domains\Recruitment\Evaluation\Exceptions\EvaluationNotOwned;
 use App\Domains\Recruitment\Evaluation\Exceptions\EvaluationStageTargetInactive;
+use App\Domains\Recruitment\Offering\Exceptions\OfferAlreadyAcceptedForApplication;
+use App\Domains\Recruitment\Offering\Exceptions\OfferAlreadyResponded;
+use App\Domains\Recruitment\Offering\Exceptions\OfferExpired;
+use App\Domains\Recruitment\Offering\Exceptions\OfferInvalidTransition;
+use App\Domains\Recruitment\Offering\Exceptions\OfferNotFound;
+use App\Domains\Recruitment\Offering\Exceptions\OfferNotSent;
 use App\Domains\Recruitment\SelectionSchedule\Exceptions\ScheduleInvalidTransition;
 use App\Domains\Recruitment\SelectionSchedule\Exceptions\ScheduleMethodDetailRequired;
 use App\Domains\Recruitment\SelectionSchedule\Exceptions\ScheduleTargetStageInactive;
@@ -176,6 +182,13 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(fn (EvaluationStageTargetInactive $exception, Request $request) => ContractResponse::error($request, 'VALIDATION_FAILED', 422, 'Tahap yang dipilih tidak aktif.'));
         $exceptions->render(fn (EvaluationAlreadySubmitted $exception, Request $request) => ContractResponse::error($request, 'EVALUATION_ALREADY_SUBMITTED', 409, 'Evaluasi sudah difinalisasi dan tidak dapat diubah.'));
         $exceptions->render(fn (EvaluationNotOwned $exception, Request $request) => ContractResponse::error($request, 'EVALUATION_NOT_OWNED', 403, 'Evaluasi ini milik evaluator lain.'));
+        // Offering Foundation v1 (OF-1, OF-2, RC-1).
+        $exceptions->render(fn (OfferNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Offering tidak ditemukan.'));
+        $exceptions->render(fn (OfferInvalidTransition $exception, Request $request) => ContractResponse::error($request, 'OFFER_INVALID_TRANSITION', 409, 'Aksi tidak sah dari status offering saat ini.'));
+        $exceptions->render(fn (OfferNotSent $exception, Request $request) => ContractResponse::error($request, 'OFFER_NOT_SENT', 409, 'Offering berstatus draf tidak dapat direspons.'));
+        $exceptions->render(fn (OfferAlreadyResponded $exception, Request $request) => ContractResponse::error($request, 'OFFER_ALREADY_RESPONDED', 409, 'Offering ini sudah direspons.'));
+        $exceptions->render(fn (OfferExpired $exception, Request $request) => ContractResponse::error($request, 'OFFER_EXPIRED', 409, 'Batas waktu respons offering sudah lewat.'));
+        $exceptions->render(fn (OfferAlreadyAcceptedForApplication $exception, Request $request) => ContractResponse::error($request, 'OFFER_ALREADY_ACCEPTED_FOR_APPLICATION', 409, 'Sudah ada offering lain yang diterima untuk lamaran ini.'));
         $exceptions->render(fn (CandidateCollectionNotFoundException $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Data tidak ditemukan.'));
         $exceptions->render(fn (CandidateDocumentNotOwnedException $exception, Request $request) => ContractResponse::error($request, 'DOCUMENT_NOT_OWNED', 403, 'Dokumen bukan milik kandidat ini.'));
         $exceptions->render(fn (CandidateDocumentUnsupportedMediaTypeException $exception, Request $request) => ContractResponse::error($request, 'UNSUPPORTED_MEDIA_TYPE', 415, 'Dokumen harus berupa PDF.'));

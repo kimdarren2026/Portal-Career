@@ -11,6 +11,7 @@ use App\Http\Controllers\Web\CandidateProfileController;
 use App\Http\Controllers\Web\CompanyController;
 use App\Http\Controllers\Web\CompanyMemberController;
 use App\Http\Controllers\Web\EvaluationController;
+use App\Http\Controllers\Web\OfferController;
 use App\Http\Controllers\Web\PublicVacancyController;
 use App\Http\Controllers\Web\RecruitmentStageController;
 use App\Http\Controllers\Web\SelectionScheduleController;
@@ -175,6 +176,11 @@ Route::middleware(['auth', 'account.status'])->prefix('candidate')->name('candid
 | adds evaluation create/list (nested here) plus the /evaluations routes
 | below. No email-verified gate, same rationale as schedules. Evaluations
 | are never candidate-visible — no candidate route exists for this domain.
+|
+| Offering Foundation v1 (OF-1, OF-2, RC-1, approved and CLOSED) adds offer
+| create (nested here) plus the /offers routes below. No email-verified
+| gate. accept/reject are OWN-only candidate actions with no proxy for any
+| other actor, including SUPER_ADMIN (OF-2).
 */
 Route::middleware(['auth', 'account.status'])->group(function (): void {
     Route::post('/vacancies/{vacancy}/applications', [ApplicationController::class, 'store'])
@@ -195,6 +201,8 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
             ->whereNumber('application')->name('evaluations.index');
         Route::post('/{application}/evaluations', [EvaluationController::class, 'store'])
             ->whereNumber('application')->name('evaluations.store');
+        Route::post('/{application}/offers', [OfferController::class, 'store'])
+            ->whereNumber('application')->name('offers.store');
     });
 
     Route::prefix('schedules')->name('schedules.')->group(function (): void {
@@ -209,6 +217,13 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
         Route::get('/{evaluation}', [EvaluationController::class, 'show'])->whereNumber('evaluation')->name('show');
         Route::patch('/{evaluation}', [EvaluationController::class, 'update'])->whereNumber('evaluation')->name('update');
         Route::post('/{evaluation}/submit', [EvaluationController::class, 'submit'])->whereNumber('evaluation')->name('submit');
+    });
+
+    Route::prefix('offers')->name('offers.')->group(function (): void {
+        Route::patch('/{offer}', [OfferController::class, 'update'])->whereNumber('offer')->name('update');
+        Route::post('/{offer}/send', [OfferController::class, 'send'])->whereNumber('offer')->name('send');
+        Route::post('/{offer}/accept', [OfferController::class, 'accept'])->whereNumber('offer')->name('accept');
+        Route::post('/{offer}/reject', [OfferController::class, 'reject'])->whereNumber('offer')->name('reject');
     });
 });
 
