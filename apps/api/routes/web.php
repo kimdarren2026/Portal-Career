@@ -4,18 +4,22 @@ use App\Domains\Candidate\Support\CandidateCollectionRegistry;
 use App\Http\Controllers\Auth\AuthenticationController;
 use App\Http\Controllers\Auth\AuthPageController;
 use App\Http\Controllers\Web\ApplicationController;
+use App\Http\Controllers\Web\CandidateApplicationPageController;
 use App\Http\Controllers\Web\CandidateCollectionController;
 use App\Http\Controllers\Web\CandidateDocumentController;
 use App\Http\Controllers\Web\CandidatePageController;
 use App\Http\Controllers\Web\CandidateProfileController;
 use App\Http\Controllers\Web\CompanyController;
 use App\Http\Controllers\Web\CompanyMemberController;
+use App\Http\Controllers\Web\DashboardPageController;
 use App\Http\Controllers\Web\EvaluationController;
 use App\Http\Controllers\Web\OfferController;
 use App\Http\Controllers\Web\PublicVacancyController;
+use App\Http\Controllers\Web\RecruiterApplicantPageController;
 use App\Http\Controllers\Web\RecruitmentOutcomeController;
 use App\Http\Controllers\Web\RecruitmentStageController;
 use App\Http\Controllers\Web\SelectionScheduleController;
+use App\Http\Controllers\Web\SelectionSchedulePageController;
 use App\Http\Controllers\Web\VacancyController;
 use App\Http\Controllers\Web\VacancyLifecycleController;
 use App\Http\Controllers\Web\VacancyScreeningQuestionController;
@@ -240,6 +244,30 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
         Route::post('/', [RecruitmentOutcomeController::class, 'store'])->name('store');
         Route::patch('/{outcome}', [RecruitmentOutcomeController::class, 'update'])->whereNumber('outcome')->name('update');
     });
+
+    /*
+    | Recruitment Frontend Vertical Slice v1 — Inertia page delivery only.
+    | Every page controller here reuses the frozen Query/Scope/Presenter
+    | classes above directly (never a loopback HTTP call) and mutates
+    | nothing. Mutations still post to the JSON routes already registered
+    | above. `pages.` names keep these separate from the JSON route names
+    | they render a shell around, so neither can be confused with the other.
+    */
+    Route::get('/dashboard', [DashboardPageController::class, 'index'])->name('pages.dashboard');
+
+    Route::get('/lamaran-saya', [CandidateApplicationPageController::class, 'index'])->name('pages.applications.index');
+    Route::get('/lamaran-saya/{application}', [CandidateApplicationPageController::class, 'show'])
+        ->whereNumber('application')->name('pages.applications.show');
+    Route::get('/lowongan/{slug}/lamar', [CandidateApplicationPageController::class, 'apply'])
+        ->where('slug', '[a-z0-9-]+')->name('pages.applications.apply');
+
+    Route::get('/jadwal-seleksi', [SelectionSchedulePageController::class, 'index'])->name('pages.schedules.index');
+    Route::get('/jadwal-seleksi/{schedule}', [SelectionSchedulePageController::class, 'show'])
+        ->whereNumber('schedule')->name('pages.schedules.show');
+
+    Route::get('/pelamar', [RecruiterApplicantPageController::class, 'index'])->name('pages.applicants.index');
+    Route::get('/pelamar/{application}', [RecruiterApplicantPageController::class, 'show'])
+        ->whereNumber('application')->name('pages.applicants.show');
 });
 
 /*

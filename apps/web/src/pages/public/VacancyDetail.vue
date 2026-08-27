@@ -8,7 +8,8 @@
  * raw external ATS URL, and "Lowongan Serupa" (unsourced) are intentionally
  * absent.
  */
-import { Head } from '@inertiajs/vue3'
+import { Head, Link, usePage } from '@inertiajs/vue3'
+import { computed } from 'vue'
 
 interface CompanySummary {
     company_id: number
@@ -61,6 +62,11 @@ const audienceLabel: Record<string, string> = {
 }
 
 const metaDescription = props.vacancy.description.slice(0, 160)
+
+const CANDIDATE_ROLES = ['CANDIDATE_EXTERNAL', 'CANDIDATE_STUDENT_FINAL_YEAR', 'CANDIDATE_ALUMNI']
+const page = usePage()
+const isAuthenticated = computed(() => !!(page.props as any).auth?.user)
+const isCandidate = computed(() => ((page.props as any).auth?.roles ?? []).some((r: string) => CANDIDATE_ROLES.includes(r)))
 </script>
 
 <template>
@@ -120,6 +126,15 @@ const metaDescription = props.vacancy.description.slice(0, 160)
                         <p v-else class="mt-4 rounded-md bg-slate-50 p-3 text-xs text-slate-600">
                             Lamaran diproses melalui Portal Karir Kampus.
                         </p>
+
+                        <template v-if="!vacancy.applies_externally">
+                            <Link v-if="isAuthenticated && isCandidate" :href="`/lowongan/${vacancy.slug}/lamar`" class="mt-4 block rounded-lg bg-[#0061a5] px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-[#004172]">
+                                Lamar Sekarang
+                            </Link>
+                            <a v-else-if="!isAuthenticated" href="/login" class="mt-4 block rounded-lg bg-[#0061a5] px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-[#004172]">
+                                Masuk untuk Melamar
+                            </a>
+                        </template>
                     </div>
 
                     <div class="rounded-lg border border-slate-200 bg-white p-5">

@@ -6,7 +6,7 @@ export type ContractError = {
     }
 }
 
-export async function authRequest(path: string, body: Record<string, unknown>, method = 'POST') {
+export async function authRequest(path: string, body: Record<string, unknown>, method = 'POST', extraHeaders: Record<string, string> = {}) {
     const csrf = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content ?? ''
     const response = await fetch(path, {
         method,
@@ -16,12 +16,18 @@ export async function authRequest(path: string, body: Record<string, unknown>, m
             'Content-Type': 'application/json',
             'X-Requested-With': 'XMLHttpRequest',
             'X-CSRF-TOKEN': csrf,
+            ...extraHeaders,
         },
         body: JSON.stringify(body),
     })
 
     const payload = response.status === 204 ? {} : (await response.json()) as ContractError & { data?: Record<string, unknown> }
     return { response, payload }
+}
+
+/** A fresh client-generated value for the `Idempotency-Key` header on a REQUIRED write. */
+export function newIdempotencyKey(): string {
+    return typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : `key-${Date.now()}-${Math.random().toString(16).slice(2)}`
 }
 
 export async function authFormRequest(path: string, body: FormData, method = 'POST') {
