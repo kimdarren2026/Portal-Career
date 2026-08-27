@@ -1,7 +1,7 @@
 # Inertia Web Action Index — Internal Application Surface
 
 **Status:** Proposed — awaiting approval
-**Date:** 24 August 2026 · **Amended:** Candidate Core HTTP surface (SPEC-DOC-07 accepted) · Candidate Application MVP transport (SPEC-DOC-08 accepted, 26 August 2026) · Recruitment Stage Authoring role-grouping correction (RS-2, RS-6 accepted, 26 August 2026)
+**Date:** 24 August 2026 · **Amended:** Candidate Core HTTP surface (SPEC-DOC-07 accepted) · Candidate Application MVP transport (SPEC-DOC-08 accepted, 26 August 2026) · Recruitment Stage Authoring role-grouping correction (RS-2, RS-6 accepted, 26 August 2026) · Selection Schedule read transport (SS-9 accepted, 27 August 2026)
 **Generated from:** `API_CONTRACT.md` — verified programmatically in both directions.
 
 **This file lists only `INERTIA_WEB` operations.** These are internal Laravel + Inertia application routes:
@@ -20,6 +20,8 @@
 
 > **Recruitment stage authoring lives here, corrected (RS-2, RS-6, accepted, 26 August 2026).** `GET`/`POST`/`PATCH /vacancies/{vacancy}/stages` and `POST /vacancies/{vacancy}/stages/reorder` are grouped under **Vacancy** — `COMPANY_SCOPE`/`CAMPUS_SCOPE`/`SUPER_ADMIN` (RS-6: Super Admin unconditional, no company membership required). They were previously mis-grouped under **Selector Assignment** with `HR_ADMIN` as the only listed role, and the `GET` row incorrectly listed `CAREER_CENTER` — both were route-inventory grouping artifacts, not authorization grants; `AUTHORIZATION_MATRIX.md`'s single combined "Manage recruitment stages · reorder" row denies Career Center for both read and write. RS-2 adds no vacancy-status or company-verification gate to any of these four routes. Selector-assignment routes (`POST`/`GET /stages/{stage}/selector-assignments`, `POST /selector-assignments/{assignment}/revoke`) remain `HR_ADMIN`-only and unimplemented — selector assignment is not defined for `COMPANY` vacancies (matrix footnote 23) and stays out of scope pending a future change request.
 
+> **Selection Schedule reads live here (SS-9, accepted, 27 August 2026).** `GET /schedules`, `GET /schedules/{schedule}`, and `GET /schedules/{schedule}/history` are reclassified from the reserved `VERSIONED_API` surface to `INERTIA_WEB`, the same SPEC-DOC-05/-07/-08 pattern — session guard, CSRF, no Sanctum, no `personal_access_tokens`. Their `/api/v1` twins stay reserved in `API_ENDPOINTS.md`. Authorization is unchanged: `COMPANY_SCOPE` (recruiter/admin), `ALLOW` (Super Admin), `READ_ONLY` (Auditor), `OWN` (candidate), `DENY` (Career Center); `HR_ADMIN`/`CAMPUS_SCOPE` stays deferred (no Campus runtime); `SELECTOR`/`ASSIGNED_STAGE` stays inert (company-side selector assignment remains deferred — no `selection_stage_assignments` runtime is fabricated to activate it). `POST /applications/{application}/schedules`, `PATCH /schedules/{schedule}`, and `POST /schedules/{schedule}/cancel` are activated by the same Selection Schedule Foundation v1 milestone (SS-1, SS-2, SS-3, SS-5, SS-8, both accepted 27 August 2026); `complete` and `no-show` remain listed here as the frozen long-run contract's paired actions but carry **no runtime** in this milestone.
+
 Routes are shown **without** the `/api/v1` prefix, which is what distinguishes them at the routing layer. Their **behaviour — validation, invariants, transitions, error codes, audit, outbox, idempotency, and concurrency — is defined by `API_CONTRACT.md` exactly as for versioned endpoints.** Idempotency and concurrency requirements are not relaxed here.
 
 **Page-delivery `GET` routes are deliberately absent.** Routes such as `/login`, `/register`, `/forgot-password`, `/reset-password/{token}`, `/verify-email/{token}`, and the Candidate portal's own profile and onboarding pages render an Inertia page and change nothing; they are UI plumbing, not contract operations (`API_CONTRACT.md` Part I §2b).
@@ -28,7 +30,7 @@ Any of these may later be promoted to `VERSIONED_API`. Promotion is additive —
 
 | Total INERTIA_WEB operations |
 | --- |
-| **126** |
+| **129** |
 
 ## Authentication & Session
 
@@ -172,6 +174,9 @@ Any of these may later be promoted to `VERSIONED_API`. Promotion is additive —
 
 | Domain | Method | Route | Purpose / Contract Section | Primary Role |
 | --- | --- | --- | --- | --- |
+| Selection Schedule | `GET` | `/schedules` | GET /api/v1/schedules | OWN / COMPANY_SCOPE / CAMPUS_SCOPE / ASSIGNED_STAGE |
+| Selection Schedule | `GET` | `/schedules/{schedule}` | GET /api/v1/schedules *(grouped)* | OWN / COMPANY_SCOPE / CAMPUS_SCOPE / ASSIGNED_STAGE |
+| Selection Schedule | `GET` | `/schedules/{schedule}/history` | GET /api/v1/schedules *(grouped)* | OWN / COMPANY_SCOPE / CAMPUS_SCOPE / ASSIGNED_STAGE |
 | Selection Schedule | `PATCH` | `/schedules/{schedule}` | PATCH /api/v1/schedules/{schedule} | COMPANY_SCOPE / CAMPUS_SCOPE / OWN |
 | Selection Schedule | `POST` | `/schedules/{schedule}/cancel` | POST /api/v1/schedules/{schedule}/cancel | COMPANY_SCOPE / CAMPUS_SCOPE / OWN |
 | Selection Schedule | `POST` | `/schedules/{schedule}/complete` | POST /api/v1/schedules/{schedule}/cancel *(grouped)* | COMPANY_SCOPE / CAMPUS_SCOPE / OWN |
@@ -256,7 +261,7 @@ Any of these may later be promoted to `VERSIONED_API`. Promotion is additive —
 | Vacancy | 21 |
 | Application | 11 |
 | Selector Assignment | 3 |
-| Selection Schedule | 4 |
+| Selection Schedule | 7 |
 | Evaluation | 3 |
 | Offering | 4 |
 | Recruitment Outcome | 4 |
@@ -264,4 +269,4 @@ Any of these may later be promoted to `VERSIONED_API`. Promotion is additive —
 | Reporting | 8 |
 | Audit | 1 |
 | Administration | 6 |
-| **Total** | **126** |
+| **Total** | **129** |

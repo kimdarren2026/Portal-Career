@@ -3073,71 +3073,96 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 ### POST /api/v1/applications/{application}/schedules
 
-**Surface:** `INERTIA_WEB`
+**Surface:** `INERTIA_WEB`  ·  **Active MVP route:** `POST /applications/{application}/schedules`
+
+> **Selection Schedule Foundation v1 (SS-1, SS-2, SS-3, SS-5, SS-8 — approved and CLOSED, 27 August 2026) activates this operation.** Schedule authorization is a separate capability from Application Stage Movement and Recruitment Stage Authoring — it is not inherited from either, but independently sourced from `AUTHORIZATION_MATRIX.md` §4.8's own "Create schedule" row.
+>
+> **SS-1 — terminal application scheduling.** An application in `HIRED`, `REJECTED`, `WITHDRAWN`, or `NO_SHOW` cannot receive a new schedule → `409 APPLICATION_TERMINAL`, reusing the same code and terminal-status set `/move-stage` already uses.
+>
+> **SS-2 — schedule stage alignment.** `recruitment_stage_id` does **not** need to equal `applications.current_stage_id`. A recruiter may schedule any active stage of the same vacancy in advance, independent of the application's current position — the same "stage identity, not position" principle MS-4 already established for `/move-stage`. Creating a schedule never moves the application; `applications.current_stage_id` is untouched.
+>
+> **SS-3 — inactive target stage eligibility.** The target `recruitment_stage_id` **must be `active`** at creation → else `422 VALIDATION_FAILED`. Rechecked from a freshly locked row inside the write transaction, mirroring `/move-stage`'s post-lock stage-active recheck.
+>
+> **SS-5 — past schedule policy.** `starts_at` must be a **future** instant relative to authoritative server time at the moment of commit → else `422 SCHEDULE_TIME_INVALID`. No minimum lead time beyond "strictly future" — a request at `now + 1 second` is valid.
+>
+> **SS-8 — RA-2 applies to create.** Beyond the `COMPANY_SCOPE` object-authorization check, a successful create additionally requires, inside the same transaction, the same gate `/transition` and `/move-stage` already enforce: the owning company's `verification_status = VERIFIED` (else `403 VACANCY_COMPANY_NOT_VERIFIED`) and the vacancy's `current_status` ∈ `{PUBLISHED, CLOSED, EXPIRED}` (else `409 APPLICATION_VACANCY_NOT_PROCESSABLE`). This is the same `ApplicationProcessingGate` already reused twice, not a second processing-state policy. Applies identically to `SUPER_ADMIN` — no source exempts it.
+>
+> **Actor set active in Foundation v1:** `COMPANY_RECRUITER`, `COMPANY_ADMIN` (`COMPANY_SCOPE`), `SUPER_ADMIN` (`ALLOW`). `CAMPUS_SCOPE` (`HR_ADMIN`) is **not** activated — no Campus vacancy runtime exists. Career Center remains `DENY` (`AUTHORIZATION_MATRIX.md:85`: "cannot... create schedules... for any company"). Selectors remain `DENY` for schedule writes (§4.8 "Create schedule" row) — `pic_user_id` is a plain optional user reference, never a selector-role or `selection_stage_assignments` requirement. Auditor remains `DENY` for writes.
 
 **Purpose:** Create a selection appointment (FR-SEL-001).
 
-**Authentication:** Required. **Authorization:** Vacancy owner — `COMPANY_SCOPE` or `CAMPUS_SCOPE`.
+**Authentication:** Required. **Authorization:** Vacancy owner — `COMPANY_SCOPE` for company vacancies, `CAMPUS_SCOPE` for campus vacancies (inert, no Campus runtime). Career Center and Selectors cannot create schedules.
 
-**Request:** `recruitment_stage_id` (required), `selection_type` (required), `starts_at` (required), `ends_at`, `timezone` (required), `method` (required — online or on-site), `location`, `meeting_url`, `pic_user_id`, `instructions`, `attachment` (optional upload reference).
+**Request:** `recruitment_stage_id` (required), `selection_type` (required), `starts_at` (required), `ends_at`, `timezone` (required), `method` (required — online or on-site), `location`, `meeting_url`, `pic_user_id`, `instructions`, `attachment` (optional upload reference — **not activated in Foundation v1**; see the Selection Schedule Foundation v1 amendment note below).
 
 **Validation:**
-- `ends_at` after `starts_at` → else `422 SCHEDULE_TIME_INVALID`.
+- `ends_at` after `starts_at` where supplied → else `422 SCHEDULE_TIME_INVALID`.
+- `starts_at` strictly future → else `422 SCHEDULE_TIME_INVALID` (SS-5).
 - **On-site requires `location`; online requires `meeting_url`** → else `422 SCHEDULE_METHOD_DETAIL_REQUIRED`.
 - `timezone` is a **named zone**, never a fixed offset, so DST is handled correctly.
-- `recruitment_stage_id` **must belong to the application's vacancy** → else `422 STAGE_NOT_IN_VACANCY` (INV-019).
+- `recruitment_stage_id` **must belong to the application's vacancy** and be `active` → else `422 STAGE_NOT_IN_VACANCY` (INV-019) or `422 VALIDATION_FAILED` (SS-3).
 
-**Business Rules:** Created at `status = SCHEDULED` with `revision_number = 0`. Appends a `selection_schedule_histories` row with `event_type = CREATED`. `attachment_storage_reference` implements the FR-SEL-001 "lampiran" field and is served through the same Policy-checked, audited download path as any other private file.
+**Business Rules:**
+- Terminal applications are rejected before any other check (SS-1) → `409 APPLICATION_TERMINAL`.
+- Created at `status = SCHEDULED` with `revision_number = 0`. Appends a `selection_schedule_histories` row with `event_type = CREATED`.
+- **Never mutates `applications.current_stage_id`, `applications.current_status`, or any application history** — scheduling is status-independent and stage-position-independent (SS-2).
+- `attachment_storage_reference` implements the FR-SEL-001 "lampiran" field structurally, but no upload mechanism is wired to it in Foundation v1 — the field stays `null` on every row created by this milestone (see amendment note).
 
 **Success Response:** `201 Created`.
 
-**Error Codes:** `SCHEDULE_TIME_INVALID` (422) · `SCHEDULE_METHOD_DETAIL_REQUIRED` (422) · `STAGE_NOT_IN_VACANCY` (422) · `AUTH_FORBIDDEN` (403).
+**Error Codes:** `SCHEDULE_TIME_INVALID` (422) · `SCHEDULE_METHOD_DETAIL_REQUIRED` (422) · `STAGE_NOT_IN_VACANCY` (422) · `VALIDATION_FAILED` (422, SS-3 inactive target and request validation) · `APPLICATION_TERMINAL` (409, SS-1) · `AUTH_FORBIDDEN` (403) · `NOT_FOUND` (404) · `VACANCY_COMPANY_NOT_VERIFIED` (403, SS-8/RA-2) · `APPLICATION_VACANCY_NOT_PROCESSABLE` (409, SS-8/RA-2).
 
 **Side Effects:** Schedule + history + audit + outbox.
 
 **Audit:** `schedule_created`.
 
-**Notification / Outbox:** Candidate and PIC notified; email per FR-NOTIF-002.
+**Notification / Outbox:** Candidate and PIC (if `pic_user_id` set) notified; email per FR-NOTIF-002.
 
 **Idempotency:** **REQUIRED.**
 
-**Concurrency:** Application row locked.
+**Concurrency:** Application row locked, then vacancy, then target stage, then company — the same deterministic order `/move-stage` established, extended by inserting the new schedule row last. After locks, terminal eligibility, RA-2, and target-stage `active`/vacancy-membership are all rechecked against freshly locked rows.
 
 **Source Requirement:** FR-SEL-001, FR-HR-005 · INV-019, INV-027
+
+> **Attachment amendment (Selection Schedule Foundation v1).** FR-SEL-001's "lampiran" field has no frozen upload mechanism anywhere in this project — no MIME allowlist, size limit, or storage/download convention comparable to `CANDIDATE_DOCUMENT_UPLOAD_POLICY` (item 9) has ever been approved for schedule attachments. Inventing one here would be a new, unsourced infrastructure decision. `attachment_storage_reference` remains in the frozen schema, is accepted as `null` by every write path in this milestone, and **is not populated by any route**. Activating a real upload path is future scope, gated on that same kind of explicit policy decision.
 
 ---
 
 ### PATCH /api/v1/schedules/{schedule}
 
-**Surface:** `INERTIA_WEB`
+**Surface:** `INERTIA_WEB`  ·  **Active MVP route:** `PATCH /schedules/{schedule}`
+
+> **Selection Schedule Foundation v1 amendment.** SS-1, SS-3, SS-5, and SS-8 apply to reschedule identically to create (terminal denial, inactive-stage denial, future-time requirement, RA-2 gate) — see the create section's blockquote for the full text of each. SS-2 is create-only (this operation never changes `recruitment_stage_id` — see below).
 
 **Purpose:** Reschedule an appointment (FR-SEL-001).
 
-**Authentication:** Required. **Authorization:** Vacancy owner.
+**Authentication:** Required. **Authorization:** Vacancy owner — `COMPANY_SCOPE` / `CAMPUS_SCOPE` (inert), `SUPER_ADMIN` `ALLOW`. Career Center and Selectors cannot reschedule.
 
-**Request:** Any of `starts_at`, `ends_at`, `timezone`, `method`, `location`, `meeting_url`, `pic_user_id`, `instructions`, plus `reason` (recommended).
+**Request:** Any of `starts_at`, `ends_at`, `timezone`, `method`, `location`, `meeting_url`, `pic_user_id`, `instructions`, plus `reason` (recommended). **`recruitment_stage_id` is never accepted here** — reschedule changes time/logistics, never the schedule's stage. A stage reassignment would be a new schedule, not a PATCH.
 
-**Validation:** As for create.
+**Validation:** As for create (time, method-detail, future-`starts_at`), plus: the schedule's **existing** `recruitment_stage_id` must still be `active` (SS-3) → else `422 VALIDATION_FAILED`.
 
 **Business Rules:**
+- Only a schedule currently `SCHEDULED` may be rescheduled → `COMPLETED`, `CANCELLED`, or `NO_SHOW` → `409 SCHEDULE_INVALID_TRANSITION`.
+- The parent application must be non-terminal (SS-1) → else `409 APPLICATION_TERMINAL`, no mutation.
+- RA-2 applies identically to create (SS-8) → `403 VACANCY_COMPANY_NOT_VERIFIED` / `409 APPLICATION_VACANCY_NOT_PROCESSABLE`, no `SUPER_ADMIN` bypass.
 - **`RESCHEDULED` is an event, not a status** (INV-027). A rescheduled appointment remains `SCHEDULED` at its new time.
 - Atomically: updates the schedule values, **increments `revision_number`**, and appends a `selection_schedule_histories` row with `event_type = RESCHEDULED`, `previous_snapshot`, `resulting_revision_number`, actor, and reason.
 - **History is preserved by the history entity, never by a status value.** No prior schedule value is lost.
-- Rescheduling a `COMPLETED`, `CANCELLED`, or `NO_SHOW` schedule → `409 SCHEDULE_INVALID_TRANSITION`.
 
 **Success Response:** `200 OK` with the new `revision_number`.
 
-**Error Codes:** `SCHEDULE_INVALID_TRANSITION` (409) · `SCHEDULE_TIME_INVALID` (422) · `SCHEDULE_METHOD_DETAIL_REQUIRED` (422) · `STALE_VERSION` (409) · `AUTH_FORBIDDEN` (403).
+**Error Codes:** `SCHEDULE_INVALID_TRANSITION` (409) · `SCHEDULE_TIME_INVALID` (422) · `SCHEDULE_METHOD_DETAIL_REQUIRED` (422) · `VALIDATION_FAILED` (422, SS-3) · `APPLICATION_TERMINAL` (409, SS-1) · `STALE_VERSION` (409) · `AUTH_FORBIDDEN` (403) · `NOT_FOUND` (404) · `VACANCY_COMPANY_NOT_VERIFIED` (403, SS-8/RA-2) · `APPLICATION_VACANCY_NOT_PROCESSABLE` (409, SS-8/RA-2).
 
 **Side Effects:** Schedule + history + audit + outbox.
 
 **Audit:** `schedule_updated`.
 
-**Notification / Outbox:** Candidate and PIC notified of the change (FR-SEL-001 requires notification on change/cancel).
+**Notification / Outbox:** Candidate and PIC (if set) notified of the change (FR-SEL-001 requires notification on change/cancel).
 
 **Idempotency:** **REQUIRED.**
 
-**Concurrency:** `If-Match` on `revision_number`; a stale reschedule → `409 STALE_VERSION`.
+**Concurrency:** Schedule row locked first (the primary contended resource), then application, vacancy, target stage, and company for RA-2/eligibility/stage-active rechecks. `If-Match` on `revision_number`; a stale reschedule → `409 STALE_VERSION` before any lock is taken on the write path — no mutation, no history, no audit, no notification.
 
 **Source Requirement:** FR-SEL-001 · **INV-027**
 
@@ -3145,21 +3170,28 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 ### POST /api/v1/schedules/{schedule}/cancel
 
-**Surface:** `INERTIA_WEB`
+**Surface:** `INERTIA_WEB`  ·  **Active MVP route:** `POST /schedules/{schedule}/cancel`
+
+> **Selection Schedule Foundation v1 amendment.** SS-1 and SS-8 both narrow cancel in the **opposite** direction from create/reschedule: cancel is deliberately exempt from both the terminal-application block and the RA-2 processing gate, so a stale `SCHEDULED` record can always be administratively closed out. SS-3 similarly does not block cancel on an inactive stage.
 
 **Purpose:** Cancel an appointment (FR-SEL-001).
 
-**Authentication:** Required. **Authorization:** Vacancy owner.
+**Authentication:** Required. **Authorization:** Vacancy owner — `COMPANY_SCOPE` / `CAMPUS_SCOPE` (inert), `SUPER_ADMIN` `ALLOW`. Career Center and Selectors cannot cancel.
 
 **Request:** `reason` (recommended). **Validation:** None mandatory.
 
-**Business Rules:** `SCHEDULED → CANCELLED`. Appends a `CANCELLED` history event. Cancellation preserves the entire schedule record and its history. Paired actions: `POST /api/v1/schedules/{schedule}/complete` (`SCHEDULED → COMPLETED`) and `POST /api/v1/schedules/{schedule}/no-show` (`SCHEDULED → NO_SHOW`). **Marking a schedule `NO_SHOW` does not automatically set the application's status to `NO_SHOW`** — that remains an explicit lifecycle transition (FR-HR-007).
+**Business Rules:**
+- **SS-1 — cancel is permitted even when the parent application is terminal** (`HIRED`, `REJECTED`, `WITHDRAWN`, `NO_SHOW`) — `APPLICATION_TERMINAL` is never raised by this operation. This is deliberate administrative cleanup: a schedule created before the application became terminal must remain closeable.
+- **SS-8 — RA-2 does not apply to cancel.** Company verification and vacancy processability are never checked; `ApplicationProcessingGate` is never called by this operation. Cancel remains available even while the company is `SUSPENDED`/non-verified or the vacancy is `SUSPENDED`.
+- **SS-3 — cancel is permitted even when the referenced stage is `active = false`.** A schedule is never stranded by a later stage deactivation.
+- Only a schedule currently `SCHEDULED` may be cancelled → `COMPLETED` or `NO_SHOW` → `409 SCHEDULE_INVALID_TRANSITION`; already `CANCELLED` → `409 SCHEDULE_INVALID_TRANSITION` (not a no-op).
+- `SCHEDULED → CANCELLED`. Appends a `CANCELLED` history event. Cancellation preserves the entire schedule record and its history. Paired actions `POST /api/v1/schedules/{schedule}/complete` and `POST /api/v1/schedules/{schedule}/no-show` remain in the frozen long-run contract but carry **no runtime in Foundation v1** — see Part X.
 
-**Success Response:** `200 OK`. **Error Codes:** `SCHEDULE_INVALID_TRANSITION` (409) · `AUTH_FORBIDDEN` (403).
+**Success Response:** `200 OK`. **Error Codes:** `SCHEDULE_INVALID_TRANSITION` (409) · `AUTH_FORBIDDEN` (403) · `NOT_FOUND` (404).
 
-**Side Effects:** Status + history + audit + outbox. **Audit:** `schedule_cancelled` / `_completed` / `_no_show`. **Notification / Outbox:** Candidate and PIC notified.
+**Side Effects:** Status + history + audit + outbox. **Audit:** `schedule_cancelled`. **Notification / Outbox:** Candidate and PIC (if set) notified.
 
-**Idempotency:** **REQUIRED.** **Concurrency:** Schedule row locked.
+**Idempotency:** **REQUIRED.** **Concurrency:** Schedule row locked; status rechecked from the locked row before mutation. No `If-Match`/`STALE_VERSION` — cancel uses row-lock-and-status-recheck, not optimistic versioning (that mechanism is reschedule-only, per its own frozen contract).
 
 **Source Requirement:** FR-SEL-001 · INV-027
 
@@ -3167,21 +3199,23 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 ### GET /api/v1/schedules
 
-**Surface:** `VERSIONED_API`
+**Surface:** `INERTIA_WEB`  ·  **Active MVP route:** `GET /schedules`
+
+> **Selection Schedule Foundation v1 (SS-9 — approved and CLOSED, 27 August 2026) reclassifies this operation and its two paired routes** (`GET /api/v1/schedules/{schedule}`, `GET /api/v1/schedules/{schedule}/history`) **from the reserved/inactive `VERSIONED_API` surface to `INERTIA_WEB`**, the same MVP browser transport pattern SPEC-DOC-05, -07, and -08 already established (Laravel session guard + CSRF, no Sanctum, no `personal_access_tokens`). The `/api/v1` identifiers remain reserved/conceptual twins, exactly as every other reclassified operation's twin does. **No business rule changed** — authorization, scoping, and payload shape are identical regardless of surface. `HR_ADMIN`/`CAMPUS_SCOPE` remains **not** activated (no Campus runtime). `SELECTOR`'s `ASSIGNED_STAGE` grant remains inert for `COMPANY` vacancies — company-side selector assignment stays deferred, and no `selection_stage_assignments` runtime is fabricated to make that row usable.
 
 **Purpose:** Scoped schedule list — *Jadwal Seleksi* for candidates, operational calendar for owners.
 
 **Authentication:** Required.
 
-**Authorization:** Query-scoped. Candidate → own applications' schedules. Owner → `COMPANY_SCOPE` / `CAMPUS_SCOPE`. **Selector → `ASSIGNED_STAGE` only** (INV-037). Career Center → DENY for candidate-level schedules.
+**Authorization:** Query-scoped. Candidate → `OWN`, own applications' schedules only. Owner → `COMPANY_SCOPE` / `CAMPUS_SCOPE` (inert). `SUPER_ADMIN` → `ALLOW`. `AUDITOR` → `READ_ONLY` (read succeeds; write remains denied). **Selector → `ASSIGNED_STAGE` only** (INV-037), inert for `COMPANY` vacancies pending selector assignment. Career Center → `DENY`.
 
 **Request:** Filters `application_id`, `recruitment_stage_id`, `status`, `starts_from`, `starts_to`. Sortable: `starts_at` (default).
 
 **Validation:** Allow-listed filters and sort fields.
 
-**Business Rules:** Candidates see their own appointment detail and instructions. Paired routes: `GET /api/v1/schedules/{schedule}` and `GET /api/v1/schedules/{schedule}/history` (append-only event trail).
+**Business Rules:** Candidates see their own appointment detail and instructions only — no internal `reason`, `actor_user_id`, raw `previous_snapshot`, or `attachment_storage_reference` is ever returned to a candidate. Paired routes: `GET /api/v1/schedules/{schedule}` and `GET /api/v1/schedules/{schedule}/history` (append-only event trail, same candidate-safe projection rule).
 
-**Success Response:** `200 OK`, paginated. **Error Codes:** `VALIDATION_FAILED` (422).
+**Success Response:** `200 OK`, paginated. **Error Codes:** `VALIDATION_FAILED` (422) · `AUTH_FORBIDDEN` (403) · `NOT_FOUND` (404).
 
 **Side Effects:** None. **Audit:** None. **Notification / Outbox:** None.
 
@@ -3800,6 +3834,13 @@ Nothing below is resolved by this document **except where a row is explicitly ma
 | 26 | ~~**move-stage**~~ | **CLOSED — approved 27 August 2026.** `POST /applications/{application}/move-stage` is routed by Application Stage Movement Foundation v1. See the move-stage section above and rows 27–28 below for the full rule |
 | 27 | ~~**MS-3 — same-stage movement**~~ | **CLOSED — approved 27 August 2026 (Decision A — REJECT).** `to_stage_id == applications.current_stage_id` → `422 VALIDATION_FAILED`, no mutation, no history, no audit, no notification. Not treated as a successful no-op; no `STAGE_CHANGED` row with `from_stage_id == to_stage_id` is ever written |
 | 28 | ~~**MS-4 — stage movement adjacency**~~ | **CLOSED — approved 27 August 2026 (Decision A — arbitrary active same-vacancy target).** Forward, backward, skipped, and lateral movement between active same-vacancy stages are all permitted. `sort_order` is authoring/display only and never gates movement legality. No forward-only rule, adjacency rule, or backward-movement permission/reason requirement exists |
+| 29 | ~~**SS-1 — terminal application scheduling**~~ | **CLOSED — approved 27 August 2026.** Create and reschedule are both denied for a terminal application (`HIRED`, `REJECTED`, `WITHDRAWN`, `NO_SHOW`) via `409 APPLICATION_TERMINAL`. Cancel of an existing `SCHEDULED` schedule remains permitted regardless of the parent application's terminal status — deliberate administrative cleanup so a stale record is never stranded |
+| 30 | ~~**SS-2 — schedule stage alignment**~~ | **CLOSED — approved 27 August 2026.** `recruitment_stage_id` need not equal `applications.current_stage_id`; create may target any `active` same-vacancy stage in advance, with no adjacency or `sort_order` rule. Creating a schedule never mutates `applications.current_stage_id` |
+| 31 | ~~**SS-3 — inactive target stage eligibility**~~ | **CLOSED — approved 27 August 2026.** Create requires the target stage `active = true`; reschedule requires the schedule's existing referenced stage to still be `active = true`; cancel is permitted regardless of the referenced stage's active state. No cascading cleanup occurs when a stage referenced by an existing schedule is later disabled |
+| 32 | ~~**SS-5 — past schedule policy**~~ | **CLOSED — approved 27 August 2026.** Create and reschedule both require `starts_at` to be strictly future relative to authoritative server time, checked inside the write transaction, not merely at request-shape validation time. No minimum lead time beyond "strictly future". `ends_at`, where supplied, must be strictly later than `starts_at` — both `422 SCHEDULE_TIME_INVALID` on violation |
+| 33 | ~~**SS-8 — RA-2 applicability**~~ | **CLOSED — approved 27 August 2026.** Create and reschedule both require the existing RA-2 processing gate (`ApplicationProcessingGate`, reused unmodified): owning company `VERIFIED` and vacancy ∈ `{PUBLISHED, CLOSED, EXPIRED}`, with no `SUPER_ADMIN` bypass. Cancel is explicitly exempt from RA-2 — company verification and vacancy processability are never checked for cancel |
+| 34 | ~~**SS-9 — schedule read transport**~~ | **CLOSED — approved 27 August 2026.** `GET /schedules`, `GET /schedules/{schedule}`, and `GET /schedules/{schedule}/history` are reclassified `INERTIA_WEB` for the MVP browser portal, the same SPEC-DOC-05/-07/-08 pattern. Their `/api/v1` twins remain reserved and inactive. No Sanctum/PAT activation. Authorization is unchanged from the frozen matrix: `COMPANY_SCOPE` (recruiter/admin), `ALLOW` (Super Admin), `READ_ONLY` (Auditor), `OWN` (candidate), `DENY` (Career Center), inert `ASSIGNED_STAGE` (Selector, pending deferred company selector assignment), deferred `CAMPUS_SCOPE` (HR_ADMIN) |
+| 35 | **Selection Schedule Foundation v1 deferred scope** — `DEFERRED` | `complete`/`no-show` paired actions, selector assignment/revocation, company-side selector runtime, evaluation, scoring, offer, outcome, reopen, Campus recruitment runtime, External Apply, candidate self-reschedule, bulk scheduling, calendar-provider integration, and the schedule attachment upload mechanism (see the create section's amendment note) are all explicitly out of Selection Schedule Foundation v1's scope. None are implemented merely because this document already describes them |
 
 **Human-decision items carried from the ERD:**
 
