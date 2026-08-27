@@ -62,13 +62,34 @@ export function statusLabel(map: Record<string, string>, value: string | null | 
     return map[value] ?? value
 }
 
+const MONTHS_ID = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des']
+
+/**
+ * `selection_schedules.starts_at`/`ends_at` pair with a separate `timezone`
+ * column: the stored value's clock digits ARE the wall-clock time in that
+ * named zone — it is not a true UTC instant to re-convert. Passing
+ * `timezone` here therefore reads the ISO string's literal date/time digits
+ * directly and appends the zone name, never constructing a `Date` (which
+ * would treat the trailing offset as real and re-convert into the viewer's
+ * own browser zone — a double conversion). A genuine instant (no paired
+ * `timezone`, e.g. `first_applied_at`, audit `occurred_at`) still converts
+ * normally into the viewer's local zone via `Intl.DateTimeFormat`.
+ */
 export function formatDateTime(value: string | null | undefined, timezone?: string | null): string {
     if (!value) return '-'
+
+    if (timezone) {
+        const match = value.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/)
+        if (match) {
+            const [, year, month, day, hour, minute] = match
+            return `${parseInt(day, 10)} ${MONTHS_ID[parseInt(month, 10) - 1]} ${year}, ${hour}.${minute} (${timezone})`
+        }
+    }
+
     try {
         return new Intl.DateTimeFormat('id-ID', {
             dateStyle: 'medium',
             timeStyle: 'short',
-            timeZone: timezone || undefined,
         }).format(new Date(value))
     } catch {
         return new Date(value).toLocaleString('id-ID')

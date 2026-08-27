@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 /**
  * Non-mutating Inertia delivery for the recruiter applicant workspace
@@ -31,7 +32,7 @@ use Inertia\Response;
 final class RecruiterApplicantPageController extends Controller
 {
     /** `GET /pelamar`. */
-    public function index(Request $request, ListCompanyApplications $query): Response|JsonResponse
+    public function index(Request $request, ListCompanyApplications $query): Response|JsonResponse|SymfonyResponse
     {
         $actor = $this->actor($request);
         if (! $this->isRecruiterActor($actor)) {
@@ -67,7 +68,7 @@ final class RecruiterApplicantPageController extends Controller
     }
 
     /** `GET /pelamar/{application}`. */
-    public function show(Request $request, int $application, GetCompanyApplication $query): Response|JsonResponse
+    public function show(Request $request, int $application, GetCompanyApplication $query): Response|JsonResponse|SymfonyResponse
     {
         $actor = $this->actor($request);
         if (! $this->isRecruiterActor($actor)) {
@@ -107,9 +108,20 @@ final class RecruiterApplicantPageController extends Controller
         return $user;
     }
 
-    private function forbidden(Request $request): JsonResponse
+    /**
+     * Browser/Inertia page navigation gets the shared styled `Error` page;
+     * a request that explicitly wants JSON (never true for a normal page
+     * visit — only `authRequest()`'s `Accept: application/json`) keeps the
+     * exact same `ContractResponse` envelope every other 403 in this
+     * codebase already uses.
+     */
+    private function forbidden(Request $request): Response|JsonResponse|SymfonyResponse
     {
-        return ContractResponse::error($request, 'AUTH_FORBIDDEN', 403, 'Anda tidak berhak melakukan tindakan ini.');
+        if ($request->expectsJson()) {
+            return ContractResponse::error($request, 'AUTH_FORBIDDEN', 403, 'Anda tidak berhak melakukan tindakan ini.');
+        }
+
+        return Inertia::render('Error', ['status' => 403])->toResponse($request)->setStatusCode(403);
     }
 
     /** @param list<int|null> $vacancyIds @return array<int, string> */

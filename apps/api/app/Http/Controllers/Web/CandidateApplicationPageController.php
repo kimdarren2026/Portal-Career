@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 /**
  * Non-mutating Inertia delivery for the candidate's own application journey
@@ -88,10 +89,16 @@ final class CandidateApplicationPageController extends CandidateController
      * no routed runtime yet in this codebase, so that state is surfaced as
      * "not yet available", not silently faked.
      */
-    public function apply(Request $request, string $slug, ListCandidateDocuments $documentsQuery): Response
+    public function apply(Request $request, string $slug, ListCandidateDocuments $documentsQuery): Response|SymfonyResponse
     {
         $vacancy = PublicVacancyScope::query()->with('company')->where('slug', $slug)->first();
-        abort_if($vacancy === null, 404);
+        if ($vacancy === null) {
+            if ($request->expectsJson()) {
+                abort(404);
+            }
+
+            return Inertia::render('Error', ['status' => 404])->toResponse($request)->setStatusCode(404);
+        }
 
         $detail = PublicVacancyPresenter::detail($vacancy);
         $questions = $vacancy->screeningQuestions()->where('active', true)

@@ -5,11 +5,12 @@
  * not a pixel reproduction. `SubmitApplication` (frozen) enforces every
  * business rule (eligibility, consent version, document ownership,
  * screening validity, one-application-per-candidate-per-vacancy); this form
- * only assembles a well-shaped request. The exact consent statement text is
- * still an open product-copy decision (`ApplicationConsentVersion`'s own
- * docblock: "the text itself... remain outside this milestone") — the
- * sentence below is a placeholder pending that decision, not a fabricated
- * business rule; the backend performs no semantic check on its hash.
+ * only assembles a well-shaped request. The consent statement is FE-1
+ * (approved and CLOSED) — exact text, scoped to only the documents selected
+ * on this application, shared with the vacancy's owning company, for this
+ * recruitment process only. `consent_version` and the SHA-256 hash mechanism
+ * are unchanged from the original implementation — the backend consent
+ * entity, its versioning, and its hash architecture are untouched.
  */
 import { Head, Link } from '@inertiajs/vue3'
 import { computed, reactive, ref } from 'vue'
@@ -33,7 +34,8 @@ const props = defineProps<{
     documents: DocumentOption[]
 }>()
 
-const CONSENT_TEXT = 'Saya menyetujui data lamaran dan dokumen yang saya bagikan digunakan oleh perusahaan penerima untuk keperluan proses rekrutmen ini.'
+/** FE-1 (approved and CLOSED). Exact text — do not paraphrase. */
+const CONSENT_TEXT = 'Saya menyetujui dokumen yang saya pilih pada lamaran ini dibagikan kepada perusahaan pemilik lowongan untuk keperluan proses rekrutmen.'
 
 const consentAccepted = ref(false)
 const selectedDocumentIds = reactive<number[]>([])

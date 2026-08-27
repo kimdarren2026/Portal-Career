@@ -9,6 +9,7 @@ use App\Http\Middleware\EnforceCompanyMemberInviteRateLimit;
 use App\Http\Middleware\EnforcePublicDiscoveryRateLimit;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Responses\ContractResponse;
+use Inertia\Inertia;
 use App\Domains\Application\Exceptions\ApplicationAlreadyExists;
 use App\Domains\Application\Exceptions\ApplicationAlreadyWithdrawn;
 use App\Domains\Application\Exceptions\ApplicationConsentRequired;
@@ -113,6 +114,37 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+
+        /*
+        | Recruitment Frontend Vertical Slice v1 — styled Inertia error pages
+        | for browser/Inertia GET page navigation only (Frontend Correction
+        | Turn). Registered BEFORE the plain-JSON renderables for the same
+        | exception below, using the identical `expectsJson()` predicate
+        | `shouldRenderJsonWhen` already uses: when the request wants JSON
+        | (every `authRequest()` mutation call explicitly sends
+        | `Accept: application/json`), this returns null and Laravel falls
+        | through to the existing `ContractResponse` renderable — untouched,
+        | same status/code/message as always. When it does not (an Inertia
+        | `<Link>`/`router.get` page visit or a plain browser address-bar
+        | navigation, neither of which ever sets that header), it renders
+        | the shared `Error` page with the correct HTTP status and no
+        | resource identifier, exception class, or SQLSTATE.
+        */
+        $exceptions->render(function (ApplicationNotFound $exception, Request $request) {
+            if ($request->expectsJson()) {
+                return null;
+            }
+
+            return Inertia::render('Error', ['status' => 404])->toResponse($request)->setStatusCode(404);
+        });
+        $exceptions->render(function (SelectionScheduleNotFound $exception, Request $request) {
+            if ($request->expectsJson()) {
+                return null;
+            }
+
+            return Inertia::render('Error', ['status' => 404])->toResponse($request)->setStatusCode(404);
+        });
+
         $exceptions->render(function (AuthenticationException $exception, Request $request) {
             if (in_array($request->path(), ['me', 'me/password', 'auth/logout'], true) || $request->is('candidate/*') || $request->is('companies/*') || $request->is('companies') || $request->is('vacancies') || $request->is('vacancies/*') || $request->is('applications') || $request->is('applications/*')) {
                 return ContractResponse::error($request, 'UNAUTHENTICATED', 401, 'Sesi autentikasi diperlukan.');
