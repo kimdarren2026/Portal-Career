@@ -3227,38 +3227,52 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 ### POST /api/v1/applications/{application}/evaluations
 
-**Surface:** `INERTIA_WEB`
+**Surface:** `INERTIA_WEB`  ·  **Active MVP route:** `POST /applications/{application}/evaluations`
+
+> **Evaluation / Scoring Foundation v1 (EV-1, EV-2, RC-1 — approved and CLOSED, 27 August 2026) activates this operation.** Evaluation authorization is a separate capability from Selection Schedule and Application Stage Movement — it is not inherited from either, but independently sourced from `AUTHORIZATION_MATRIX.md` §4.8's own "Create / update evaluation" row, which grants `COMPANY_RECRUITER`/`COMPANY_ADMIN` their own `COMPANY_SCOPE`, parallel to (not gated behind) Selector's `ASSIGNED_STAGE` grant.
+>
+> **EV-1 — terminal application eligibility.** An application in `HIRED`, `REJECTED`, `WITHDRAWN`, or `NO_SHOW` cannot receive a new evaluation, an update to an existing draft, or a submit → `409 APPLICATION_TERMINAL` in all three cases, reusing the same code and terminal-status set `/move-stage` and Selection Schedule already use.
+>
+> **EV-2 — evaluation stage alignment.** `recruitment_stage_id` does **not** need to equal `applications.current_stage_id`. An evaluator may record against any `active` stage of the same vacancy — the same "stage identity, not position" principle MS-4/SS-2 already established. Create and update both require the referenced stage to be `active`; **submit is deliberately exempt** — an existing draft remains submittable even if its stage is later disabled, so a valid draft is never stranded by an unrelated Stage Authoring action. Evaluation never mutates `applications.current_stage_id`.
+>
+> **RC-1 — RA-2 applies to create, update, and submit.** Beyond the `COMPANY_SCOPE` object-authorization check, each of these three operations additionally requires, inside the same transaction, the same gate `/transition`, `/move-stage`, and Selection Schedule create/reschedule already enforce: the owning company's `verification_status = VERIFIED` (else `403 VACANCY_COMPANY_NOT_VERIFIED`) and the vacancy's `current_status` ∈ `{PUBLISHED, CLOSED, EXPIRED}` (else `409 APPLICATION_VACANCY_NOT_PROCESSABLE`). This is the same `ApplicationProcessingGate` already reused three times, not a second processing-state policy. Applies identically to `SUPER_ADMIN` — no source exempts it.
+>
+> **Actor set active in Foundation v1:** `COMPANY_RECRUITER`, `COMPANY_ADMIN` (`COMPANY_SCOPE`), `SUPER_ADMIN` (`ALLOW`). `CAMPUS_SCOPE` (`HR_ADMIN`) is **not** activated — no Campus vacancy runtime exists. Career Center remains `DENY` (§4.8's own row). `AUDITOR` remains `DENY` — the Evaluation matrix rows carry no `READ_ONLY` carve-out, unlike Selection Schedule's read rows. Selector's `ASSIGNED_STAGE` grant remains **inert** for `COMPANY` vacancies — company-side selector assignment stays deferred (matrix footnote 23), and no `selection_stage_assignments` runtime is fabricated to activate it; `SELECTOR_NOT_ASSIGNED_TO_STAGE` is therefore unreachable in this milestone. Recruiter/Admin evaluation is fully independent of Selector Assignment.
+>
+> **Author-only PATCH and submit.** "Editable by its author until submitted" and "author only" are business rules distinct from object authorization — `SUPER_ADMIN`'s unconditional `ALLOW` reaches (may read) any evaluation, but does **not** exempt it from the author-only restriction on `PATCH`/`submit`, since no source grants that exemption. Violation → `403 EVALUATION_NOT_OWNED` (already-registered code).
+>
+> **PATCH scope (Foundation v1).** The frozen contract names no exact PATCH field set beyond "author only, before submission." Foundation v1 accepts scalar-field updates — `recruitment_stage_id` (per EV-2), `recommendation`, `comments`, `total_score` — matching the same fields create accepts, using the established partial-update (`sometimes`) convention. **Item-set mutation via PATCH is out of scope for Foundation v1** — no source defines whether a PATCH's `items[]` replaces the whole set, merges, or is rejected outright, and inventing collection semantics here would be an unsourced business rule. `items[]` remains create-only in this milestone.
 
 **Purpose:** Record a candidate evaluation (FR-SEL-002, FR-HR-007).
 
-**Authentication:** Required.
+**Authentication:** Required. **Authorization:** Vacancy owner — `COMPANY_SCOPE` for company vacancies, `CAMPUS_SCOPE` for campus vacancies (inert, no Campus runtime), **or** a selector with an **active** `selection_stage_assignments` row for the target stage (inert for `COMPANY` vacancies in Foundation v1) → else `403 SELECTOR_NOT_ASSIGNED_TO_STAGE` (INV-037). Role SELECTOR alone is never sufficient. Career Center and Auditor cannot create, read, update, or submit evaluations.
 
-**Authorization:** Vacancy owner, **or** a selector with an **active** `selection_stage_assignments` row for the target stage → else `403 SELECTOR_NOT_ASSIGNED_TO_STAGE` (INV-037). Role SELECTOR alone is never sufficient.
+**Request:** `recruitment_stage_id` (required), `recommendation`, `comments`, `total_score`, `items[]` — each `{ criterion, weight?, score?, comment?, sort_order }`. `evaluator_user_id` is **not** a request field — it is always the authenticated actor; no delegation exists.
 
-**Request:** `recruitment_stage_id` (required), `recommendation`, `comments`, `total_score`, `items[]` — each `{ criterion, weight?, score?, comment?, sort_order }`.
-
-**Validation:** `recruitment_stage_id` belongs to the application's vacancy (INV-019). Numeric fields numeric where supplied.
+**Validation:** `recruitment_stage_id` belongs to the application's vacancy (INV-019) and is `active` (EV-2) → else `422 STAGE_NOT_IN_VACANCY` or `422 VALIDATION_FAILED`. Numeric fields numeric where supplied.
 
 **Business Rules:**
-- **No scoring algorithm is assumed and none is computed.** `weight`, `score`, and `total_score` are all optional; an evaluator may submit comments and a recommendation with no numbers at all (FR-SEL-002 lists criteria, weight, score, comments, recommendation as available fields, not as a required rubric).
+- Terminal applications are rejected before any other check (EV-1) → `409 APPLICATION_TERMINAL`.
+- **No scoring algorithm is assumed and none is computed.** `weight`, `score`, and `total_score` are all optional; an evaluator may submit comments and a recommendation with no numbers at all (FR-SEL-002 lists criteria, weight, score, comments, recommendation as available fields, not as a required rubric). No weight-sum rule, no automatic aggregation, no pass/fail threshold.
 - **No ranking, normalization, percentile, candidate comparison, psychometric engine, or AI recommendation exists anywhere in this API.** No endpoint returns a ranked candidate list, and no field feeds one.
 - Created as a draft; editable by its author until submitted.
+- **Never mutates `applications.current_stage_id` or `applications.current_status`, creates no offer, and creates no recruitment outcome.**
 - **An evaluation result never becomes a candidate-facing status by itself** (FR-HR-007). Changing the candidate's status is a separate, explicit transition.
-- Evaluations are **never candidate-visible**.
+- Evaluations are **never candidate-visible** — no Evaluation surface of any kind is exposed to Candidate actors.
 
 **Success Response:** `201 Created`.
 
-**Error Codes:** `SELECTOR_NOT_ASSIGNED_TO_STAGE` (403) · `STAGE_NOT_IN_VACANCY` (422) · `VALIDATION_FAILED` (422) · `AUTH_FORBIDDEN` (403).
+**Error Codes:** `SELECTOR_NOT_ASSIGNED_TO_STAGE` (403) · `STAGE_NOT_IN_VACANCY` (422) · `VALIDATION_FAILED` (422) · `APPLICATION_TERMINAL` (409, EV-1) · `AUTH_FORBIDDEN` (403) · `NOT_FOUND` (404) · `VACANCY_COMPANY_NOT_VERIFIED` (403, RC-1/RA-2) · `APPLICATION_VACANCY_NOT_PROCESSABLE` (409, RC-1/RA-2).
 
-**Side Effects:** Evaluation + items. Paired routes: `GET /api/v1/applications/{application}/evaluations` (scoped — a selector sees the assigned stage's evaluations only), `GET /api/v1/evaluations/{evaluation}`, `PATCH /api/v1/evaluations/{evaluation}` (author only, before submission), `POST /api/v1/evaluations/{evaluation}/submit` (finalizes; sets `submitted_at`; afterwards `409 EVALUATION_ALREADY_SUBMITTED`).
+**Side Effects:** Evaluation + items. Paired routes: `GET /api/v1/applications/{application}/evaluations` (scoped — a selector sees the assigned stage's evaluations only), `GET /api/v1/evaluations/{evaluation}`, `PATCH /api/v1/evaluations/{evaluation}` (author only, before submission — scalar fields only in Foundation v1, see amendment note above), `POST /api/v1/evaluations/{evaluation}/submit` (finalizes; sets `submitted_at`; afterwards `409 EVALUATION_ALREADY_SUBMITTED`).
 
 **Audit:** `evaluation_created` / `_updated` / `_submitted` (FR-AUD-001).
 
-**Notification / Outbox:** Owner notified on submission. **Never the candidate.**
+**Notification / Outbox:** Owner notified on submission. **Never the candidate.** "Owner" resolves to every active member of the owning company, the same recipient-resolution rule already established for Application submit/withdraw notifications.
 
-**Idempotency:** **REQUIRED** on submit.
+**Idempotency:** **REQUIRED** on submit. **Not required on create or update** — the frozen contract scopes this requirement to submit only.
 
-**Concurrency:** Evaluation row locked on submit; a second submit → `409`.
+**Concurrency:** Application row locked, then vacancy, then target stage, then company — the same deterministic order Selection Schedule create established, extended for the new evaluation row inserted last. Evaluation row locked on submit; a second submit → `409 EVALUATION_ALREADY_SUBMITTED`.
 
 **Source Requirement:** FR-SEL-002, FR-HR-006, FR-HR-007 · **INV-019, INV-037**
 
@@ -3841,6 +3855,10 @@ Nothing below is resolved by this document **except where a row is explicitly ma
 | 33 | ~~**SS-8 — RA-2 applicability**~~ | **CLOSED — approved 27 August 2026.** Create and reschedule both require the existing RA-2 processing gate (`ApplicationProcessingGate`, reused unmodified): owning company `VERIFIED` and vacancy ∈ `{PUBLISHED, CLOSED, EXPIRED}`, with no `SUPER_ADMIN` bypass. Cancel is explicitly exempt from RA-2 — company verification and vacancy processability are never checked for cancel |
 | 34 | ~~**SS-9 — schedule read transport**~~ | **CLOSED — approved 27 August 2026.** `GET /schedules`, `GET /schedules/{schedule}`, and `GET /schedules/{schedule}/history` are reclassified `INERTIA_WEB` for the MVP browser portal, the same SPEC-DOC-05/-07/-08 pattern. Their `/api/v1` twins remain reserved and inactive. No Sanctum/PAT activation. Authorization is unchanged from the frozen matrix: `COMPANY_SCOPE` (recruiter/admin), `ALLOW` (Super Admin), `READ_ONLY` (Auditor), `OWN` (candidate), `DENY` (Career Center), inert `ASSIGNED_STAGE` (Selector, pending deferred company selector assignment), deferred `CAMPUS_SCOPE` (HR_ADMIN) |
 | 35 | **Selection Schedule Foundation v1 deferred scope** — `DEFERRED` | `complete`/`no-show` paired actions, selector assignment/revocation, company-side selector runtime, evaluation, scoring, offer, outcome, reopen, Campus recruitment runtime, External Apply, candidate self-reschedule, bulk scheduling, calendar-provider integration, and the schedule attachment upload mechanism (see the create section's amendment note) are all explicitly out of Selection Schedule Foundation v1's scope. None are implemented merely because this document already describes them |
+| 36 | ~~**EV-1 — evaluation terminal application eligibility**~~ | **CLOSED — approved 27 August 2026.** Create, update, and submit are all denied for a terminal application (`HIRED`, `REJECTED`, `WITHDRAWN`, `NO_SHOW`) via `409 APPLICATION_TERMINAL`, checked against an authoritative locked application row in all three operations. No late evaluation mutation after the application becomes terminal |
+| 37 | ~~**EV-2 — evaluation stage alignment**~~ | **CLOSED — approved 27 August 2026.** `recruitment_stage_id` need not equal `applications.current_stage_id`; create/update may target any `active` same-vacancy stage, with no adjacency or `sort_order` rule. **Submit is exempt from the active-stage requirement** — a draft created against a then-active stage remains submittable even if that stage is later disabled, so a valid draft is never stranded by a later Stage Authoring action. Evaluation never mutates `applications.current_stage_id` |
+| 38 | ~~**RC-1 — RA-2 applicability to Evaluation**~~ | **CLOSED — approved 27 August 2026.** Create, update, and submit all require the existing RA-2 processing gate (`ApplicationProcessingGate`, reused unmodified): owning company `VERIFIED` and vacancy ∈ `{PUBLISHED, CLOSED, EXPIRED}`, with no `SUPER_ADMIN` bypass. This closes the same shared cross-cutting question RC-1 already identified for Offering — this decision resolves it for Evaluation only; Offering's own RA-2 applicability remains a separate, not-yet-closed decision |
+| 39 | **Evaluation / Scoring Foundation v1 deferred scope** — `DEFERRED` | Item-set mutation via `PATCH` (see the create section's PATCH-scope amendment note), company-side selector assignment/revocation, selector applicant evaluation runtime, schedule `complete`/`no-show`, offering, offer accept/reject, recruitment outcome, reopen, Campus recruitment runtime, External Apply, bulk evaluation, AI/automatic scoring, and any weighted-average or pass/fail formula are all explicitly out of this milestone's scope. None are implemented merely because this document already describes them |
 
 **Human-decision items carried from the ERD:**
 

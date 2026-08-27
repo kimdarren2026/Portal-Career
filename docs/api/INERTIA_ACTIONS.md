@@ -186,9 +186,9 @@ Any of these may later be promoted to `VERSIONED_API`. Promotion is additive —
 
 | Domain | Method | Route | Purpose / Contract Section | Primary Role |
 | --- | --- | --- | --- | --- |
-| Evaluation | `GET` | `/evaluations/{evaluation}` | POST /api/v1/applications/{application}/evaluations *(grouped)* | CAMPUS_SCOPE / ASSIGNED_STAGE |
-| Evaluation | `PATCH` | `/evaluations/{evaluation}` | POST /api/v1/applications/{application}/evaluations *(grouped)* | CAMPUS_SCOPE / ASSIGNED_STAGE |
-| Evaluation | `POST` | `/evaluations/{evaluation}/submit` | POST /api/v1/applications/{application}/evaluations *(grouped)* | CAMPUS_SCOPE / ASSIGNED_STAGE |
+| Evaluation | `GET` | `/evaluations/{evaluation}` | POST /api/v1/applications/{application}/evaluations *(grouped)* | COMPANY_SCOPE / CAMPUS_SCOPE / ASSIGNED_STAGE |
+| Evaluation | `PATCH` | `/evaluations/{evaluation}` | POST /api/v1/applications/{application}/evaluations *(grouped)* | COMPANY_SCOPE / CAMPUS_SCOPE / ASSIGNED_STAGE |
+| Evaluation | `POST` | `/evaluations/{evaluation}/submit` | POST /api/v1/applications/{application}/evaluations *(grouped)* | COMPANY_SCOPE / CAMPUS_SCOPE / ASSIGNED_STAGE |
 
 ## Offering
 
