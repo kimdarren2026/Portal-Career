@@ -40,6 +40,12 @@ use App\Domains\Company\Exceptions\CompanyMemberNotFound;
 use App\Domains\Company\Exceptions\CompanyNotFound;
 use App\Domains\Company\Exceptions\CompanyNotPublic;
 use App\Domains\Company\Exceptions\LastCompanyAdmin;
+use App\Domains\Recruitment\SelectionSchedule\Exceptions\ScheduleInvalidTransition;
+use App\Domains\Recruitment\SelectionSchedule\Exceptions\ScheduleMethodDetailRequired;
+use App\Domains\Recruitment\SelectionSchedule\Exceptions\ScheduleTargetStageInactive;
+use App\Domains\Recruitment\SelectionSchedule\Exceptions\ScheduleTimeInvalid;
+use App\Domains\Recruitment\SelectionSchedule\Exceptions\SelectionScheduleNotFound;
+use App\Domains\Recruitment\SelectionSchedule\Exceptions\SelectionScheduleStaleVersion;
 use App\Domains\Vacancy\Exceptions\RecruitmentStageNotFound;
 use App\Domains\Vacancy\Exceptions\RecruitmentStageNotInVacancy;
 use App\Domains\Vacancy\Exceptions\ScreeningQuestionNotFound;
@@ -154,6 +160,13 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(fn (RecruitmentStageNotInVacancy $exception, Request $request) => ContractResponse::error($request, 'STAGE_NOT_IN_VACANCY', 422, 'Susunan tahap tidak sesuai dengan tahap lowongan ini.'));
         $exceptions->render(fn (ApplicationStageTargetInactive $exception, Request $request) => ContractResponse::error($request, 'VALIDATION_FAILED', 422, 'Tahap tujuan tidak aktif.'));
         $exceptions->render(fn (ApplicationStageAlreadyCurrent $exception, Request $request) => ContractResponse::error($request, 'VALIDATION_FAILED', 422, 'Aplikasi sudah berada pada tahap ini.'));
+        // Selection Schedule Foundation v1 (SS-1, SS-2, SS-3, SS-5, SS-8, SS-9).
+        $exceptions->render(fn (SelectionScheduleNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Jadwal seleksi tidak ditemukan.'));
+        $exceptions->render(fn (ScheduleTimeInvalid $exception, Request $request) => ContractResponse::error($request, 'SCHEDULE_TIME_INVALID', 422, 'Waktu jadwal tidak valid.'));
+        $exceptions->render(fn (ScheduleMethodDetailRequired $exception, Request $request) => ContractResponse::error($request, 'SCHEDULE_METHOD_DETAIL_REQUIRED', 422, 'Lokasi atau tautan pertemuan wajib diisi sesuai metode.'));
+        $exceptions->render(fn (ScheduleInvalidTransition $exception, Request $request) => ContractResponse::error($request, 'SCHEDULE_INVALID_TRANSITION', 409, 'Aksi tidak sah dari status jadwal saat ini.'));
+        $exceptions->render(fn (ScheduleTargetStageInactive $exception, Request $request) => ContractResponse::error($request, 'VALIDATION_FAILED', 422, 'Tahap yang dirujuk tidak aktif.'));
+        $exceptions->render(fn (SelectionScheduleStaleVersion $exception, Request $request) => ContractResponse::error($request, 'STALE_VERSION', 409, 'Versi jadwal sudah berubah. Muat ulang sebelum menyimpan.'));
         $exceptions->render(fn (CandidateCollectionNotFoundException $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Data tidak ditemukan.'));
         $exceptions->render(fn (CandidateDocumentNotOwnedException $exception, Request $request) => ContractResponse::error($request, 'DOCUMENT_NOT_OWNED', 403, 'Dokumen bukan milik kandidat ini.'));
         $exceptions->render(fn (CandidateDocumentUnsupportedMediaTypeException $exception, Request $request) => ContractResponse::error($request, 'UNSUPPORTED_MEDIA_TYPE', 415, 'Dokumen harus berupa PDF.'));

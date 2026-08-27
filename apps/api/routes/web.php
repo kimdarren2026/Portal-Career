@@ -12,6 +12,7 @@ use App\Http\Controllers\Web\CompanyController;
 use App\Http\Controllers\Web\CompanyMemberController;
 use App\Http\Controllers\Web\PublicVacancyController;
 use App\Http\Controllers\Web\RecruitmentStageController;
+use App\Http\Controllers\Web\SelectionScheduleController;
 use App\Http\Controllers\Web\VacancyController;
 use App\Http\Controllers\Web\VacancyLifecycleController;
 use App\Http\Controllers\Web\VacancyScreeningQuestionController;
@@ -160,8 +161,14 @@ Route::middleware(['auth', 'account.status'])->prefix('candidate')->name('candid
 | CLOSED) extends index/show to COMPANY_SCOPE and SUPER_ADMIN and adds
 | transition. No email-verified gate on transition: its contract states
 | "Authentication: Required" without one, the same as vacancy moderation.
-| move-stage, bulk-transition, and document download are deliberately NOT
-| routed — out of this milestone's scope (RA-3 defers download).
+| move-stage is routed by Application Stage Movement Foundation v1 (MS-3,
+| MS-4, approved and CLOSED). bulk-transition and document download are
+| deliberately NOT routed — out of scope (RA-3 defers download).
+|
+| Selection Schedule Foundation v1 (SS-1, SS-2, SS-3, SS-5, SS-8, SS-9,
+| approved and CLOSED) adds schedule create (nested here) plus the
+| /schedules routes below. No email-verified gate: the schedule contract
+| states "Authentication: Required" without one, same as transition/move-stage.
 */
 Route::middleware(['auth', 'account.status'])->group(function (): void {
     Route::post('/vacancies/{vacancy}/applications', [ApplicationController::class, 'store'])
@@ -176,6 +183,16 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
             ->whereNumber('application')->name('transition');
         Route::post('/{application}/move-stage', [ApplicationController::class, 'moveStage'])
             ->whereNumber('application')->name('move-stage');
+        Route::post('/{application}/schedules', [SelectionScheduleController::class, 'store'])
+            ->whereNumber('application')->name('schedules.store');
+    });
+
+    Route::prefix('schedules')->name('schedules.')->group(function (): void {
+        Route::get('/', [SelectionScheduleController::class, 'index'])->name('index');
+        Route::get('/{schedule}', [SelectionScheduleController::class, 'show'])->whereNumber('schedule')->name('show');
+        Route::get('/{schedule}/history', [SelectionScheduleController::class, 'history'])->whereNumber('schedule')->name('history');
+        Route::patch('/{schedule}', [SelectionScheduleController::class, 'reschedule'])->whereNumber('schedule')->name('reschedule');
+        Route::post('/{schedule}/cancel', [SelectionScheduleController::class, 'cancel'])->whereNumber('schedule')->name('cancel');
     });
 });
 
