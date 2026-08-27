@@ -66,7 +66,7 @@ final class RejectOffer
                 ->join('vacancies', 'vacancies.id', '=', 'applications.vacancy_id')
                 ->where('applications.id', $locked->application_id)
                 ->value('vacancies.company_id');
-            $this->notifier->rejected($locked, $actor, $companyId);
+            $this->notifier->rejected($locked, $companyId);
 
             return $locked;
         });

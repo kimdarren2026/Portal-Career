@@ -14,8 +14,12 @@ use Illuminate\Support\Facades\DB;
  * (INV-015). "Owner" resolves to every active member of the owning company,
  * the same recipient-resolution rule `ApplicationNotifier`/`EvaluationNotifier`
  * already established for FR-NOTIF-002. Send notifies the candidate only
- * (FR-NOTIF-002 "Offering diterbitkan"); accept/reject notify both the
- * owner and the candidate (FR-NOTIF-002 "Offering accepted/rejected").
+ * (FR-NOTIF-002 "Offering diterbitkan"). Accept notifies both the owner and
+ * the candidate — the frozen accept contract explicitly states "Vacancy
+ * owner notified... candidate confirmation". Reject notifies the owner
+ * **only** — the frozen reject contract states "Vacancy owner notified."
+ * with no candidate-confirmation clause, unlike accept; this asymmetry is
+ * deliberate in the source, not an oversight.
  */
 final class OfferNotifier
 {
@@ -34,9 +38,8 @@ final class OfferNotifier
         }
     }
 
-    public function rejected(Offer $offer, User $candidateUser, int $companyId): void
+    public function rejected(Offer $offer, int $companyId): void
     {
-        $this->queueOne((int) $candidateUser->getKey(), (string) $candidateUser->email, $offer, 'OFFER_REJECTED', 'offer.rejected.candidate');
         foreach ($this->companyMemberEmails($companyId) as $userId => $email) {
             $this->queueOne($userId, (string) $email, $offer, 'OFFER_REJECTED', 'offer.rejected.owner');
         }

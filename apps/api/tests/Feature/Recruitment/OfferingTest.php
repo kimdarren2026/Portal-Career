@@ -412,10 +412,13 @@ final class OfferingTest extends VacancyTestCase
         $applicationId2 = $this->submitApplication($candidate2, $vacancyId);
         $offerId2 = $this->sendOffer($admin, $applicationId2);
         $this->actingAs($candidate2)->postJson("/offers/{$offerId2}/reject", [])->assertOk();
-        self::assertSame(1, DB::table('notifications')->where('related_object_type', 'offer')->where('related_object_id', $offerId2)
+        self::assertSame(0, DB::table('notifications')->where('related_object_type', 'offer')->where('related_object_id', $offerId2)
             ->where('body_reference', 'offer.rejected.candidate')->count());
         self::assertSame(1, DB::table('notifications')->where('related_object_type', 'offer')->where('related_object_id', $offerId2)
             ->where('body_reference', 'offer.rejected.owner')->count());
+        self::assertSame(0, DB::table('email_outbox')->where('template_reference', 'offer.rejected.candidate')->count());
+        self::assertSame(1, DB::table('email_outbox')->where('template_reference', 'offer.rejected.owner')
+            ->where('related_object_id', $offerId2)->count());
     }
 
     // ---------------------------------------------------------------
@@ -468,6 +471,11 @@ final class OfferingTest extends VacancyTestCase
 
         self::assertEquals($first->json('data'), $replay->json('data'));
         self::assertSame(1, DB::table('audit_logs')->where('action', 'offer_rejected')->where('object_id', $offerId)->count());
+        self::assertSame(1, DB::table('notifications')->where('related_object_type', 'offer')->where('related_object_id', $offerId)
+            ->where('body_reference', 'offer.rejected.owner')->count());
+        self::assertSame(0, DB::table('notifications')->where('related_object_type', 'offer')->where('related_object_id', $offerId)
+            ->where('body_reference', 'offer.rejected.candidate')->count());
+        self::assertSame(0, DB::table('email_outbox')->where('template_reference', 'offer.rejected.candidate')->count());
     }
 
     // ---------------------------------------------------------------
