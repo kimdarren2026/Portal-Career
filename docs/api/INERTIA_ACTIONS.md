@@ -205,12 +205,13 @@ Any of these may later be promoted to `VERSIONED_API`. Promotion is additive —
 
 ## Recruitment Outcome
 
-Recruitment Outcome Foundation v1 (OC-1, RC-2, approved and CLOSED) activates `INTERNAL_APPLICATION` only. `CAMPUS_SCOPE` and Career Center's alumni/reporting grant (RC-2) remain deferred/inactive. `GET /recruitment-outcomes/incomplete` remains unrouted pending H-5 (`API_CONTRACT.md`).
+Recruitment Outcome Foundation v1 (OC-1, RC-2, H-5, approved and CLOSED) activates `INTERNAL_APPLICATION` only. `CAMPUS_SCOPE` and Career Center's alumni/reporting grant (RC-2) remain deferred/inactive. `GET /recruitment-outcomes/incomplete` (H-5) is read-only reporting.
 
 | Domain | Method | Route | Purpose / Contract Section | Primary Role |
 | --- | --- | --- | --- | --- |
 | Recruitment Outcome | `GET` | `/recruitment-outcomes` | POST /api/v1/recruitment-outcomes *(grouped)* | COMPANY_SCOPE / ALLOW (Super Admin) / READ_ONLY (Auditor) |
 | Recruitment Outcome | `POST` | `/recruitment-outcomes` | POST /api/v1/recruitment-outcomes | COMPANY_SCOPE / ALLOW (Super Admin) |
+| Recruitment Outcome | `GET` | `/recruitment-outcomes/incomplete` | POST /api/v1/recruitment-outcomes *(grouped)* | COMPANY_SCOPE / ALLOW (Super Admin) / READ_ONLY (Auditor) |
 | Recruitment Outcome | `PATCH` | `/recruitment-outcomes/{outcome}` | POST /api/v1/recruitment-outcomes *(grouped)* | COMPANY_SCOPE / ALLOW (Super Admin) |
 
 ## SMTP Configuration
