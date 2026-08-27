@@ -3407,11 +3407,23 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 
 ### POST /api/v1/recruitment-outcomes
 
-**Surface:** `INERTIA_WEB`
+**Surface:** `INERTIA_WEB`  ·  **Active MVP route:** `POST /recruitment-outcomes`
+
+> **Recruitment Outcome Foundation v1 (OC-1, RC-2 — approved and CLOSED, 27 August 2026) activates create, list, and correction (`PATCH`) for `source_type = INTERNAL_APPLICATION` only.**
+>
+> **OC-1 — Internal Application outcome vocabulary.** For `source_type = INTERNAL_APPLICATION`, the `outcome` field accepts exactly `HIRED`, `REJECTED`, `WITHDRAWN`, `NO_SHOW` in Foundation v1 — enforced by request/runtime validation, **not** a database CHECK constraint (the `outcome` column itself remains an unconstrained `string(64)`, unchanged). No other string is accepted for `INTERNAL_APPLICATION` (`ACCEPTED`, `DECLINED`, `OTHER`, and every other value → `422 VALIDATION_FAILED`). This vocabulary is scoped to `INTERNAL_APPLICATION` only and must not be assumed to apply to a future `EXTERNAL_APPLY` runtime.
+>
+> **RC-2 — Career Center outcome scope for this milestone.** The matrix's existing Career Center `ALLOW` for "Record / correct recruitment outcome" and "List outcomes" (footnote 29) is **alumni/reporting scope** — i.e. `EXTERNAL_APPLY`. It is **not activated** for this `INTERNAL_APPLICATION`/`COMPANY`-only milestone: Career Center is `DENY` on every route below. The matrix grant itself is untouched and remains available for the future Alumni/External Apply Outcome milestone that activates it.
+>
+> **Actor set active in Foundation v1:** `COMPANY_RECRUITER`, `COMPANY_ADMIN` (`COMPANY_SCOPE`, create/list/correct), `SUPER_ADMIN` (`ALLOW`), `AUDITOR` (`READ_ONLY` — list only, no write). `CAREER_CENTER` (RC-2, above), `SELECTOR`, and `CANDIDATE` are `DENY`. `HR_ADMIN`/`CAMPUS_SCOPE` remains **deferred** — no Campus vacancy runtime exists.
+>
+> **`GET /recruitment-outcomes/incomplete` is NOT activated in this milestone.** No BRD/FSD/frozen source defines exact selection semantics for which `INTERNAL_APPLICATION` records without a recorded outcome count as "incomplete" (no status precondition, time window, or vacancy-lifecycle qualifier is specified anywhere — FR-NOTIF-004/FR-REP-001/FR-REP-002 name the reminder concept only). Inventing a selection rule (e.g. "every unreported application" or "terminal applications only") would be an unsourced business rule. See H-5 below; this route remains unrouted pending an explicit Product Owner decision.
+>
+> **`reported_by_source` is client-supplied**, not server-derived — the request table below and the schema `CHECK` constraint already fix its exact vocabulary (`CANDIDATE` \| `COMPANY` \| `CAMPUS_STAFF` \| `INTEGRATION`); no additional actor-to-source mapping is invented or enforced. `confirmed_by`/`confirmed_at` are **not** request fields — they are server-set to the authenticated actor and the record time, exactly the same "who/when performed this write" pattern already used for `offered_by_user_id`/`offered_at`.
 
 **Purpose:** Record the final recruitment outcome (FSD §4.3 *Outcome Rekrutmen*, FR-EXT-004, FR-REP-002).
 
-**Authentication:** Required. **Authorization:** Vacancy owner — `COMPANY_SCOPE` or `CAMPUS_SCOPE`; Career Center for alumni-outcome reporting within its scope.
+**Authentication:** Required. **Authorization:** Vacancy owner — `COMPANY_SCOPE` for `INTERNAL_APPLICATION`/`COMPANY` vacancies in Foundation v1; `CAMPUS_SCOPE` remains deferred; Career Center's alumni-outcome grant remains deferred/inactive for this milestone (RC-2).
 
 **Request:**
 
@@ -3427,25 +3439,29 @@ Entries are validated exactly as on create: frozen `requirement_type` membership
 **Validation:** **Exactly one source reference must be present** (INV-022). Both present or neither present → `422 OUTCOME_SOURCE_INVALID`.
 
 **Business Rules:**
-- The XOR is enforced in the Action **and** by a database CHECK constraint. Both-null and both-populated rows are unrepresentable.
+- The XOR is enforced in the Action **and** by a database CHECK constraint. Both-null and both-populated rows are unrepresentable. Foundation v1 accepts `source_type = INTERNAL_APPLICATION` only — a request with `source_type = EXTERNAL_APPLY` is rejected (no `EXTERNAL_APPLY` runtime exists yet), never silently reinterpreted.
 - **No `vacancy_id` or `candidate_profile_id` is accepted or stored.** Both are reachable through the single populated source reference; storing a second copy would create an authority able to contradict its own parent (decision D-4). Reporting joins through the source.
 - `reported_by_source` records *who reported*, distinct from `source_type` which records *which recruitment path*. Recording an outcome implies **no** two-way ATS integration.
+- `outcome` for `INTERNAL_APPLICATION` is validated against the OC-1 vocabulary (`HIRED`, `REJECTED`, `WITHDRAWN`, `NO_SHOW`) → `422 VALIDATION_FAILED` otherwise.
 - One outcome per source → `409 OUTCOME_ALREADY_RECORDED`.
-- **A missing outcome never blocks anything** (INV-014, FR-NOTIF-004). It produces a reminder and appears in `GET /api/v1/recruitment-outcomes/incomplete`. **No vacancy-creation endpoint in this contract reads `recruitment_outcomes`** — the gate does not exist and must never be added.
+- **No terminal-application gate.** Unlike Evaluation (EV-1) and Selection Schedule (SS-1), outcome recording is never denied because the application is terminal — a terminal lifecycle state is the expected, common case for reporting an outcome.
+- **No offer dependency.** Recording `HIRED` never requires an `ACCEPTED` offer to exist, never creates or mutates an offer, and never sets `applications.current_status`. Outcome recording is explicit reporting, not an offer or application side effect.
+- **Application status/stage independence.** Recording any outcome value never mutates `applications.current_status` or `current_stage_id`, and no source requires synchronizing them — application lifecycle and outcome reporting are independently maintained.
+- **A missing outcome never blocks anything** (INV-014, FR-NOTIF-004). **`GET /recruitment-outcomes/incomplete` is not activated in Foundation v1** — see the amendment note above and H-5. **No vacancy-creation endpoint in this contract reads `recruitment_outcomes`** — the gate does not exist and must never be added.
 
 **Success Response:** `201 Created`.
 
-**Error Codes:** `OUTCOME_SOURCE_INVALID` (422) · `OUTCOME_ALREADY_RECORDED` (409) · `AUTH_FORBIDDEN` (403) · `NOT_FOUND` (404).
+**Error Codes:** `OUTCOME_SOURCE_INVALID` (422) · `OUTCOME_ALREADY_RECORDED` (409) · `VALIDATION_FAILED` (422, OC-1 vocabulary) · `AUTH_FORBIDDEN` (403) · `NOT_FOUND` (404).
 
-**Side Effects:** Outcome row + audit. Paired routes: `GET /api/v1/recruitment-outcomes` (scoped list), `PATCH /api/v1/recruitment-outcomes/{outcome}` (authorized correction, audited — the source reference itself is **not** editable), `GET /api/v1/recruitment-outcomes/incomplete` (reminder context for FR-REP-001/002 dashboards).
+**Side Effects:** Outcome row + audit. Paired routes: `GET /recruitment-outcomes` (scoped list), `PATCH /recruitment-outcomes/{outcome}` (authorized correction, audited — the source reference itself is **not** editable; mutable fields are `outcome` (OC-1-validated), `reported_by_source`, `notes`). `GET /recruitment-outcomes/incomplete` is reserved and inactive (H-5).
 
 **Audit:** `recruitment_outcome_recorded` / `_updated`.
 
-**Notification / Outbox:** Reminder emails for incomplete outcomes are scheduler-driven (FR-NOTIF-004), not triggered here.
+**Notification / Outbox:** **NONE.** No candidate, company, or Career Center notification and no `email_outbox` row is queued by create or correction. Reminder emails for incomplete outcomes remain scheduler-driven future scope (FR-NOTIF-004), not triggered by this milestone.
 
-**Idempotency:** **REQUIRED.**
+**Idempotency:** **REQUIRED** on create, the same `IdempotencyGuard` pattern as every other `REQUIRED` operation in this contract — a missing key is accepted and simply forfeits replay protection, never a hard `4xx`. Not required on `PATCH` (no source names a correction idempotency requirement).
 
-**Concurrency:** Conditional uniqueness per source enforced by constraint.
+**Concurrency:** Conditional uniqueness per source enforced by constraint; the application row is additionally locked for `INTERNAL_APPLICATION` create so two concurrent creates for the same application serialize deterministically, with the partial unique index (`uq_recruitment_outcomes_application`) as the backstop — never a raw `SQLSTATE`.
 
 **Source Requirement:** FR-EXT-004, FR-NOTIF-004, FR-REP-002, FR-HR-005 · **INV-014, INV-022**
 
@@ -3881,6 +3897,9 @@ Nothing below is resolved by this document **except where a row is explicitly ma
 | 41 | ~~**OF-2 — candidate offer response transport**~~ | **CLOSED — approved 27 August 2026.** `POST /offers/{offer}/accept` and `POST /offers/{offer}/reject` are reclassified `INERTIA_WEB` for the MVP browser portal, the same SPEC-DOC-05/-07/-08/SS-9 pattern. Their `/api/v1` twins remain reserved and inactive. No Sanctum/PAT activation. `OWN` only — no proxy response exists for any other actor, including `SUPER_ADMIN`, which is `DENY` here despite its unconditional recruiter-side `ALLOW` |
 | 42 | ~~**RC-1 — RA-2 applicability to Offering**~~ | **CLOSED — approved 27 August 2026.** Create, update, and send all require the existing RA-2 processing gate (`ApplicationProcessingGate`, reused unmodified): owning company `VERIFIED` and vacancy ∈ `{PUBLISHED, CLOSED, EXPIRED}`, with no `SUPER_ADMIN` bypass. Candidate accept/reject are explicitly RA-2-exempt — this closes the RC-1 question Evaluation's own closure (row 38) explicitly left open for Offering |
 | 43 | **Offering Foundation v1 deferred scope** — `DEFERRED` | Offer revoke/withdraw/resend, the offer-expiry scheduler job, bulk offer, salary/currency/benefits/start-date fields (none exist in the schema), counter-offer, digital signature, document generation, payroll/onboarding/employment-contract workflow, Evaluation coupling, automatic Outcome creation, Campus recruitment runtime, External Apply, Selector offering capability, and the offer document upload mechanism (see the create section's amendment note) are all explicitly out of this milestone's scope. `PENDING_RESPONSE` remains a dormant, unproduced frozen status value — no trigger for it is invented. None of the deferred items are implemented merely because this document already describes them |
+| 44 | ~~**OC-1 — Internal Application outcome vocabulary**~~ | **CLOSED — approved 27 August 2026.** For `source_type = INTERNAL_APPLICATION`, `outcome` accepts exactly `HIRED`, `REJECTED`, `WITHDRAWN`, `NO_SHOW` in Foundation v1, enforced by request/runtime validation only — no database CHECK constraint or migration is added, and the `outcome` column remains an unconstrained `string(64)`. No other value is accepted (`422 VALIDATION_FAILED`). This vocabulary applies to `INTERNAL_APPLICATION` only and is never assumed for a future `EXTERNAL_APPLY` runtime |
+| 45 | ~~**RC-2 — Career Center outcome scope**~~ | **CLOSED — approved 27 August 2026.** The matrix's Career Center `ALLOW` for outcome record/correct/list (footnote 29) is alumni/reporting scope (`EXTERNAL_APPLY`). It is **not activated** for this `INTERNAL_APPLICATION`/`COMPANY`-only milestone — Career Center is `DENY` on every Recruitment Outcome Foundation v1 route. The matrix grant itself is untouched, reserved for a future Alumni/External Apply Outcome milestone |
+| 46 | **Recruitment Outcome Foundation v1 deferred scope** — `DEFERRED` | `EXTERNAL_APPLY` outcome runtime and vocabulary, Career Center alumni outcome recording, Campus (`HR_ADMIN`) outcome runtime, candidate outcome write, Selector outcome access, automatic outcome creation/correction, outcome delete, outcome history table, outcome approval workflow, bulk outcome mutation, a reminder scheduler, and Time-to-Fill persistence are all explicitly out of this milestone's scope. `GET /recruitment-outcomes/incomplete` is additionally unrouted pending H-5. None are implemented merely because this document already describes them |
 
 **Human-decision items carried from the ERD:**
 
@@ -3889,6 +3908,7 @@ Nothing below is resolved by this document **except where a row is explicitly ma
 | **H-2** | Vacancy-level outcome not recordable | `recruitment_outcomes` is candidate-level only. "Closed, no suitable candidate" has no endpoint, and none was invented |
 | **H-3** | Candidate revocation of a shared document | `application_documents.revoked_at` exists and is honoured on read, but **no candidate-facing revoke endpoint is specified** — FSD v1.1 does not define the action |
 | **H-4** | Audit IP / device metadata collection | `audit_logs` may include them **only where policy permits**; both remain optional throughout |
+| **H-5** | `GET /recruitment-outcomes/incomplete` selection semantics | No BRD/FSD/frozen source defines which `INTERNAL_APPLICATION` records without a recorded outcome count as "incomplete" — no status precondition, time window, or vacancy-lifecycle qualifier is specified. FR-NOTIF-004/FR-REP-001/FR-REP-002 name the reminder concept only, never its exact selection query. **Recruitment Outcome Foundation v1 leaves this route unrouted** rather than invent a selection rule; create, list, and correction are unaffected and fully active |
 
 ---
 
