@@ -11,6 +11,7 @@ use App\Domains\Recruitment\Outcome\Actions\CreateRecruitmentOutcome;
 use App\Domains\Recruitment\Outcome\Actions\UpdateRecruitmentOutcome;
 use App\Domains\Recruitment\Outcome\Exceptions\RecruitmentOutcomeNotFound;
 use App\Domains\Recruitment\Outcome\Presenters\RecruitmentOutcomePresenter;
+use App\Domains\Recruitment\Outcome\Queries\ListIncompleteRecruitmentOutcomes;
 use App\Domains\Recruitment\Outcome\Queries\ListRecruitmentOutcomes;
 use App\Domains\Recruitment\Outcome\Support\RecruitmentOutcomeScope;
 use App\Domains\Shared\Support\IdempotencyGuard;
@@ -24,11 +25,11 @@ use Illuminate\Http\Request;
 use Throwable;
 
 /**
- * Recruitment Outcome Foundation v1 (OC-1, RC-2, both approved and CLOSED).
- * `INTERNAL_APPLICATION`/`COMPANY` only — `CAMPUS_SCOPE` and Career Center's
- * alumni/reporting grant (RC-2) remain deferred/inactive. No candidate
- * route exists. `GET /recruitment-outcomes/incomplete` is deliberately not
- * routed (H-5, `API_CONTRACT.md`).
+ * Recruitment Outcome Foundation v1 (OC-1, RC-2, H-5, all approved and
+ * CLOSED). `INTERNAL_APPLICATION`/`COMPANY` only — `CAMPUS_SCOPE` and Career
+ * Center's alumni/reporting grant (RC-2) remain deferred/inactive. No
+ * candidate route exists. `incomplete` is read-only reporting — it never
+ * writes an outcome, mutates an application, or sends a notification.
  */
 final class RecruitmentOutcomeController extends Controller
 {
@@ -63,6 +64,19 @@ final class RecruitmentOutcomeController extends Controller
         $outcomes = $query->execute(RecruitmentOutcomeScope::operationalQueryFor($actor), $filters);
 
         return ContractResponse::success($request, $this->paginated($outcomes, RecruitmentOutcomePresenter::operational(...)));
+    }
+
+    public function incomplete(Request $request, ListIncompleteRecruitmentOutcomes $query): JsonResponse
+    {
+        $actor = $this->actor($request);
+
+        if (! $this->isReadActor($actor)) {
+            return $this->forbidden($request);
+        }
+
+        $applications = $query->execute(RecruitmentOutcomeScope::incompleteQueryFor($actor));
+
+        return ContractResponse::success($request, $this->paginated($applications, RecruitmentOutcomePresenter::incomplete(...)));
     }
 
     public function update(UpdateRecruitmentOutcomeRequest $request, int $outcome, UpdateRecruitmentOutcome $action): JsonResponse

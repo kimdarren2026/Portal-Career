@@ -40,9 +40,9 @@ final class RecruitmentOutcomeTest extends VacancyTestCase
 
         self::assertTrue($registered->contains('GET|HEAD recruitment-outcomes'));
         self::assertTrue($registered->contains('POST recruitment-outcomes'));
+        self::assertTrue($registered->contains('GET|HEAD recruitment-outcomes/incomplete'));
         self::assertTrue($registered->contains('PATCH recruitment-outcomes/{outcome}'));
 
-        self::assertFalse($registered->contains(fn (string $r): bool => str_contains($r, 'incomplete')));
         self::assertFalse($registered->contains(fn (string $r): bool => str_contains($r, 'DELETE') && str_contains($r, 'recruitment-outcome')));
         self::assertFalse($registered->contains(fn (string $r): bool => str_contains($r, 'api/v1') && str_contains($r, 'recruitment-outcome')));
     }
@@ -222,6 +222,28 @@ final class RecruitmentOutcomeTest extends VacancyTestCase
         self::assertSame(1, DB::table('audit_logs')->where('action', 'recruitment_outcome_recorded')->count());
     }
 
+    /**
+     * API_CONTRACT.md Part I §7's own global rule for every `REQUIRED`
+     * idempotency endpoint: "Missing on a required endpoint: Accepted, but
+     * the caller forfeits replay protection and the endpoint's own
+     * uniqueness rule becomes the only guard." A missing key is never a
+     * hard error — the second keyless request for the same application
+     * surfaces `OUTCOME_ALREADY_RECORDED`, never a raw SQLSTATE.
+     */
+    public function test_create_missing_idempotency_key_is_accepted_and_uniqueness_becomes_the_guard(): void
+    {
+        [$admin, , $vacancyId] = $this->openVacancy('outcome-idem-missing@example.test');
+        [$candidate] = $this->candidate('outcome-idem-missing-c@example.test');
+        $applicationId = $this->submitApplication($candidate, $vacancyId);
+
+        $this->actingAs($admin)->postJson('/recruitment-outcomes', $this->outcomePayload($applicationId))->assertCreated();
+        $this->actingAs($admin)->postJson('/recruitment-outcomes', $this->outcomePayload($applicationId, ['outcome' => 'REJECTED']))
+            ->assertStatus(409)->assertJsonPath('error.code', 'OUTCOME_ALREADY_RECORDED');
+
+        self::assertSame(1, DB::table('recruitment_outcomes')->where('application_id', $applicationId)->count());
+        self::assertSame(1, DB::table('audit_logs')->where('action', 'recruitment_outcome_recorded')->count());
+    }
+
     // ---------------------------------------------------------------
     // List
     // ---------------------------------------------------------------
@@ -366,6 +388,148 @@ final class RecruitmentOutcomeTest extends VacancyTestCase
     }
 
     // ---------------------------------------------------------------
+    // H-5 — incomplete outcome
+    // ---------------------------------------------------------------
+
+    public function test_incomplete_route_registered_and_authorization(): void
+    {
+        $registered = collect(Route::getRoutes())->map(
+            static fn ($route): string => strtoupper(implode('|', $route->methods())).' '.$route->uri(),
+        );
+        self::assertTrue($registered->contains('GET|HEAD recruitment-outcomes/incomplete'));
+
+        [$admin, , $vacancyId] = $this->openVacancy('outcome-incomplete-auth@example.test');
+        [$candidate] = $this->candidate('outcome-incomplete-auth-c@example.test');
+        $applicationId = $this->submitApplication($candidate, $vacancyId);
+        DB::table('applications')->where('id', $applicationId)->update(['current_status' => 'HIRED']);
+
+        $this->actingAs($admin)->getJson('/recruitment-outcomes/incomplete')->assertOk();
+
+        $superAdmin = $this->makeUser('outcome-incomplete-auth-super@example.test', UserStatus::Active);
+        $this->assignRole($superAdmin, RoleCode::SuperAdmin);
+        $this->actingAs($superAdmin)->getJson('/recruitment-outcomes/incomplete')->assertOk();
+
+        $auditor = $this->moderator('outcome-incomplete-auth-auditor@example.test', RoleCode::Auditor);
+        $this->actingAs($auditor)->getJson('/recruitment-outcomes/incomplete')->assertOk();
+
+        $careerCenter = $this->moderator('outcome-incomplete-auth-cc@example.test', RoleCode::CareerCenterStaff);
+        $this->actingAs($careerCenter)->getJson('/recruitment-outcomes/incomplete')->assertStatus(403);
+
+        $selector = $this->moderator('outcome-incomplete-auth-selector@example.test', RoleCode::Selector);
+        $this->actingAs($selector)->getJson('/recruitment-outcomes/incomplete')->assertStatus(403);
+
+        $this->actingAs($candidate)->getJson('/recruitment-outcomes/incomplete')->assertStatus(403);
+    }
+
+    public function test_incomplete_lists_terminal_applications_without_outcome(): void
+    {
+        [$admin, , $vacancyId] = $this->openVacancy('outcome-incomplete-pos@example.test');
+
+        $applicationIds = [];
+        foreach (['HIRED', 'REJECTED', 'WITHDRAWN', 'NO_SHOW'] as $index => $status) {
+            [$candidate] = $this->candidate("outcome-incomplete-pos-c{$index}@example.test");
+            $applicationId = $this->submitApplication($candidate, $vacancyId);
+            $this->setTerminalStatus($applicationId, $status);
+            $applicationIds[$status] = $applicationId;
+        }
+
+        $response = $this->actingAs($admin)->getJson('/recruitment-outcomes/incomplete')->assertOk();
+        $listed = collect($response->json('data.items'))->pluck('application_id')->all();
+
+        foreach ($applicationIds as $status => $applicationId) {
+            self::assertContains($applicationId, $listed, "Application with terminal status {$status} should be listed as incomplete.");
+        }
+    }
+
+    public function test_incomplete_excludes_non_terminal_applications(): void
+    {
+        [$admin, , $vacancyId] = $this->openVacancy('outcome-incomplete-neg@example.test');
+
+        $applicationIds = [];
+        foreach (['APPLIED', 'UNDER_REVIEW', 'SHORTLISTED'] as $index => $status) {
+            [$candidate] = $this->candidate("outcome-incomplete-neg-c{$index}@example.test");
+            $applicationId = $this->submitApplication($candidate, $vacancyId);
+            DB::table('applications')->where('id', $applicationId)->update(['current_status' => $status]);
+            $applicationIds[] = $applicationId;
+        }
+
+        $response = $this->actingAs($admin)->getJson('/recruitment-outcomes/incomplete')->assertOk();
+        $listed = collect($response->json('data.items'))->pluck('application_id')->all();
+
+        foreach ($applicationIds as $applicationId) {
+            self::assertNotContains($applicationId, $listed);
+        }
+    }
+
+    public function test_incomplete_excludes_terminal_application_with_recorded_outcome(): void
+    {
+        [$admin, , $vacancyId] = $this->openVacancy('outcome-incomplete-has@example.test');
+        [$candidate] = $this->candidate('outcome-incomplete-has-c@example.test');
+        $applicationId = $this->submitApplication($candidate, $vacancyId);
+        DB::table('applications')->where('id', $applicationId)->update(['current_status' => 'HIRED']);
+
+        $this->actingAs($admin)->postJson('/recruitment-outcomes', $this->outcomePayload($applicationId))->assertCreated();
+
+        $response = $this->actingAs($admin)->getJson('/recruitment-outcomes/incomplete')->assertOk();
+        $listed = collect($response->json('data.items'))->pluck('application_id')->all();
+        self::assertNotContains($applicationId, $listed);
+    }
+
+    public function test_incomplete_company_scope_excludes_foreign_company_and_revoked_membership(): void
+    {
+        [$adminA, $companyA, $vacancyIdA] = $this->openVacancy('outcome-incomplete-scope-a@example.test');
+        [, , $vacancyIdB] = $this->openVacancy('outcome-incomplete-scope-b@example.test');
+
+        [$candidateA] = $this->candidate('outcome-incomplete-scope-ca@example.test');
+        $applicationA = $this->submitApplication($candidateA, $vacancyIdA);
+        DB::table('applications')->where('id', $applicationA)->update(['current_status' => 'HIRED']);
+
+        [$candidateB] = $this->candidate('outcome-incomplete-scope-cb@example.test');
+        $applicationB = $this->submitApplication($candidateB, $vacancyIdB);
+        DB::table('applications')->where('id', $applicationB)->update(['current_status' => 'HIRED']);
+
+        $response = $this->actingAs($adminA)->getJson('/recruitment-outcomes/incomplete')->assertOk();
+        $listed = collect($response->json('data.items'))->pluck('application_id')->all();
+        self::assertContains($applicationA, $listed);
+        self::assertNotContains($applicationB, $listed);
+
+        $revoked = $this->recruiterMember($companyA->id, 'outcome-incomplete-scope-revoked@example.test');
+        DB::table('company_members')->where('company_id', $companyA->id)->where('user_id', $revoked->id)
+            ->update(['status' => 'REVOKED', 'revoked_at' => now()]);
+        $revokedResponse = $this->actingAs($revoked)->getJson('/recruitment-outcomes/incomplete')->assertOk();
+        self::assertSame([], $revokedResponse->json('data.items'));
+    }
+
+    public function test_incomplete_is_read_only_and_ignores_ra2_and_offer_dependency(): void
+    {
+        [$admin, $company, $vacancyId] = $this->openVacancy('outcome-incomplete-readonly@example.test');
+        [$candidate] = $this->candidate('outcome-incomplete-readonly-c@example.test');
+        $applicationId = $this->submitApplication($candidate, $vacancyId);
+        DB::table('applications')->where('id', $applicationId)->update(['current_status' => 'HIRED']);
+
+        // No offer of any kind exists for this application, and the company
+        // is de-verified / vacancy suspended after the fact — neither RA-2
+        // nor an offer requirement may hide a terminal, outcome-less row.
+        DB::table('companies')->where('id', $company->id)->update(['verification_status' => 'REJECTED']);
+        DB::table('vacancies')->where('id', $vacancyId)->update(['current_status' => 'SUSPENDED']);
+
+        $outcomesBefore = DB::table('recruitment_outcomes')->count();
+        $notificationsBefore = DB::table('notifications')->count();
+        $outboxBefore = DB::table('email_outbox')->count();
+        $auditBefore = DB::table('audit_logs')->where('action', 'recruitment_outcome_recorded')->count();
+
+        $response = $this->actingAs($admin)->getJson('/recruitment-outcomes/incomplete')->assertOk();
+        $listed = collect($response->json('data.items'))->pluck('application_id')->all();
+        self::assertContains($applicationId, $listed);
+
+        self::assertSame($outcomesBefore, DB::table('recruitment_outcomes')->count());
+        self::assertSame($notificationsBefore, DB::table('notifications')->count());
+        self::assertSame($outboxBefore, DB::table('email_outbox')->count());
+        self::assertSame($auditBefore, DB::table('audit_logs')->where('action', 'recruitment_outcome_recorded')->count());
+        self::assertSame('HIRED', DB::table('applications')->where('id', $applicationId)->value('current_status'));
+    }
+
+    // ---------------------------------------------------------------
     // Fixtures
     // ---------------------------------------------------------------
 
@@ -418,6 +582,14 @@ final class RecruitmentOutcomeTest extends VacancyTestCase
                 'accepted' => true,
             ],
         ])->assertCreated()->json('data.id');
+    }
+
+    private function setTerminalStatus(int $applicationId, string $status): void
+    {
+        DB::table('applications')->where('id', $applicationId)->update(array_merge(
+            ['current_status' => $status],
+            $status === 'WITHDRAWN' ? ['withdrawn_at' => now()] : [],
+        ));
     }
 
     /** @return array<string, mixed> */

@@ -183,11 +183,12 @@ Route::middleware(['auth', 'account.status'])->prefix('candidate')->name('candid
 | gate. accept/reject are OWN-only candidate actions with no proxy for any
 | other actor, including SUPER_ADMIN (OF-2).
 |
-| Recruitment Outcome Foundation v1 (OC-1, RC-2, approved and CLOSED) adds
-| the /recruitment-outcomes routes below. INTERNAL_APPLICATION only —
-| CAMPUS_SCOPE and Career Center's alumni/reporting grant (RC-2) remain
-| deferred/inactive. No candidate route exists. GET .../incomplete is
-| deliberately NOT routed (H-5, API_CONTRACT.md).
+| Recruitment Outcome Foundation v1 (OC-1, RC-2, H-5, approved and CLOSED)
+| adds the /recruitment-outcomes routes below, including .../incomplete
+| (H-5). INTERNAL_APPLICATION only — CAMPUS_SCOPE and Career Center's
+| alumni/reporting grant (RC-2) remain deferred/inactive. No candidate route
+| exists. incomplete is read-only reporting: it never creates an outcome,
+| mutates an application, or sends a notification.
 */
 Route::middleware(['auth', 'account.status'])->group(function (): void {
     Route::post('/vacancies/{vacancy}/applications', [ApplicationController::class, 'store'])
@@ -235,6 +236,7 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
 
     Route::prefix('recruitment-outcomes')->name('recruitment-outcomes.')->group(function (): void {
         Route::get('/', [RecruitmentOutcomeController::class, 'index'])->name('index');
+        Route::get('/incomplete', [RecruitmentOutcomeController::class, 'incomplete'])->name('incomplete');
         Route::post('/', [RecruitmentOutcomeController::class, 'store'])->name('store');
         Route::patch('/{outcome}', [RecruitmentOutcomeController::class, 'update'])->whereNumber('outcome')->name('update');
     });

@@ -44,9 +44,13 @@ final class SelectionScheduleTest extends VacancyTestCase
         self::assertTrue($registered->contains('PATCH schedules/{schedule}'));
         self::assertTrue($registered->contains('POST schedules/{schedule}/cancel'));
 
+        // Matched together with 'schedule' so this never trips on an unrelated
+        // route from another milestone whose URI happens to contain the same
+        // substring — e.g. Recruitment Outcome Foundation v1's
+        // `recruitment-outcomes/incomplete` (H-5) contains "complete".
         foreach (['complete', 'no-show', 'selector-assignment'] as $absent) {
             self::assertFalse(
-                $registered->contains(fn (string $r): bool => str_contains($r, $absent)),
+                $registered->contains(fn (string $r): bool => str_contains($r, $absent) && str_contains($r, 'schedule')),
                 "No route may exist for {$absent} in this milestone.",
             );
         }

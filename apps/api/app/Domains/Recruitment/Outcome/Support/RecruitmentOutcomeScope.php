@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domains\Recruitment\Outcome\Support;
 
+use App\Domains\Application\Models\Application;
 use App\Domains\Identity\Enums\RoleCode;
 use App\Domains\Identity\Models\User;
 use App\Domains\Recruitment\Outcome\Models\RecruitmentOutcome;
@@ -58,6 +59,25 @@ final class RecruitmentOutcomeScope
     public static function findFor(User $user, int $outcomeId): ?RecruitmentOutcome
     {
         return self::operationalQueryFor($user)->whereKey($outcomeId)->first();
+    }
+
+    /**
+     * H-5's incomplete query scopes `applications`, not `recruitment_outcomes`
+     * (a row that does not exist cannot be scoped through its own table).
+     * Same COMPANY_SCOPE / SUPER_ADMIN / AUDITOR shape as
+     * `operationalQueryFor()`, applied to `Application::query()` instead.
+     * No RA-2, no company-verification, and no vacancy-processable gate —
+     * this is a read-only report, not applicant processing.
+     */
+    public static function incompleteQueryFor(User $user): Builder
+    {
+        if (self::isSuperAdmin($user) || self::isAuditor($user)) {
+            return Application::query()->whereHas('vacancy', fn (Builder $q) => $q->where('ownership_type', 'COMPANY'));
+        }
+
+        return Application::query()
+            ->whereHas('vacancy', fn (Builder $q) => $q->where('ownership_type', 'COMPANY')
+                ->whereIn('company_id', self::activeCompanyIds($user)));
     }
 
     /** @return \Illuminate\Database\Query\Builder */
