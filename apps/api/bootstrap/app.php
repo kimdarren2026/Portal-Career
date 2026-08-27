@@ -50,6 +50,8 @@ use App\Domains\Recruitment\Offering\Exceptions\OfferExpired;
 use App\Domains\Recruitment\Offering\Exceptions\OfferInvalidTransition;
 use App\Domains\Recruitment\Offering\Exceptions\OfferNotFound;
 use App\Domains\Recruitment\Offering\Exceptions\OfferNotSent;
+use App\Domains\Recruitment\Outcome\Exceptions\OutcomeAlreadyRecorded;
+use App\Domains\Recruitment\Outcome\Exceptions\RecruitmentOutcomeNotFound;
 use App\Domains\Recruitment\SelectionSchedule\Exceptions\ScheduleInvalidTransition;
 use App\Domains\Recruitment\SelectionSchedule\Exceptions\ScheduleMethodDetailRequired;
 use App\Domains\Recruitment\SelectionSchedule\Exceptions\ScheduleTargetStageInactive;
@@ -189,6 +191,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(fn (OfferAlreadyResponded $exception, Request $request) => ContractResponse::error($request, 'OFFER_ALREADY_RESPONDED', 409, 'Offering ini sudah direspons.'));
         $exceptions->render(fn (OfferExpired $exception, Request $request) => ContractResponse::error($request, 'OFFER_EXPIRED', 409, 'Batas waktu respons offering sudah lewat.'));
         $exceptions->render(fn (OfferAlreadyAcceptedForApplication $exception, Request $request) => ContractResponse::error($request, 'OFFER_ALREADY_ACCEPTED_FOR_APPLICATION', 409, 'Sudah ada offering lain yang diterima untuk lamaran ini.'));
+        // Recruitment Outcome Foundation v1 (OC-1, RC-2).
+        $exceptions->render(fn (RecruitmentOutcomeNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Recruitment outcome tidak ditemukan.'));
+        $exceptions->render(fn (OutcomeAlreadyRecorded $exception, Request $request) => ContractResponse::error($request, 'OUTCOME_ALREADY_RECORDED', 409, 'Outcome sudah pernah dicatat untuk lamaran ini.'));
         $exceptions->render(fn (CandidateCollectionNotFoundException $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Data tidak ditemukan.'));
         $exceptions->render(fn (CandidateDocumentNotOwnedException $exception, Request $request) => ContractResponse::error($request, 'DOCUMENT_NOT_OWNED', 403, 'Dokumen bukan milik kandidat ini.'));
         $exceptions->render(fn (CandidateDocumentUnsupportedMediaTypeException $exception, Request $request) => ContractResponse::error($request, 'UNSUPPORTED_MEDIA_TYPE', 415, 'Dokumen harus berupa PDF.'));

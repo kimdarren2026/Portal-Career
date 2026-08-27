@@ -13,6 +13,7 @@ use App\Http\Controllers\Web\CompanyMemberController;
 use App\Http\Controllers\Web\EvaluationController;
 use App\Http\Controllers\Web\OfferController;
 use App\Http\Controllers\Web\PublicVacancyController;
+use App\Http\Controllers\Web\RecruitmentOutcomeController;
 use App\Http\Controllers\Web\RecruitmentStageController;
 use App\Http\Controllers\Web\SelectionScheduleController;
 use App\Http\Controllers\Web\VacancyController;
@@ -181,6 +182,12 @@ Route::middleware(['auth', 'account.status'])->prefix('candidate')->name('candid
 | create (nested here) plus the /offers routes below. No email-verified
 | gate. accept/reject are OWN-only candidate actions with no proxy for any
 | other actor, including SUPER_ADMIN (OF-2).
+|
+| Recruitment Outcome Foundation v1 (OC-1, RC-2, approved and CLOSED) adds
+| the /recruitment-outcomes routes below. INTERNAL_APPLICATION only —
+| CAMPUS_SCOPE and Career Center's alumni/reporting grant (RC-2) remain
+| deferred/inactive. No candidate route exists. GET .../incomplete is
+| deliberately NOT routed (H-5, API_CONTRACT.md).
 */
 Route::middleware(['auth', 'account.status'])->group(function (): void {
     Route::post('/vacancies/{vacancy}/applications', [ApplicationController::class, 'store'])
@@ -224,6 +231,12 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
         Route::post('/{offer}/send', [OfferController::class, 'send'])->whereNumber('offer')->name('send');
         Route::post('/{offer}/accept', [OfferController::class, 'accept'])->whereNumber('offer')->name('accept');
         Route::post('/{offer}/reject', [OfferController::class, 'reject'])->whereNumber('offer')->name('reject');
+    });
+
+    Route::prefix('recruitment-outcomes')->name('recruitment-outcomes.')->group(function (): void {
+        Route::get('/', [RecruitmentOutcomeController::class, 'index'])->name('index');
+        Route::post('/', [RecruitmentOutcomeController::class, 'store'])->name('store');
+        Route::patch('/{outcome}', [RecruitmentOutcomeController::class, 'update'])->whereNumber('outcome')->name('update');
     });
 });
 
