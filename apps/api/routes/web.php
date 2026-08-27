@@ -10,6 +10,7 @@ use App\Http\Controllers\Web\CandidatePageController;
 use App\Http\Controllers\Web\CandidateProfileController;
 use App\Http\Controllers\Web\CompanyController;
 use App\Http\Controllers\Web\CompanyMemberController;
+use App\Http\Controllers\Web\EvaluationController;
 use App\Http\Controllers\Web\PublicVacancyController;
 use App\Http\Controllers\Web\RecruitmentStageController;
 use App\Http\Controllers\Web\SelectionScheduleController;
@@ -169,6 +170,11 @@ Route::middleware(['auth', 'account.status'])->prefix('candidate')->name('candid
 | approved and CLOSED) adds schedule create (nested here) plus the
 | /schedules routes below. No email-verified gate: the schedule contract
 | states "Authentication: Required" without one, same as transition/move-stage.
+|
+| Evaluation / Scoring Foundation v1 (EV-1, EV-2, RC-1, approved and CLOSED)
+| adds evaluation create/list (nested here) plus the /evaluations routes
+| below. No email-verified gate, same rationale as schedules. Evaluations
+| are never candidate-visible — no candidate route exists for this domain.
 */
 Route::middleware(['auth', 'account.status'])->group(function (): void {
     Route::post('/vacancies/{vacancy}/applications', [ApplicationController::class, 'store'])
@@ -185,6 +191,10 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
             ->whereNumber('application')->name('move-stage');
         Route::post('/{application}/schedules', [SelectionScheduleController::class, 'store'])
             ->whereNumber('application')->name('schedules.store');
+        Route::get('/{application}/evaluations', [EvaluationController::class, 'index'])
+            ->whereNumber('application')->name('evaluations.index');
+        Route::post('/{application}/evaluations', [EvaluationController::class, 'store'])
+            ->whereNumber('application')->name('evaluations.store');
     });
 
     Route::prefix('schedules')->name('schedules.')->group(function (): void {
@@ -193,6 +203,12 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
         Route::get('/{schedule}/history', [SelectionScheduleController::class, 'history'])->whereNumber('schedule')->name('history');
         Route::patch('/{schedule}', [SelectionScheduleController::class, 'reschedule'])->whereNumber('schedule')->name('reschedule');
         Route::post('/{schedule}/cancel', [SelectionScheduleController::class, 'cancel'])->whereNumber('schedule')->name('cancel');
+    });
+
+    Route::prefix('evaluations')->name('evaluations.')->group(function (): void {
+        Route::get('/{evaluation}', [EvaluationController::class, 'show'])->whereNumber('evaluation')->name('show');
+        Route::patch('/{evaluation}', [EvaluationController::class, 'update'])->whereNumber('evaluation')->name('update');
+        Route::post('/{evaluation}/submit', [EvaluationController::class, 'submit'])->whereNumber('evaluation')->name('submit');
     });
 });
 

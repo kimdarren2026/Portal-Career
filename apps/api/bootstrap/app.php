@@ -40,6 +40,10 @@ use App\Domains\Company\Exceptions\CompanyMemberNotFound;
 use App\Domains\Company\Exceptions\CompanyNotFound;
 use App\Domains\Company\Exceptions\CompanyNotPublic;
 use App\Domains\Company\Exceptions\LastCompanyAdmin;
+use App\Domains\Recruitment\Evaluation\Exceptions\EvaluationAlreadySubmitted;
+use App\Domains\Recruitment\Evaluation\Exceptions\EvaluationNotFound;
+use App\Domains\Recruitment\Evaluation\Exceptions\EvaluationNotOwned;
+use App\Domains\Recruitment\Evaluation\Exceptions\EvaluationStageTargetInactive;
 use App\Domains\Recruitment\SelectionSchedule\Exceptions\ScheduleInvalidTransition;
 use App\Domains\Recruitment\SelectionSchedule\Exceptions\ScheduleMethodDetailRequired;
 use App\Domains\Recruitment\SelectionSchedule\Exceptions\ScheduleTargetStageInactive;
@@ -167,6 +171,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(fn (ScheduleInvalidTransition $exception, Request $request) => ContractResponse::error($request, 'SCHEDULE_INVALID_TRANSITION', 409, 'Aksi tidak sah dari status jadwal saat ini.'));
         $exceptions->render(fn (ScheduleTargetStageInactive $exception, Request $request) => ContractResponse::error($request, 'VALIDATION_FAILED', 422, 'Tahap yang dirujuk tidak aktif.'));
         $exceptions->render(fn (SelectionScheduleStaleVersion $exception, Request $request) => ContractResponse::error($request, 'STALE_VERSION', 409, 'Versi jadwal sudah berubah. Muat ulang sebelum menyimpan.'));
+        // Evaluation / Scoring Foundation v1 (EV-1, EV-2, RC-1).
+        $exceptions->render(fn (EvaluationNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Evaluasi tidak ditemukan.'));
+        $exceptions->render(fn (EvaluationStageTargetInactive $exception, Request $request) => ContractResponse::error($request, 'VALIDATION_FAILED', 422, 'Tahap yang dipilih tidak aktif.'));
+        $exceptions->render(fn (EvaluationAlreadySubmitted $exception, Request $request) => ContractResponse::error($request, 'EVALUATION_ALREADY_SUBMITTED', 409, 'Evaluasi sudah difinalisasi dan tidak dapat diubah.'));
+        $exceptions->render(fn (EvaluationNotOwned $exception, Request $request) => ContractResponse::error($request, 'EVALUATION_NOT_OWNED', 403, 'Evaluasi ini milik evaluator lain.'));
         $exceptions->render(fn (CandidateCollectionNotFoundException $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Data tidak ditemukan.'));
         $exceptions->render(fn (CandidateDocumentNotOwnedException $exception, Request $request) => ContractResponse::error($request, 'DOCUMENT_NOT_OWNED', 403, 'Dokumen bukan milik kandidat ini.'));
         $exceptions->render(fn (CandidateDocumentUnsupportedMediaTypeException $exception, Request $request) => ContractResponse::error($request, 'UNSUPPORTED_MEDIA_TYPE', 415, 'Dokumen harus berupa PDF.'));
