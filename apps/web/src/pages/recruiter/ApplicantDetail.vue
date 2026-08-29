@@ -10,7 +10,7 @@ import { Head, Link, router } from '@inertiajs/vue3'
 import { computed, reactive, ref } from 'vue'
 import AppShell from '@/layouts/AppShell.vue'
 import { authRequest, errorText, newIdempotencyKey } from '@/lib/auth'
-import { allowedTransitions, applicationStatusBadgeClass, applicationStatusLabel, formatDateTime, scheduleMethodLabel, scheduleStatusLabel, statusLabel } from '@/lib/labels'
+import { allowedTransitions, applicationStatusBadgeClass, applicationStatusLabel, formatDateTime, scheduleMethodLabel, scheduleStatusLabel, statusLabel, zonedWallTimeToIso } from '@/lib/labels'
 
 interface HistoryEvent { event_type: string; from_status: string | null; to_status: string | null; actor_user_id: number | null; reason: string | null; candidate_visibility: string; candidate_visible_note: string | null; occurred_at: string | null }
 interface DocumentShare { id: number; snapshot_name: string; shared_at: string | null }
@@ -97,8 +97,10 @@ async function submitSchedule() {
         {
             recruitment_stage_id: Number(scheduleForm.recruitment_stage_id),
             selection_type: scheduleForm.selection_type,
-            starts_at: scheduleForm.starts_at,
-            ends_at: scheduleForm.ends_at || undefined,
+            // `datetime-local` is wall-clock in `timezone`; the frozen contract
+            // stores an absolute UTC instant, so convert before submitting.
+            starts_at: zonedWallTimeToIso(scheduleForm.starts_at, scheduleForm.timezone),
+            ends_at: scheduleForm.ends_at ? zonedWallTimeToIso(scheduleForm.ends_at, scheduleForm.timezone) : undefined,
             timezone: scheduleForm.timezone,
             method: scheduleForm.method,
             location: scheduleForm.method === 'ON_SITE' ? scheduleForm.location : undefined,

@@ -10,3 +10,12 @@
  * component layer may override Stitch as the product design authority.
  */
 @import 'tailwindcss';
+
+/*
+ * Vite runs from `apps/api`, so Tailwind's automatic content detection is
+ * rooted there and never sees the Vue/TS source in this directory (a sibling
+ * of the Vite root). Point it at the frontend source tree explicitly so the
+ * utility classes the components already declare are actually generated.
+ * ADR-004: "Production compiles Tailwind locally."
+ */
+@source './**/*.{vue,ts}';

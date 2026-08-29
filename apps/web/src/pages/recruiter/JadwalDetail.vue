@@ -4,7 +4,7 @@ import { Head, Link, router } from '@inertiajs/vue3'
 import { reactive, ref } from 'vue'
 import AppShell from '@/layouts/AppShell.vue'
 import { authRequest, errorText, newIdempotencyKey } from '@/lib/auth'
-import { formatDateTime, scheduleEventLabel, scheduleMethodLabel, scheduleStatusLabel, statusLabel } from '@/lib/labels'
+import { formatDateTime, isoToZonedInput, scheduleEventLabel, scheduleMethodLabel, scheduleStatusLabel, statusLabel, zonedWallTimeToIso } from '@/lib/labels'
 
 interface ScheduleDetail {
     id: number
@@ -29,8 +29,10 @@ const props = defineProps<{ schedule: ScheduleDetail; history: HistoryEvent[]; a
 const canMutate = props.schedule.status === 'SCHEDULED' || props.schedule.status === 'RESCHEDULED'
 
 const form = reactive({
-    starts_at: props.schedule.starts_at ? props.schedule.starts_at.slice(0, 16) : '',
-    ends_at: props.schedule.ends_at ? props.schedule.ends_at.slice(0, 16) : '',
+    // Prefill the `datetime-local` inputs with the wall-clock time in the
+    // schedule's own zone, not the raw UTC digits of the stored instant.
+    starts_at: isoToZonedInput(props.schedule.starts_at, props.schedule.timezone),
+    ends_at: isoToZonedInput(props.schedule.ends_at, props.schedule.timezone),
     timezone: props.schedule.timezone,
     method: props.schedule.method,
     location: props.schedule.location ?? '',
@@ -48,8 +50,10 @@ async function reschedule() {
     submitting.value = true
     message.value = ''
     const payload: Record<string, unknown> = {
-        starts_at: form.starts_at || undefined,
-        ends_at: form.ends_at || null,
+        // Convert wall-clock-in-`timezone` back to the absolute UTC instant the
+        // frozen contract persists.
+        starts_at: form.starts_at ? zonedWallTimeToIso(form.starts_at, form.timezone) : undefined,
+        ends_at: form.ends_at ? zonedWallTimeToIso(form.ends_at, form.timezone) : null,
         timezone: form.timezone || undefined,
         method: form.method || undefined,
         location: form.method === 'ON_SITE' ? form.location : null,

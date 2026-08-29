@@ -95,6 +95,14 @@ return Application::configure(basePath: dirname(__DIR__))
         // audit_logs.correlation_id (FSD §9.3, API_CONTRACT.md Part I §10).
         $middleware->append(AssignCorrelationId::class);
 
+        // Guest hitting an `auth`-guarded browser page: send them to the login
+        // page. The frozen login route is named `auth.login.page`, not `login`,
+        // so the framework default `route('login')` throws RouteNotFoundException
+        // (HTTP 500) for every Inertia page visit by an unauthenticated user.
+        // A path here is resolved without a route name. JSON callers still get
+        // the existing 401 `ContractResponse` envelope via the exception render.
+        $middleware->redirectGuestsTo('/login');
+
         // INERTIA_WEB surface: session cookie + CSRF (ADR-001, ADR-005).
         $middleware->web(append: [
             HandleInertiaRequests::class,
