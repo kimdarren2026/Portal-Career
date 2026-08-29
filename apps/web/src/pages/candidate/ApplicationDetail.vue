@@ -4,9 +4,9 @@ import { Head, Link, router } from '@inertiajs/vue3'
 import { computed, ref } from 'vue'
 import AppShell from '@/layouts/AppShell.vue'
 import { authRequest, errorText, newIdempotencyKey } from '@/lib/auth'
-import { applicationStatusBadgeClass, applicationStatusLabel, formatDateTime, statusLabel } from '@/lib/labels'
+import { applicationStatusBadgeClass, applicationStatusLabel, candidateHistoryLabel, formatDateTime, statusLabel } from '@/lib/labels'
 
-interface HistoryEvent { event_type: string; from_status: string | null; to_status: string | null; candidate_visible_note: string | null; occurred_at: string | null }
+interface HistoryEvent { event_type: string; from_status: string | null; to_status: string | null; stage_label: string | null; candidate_visible_note: string | null; occurred_at: string | null }
 interface DocumentShare { id: number; snapshot_name: string; shared_at: string | null }
 interface ScreeningAnswer { screening_question_id: number; answer_text: string | null; answer_boolean: boolean | null; answer_number: number | null; answer_option: string | null }
 
@@ -71,7 +71,7 @@ async function withdraw() {
             <p v-if="!application.history?.length" class="mt-3 text-sm text-slate-500">Belum ada riwayat status yang dapat ditampilkan.</p>
             <ol v-else class="mt-4 space-y-4 border-l-2 border-slate-200 pl-4">
                 <li v-for="(event, index) in application.history" :key="index">
-                    <p class="text-sm font-semibold text-slate-800">{{ statusLabel(applicationStatusLabel, event.to_status) }}</p>
+                    <p class="text-sm font-semibold text-slate-800">{{ candidateHistoryLabel(event) }}</p>
                     <p class="text-xs text-slate-500">{{ formatDateTime(event.occurred_at) }}</p>
                     <p v-if="event.candidate_visible_note" class="mt-1 text-sm text-slate-600">{{ event.candidate_visible_note }}</p>
                 </li>

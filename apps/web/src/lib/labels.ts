@@ -85,13 +85,17 @@ export const employmentTypeLabel: Record<string, string> = {
 }
 
 /**
- * FE-5 (approved PO decision, 29 August 2026 — API_CONTRACT.md Part X row 51).
- * Approves the display label for `HYBRID` ONLY. `vacancies.workplace_mode`
- * remains vocabulary-pending; every other value falls through to its raw
- * string via `statusLabel`.
+ * FE-7 (approved PO decision, 29 August 2026 — API_CONTRACT.md Part X row 53,
+ * completing FE-5). The v1 `vacancies.workplace_mode` display vocabulary,
+ * closed for exactly these three values. The single authoritative frontend
+ * map — used for vacancy badges, metadata and filter option labels alike.
+ * Stored/request values are unchanged; an unknown value falls through to its
+ * raw string via `statusLabel`, never a manufactured label.
  */
 export const workplaceModeLabel: Record<string, string> = {
+    ONSITE: 'On-site',
     HYBRID: 'Hybrid',
+    REMOTE: 'Remote',
 }
 
 /**
@@ -105,6 +109,21 @@ export const workplaceModeLabel: Record<string, string> = {
  */
 export function applicationHistoryLabel(event: { event_type?: string | null; to_status?: string | null }): string {
     if (event.event_type === 'STAGE_CHANGED') return 'Tahap Seleksi Diubah'
+    return statusLabel(applicationStatusLabel, event.to_status)
+}
+
+/**
+ * Candidate application-history row label. A candidate never sees an internal
+ * stage name (FR-APP-004): for a candidate-visible `STAGE_CHANGED` the row
+ * shows the target stage's `candidate_visible_label` verbatim — the same
+ * `stage_label` the backend already puts in the `application.stage_moved`
+ * notification — falling back to the bare domain noun "Tahap Seleksi" only
+ * when the recruiter left that label unset. INTERNAL stage events never reach
+ * the candidate payload (backend `ApplicationPresenter` filter). Every other
+ * event type keeps its resulting-status label.
+ */
+export function candidateHistoryLabel(event: { event_type?: string | null; to_status?: string | null; stage_label?: string | null }): string {
+    if (event.event_type === 'STAGE_CHANGED') return event.stage_label || 'Tahap Seleksi'
     return statusLabel(applicationStatusLabel, event.to_status)
 }
 

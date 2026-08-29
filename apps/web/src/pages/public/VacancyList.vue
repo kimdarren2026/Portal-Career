@@ -93,9 +93,7 @@ function goToPage(page: number) {
                 </select>
                 <select v-model="form.workplace_mode" class="rounded-md border-slate-300 text-sm">
                     <option value="">Semua Sistem Kerja</option>
-                    <option value="ONSITE">On-site</option>
-                    <option value="HYBRID">Hybrid</option>
-                    <option value="REMOTE">Remote</option>
+                    <option v-for="(label, code) in workplaceModeLabel" :key="code" :value="code">{{ label }}</option>
                 </select>
                 <button type="submit" class="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white sm:col-span-4 sm:w-auto sm:justify-self-start">Terapkan Filter</button>
             </form>

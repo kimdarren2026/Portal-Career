@@ -386,6 +386,76 @@ final class ApplicationStageMovementTest extends VacancyTestCase
     }
 
     // ---------------------------------------------------------------
+    // Candidate history presentation (candidate-visible STAGE_CHANGED)
+    // ---------------------------------------------------------------
+
+    public function test_candidate_history_visible_stage_change_carries_candidate_visible_label_never_internal_name(): void
+    {
+        [$admin, , $vacancyId] = $this->openVacancy('ms-cand-hist@example.test');
+        $stageA = $this->createStage($admin, $vacancyId, 'A', 0);
+        $stageB = $this->createStage($admin, $vacancyId, 'MS-INTERNAL-STAGE-NAME-ZZ', 1, true, 'Wawancara');
+        [$candidate] = $this->candidate('ms-cand-hist-c@example.test');
+        $applicationId = $this->submitApplication($candidate, $vacancyId);
+        DB::table('applications')->where('id', $applicationId)->update(['current_stage_id' => $stageA]);
+
+        $this->actingAs($admin)->postJson("/applications/{$applicationId}/move-stage", [
+            'to_stage_id' => $stageB, 'candidate_visibility' => 'VISIBLE', 'reason' => 'Catatan internal rahasia.',
+        ])->assertOk();
+
+        $detail = $this->actingAs($candidate)->getJson("/applications/{$applicationId}?include=history")->assertOk();
+
+        $stageEvents = collect($detail->json('data.history'))->where('event_type', 'STAGE_CHANGED')->values();
+        self::assertCount(1, $stageEvents);
+        self::assertSame('Wawancara', $stageEvents[0]['stage_label']);
+        self::assertNull($stageEvents[0]['to_status']);
+        self::assertNull($stageEvents[0]['from_status']);
+
+        $body = $detail->getContent();
+        self::assertStringNotContainsString('MS-INTERNAL-STAGE-NAME-ZZ', $body);
+        self::assertStringNotContainsString('Catatan internal rahasia.', $body);
+        self::assertStringNotContainsString('actor_user_id', $body);
+    }
+
+    public function test_candidate_history_internal_stage_change_is_absent(): void
+    {
+        [$admin, , $vacancyId] = $this->openVacancy('ms-cand-hist-int@example.test');
+        $stageA = $this->createStage($admin, $vacancyId, 'A', 0);
+        $stageB = $this->createStage($admin, $vacancyId, 'B', 1, true, 'Wawancara');
+        [$candidate] = $this->candidate('ms-cand-hist-int-c@example.test');
+        $applicationId = $this->submitApplication($candidate, $vacancyId);
+        DB::table('applications')->where('id', $applicationId)->update(['current_stage_id' => $stageA]);
+
+        $this->actingAs($admin)->postJson("/applications/{$applicationId}/move-stage", [
+            'to_stage_id' => $stageB, 'candidate_visibility' => 'INTERNAL',
+        ])->assertOk();
+
+        $detail = $this->actingAs($candidate)->getJson("/applications/{$applicationId}?include=history")->assertOk();
+
+        self::assertEmpty(collect($detail->json('data.history'))->where('event_type', 'STAGE_CHANGED')->all());
+    }
+
+    public function test_candidate_history_visible_stage_change_without_label_has_null_stage_label(): void
+    {
+        [$admin, , $vacancyId] = $this->openVacancy('ms-cand-hist-nolabel@example.test');
+        $stageA = $this->createStage($admin, $vacancyId, 'A', 0);
+        $stageB = $this->createStage($admin, $vacancyId, 'MS-INTERNAL-NOLABEL-ZZ', 1);
+        [$candidate] = $this->candidate('ms-cand-hist-nolabel-c@example.test');
+        $applicationId = $this->submitApplication($candidate, $vacancyId);
+        DB::table('applications')->where('id', $applicationId)->update(['current_stage_id' => $stageA]);
+
+        $this->actingAs($admin)->postJson("/applications/{$applicationId}/move-stage", [
+            'to_stage_id' => $stageB, 'candidate_visibility' => 'VISIBLE',
+        ])->assertOk();
+
+        $detail = $this->actingAs($candidate)->getJson("/applications/{$applicationId}?include=history")->assertOk();
+
+        $stageEvents = collect($detail->json('data.history'))->where('event_type', 'STAGE_CHANGED')->values();
+        self::assertCount(1, $stageEvents);
+        self::assertNull($stageEvents[0]['stage_label']);
+        self::assertStringNotContainsString('MS-INTERNAL-NOLABEL-ZZ', $detail->getContent());
+    }
+
+    // ---------------------------------------------------------------
     // Notification
     // ---------------------------------------------------------------
 
