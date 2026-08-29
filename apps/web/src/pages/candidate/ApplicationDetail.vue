@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /** Mirrors design/stitch/candidate/detail-lamaran's structure — not a pixel reproduction. */
 import { Head, Link, router } from '@inertiajs/vue3'
-import { computed, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import AppShell from '@/layouts/AppShell.vue'
 import { authRequest, errorText, newIdempotencyKey } from '@/lib/auth'
 import { applicationStatusBadgeClass, applicationStatusLabel, candidateHistoryLabel, formatDateTime, statusLabel } from '@/lib/labels'
@@ -23,13 +23,30 @@ interface ApplicationDetail {
     documents?: DocumentShare[]
     screening_answers?: ScreeningAnswer[]
 }
+/** OfferPresenter::candidate — the frozen candidate allow-list (no offered_by, no rejection_reason, no internal notes). */
+interface CandidateOffer { id: number; status: string; offered_at: string | null; response_deadline: string | null; note: string | null; sent_at: string | null; responded_at: string | null }
 
-const props = defineProps<{ application: ApplicationDetail }>()
+const props = defineProps<{ application: ApplicationDetail; offers?: CandidateOffer[] }>()
 
 const withdrawing = ref(false)
 const withdrawReason = ref('')
 const message = ref('')
 const showWithdrawForm = ref(false)
+
+const responding = ref(false)
+const rejectReason = reactive<Record<number, string>>({})
+const showReject = ref<number | null>(null)
+
+async function respondOffer(id: number, action: 'accept' | 'reject') {
+    responding.value = true
+    message.value = ''
+    const body = action === 'reject' && rejectReason[id] ? { rejection_reason: rejectReason[id] } : {}
+    const { response, payload } = await authRequest(`/offers/${id}/${action}`, body, 'POST', { 'Idempotency-Key': newIdempotencyKey() })
+    responding.value = false
+    if (!response.ok) { message.value = errorText(payload); return }
+    showReject.value = null
+    router.reload()
+}
 
 const canWithdraw = computed(() => !['WITHDRAWN', 'HIRED', 'REJECTED', 'NO_SHOW'].includes(props.application.current_status))
 
@@ -76,6 +93,49 @@ async function withdraw() {
                     <p v-if="event.candidate_visible_note" class="mt-1 text-sm text-slate-600">{{ event.candidate_visible_note }}</p>
                 </li>
             </ol>
+        </section>
+
+        <section v-if="offers?.length" class="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h2 class="text-lg font-semibold text-[#002045]">Penawaran</h2>
+            <ul class="mt-3 space-y-4">
+                <li v-for="offer in offers" :key="offer.id" class="rounded-lg border border-slate-200 p-4">
+                    <dl class="space-y-1 text-sm text-slate-600">
+                        <div v-if="offer.sent_at"><dt class="inline text-slate-500">Dikirim:</dt> {{ formatDateTime(offer.sent_at) }}</div>
+                        <div v-if="offer.response_deadline"><dt class="inline text-slate-500">Batas respons:</dt> {{ formatDateTime(offer.response_deadline) }}</div>
+                        <div v-if="offer.responded_at"><dt class="inline text-slate-500">Anda merespons:</dt> {{ formatDateTime(offer.responded_at) }}</div>
+                    </dl>
+                    <p v-if="offer.note" class="mt-2 whitespace-pre-line rounded-lg bg-slate-50 p-3 text-sm text-slate-700">{{ offer.note }}</p>
+
+                    <div v-if="offer.status === 'SENT' || offer.status === 'PENDING_RESPONSE'" class="mt-4">
+                        <div v-if="showReject !== offer.id" class="flex flex-wrap gap-3">
+                            <button type="button" :disabled="responding" class="rounded-lg bg-[#0061a5] px-4 py-2 text-sm font-semibold text-white hover:bg-[#004172] disabled:opacity-60" @click="respondOffer(offer.id, 'accept')">
+                                {{ responding ? 'Memproses…' : 'Terima Penawaran' }}
+                            </button>
+                            <button type="button" :disabled="responding" class="rounded-lg border border-[#93000a] px-4 py-2 text-sm font-semibold text-[#93000a] hover:bg-red-50 disabled:opacity-60" @click="showReject = offer.id">
+                                Tolak Penawaran
+                            </button>
+                        </div>
+                        <form v-else class="space-y-3" @submit.prevent="respondOffer(offer.id, 'reject')">
+                            <label class="block text-sm font-medium text-slate-700">Alasan penolakan (opsional)
+                                <textarea v-model="rejectReason[offer.id]" rows="3" maxlength="1000" class="mt-1 block w-full rounded-lg border-slate-300 focus:border-[#0061a5] focus:ring-[#0061a5]" />
+                            </label>
+                            <div class="flex gap-3">
+                                <button type="submit" :disabled="responding" class="rounded-lg bg-[#93000a] px-4 py-2 text-sm font-semibold text-white hover:bg-red-800 disabled:opacity-60">{{ responding ? 'Memproses…' : 'Konfirmasi Penolakan' }}</button>
+                                <button type="button" class="text-sm font-medium text-slate-600 hover:underline" @click="showReject = null">Batal</button>
+                            </div>
+                        </form>
+                    </div>
+                    <p v-else-if="offer.status === 'ACCEPTED'" class="mt-3 rounded-lg bg-green-50 p-3 text-sm text-green-800">
+                        Anda telah menerima penawaran ini. Status lamaran Anda kini {{ statusLabel(applicationStatusLabel, 'HIRED') }}.
+                    </p>
+                    <p v-else-if="offer.status === 'REJECTED'" class="mt-3 rounded-lg bg-slate-50 p-3 text-sm text-slate-600">
+                        Anda telah menolak penawaran ini.
+                    </p>
+                    <p v-else-if="offer.status === 'EXPIRED'" class="mt-3 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">
+                        Batas waktu respons penawaran ini sudah lewat.
+                    </p>
+                </li>
+            </ul>
         </section>
 
         <section v-if="application.documents?.length" class="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">

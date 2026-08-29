@@ -9,6 +9,10 @@ use App\Domains\Application\Queries\GetCompanyApplication;
 use App\Domains\Application\Queries\ListCompanyApplications;
 use App\Domains\Application\Support\RecruiterApplicationScope;
 use App\Domains\Identity\Models\User;
+use App\Domains\Recruitment\Evaluation\Presenters\EvaluationPresenter;
+use App\Domains\Recruitment\Evaluation\Support\EvaluationScope;
+use App\Domains\Recruitment\Offering\Presenters\OfferPresenter;
+use App\Domains\Recruitment\Offering\Support\OfferScope;
 use App\Domains\Recruitment\SelectionSchedule\Presenters\SelectionSchedulePresenter;
 use App\Domains\Recruitment\SelectionSchedule\Support\SelectionScheduleScope;
 use App\Domains\Vacancy\Support\VacancyScope;
@@ -88,10 +92,26 @@ final class RecruiterApplicantPageController extends Controller
             ->orderBy('starts_at', 'desc')->get()
             ->map(SelectionSchedulePresenter::operational(...))->values()->all();
 
+        // Read-only slice of the frozen Evaluation / Offering runtimes for this
+        // one already-authorized application — reuses the frozen scopes and
+        // allow-list presenters, exactly like `schedules` above. Every mutation
+        // still posts to the existing JSON routes.
+        $evaluations = EvaluationScope::operationalQueryFor($actor)
+            ->where('application_id', $model->getKey())
+            ->with('items')->orderBy('created_at')->orderBy('id')->get()
+            ->map(EvaluationPresenter::summary(...))->values()->all();
+
+        $offers = OfferScope::operationalQueryFor($actor)
+            ->where('application_id', $model->getKey())
+            ->orderBy('created_at', 'desc')->orderBy('id', 'desc')->get()
+            ->map(OfferPresenter::operational(...))->values()->all();
+
         return Inertia::render('recruiter/ApplicantDetail', [
             'application' => $detail,
             'stages' => $stages,
             'schedules' => $schedules,
+            'evaluations' => $evaluations,
+            'offers' => $offers,
         ]);
     }
 

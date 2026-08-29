@@ -194,6 +194,107 @@ final class RecruitmentFrontendPagesTest extends VacancyTestCase
     }
 
     // ---------------------------------------------------------------
+    // v2 — Evaluation / Offering / Outcome embedded & page surfaces
+    // ---------------------------------------------------------------
+
+    public function test_applicant_detail_embeds_scoped_evaluations_and_offers(): void
+    {
+        [$admin, , $vacancyId] = $this->openVacancy('frontend-v2-embed@example.test');
+        $stageId = $this->createStage($admin, $vacancyId, 'Teknis', 0);
+        [$candidate] = $this->candidate('frontend-v2-embed-c@example.test');
+        $applicationId = $this->submitApplication($candidate, $vacancyId);
+
+        $this->actingAs($admin)->postJson("/applications/{$applicationId}/evaluations", [
+            'recruitment_stage_id' => $stageId, 'recommendation' => 'HIRE', 'total_score' => 82,
+        ])->assertCreated();
+        $offerId = (int) $this->actingAs($admin)->postJson("/applications/{$applicationId}/offers", ['note' => 'Selamat bergabung.'])->assertCreated()->json('data.id');
+        $this->actingAs($admin)->postJson("/offers/{$offerId}/send")->assertOk();
+
+        $this->actingAs($admin)->get("/pelamar/{$applicationId}")->assertOk()->assertInertia(
+            fn (Assert $page) => $page->component('recruiter/ApplicantDetail')
+                ->has('evaluations', 1)
+                ->where('evaluations.0.recommendation', 'HIRE')
+                ->has('evaluations.0.evaluator_user_id')
+                ->has('offers', 1)
+                ->where('offers.0.status', 'SENT')
+                ->has('offers.0.offered_by_user_id'),
+        );
+
+        // A different company's admin cannot see this application at all.
+        [$otherAdmin] = $this->openVacancy('frontend-v2-embed-other@example.test');
+        $this->actingAs($otherAdmin)->get("/pelamar/{$applicationId}")->assertStatus(404);
+    }
+
+    public function test_candidate_application_detail_shows_sent_offer_only_with_candidate_allowlist(): void
+    {
+        [$admin, , $vacancyId] = $this->openVacancy('frontend-v2-candoffer@example.test');
+        [$candidate] = $this->candidate('frontend-v2-candoffer-c@example.test');
+        $applicationId = $this->submitApplication($candidate, $vacancyId);
+
+        $offerId = (int) $this->actingAs($admin)->postJson("/applications/{$applicationId}/offers", ['note' => 'Rahasia internal? Tidak.'])->assertCreated()->json('data.id');
+
+        // DRAFT (not yet sent) — candidate sees nothing.
+        $this->actingAs($candidate)->get("/lamaran-saya/{$applicationId}")->assertOk()->assertInertia(
+            fn (Assert $page) => $page->component('candidate/ApplicationDetail')->has('offers', 0),
+        );
+
+        $this->actingAs($admin)->postJson("/offers/{$offerId}/send")->assertOk();
+
+        $response = $this->actingAs($candidate)->get("/lamaran-saya/{$applicationId}")->assertOk();
+        $response->assertInertia(
+            fn (Assert $page) => $page->component('candidate/ApplicationDetail')
+                ->has('offers', 1)
+                ->where('offers.0.status', 'SENT')
+                ->missing('offers.0.offered_by_user_id')
+                ->missing('offers.0.rejection_reason'),
+        );
+    }
+
+    public function test_outcome_rekrutmen_incomplete_then_recorded(): void
+    {
+        [$admin, , $vacancyId] = $this->openVacancy('frontend-v2-outcome@example.test');
+        [$candidate] = $this->candidate('frontend-v2-outcome-c@example.test');
+        $applicationId = $this->submitApplication($candidate, $vacancyId);
+        DB::table('applications')->where('id', $applicationId)->update(['current_status' => 'REJECTED']);
+
+        $this->actingAs($admin)->get('/outcome-rekrutmen')->assertOk()->assertInertia(
+            fn (Assert $page) => $page->component('recruiter/OutcomeRekrutmen')
+                ->where('can_write', true)
+                ->where('incomplete.items.0.application_id', $applicationId)
+                ->where('incomplete.items.0.current_status', 'REJECTED')
+                ->has('incomplete.items.0.application_code')
+                ->has('recorded.items', 0),
+        );
+
+        $this->actingAs($admin)->postJson('/recruitment-outcomes', [
+            'source_type' => 'INTERNAL_APPLICATION', 'application_id' => $applicationId,
+            'outcome' => 'REJECTED', 'reported_by_source' => 'COMPANY',
+        ])->assertCreated();
+
+        $this->actingAs($admin)->get('/outcome-rekrutmen')->assertOk()->assertInertia(
+            fn (Assert $page) => $page->component('recruiter/OutcomeRekrutmen')
+                ->has('incomplete.items', 0)
+                ->has('recorded.items', 1)
+                ->where('recorded.items.0.outcome', 'REJECTED')
+                ->where('recorded.items.0.reported_by_source', 'COMPANY'),
+        );
+    }
+
+    public function test_outcome_rekrutmen_denies_candidate_with_styled_error(): void
+    {
+        [$candidate] = $this->candidate('frontend-v2-outcome-deny@example.test');
+        $this->actingAs($candidate)->get('/outcome-rekrutmen')->assertStatus(403)
+            ->assertInertia(fn (Assert $page) => $page->component('Error')->where('status', 403));
+    }
+
+    private function createStage(User $admin, int $vacancyId, string $name, int $sortOrder): int
+    {
+        return (int) $this->actingAs($admin)->postJson("/vacancies/{$vacancyId}/stages", [
+            'name' => $name, 'stage_type' => 'GENERAL', 'sort_order' => $sortOrder, 'active' => true,
+        ])->assertCreated()->json('data.id');
+    }
+
+    // ---------------------------------------------------------------
     // Fixtures (same shape as RecruitmentOutcomeTest's own private helpers)
     // ---------------------------------------------------------------
 

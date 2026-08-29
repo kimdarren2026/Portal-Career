@@ -17,6 +17,7 @@ use App\Http\Controllers\Web\OfferController;
 use App\Http\Controllers\Web\PublicVacancyController;
 use App\Http\Controllers\Web\RecruiterApplicantPageController;
 use App\Http\Controllers\Web\RecruitmentOutcomeController;
+use App\Http\Controllers\Web\RecruitmentOutcomePageController;
 use App\Http\Controllers\Web\RecruitmentStageController;
 use App\Http\Controllers\Web\SelectionScheduleController;
 use App\Http\Controllers\Web\SelectionSchedulePageController;
@@ -268,6 +269,11 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
     Route::get('/pelamar', [RecruiterApplicantPageController::class, 'index'])->name('pages.applicants.index');
     Route::get('/pelamar/{application}', [RecruiterApplicantPageController::class, 'show'])
         ->whereNumber('application')->name('pages.applicants.show');
+
+    // Frontend Vertical Slice v2 — activates the canonical "Outcome Rekrutmen"
+    // recruiter nav item. Page delivery only; create/correct still post to the
+    // JSON `recruitment-outcomes.*` routes above.
+    Route::get('/outcome-rekrutmen', [RecruitmentOutcomePageController::class, 'index'])->name('pages.outcomes.index');
 });
 
 /*

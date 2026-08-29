@@ -128,6 +128,24 @@ export function candidateHistoryLabel(event: { event_type?: string | null; to_st
 }
 
 /**
+ * `recruitment_outcomes.outcome` for `source_type = INTERNAL_APPLICATION`
+ * (OC-1 — `InternalApplicationOutcome::ALLOWED`). These four codes are the
+ * exact terminal `applications.current_status` vocabulary, so their display
+ * label is the already-approved `applicationStatusLabel` mapping for the same
+ * codes — no separate/invented translation. `statusLabel(applicationStatusLabel, x)`.
+ */
+export const internalApplicationOutcomeOptions = ['HIRED', 'REJECTED', 'WITHDRAWN', 'NO_SHOW'] as const
+
+/**
+ * `recruitment_outcomes.reported_by_source` — client-supplied, exact schema
+ * `CHECK` vocabulary (API_CONTRACT Part …: "no additional actor-to-source
+ * mapping is invented or enforced"). No approved Indonesian display label
+ * exists, so the raw contract code is shown verbatim; the contract's full set
+ * is offered and never silently narrowed.
+ */
+export const reportedBySourceOptions = ['CANDIDATE', 'COMPANY', 'CAMPUS_STAFF', 'INTEGRATION'] as const
+
+/**
  * The institution's user-facing timezone (DATABASE_SCHEMA.md — "Asia/Jakarta
  * is the expected default for this institution"). Used to render genuine
  * absolute instants that carry no paired timezone of their own, so display

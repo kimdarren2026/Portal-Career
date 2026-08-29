@@ -10,6 +10,8 @@ use App\Domains\Application\Queries\ListCandidateApplications;
 use App\Domains\Application\Support\ApplicationScope;
 use App\Domains\Candidate\Queries\ListCandidateDocuments;
 use App\Domains\Candidate\Support\CandidateProfileResolver;
+use App\Domains\Recruitment\Offering\Models\Offer;
+use App\Domains\Recruitment\Offering\Presenters\OfferPresenter;
 use App\Domains\Vacancy\Support\PublicVacancyPresenter;
 use App\Domains\Vacancy\Support\PublicVacancyScope;
 use App\Domains\Vacancy\Support\VacancyPresenter;
@@ -76,7 +78,21 @@ final class CandidateApplicationPageController extends CandidateController
         $detail = $query->execute($model, GetCandidateApplication::INCLUDES);
         $detail['vacancy_title'] = self::vacancyTitles([$detail['vacancy_id']])[$detail['vacancy_id']] ?? null;
 
-        return Inertia::render('candidate/ApplicationDetail', ['application' => $detail]);
+        // Offers become candidate-visible only once the recruiter has sent them
+        // (FR-SEL-003 — DRAFT is a recruiter-only working state). `$model` is
+        // already this candidate's own application, so any offer on it is
+        // theirs; `OfferPresenter::candidate` is the frozen candidate allow-list
+        // (no `offered_by_user_id`, no `rejection_reason`, no internal notes).
+        $offers = Offer::query()
+            ->where('application_id', $model->getKey())
+            ->whereNotNull('sent_at')
+            ->orderBy('created_at', 'desc')->orderBy('id', 'desc')->get()
+            ->map(OfferPresenter::candidate(...))->values()->all();
+
+        return Inertia::render('candidate/ApplicationDetail', [
+            'application' => $detail,
+            'offers' => $offers,
+        ]);
     }
 
     /**
