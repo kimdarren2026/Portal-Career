@@ -9,6 +9,7 @@
  */
 import { Head, router } from '@inertiajs/vue3'
 import { reactive } from 'vue'
+import { employmentTypeLabel, statusLabel, workplaceModeLabel } from '@/lib/labels'
 
 interface CompanySummary {
     company_id: number
@@ -107,8 +108,8 @@ function goToPage(page: number) {
                         <h2 class="text-lg font-semibold text-slate-900">{{ item.title }}</h2>
                         <p class="mt-1 text-sm text-slate-600">{{ item.company.name }}<span v-if="item.location"> · {{ item.location }}</span></p>
                         <div class="mt-2 flex flex-wrap gap-2 text-xs">
-                            <span v-if="item.employment_type" class="rounded-full bg-slate-100 px-2 py-1 text-slate-700">{{ item.employment_type }}</span>
-                            <span v-if="item.workplace_mode" class="rounded-full bg-slate-100 px-2 py-1 text-slate-700">{{ item.workplace_mode }}</span>
+                            <span v-if="item.employment_type" class="rounded-full bg-slate-100 px-2 py-1 text-slate-700">{{ statusLabel(employmentTypeLabel, item.employment_type) }}</span>
+                            <span v-if="item.workplace_mode" class="rounded-full bg-slate-100 px-2 py-1 text-slate-700">{{ statusLabel(workplaceModeLabel, item.workplace_mode) }}</span>
                             <span class="rounded-full bg-slate-100 px-2 py-1 text-slate-700">{{ audienceLabel[item.target_audience] ?? item.target_audience }}</span>
                             <span v-if="item.company.mitra_kampus_active" class="rounded-full bg-emerald-100 px-2 py-1 text-emerald-800">Mitra Kampus</span>
                         </div>

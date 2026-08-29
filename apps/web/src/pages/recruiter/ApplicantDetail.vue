@@ -10,7 +10,7 @@ import { Head, Link, router } from '@inertiajs/vue3'
 import { computed, reactive, ref } from 'vue'
 import AppShell from '@/layouts/AppShell.vue'
 import { authRequest, errorText, newIdempotencyKey } from '@/lib/auth'
-import { allowedTransitions, applicationStatusBadgeClass, applicationStatusLabel, formatDateTime, scheduleMethodLabel, scheduleStatusLabel, statusLabel, zonedWallTimeToIso } from '@/lib/labels'
+import { allowedTransitions, applicationHistoryLabel, applicationStatusBadgeClass, applicationStatusLabel, formatDateTime, scheduleMethodLabel, scheduleStatusLabel, statusLabel, zonedWallTimeToIso } from '@/lib/labels'
 
 interface HistoryEvent { event_type: string; from_status: string | null; to_status: string | null; actor_user_id: number | null; reason: string | null; candidate_visibility: string; candidate_visible_note: string | null; occurred_at: string | null }
 interface DocumentShare { id: number; snapshot_name: string; shared_at: string | null }
@@ -231,7 +231,7 @@ async function submitSchedule() {
             <h2 class="text-lg font-semibold text-[#002045]">Riwayat</h2>
             <ol class="mt-4 space-y-3 border-l-2 border-slate-200 pl-4">
                 <li v-for="(event, index) in application.history" :key="index">
-                    <p class="text-sm font-semibold text-slate-800">{{ statusLabel(applicationStatusLabel, event.to_status) }}</p>
+                    <p class="text-sm font-semibold text-slate-800">{{ applicationHistoryLabel(event) }}</p>
                     <p class="text-xs text-slate-500">{{ formatDateTime(event.occurred_at) }} · {{ event.candidate_visibility === 'VISIBLE' ? 'Terlihat kandidat' : 'Internal' }}</p>
                     <p v-if="event.reason" class="mt-1 text-sm text-slate-600">{{ event.reason }}</p>
                 </li>

@@ -10,6 +10,7 @@
  */
 import { Head, Link, usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
+import { employmentTypeLabel, statusLabel, vacancyTypeLabel, workplaceModeLabel } from '@/lib/labels'
 
 interface CompanySummary {
     company_id: number
@@ -83,8 +84,8 @@ const isCandidate = computed(() => ((page.props as any).auth?.roles ?? []).some(
                         <h1 class="text-2xl font-semibold text-slate-900">{{ vacancy.title }}</h1>
                         <p class="mt-1 text-slate-600">{{ vacancy.company.name }}<span v-if="vacancy.location"> · {{ vacancy.location }}</span></p>
                         <div class="mt-3 flex flex-wrap gap-2 text-xs">
-                            <span v-if="vacancy.employment_type" class="rounded-full bg-slate-100 px-2 py-1 text-slate-700">{{ vacancy.employment_type }}</span>
-                            <span v-if="vacancy.workplace_mode" class="rounded-full bg-slate-100 px-2 py-1 text-slate-700">{{ vacancy.workplace_mode }}</span>
+                            <span v-if="vacancy.employment_type" class="rounded-full bg-slate-100 px-2 py-1 text-slate-700">{{ statusLabel(employmentTypeLabel, vacancy.employment_type) }}</span>
+                            <span v-if="vacancy.workplace_mode" class="rounded-full bg-slate-100 px-2 py-1 text-slate-700">{{ statusLabel(workplaceModeLabel, vacancy.workplace_mode) }}</span>
                             <span class="rounded-full bg-slate-100 px-2 py-1 text-slate-700">{{ audienceLabel[vacancy.target_audience] ?? vacancy.target_audience }}</span>
                             <span v-if="vacancy.company.mitra_kampus_active" class="rounded-full bg-emerald-100 px-2 py-1 text-emerald-800">Mitra Kampus</span>
                         </div>
@@ -115,7 +116,7 @@ const isCandidate = computed(() => ((page.props as any).auth?.roles ?? []).some(
                     <div class="rounded-lg border border-slate-200 bg-white p-5">
                         <h3 class="text-sm font-semibold text-slate-900">Informasi Lowongan</h3>
                         <dl class="mt-3 space-y-2 text-sm">
-                            <div class="flex justify-between"><dt class="text-slate-500">Jenis</dt><dd class="text-slate-800">{{ vacancy.vacancy_type }}</dd></div>
+                            <div class="flex justify-between"><dt class="text-slate-500">Jenis</dt><dd class="text-slate-800">{{ statusLabel(vacancyTypeLabel, vacancy.vacancy_type) }}</dd></div>
                             <div class="flex justify-between"><dt class="text-slate-500">Kebutuhan</dt><dd class="text-slate-800">{{ vacancy.openings_count }} orang</dd></div>
                             <div v-if="vacancy.minimum_education" class="flex justify-between"><dt class="text-slate-500">Pendidikan</dt><dd class="text-slate-800">{{ vacancy.minimum_education }}</dd></div>
                             <div v-if="vacancy.experience_requirement" class="flex justify-between"><dt class="text-slate-500">Pengalaman</dt><dd class="text-slate-800">{{ vacancy.experience_requirement }}</dd></div>

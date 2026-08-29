@@ -63,6 +63,52 @@ export function statusLabel(map: Record<string, string>, value: string | null | 
 }
 
 /**
+ * FE-3 (approved PO decision, 29 August 2026 — API_CONTRACT.md Part X row 49).
+ * Display labels for the fixed `vacancies.vacancy_type` enum. Display only;
+ * the stored values and `VacancyType` enum are unchanged.
+ */
+export const vacancyTypeLabel: Record<string, string> = {
+    CAMPUS_EMPLOYMENT: 'Karier di Kampus',
+    COMPANY_EMPLOYMENT: 'Pekerjaan di Perusahaan',
+    INTERNSHIP: 'Magang',
+}
+
+/**
+ * FE-4 (approved PO decision, 29 August 2026 — API_CONTRACT.md Part X row 50).
+ * Approves the display label for `FULL_TIME` ONLY. `vacancies.employment_type`
+ * remains vocabulary-pending (DATABASE_SCHEMA.md Part X item 7); every other
+ * value falls through to its raw string via `statusLabel`, never a
+ * manufactured label.
+ */
+export const employmentTypeLabel: Record<string, string> = {
+    FULL_TIME: 'Penuh Waktu',
+}
+
+/**
+ * FE-5 (approved PO decision, 29 August 2026 — API_CONTRACT.md Part X row 51).
+ * Approves the display label for `HYBRID` ONLY. `vacancies.workplace_mode`
+ * remains vocabulary-pending; every other value falls through to its raw
+ * string via `statusLabel`.
+ */
+export const workplaceModeLabel: Record<string, string> = {
+    HYBRID: 'Hybrid',
+}
+
+/**
+ * FE-6 (approved PO decision, 29 August 2026 — API_CONTRACT.md Part X row 52).
+ * Recruiter application-history row label. `STAGE_CHANGED` is a stage-only
+ * event with no application status — it must never be passed through the
+ * application-status label map (which would render "-" for its NULL
+ * `to_status`). Every other event type is a status transition whose label is
+ * its resulting status. Frontend presentation only; candidate visibility
+ * filtering stays with the backend presenter.
+ */
+export function applicationHistoryLabel(event: { event_type?: string | null; to_status?: string | null }): string {
+    if (event.event_type === 'STAGE_CHANGED') return 'Tahap Seleksi Diubah'
+    return statusLabel(applicationStatusLabel, event.to_status)
+}
+
+/**
  * The institution's user-facing timezone (DATABASE_SCHEMA.md — "Asia/Jakarta
  * is the expected default for this institution"). Used to render genuine
  * absolute instants that carry no paired timezone of their own, so display
