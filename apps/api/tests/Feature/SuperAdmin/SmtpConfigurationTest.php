@@ -300,4 +300,69 @@ final class SmtpConfigurationTest extends VacancyTestCase
 
         $this->assertSame(1, DB::table('smtp_configurations')->count());
     }
+
+    /**
+     * Post-v11 hardening: a first-write race for the single-active slot
+     * (`uq_smtp_configurations_active`) must never surface as a 500. Here a
+     * competing ACTIVE row is injected exactly once, during the Action's own
+     * insert — the Action retries and completes normally.
+     */
+    public function test_first_write_race_is_retried_and_succeeds(): void
+    {
+        $admin = $this->superAdmin('smtp-race-retry@example.test');
+        $injected = 0;
+
+        SmtpConfiguration::creating(function () use (&$injected, $admin): void {
+            if ($injected++ > 0) {
+                return;
+            }
+            DB::table('smtp_configurations')->insert([
+                'host' => 'rival.test', 'port' => 25, 'encryption_mode' => 'NONE',
+                'from_address' => 'rival@rival.test', 'max_attempts' => 3, 'retry_backoff_seconds' => 60,
+                'is_active' => true, 'last_test_result' => 'NOT_TESTED',
+                'updated_by_user_id' => $admin->id, 'created_at' => now(), 'updated_at' => now(),
+            ]);
+        });
+
+        try {
+            $this->actingAs($admin)->putJson('/admin/smtp-configuration', $this->validPayload())
+                ->assertOk()
+                ->assertJsonPath('data.configuration.host', 'smtp.new.test')
+                ->assertJsonPath('data.configuration.is_active', true);
+        } finally {
+            SmtpConfiguration::flushEventListeners();
+        }
+
+        $this->assertSame(1, DB::table('smtp_configurations')->where('is_active', true)->count());
+    }
+
+    /**
+     * If the race cannot be resolved by the single retry, the loser gets a
+     * safe `409 CONFLICT` — never a SQLSTATE, constraint name, SQL, or 500.
+     */
+    public function test_unresolvable_active_race_maps_to_409_conflict_not_500(): void
+    {
+        $admin = $this->superAdmin('smtp-race-conflict@example.test');
+
+        SmtpConfiguration::creating(function () use ($admin): void {
+            DB::table('smtp_configurations')->insert([
+                'host' => 'rival.test', 'port' => 25, 'encryption_mode' => 'NONE',
+                'from_address' => 'rival@rival.test', 'max_attempts' => 3, 'retry_backoff_seconds' => 60,
+                'is_active' => true, 'last_test_result' => 'NOT_TESTED',
+                'updated_by_user_id' => $admin->id, 'created_at' => now(), 'updated_at' => now(),
+            ]);
+        });
+
+        try {
+            $response = $this->actingAs($admin)->putJson('/admin/smtp-configuration', $this->validPayload());
+        } finally {
+            SmtpConfiguration::flushEventListeners();
+        }
+
+        $response->assertStatus(409)->assertJsonPath('error.code', 'CONFLICT');
+        $body = $response->getContent();
+        foreach (['SQLSTATE', '23505', 'uq_smtp_configurations_active', 'QueryException', 'Exception', 'insert into'] as $leak) {
+            $this->assertStringNotContainsString($leak, $body);
+        }
+    }
 }

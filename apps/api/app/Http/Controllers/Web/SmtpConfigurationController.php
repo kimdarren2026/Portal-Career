@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Web;
 use App\Domains\Identity\Models\User;
 use App\Domains\Notification\Actions\TestSmtpConfiguration;
 use App\Domains\Notification\Actions\UpdateSmtpConfiguration;
+use App\Domains\Notification\Exceptions\SmtpConfigurationConflict;
 use App\Domains\Notification\Exceptions\SmtpConfigurationMissing;
 use App\Domains\Notification\Models\SmtpConfiguration;
 use App\Domains\Notification\Support\SmtpConfigurationPresenter;
@@ -76,6 +77,15 @@ final class SmtpConfigurationController extends Controller
         try {
             $row = $action->execute($actor, $request->configData(), $request->secretProvided(), $request->plainSecret());
             $data = ['configuration' => SmtpConfigurationPresenter::safe($row)];
+        } catch (SmtpConfigurationConflict) {
+            $this->idempotency->fail($id);
+
+            return ContractResponse::error(
+                $request,
+                'CONFLICT',
+                409,
+                'Konfigurasi SMTP aktif sedang diubah oleh permintaan lain. Silakan coba lagi.',
+            );
         } catch (\Throwable $e) {
             $this->idempotency->fail($id);
 

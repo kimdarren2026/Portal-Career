@@ -6,7 +6,9 @@ namespace App\Domains\Notification\Actions;
 
 use App\Domains\Identity\Models\User;
 use App\Domains\Identity\Support\AuditWriter;
+use App\Domains\Notification\Exceptions\SmtpConfigurationConflict;
 use App\Domains\Notification\Models\SmtpConfiguration;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 
@@ -18,6 +20,14 @@ use Illuminate\Support\Facades\DB;
  * transaction with the active row locked, so two concurrent writers can never
  * both leave an active row — the DB partial unique index
  * `uq_smtp_configurations_active` is the final authority.
+ *
+ * First-write race: when the table is empty there is no row to lock, so two
+ * genuinely simultaneous first writes can both reach the INSERT. The unique
+ * index rejects the loser with a `UniqueConstraintViolationException`; this
+ * Action retries once (the winner's row now exists and is locked/deactivated
+ * as a normal update) and, only if that also races, raises
+ * {@see SmtpConfigurationConflict} → `409 CONFLICT`. A raw SQLSTATE, the
+ * constraint name, or a 500 is never surfaced.
  *
  * Credential semantics (frozen):
  * - `password` omitted   → the existing encrypted value is copied unchanged;
@@ -50,53 +60,67 @@ final class UpdateSmtpConfiguration
      */
     public function execute(User $actor, array $data, bool $secretProvided, ?string $plainSecret): SmtpConfiguration
     {
-        return DB::transaction(function () use ($actor, $data, $secretProvided, $plainSecret): SmtpConfiguration {
-            $base = SmtpConfiguration::query()->where('is_active', true)->lockForUpdate()->first()
-                ?? SmtpConfiguration::query()->orderByDesc('id')->lockForUpdate()->first();
+        for ($attempt = 1; ; $attempt++) {
+            try {
+                return DB::transaction(fn (): SmtpConfiguration => $this->write($actor, $data, $secretProvided, $plainSecret));
+            } catch (UniqueConstraintViolationException) {
+                // uq_smtp_configurations_active — a concurrent first-writer took
+                // the single-active slot. Retry once as a normal update.
+                if ($attempt >= 2) {
+                    throw new SmtpConfigurationConflict();
+                }
+            }
+        }
+    }
 
-            $encrypted = $secretProvided
-                ? ($plainSecret === null ? null : Crypt::encryptString($plainSecret))
-                : $base?->getAttribute('encrypted_password');
+    /** @param array<string, mixed> $data */
+    private function write(User $actor, array $data, bool $secretProvided, ?string $plainSecret): SmtpConfiguration
+    {
+        $base = SmtpConfiguration::query()->where('is_active', true)->lockForUpdate()->first()
+            ?? SmtpConfiguration::query()->orderByDesc('id')->lockForUpdate()->first();
 
-            // Deactivate whatever is currently active (at most one row); the new
-            // row then carries the requested active state. Zero active is valid.
-            SmtpConfiguration::query()->where('is_active', true)
-                ->update(['is_active' => false, 'updated_at' => now()]);
+        $encrypted = $secretProvided
+            ? ($plainSecret === null ? null : Crypt::encryptString($plainSecret))
+            : $base?->getAttribute('encrypted_password');
 
-            $row = new SmtpConfiguration();
-            $row->forceFill([
-                'host' => $data['host'],
-                'port' => $data['port'],
-                'encryption_mode' => $data['encryption_mode'],
-                'username' => $data['username'] ?? null,
-                'encrypted_password' => $encrypted,
-                'from_address' => $data['from_address'],
-                'from_name' => $data['from_name'] ?? null,
-                'reply_to_address' => $data['reply_to_address'] ?? null,
-                'timeout_seconds' => $data['timeout_seconds'] ?? null,
-                'max_attempts' => $data['max_attempts'],
-                'retry_backoff_seconds' => $data['retry_backoff_seconds'],
-                'is_active' => (bool) $data['is_active'],
-                'last_tested_at' => null,
-                'last_test_result' => 'NOT_TESTED',
-                'updated_by_user_id' => $actor->getKey(),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ])->save();
+        // Deactivate whatever is currently active (at most one row); the new
+        // row then carries the requested active state. Zero active is valid.
+        SmtpConfiguration::query()->where('is_active', true)
+            ->update(['is_active' => false, 'updated_at' => now()]);
 
-            $this->audit->record(
-                'smtp_configuration_updated',
-                $actor,
-                'smtp_configuration',
-                (int) $row->getKey(),
-                [
-                    'credential_changed' => $secretProvided,
-                    'changed_fields' => $this->changedFields($base, $data),
-                ],
-            );
+        $row = new SmtpConfiguration();
+        $row->forceFill([
+            'host' => $data['host'],
+            'port' => $data['port'],
+            'encryption_mode' => $data['encryption_mode'],
+            'username' => $data['username'] ?? null,
+            'encrypted_password' => $encrypted,
+            'from_address' => $data['from_address'],
+            'from_name' => $data['from_name'] ?? null,
+            'reply_to_address' => $data['reply_to_address'] ?? null,
+            'timeout_seconds' => $data['timeout_seconds'] ?? null,
+            'max_attempts' => $data['max_attempts'],
+            'retry_backoff_seconds' => $data['retry_backoff_seconds'],
+            'is_active' => (bool) $data['is_active'],
+            'last_tested_at' => null,
+            'last_test_result' => 'NOT_TESTED',
+            'updated_by_user_id' => $actor->getKey(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ])->save();
 
-            return $row->refresh();
-        });
+        $this->audit->record(
+            'smtp_configuration_updated',
+            $actor,
+            'smtp_configuration',
+            (int) $row->getKey(),
+            [
+                'credential_changed' => $secretProvided,
+                'changed_fields' => $this->changedFields($base, $data),
+            ],
+        );
+
+        return $row->refresh();
     }
 
     /**
