@@ -30,6 +30,7 @@ use App\Http\Controllers\Web\RecruitmentOutcomePageController;
 use App\Http\Controllers\Web\RecruitmentStageController;
 use App\Http\Controllers\Web\SelectionScheduleController;
 use App\Http\Controllers\Web\SelectionSchedulePageController;
+use App\Http\Controllers\Web\SmtpConfigurationController;
 use App\Http\Controllers\Web\SuperAdminPageController;
 use App\Http\Controllers\Web\VacancyController;
 use App\Http\Controllers\Web\VacancyLifecycleController;
@@ -428,6 +429,23 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
     */
     Route::get('/audit-log', [SuperAdminPageController::class, 'auditLogIndex'])
         ->name('pages.super-admin.audit-log');
+
+    /*
+    | SMTP Configuration Foundation (FR-NOTIF-005 / ADR-015) — runtime-managed
+    | SMTP settings with an application-encrypted, write-only credential
+    | (INV-035) and at most one active configuration (INV-036). Contract
+    | endpoints already carry `Surface: INERTIA_WEB`; the browser paths are
+    | the contract URIs with `/api/v1` removed. SUPER_ADMIN only on every
+    | route (Policy-checked); Auditor is denied (matrix §4.9 footnote 33).
+    | The Super Admin "Konfigurasi SMTP" page route is activated by the
+    | frontend slice.
+    */
+    Route::get('/admin/smtp-configuration', [SmtpConfigurationController::class, 'show'])
+        ->name('admin.smtp-configuration.show');
+    Route::put('/admin/smtp-configuration', [SmtpConfigurationController::class, 'update'])
+        ->name('admin.smtp-configuration.update');
+    Route::post('/admin/smtp-configuration/test', [SmtpConfigurationController::class, 'test'])
+        ->name('admin.smtp-configuration.test');
 });
 
 /*
