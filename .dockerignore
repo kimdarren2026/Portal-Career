@@ -1,0 +1,26 @@
+# Keep the build context small and free of dev/runtime state and secrets.
+.git
+.github
+**/node_modules
+**/vendor
+apps/api/public/build
+apps/api/bootstrap/ssr
+apps/api/bootstrap/cache/*.php
+apps/api/storage/framework/cache/data/*
+apps/api/storage/framework/sessions/*
+apps/api/storage/framework/views/*
+apps/api/storage/logs/*
+**/.env
+**/.env.*
+!**/.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+archive/
+design/
+docs/
+tests/
+**/*.md
+.DS_Store
