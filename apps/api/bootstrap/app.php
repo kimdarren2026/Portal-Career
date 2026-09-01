@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\AssignCorrelationId;
+use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\EnforceAuthAbuseControls;
 use App\Http\Middleware\EnsureAccountStatus;
 use App\Http\Middleware\EnsureVerifiedEmail;
@@ -90,8 +91,39 @@ return Application::configure(basePath: dirname(__DIR__))
         apiPrefix: 'api/v1',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
+        // Operational health endpoints (DEPLOYMENT_ARCHITECTURE.md §5), served
+        // WITHOUT the web/session/CSRF stack: a readiness probe every few
+        // seconds must not open a session. `/health/live` never touches a
+        // dependency (restart supervision); `/health/ready` checks PostgreSQL,
+        // Redis and object storage for the load balancer. Neither discloses
+        // anything beyond pass/fail per dependency. Laravel's `/up` is kept.
+        then: function (): void {
+            \Illuminate\Support\Facades\Route::get('/health/live', [\App\Http\Controllers\HealthController::class, 'live'])->name('health.live');
+            \Illuminate\Support\Facades\Route::get('/health/ready', [\App\Http\Controllers\HealthController::class, 'ready'])->name('health.ready');
+        },
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Behind a TLS-terminating reverse proxy / load balancer, honour
+        // X-Forwarded-* so the scheme, host, port and client IP are correct
+        // (secure-cookie decisions, absolute URLs, rate-limit keys). The proxy
+        // set is deployment-specific: TRUSTED_PROXIES is a comma list, or `*`
+        // when the app is only ever reachable through the proxy. Unset = trust
+        // nothing (safe default for local / direct exposure).
+        $trustedProxies = (string) env('TRUSTED_PROXIES', '');
+        if ($trustedProxies !== '') {
+            $middleware->trustProxies(
+                at: $trustedProxies === '*' ? '*' : array_map('trim', explode(',', $trustedProxies)),
+                headers: Request::HEADER_X_FORWARDED_FOR
+                    | Request::HEADER_X_FORWARDED_HOST
+                    | Request::HEADER_X_FORWARDED_PORT
+                    | Request::HEADER_X_FORWARDED_PROTO,
+            );
+        }
+
+        // Baseline security response headers (SECURITY_ARCHITECTURE.md §3) —
+        // defence in depth; HSTS and CSP remain the edge proxy's job (§6).
+        $middleware->append(SecurityHeaders::class);
+
         // Correlation ID on every request, propagated into logs, jobs and
         // audit_logs.correlation_id (FSD §9.3, API_CONTRACT.md Part I §10).
         $middleware->append(AssignCorrelationId::class);
