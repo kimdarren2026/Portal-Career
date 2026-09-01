@@ -89,7 +89,9 @@ Reaches: company verification queue and decisions, company vacancy moderation de
 ### HR_ADMIN
 **Campus recruitment scope** (Admin Kepegawaian / HR-SDM).
 
-Reaches: campus vacancies (`ownership_type = CAMPUS`) and everything beneath them — applicants, stages, selector assignments, schedules, evaluations, offers, outcomes, campus reports.
+**Runtime status: ACTIVATED — approved PO / SPEC-DOC decision, 1 September 2026 (`API_CONTRACT.md` Part X item 60 / SPEC-DOC-10).** This scope was previously DEFERRED; it is now wired through `VacancyScope`, `VacancyPolicy`, `RecruiterApplicationScope`, `SelectionScheduleScope`, `EvaluationScope`, `OfferScope` and `RecruitmentOutcomeScope`, plus `POST /hr/vacancies` (create) and the campus lifecycle `POST /hr/vacancies/{vacancy}/{publish|schedule|close|suspend|restore}` (FSD §8.4). `CAMPUS_SCOPE` was the frozen matrix intent all along (this section, the `K` grant on "Create campus vacancy", and footnote 10) — this decision changes only the implementation state, no authorization.
+
+Reaches: campus vacancies (`ownership_type = CAMPUS`) and everything beneath them — applicants, stages, selector assignments, schedules, evaluations, offers, outcomes, campus reports. Never a `COMPANY` vacancy — `HR_ADMIN` gets an empty scope on the company track exactly as `COMPANY_SCOPE` gets nothing on the campus track. Reporting (FR-REP-003) stays deferred.
 
 Cannot create or manage company vacancies, cannot verify companies, cannot moderate company vacancies. Campus vacancies are never moderated (INV-018), so no moderation capability exists on this path at all.
 

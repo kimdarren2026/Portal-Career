@@ -1,7 +1,7 @@
 # Inertia Web Action Index — Internal Application Surface
 
 **Status:** Proposed — awaiting approval
-**Date:** 24 August 2026 · **Amended:** Candidate Core HTTP surface (SPEC-DOC-07 accepted) · Candidate Application MVP transport (SPEC-DOC-08 accepted, 26 August 2026) · Recruitment Stage Authoring role-grouping correction (RS-2, RS-6 accepted, 26 August 2026) · Selection Schedule read transport (SS-9 accepted, 27 August 2026) · Evaluation COMPANY_SCOPE correction (accepted, 27 August 2026) · Candidate offer response transport (OF-2 accepted, 27 August 2026) · In-app notification web surface (SPEC-DOC-09 / Part X item 59 accepted, 1 September 2026)
+**Date:** 24 August 2026 · **Amended:** Candidate Core HTTP surface (SPEC-DOC-07 accepted) · Candidate Application MVP transport (SPEC-DOC-08 accepted, 26 August 2026) · Recruitment Stage Authoring role-grouping correction (RS-2, RS-6 accepted, 26 August 2026) · Selection Schedule read transport (SS-9 accepted, 27 August 2026) · Evaluation COMPANY_SCOPE correction (accepted, 27 August 2026) · Candidate offer response transport (OF-2 accepted, 27 August 2026) · In-app notification web surface (SPEC-DOC-09 / Part X item 59 accepted, 1 September 2026) · Campus Recruitment scope activation (SPEC-DOC-10 / Part X item 60 accepted, 1 September 2026)
 **Generated from:** `API_CONTRACT.md` — verified programmatically in both directions.
 
 **This file lists only `INERTIA_WEB` operations.** These are internal Laravel + Inertia application routes:
@@ -32,7 +32,7 @@ Any of these may later be promoted to `VERSIONED_API`. Promotion is additive —
 
 | Total INERTIA_WEB operations |
 | --- |
-| **134** |
+| **139** |
 
 ## Authentication & Session
 
@@ -126,7 +126,12 @@ Any of these may later be promoted to `VERSIONED_API`. Promotion is additive —
 
 | Domain | Method | Route | Purpose / Contract Section | Primary Role |
 | --- | --- | --- | --- | --- |
-| Vacancy | `POST` | `/hr/vacancies` | POST /api/v1/hr/vacancies | COMPANY_SCOPE / CAMPUS_SCOPE / CAREER_CENTER |
+| Vacancy | `POST` | `/hr/vacancies` | POST /api/v1/hr/vacancies (Part X item 60 — ACTIVE) | HR_ADMIN (CAMPUS_SCOPE) |
+| Vacancy | `POST` | `/hr/vacancies/{vacancy}/publish` | Campus lifecycle, FSD §8.4 (Part X item 60) | HR_ADMIN (CAMPUS_SCOPE) |
+| Vacancy | `POST` | `/hr/vacancies/{vacancy}/schedule` | Campus lifecycle, FSD §8.4 (Part X item 60) | HR_ADMIN (CAMPUS_SCOPE) |
+| Vacancy | `POST` | `/hr/vacancies/{vacancy}/close` | Campus lifecycle, FSD §8.4 (Part X item 60) | HR_ADMIN (CAMPUS_SCOPE) |
+| Vacancy | `POST` | `/hr/vacancies/{vacancy}/suspend` | Campus lifecycle, FSD §8.4 (Part X item 60) | HR_ADMIN (CAMPUS_SCOPE) |
+| Vacancy | `POST` | `/hr/vacancies/{vacancy}/restore` | Campus lifecycle, FSD §8.4 (Part X item 60) | HR_ADMIN (CAMPUS_SCOPE) |
 | Vacancy | `GET` | `/vacancies` | GET /api/v1/vacancies | COMPANY_SCOPE / CAMPUS_SCOPE / CAREER_CENTER |
 | Vacancy | `GET` | `/vacancies/{vacancy}` | GET /api/v1/vacancies/{vacancy} | COMPANY_SCOPE / CAMPUS_SCOPE / CAREER_CENTER |
 | Vacancy | `PATCH` | `/vacancies/{vacancy}` | PATCH /api/v1/vacancies/{vacancy} | COMPANY_SCOPE / CAMPUS_SCOPE / CAREER_CENTER |
@@ -274,7 +279,7 @@ Reclassified `VERSIONED_API → INERTIA_WEB` on 1 September 2026 (`API_CONTRACT.
 | Company | 16 |
 | Career Center Verification | 1 |
 | Partnership | 6 |
-| Vacancy | 21 |
+| Vacancy | 26 |
 | Application | 11 |
 | Selector Assignment | 3 |
 | Selection Schedule | 7 |
@@ -286,4 +291,4 @@ Reclassified `VERSIONED_API → INERTIA_WEB` on 1 September 2026 (`API_CONTRACT.
 | Reporting | 8 |
 | Audit | 1 |
 | Administration | 6 |
-| **Total** | **134** |
+| **Total** | **139** |
