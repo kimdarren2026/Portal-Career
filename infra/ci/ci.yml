@@ -1,0 +1,146 @@
+name: CI
+
+# ACTIVATION: move this file to `.github/workflows/ci.yml` to enable it on
+# GitHub. It is kept under `infra/ci/` here because the credential used to
+# publish this repository lacks the `workflow` scope required to create a file
+# under `.github/workflows/`. The move is a one-step, no-change operation for a
+# maintainer whose token has that scope.
+#
+# Continuous integration for the frozen MVP core. Runs the exact validation
+# gate the vertical-slice programs use: composer validate, the full PHPUnit
+# Feature suite against real PostgreSQL + Redis, the frontend type-check, and
+# the client + SSR production builds. No deployment, no real credentials —
+# every value here is a throwaway CI-only value.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Backend test suite (PostgreSQL + Redis)
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          # `portal_karir` is the migration owner and owns the test database,
+          # exactly as tests/Concerns/RefreshesDatabaseWithMigrationOwner expects.
+          POSTGRES_USER: portal_karir
+          POSTGRES_PASSWORD: ci_only_not_a_secret
+          POSTGRES_DB: portal_karir_test
+          TZ: UTC
+          PGTZ: UTC
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U portal_karir -d portal_karir_test"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping" --health-interval 5s
+          --health-timeout 3s --health-retries 20
+
+    env:
+      APP_ENV: testing
+      APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+      DB_CONNECTION: pgsql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      DB_DATABASE: portal_karir_test
+      DB_USERNAME: portal_karir_app
+      DB_PASSWORD: ci_only_not_a_secret
+      DB_MIGRATION_USERNAME: portal_karir
+      DB_MIGRATION_PASSWORD: ci_only_not_a_secret
+      REDIS_CLIENT: predis
+      REDIS_HOST: 127.0.0.1
+      REDIS_PORT: 6379
+      CACHE_STORE: redis
+      REDIS_CACHE_DB: 15
+      REDIS_PREFIX: portal_karir_ci_
+      QUEUE_CONNECTION: sync
+      SESSION_DRIVER: array
+      MAIL_MAILER: array
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Provision the restricted runtime database role
+        run: |
+          PGPASSWORD=ci_only_not_a_secret psql -h 127.0.0.1 -U portal_karir -d portal_karir_test -v ON_ERROR_STOP=1 -c \
+            "DO \$\$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'portal_karir_app') THEN CREATE ROLE portal_karir_app LOGIN PASSWORD 'ci_only_not_a_secret'; END IF; END \$\$;"
+          PGPASSWORD=ci_only_not_a_secret psql -h 127.0.0.1 -U portal_karir -d portal_karir_test -v ON_ERROR_STOP=1 -c \
+            "GRANT CONNECT ON DATABASE portal_karir_test TO portal_karir_app;"
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, openssl, fileinfo, pdo, pdo_pgsql, pgsql, ctype, json, bcmath, intl
+          coverage: none
+          ini-values: error_reporting=E_ALL
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: apps/api/vendor
+          key: composer-${{ runner.os }}-${{ hashFiles('apps/api/composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-
+
+      - name: composer validate --strict
+        working-directory: apps/api
+        run: composer validate --strict
+
+      - name: Install PHP dependencies (locked)
+        working-directory: apps/api
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Install Node dependencies (locked)
+        run: npm ci
+
+      - name: Frontend type-check
+        run: npm run type-check
+
+      - name: Client production build
+        run: npm run build
+
+      - name: SSR production build
+        run: npm run build:ssr
+
+      - name: PHPUnit Feature suite
+        working-directory: apps/api
+        run: php artisan test --testsuite=Feature
+
+      - name: git diff --check
+        run: git diff --check
+
+  image:
+    name: Production image builds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the production application image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: infra/docker/Dockerfile
+          push: false
+          tags: portal-karir-kampus:ci
+      - name: Smoke test — the image boots and autoload resolves
+        run: |
+          docker run --rm --entrypoint php portal-karir-kampus:ci -v
+          docker run --rm --entrypoint php portal-karir-kampus:ci artisan --version
