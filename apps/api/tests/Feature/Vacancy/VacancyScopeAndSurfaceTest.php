@@ -178,7 +178,11 @@ final class VacancyScopeAndSurfaceTest extends VacancyTestCase
                 && ! str_contains($r, 'stages')
                 && ! str_contains($r, 'kelola-lowongan')
                 && ! str_contains($r, 'moderasi-lowongan')
-                && ! str_contains($r, 'hr/vacancies'),
+                && ! str_contains($r, 'hr/vacancies')
+                // Admin Kepegawaian page shell `GET /kepegawaian/lowongan-kampus/{vacancy}`
+                // (Campus Recruitment Frontend v8) delivers a page and mutates
+                // nothing — same category as `/kelola-lowongan/{vacancy}`.
+                && ! str_contains($r, 'kepegawaian'),
         )->count(), 'The eight authoring routes plus the seven lifecycle routes.');
 
         // Campus Recruitment Foundation: exactly the six frozen campus routes

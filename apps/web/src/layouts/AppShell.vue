@@ -19,7 +19,7 @@ import { authRequest } from '@/lib/auth'
 type NavItem = { label: string; href?: string; active?: boolean }
 
 const props = defineProps<{
-    persona: 'candidate' | 'recruiter' | 'career-center'
+    persona: 'candidate' | 'recruiter' | 'career-center' | 'admin-kepegawaian'
     active: string
     title: string
 }>()
@@ -70,15 +70,33 @@ const careerCenterNav: NavItem[] = [
     { label: 'Pengaturan Moderasi' },
 ]
 
+// Admin Kepegawaian — exactly 10 canonical items (Campus Recruitment
+// Frontend v8). "Laporan" stays deferred ("Segera hadir") — FR-REP-003 /
+// GET /reports has no runtime.
+const adminKepegawaianNav: NavItem[] = [
+    { label: 'Dashboard', href: '/kepegawaian/dashboard' },
+    { label: 'Lowongan Kampus', href: '/kepegawaian/lowongan-kampus' },
+    { label: 'Pelamar', href: '/kepegawaian/pelamar' },
+    { label: 'Jadwal Seleksi', href: '/kepegawaian/jadwal-seleksi' },
+    { label: 'Penilaian', href: '/kepegawaian/penilaian' },
+    { label: 'Offering', href: '/kepegawaian/offering' },
+    { label: 'Outcome Rekrutmen', href: '/kepegawaian/outcome-rekrutmen' },
+    { label: 'Laporan' },
+    { label: 'Notifikasi', href: '/kepegawaian/notifikasi' },
+    { label: 'Pengaturan', href: '/kepegawaian/pengaturan' },
+]
+
 const items = computed(() => {
     if (props.persona === 'recruiter') return recruiterNav
     if (props.persona === 'career-center') return careerCenterNav
+    if (props.persona === 'admin-kepegawaian') return adminKepegawaianNav
     return candidateNav
 })
 
 const personaSubtitle = computed(() => {
     if (props.persona === 'recruiter') return 'Ruang Kerja Recruiter'
     if (props.persona === 'career-center') return 'Back-office Career Center'
+    if (props.persona === 'admin-kepegawaian') return 'Back Office Kepegawaian'
     return 'Portal Karir Terpadu'
 })
 

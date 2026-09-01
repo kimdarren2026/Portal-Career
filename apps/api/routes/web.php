@@ -15,6 +15,7 @@ use App\Http\Controllers\Web\CompanyController;
 use App\Http\Controllers\Web\CompanyMemberController;
 use App\Http\Controllers\Web\CompanyMemberPageController;
 use App\Http\Controllers\Web\CompanyPageController;
+use App\Http\Controllers\Web\HrPageController;
 use App\Http\Controllers\Web\HrVacancyController;
 use App\Http\Controllers\Web\NotificationController;
 use App\Http\Controllers\Web\NotificationPageController;
@@ -348,6 +349,32 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
     | remain deferred (D-6 open; partnership lifecycle under-specified).
     */
     Route::get('/notifikasi', [NotificationPageController::class, 'index'])->name('pages.notifications');
+
+    /*
+    | Campus Recruitment Frontend Slice v8 — the Admin Kepegawaian workspace.
+    | Non-mutating Inertia page delivery under `/kepegawaian/*`; every read
+    | reuses the frozen Query/Scope/Presenter classes (all now CAMPUS_SCOPE-
+    | aware, SPEC-DOC-10). Mutations post to the frozen JSON routes
+    | (`/hr/vacancies*`, `/applications/*`, `/schedules/*`, `/evaluations/*`,
+    | `/offers/*`, `/recruitment-outcomes`, `/notifications/*`). "Laporan"
+    | stays deferred (FR-REP-003 / GET /reports has no runtime).
+    */
+    Route::prefix('kepegawaian')->name('pages.hr.')->group(function (): void {
+        Route::get('/dashboard', [HrPageController::class, 'dashboard'])->name('dashboard');
+        Route::get('/lowongan-kampus', [HrPageController::class, 'vacancyIndex'])->name('vacancies.index');
+        Route::get('/lowongan-kampus/baru', [HrPageController::class, 'vacancyCreate'])->name('vacancies.create');
+        Route::get('/lowongan-kampus/{vacancy}', [HrPageController::class, 'vacancyShow'])
+            ->whereNumber('vacancy')->name('vacancies.show');
+        Route::get('/pelamar', [HrPageController::class, 'applicantIndex'])->name('applicants.index');
+        Route::get('/pelamar/{application}', [HrPageController::class, 'applicantShow'])
+            ->whereNumber('application')->name('applicants.show');
+        Route::get('/jadwal-seleksi', [HrPageController::class, 'scheduleIndex'])->name('schedules.index');
+        Route::get('/penilaian', [HrPageController::class, 'evaluationIndex'])->name('evaluations.index');
+        Route::get('/offering', [HrPageController::class, 'offerIndex'])->name('offers.index');
+        Route::get('/outcome-rekrutmen', [HrPageController::class, 'outcomeIndex'])->name('outcomes.index');
+        Route::get('/notifikasi', [HrPageController::class, 'notifications'])->name('notifications');
+        Route::get('/pengaturan', [HrPageController::class, 'settings'])->name('settings');
+    });
 
     /*
     | Career Center Company Verification & Vacancy Moderation Frontend Slice v4
