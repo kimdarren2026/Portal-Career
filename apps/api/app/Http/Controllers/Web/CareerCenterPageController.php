@@ -73,8 +73,15 @@ final class CareerCenterPageController extends Controller
             ->orderByDesc('updated_at')->orderByDesc('id')
             ->paginate(20)->withQueryString();
 
+        $companies = $page->items();
+        $submittedAt = CompanyModerationPresenter::submittedAtMap(
+            array_map(static fn ($c): int => (int) $c->getKey(), $companies),
+        );
+
         return Inertia::render('career-center/VerifikasiPerusahaan', [
-            'items' => collect($page->items())->map(CompanyModerationPresenter::summary(...))->values()->all(),
+            'items' => collect($companies)
+                ->map(static fn ($c): array => CompanyModerationPresenter::summary($c, $submittedAt[(int) $c->getKey()] ?? null))
+                ->values()->all(),
             'pagination' => self::pagination($page),
             'filters' => (object) array_filter(['status' => $status, 'q' => $q === '' ? null : $q]),
         ]);

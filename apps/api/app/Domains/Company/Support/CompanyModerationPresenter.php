@@ -26,12 +26,19 @@ use Illuminate\Support\Facades\DB;
  */
 final class CompanyModerationPresenter
 {
-    /** Queue-row shape — the fields a Career Center reviewer scans in the list. @return array<string, mixed> */
-    public static function summary(Company $company): array
+    /**
+     * Queue-row shape — the fields a Career Center reviewer scans in the list.
+     * `$submittedAt` (the latest `SUBMIT` review instant) is passed in so a
+     * list caller can batch-resolve it for every row in one query; a single
+     * caller may omit it and let this method read it.
+     *
+     * @return array<string, mixed>
+     */
+    public static function summary(Company $company, ?string $submittedAt = null): array
     {
-        $lastSubmission = $company->verificationReviews()
+        $submittedAt ??= $company->verificationReviews()
             ->where('action', 'SUBMIT')->orderByDesc('reviewed_at')->orderByDesc('id')
-            ->value('reviewed_at');
+            ->value('reviewed_at')?->toIso8601String();
 
         return [
             'id' => (int) $company->getKey(),
@@ -44,9 +51,35 @@ final class CompanyModerationPresenter
             'verification_status' => $company->verification_status->value,
             'verified_at' => $company->verified_at?->toIso8601String(),
             'suspended_at' => $company->suspended_at?->toIso8601String(),
-            'submitted_at' => $lastSubmission?->toIso8601String(),
+            'submitted_at' => $submittedAt,
             'updated_at' => $company->updated_at?->toIso8601String(),
         ];
+    }
+
+    /**
+     * Latest `SUBMIT` review instant per company, batched — one query for a
+     * whole page of queue rows (no N+1).
+     *
+     * @param list<int> $companyIds
+     * @return array<int, string> company id → ISO-8601 instant
+     */
+    public static function submittedAtMap(array $companyIds): array
+    {
+        $ids = array_values(array_filter($companyIds));
+        if ($ids === []) {
+            return [];
+        }
+
+        return DB::table('company_verification_reviews')
+            ->select('company_id', DB::raw('MAX(reviewed_at) as submitted_at'))
+            ->where('action', 'SUBMIT')
+            ->whereIn('company_id', $ids)
+            ->groupBy('company_id')
+            ->get()
+            ->mapWithKeys(static fn ($row): array => [
+                (int) $row->company_id => \Illuminate\Support\Carbon::parse($row->submitted_at)->toIso8601String(),
+            ])
+            ->all();
     }
 
     /** Full review surface. @return array<string, mixed> */
