@@ -39,6 +39,30 @@ final class RecruitmentFrontendPagesTest extends VacancyTestCase
             ->assertInertia(fn (Assert $page) => $page->component('candidate/Dashboard')->has('counts'));
     }
 
+    public function test_recruiter_dashboard_snapshot_is_company_scoped_and_source_backed(): void
+    {
+        // Actor's own company: one PENDING_REVIEW + one REVISION_REQUIRED vacancy.
+        [$recruiter, $company] = $this->verifiedCompanyWithRecruiter('dash-snap-a@example.test');
+        $this->vacancyAt($recruiter, $company, 'PENDING_REVIEW');
+        $this->vacancyAt($recruiter, $company, 'REVISION_REQUIRED');
+
+        // A different company's vacancy must never bleed into the counts.
+        [$otherRecruiter, $otherCompany] = $this->verifiedCompanyWithRecruiter('dash-snap-b@example.test');
+        $this->vacancyAt($otherRecruiter, $otherCompany, 'REVISION_REQUIRED');
+
+        $this->actingAs($recruiter)->get('/dashboard')->assertOk()->assertInertia(
+            fn (Assert $page) => $page->component('recruiter/Dashboard')
+                ->where('company.name', $company->name)
+                ->where('company.verification_status', 'VERIFIED')
+                ->where('vacancies_by_status.PENDING_REVIEW', 1)
+                ->where('vacancies_by_status.REVISION_REQUIRED', 1)
+                ->where('counts.revision_requests', 1)
+                ->where('counts.incomplete_outcomes', 0)
+                ->has('counts.applicants')
+                ->has('counts.schedules_upcoming'),
+        );
+    }
+
     public function test_lamaran_saya_lists_only_own_applications(): void
     {
         [$admin, , $vacancyId] = $this->openVacancy('frontend-lamaran@example.test');

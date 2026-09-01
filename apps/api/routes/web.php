@@ -12,6 +12,7 @@ use App\Http\Controllers\Web\CandidateProfileController;
 use App\Http\Controllers\Web\CareerCenterPageController;
 use App\Http\Controllers\Web\CompanyController;
 use App\Http\Controllers\Web\CompanyMemberController;
+use App\Http\Controllers\Web\CompanyMemberPageController;
 use App\Http\Controllers\Web\CompanyPageController;
 use App\Http\Controllers\Web\DashboardPageController;
 use App\Http\Controllers\Web\EvaluationController;
@@ -295,6 +296,17 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
     Route::get('/kelola-lowongan/baru', [RecruiterVacancyPageController::class, 'create'])->name('pages.vacancies.create');
     Route::get('/kelola-lowongan/{vacancy}', [RecruiterVacancyPageController::class, 'show'])
         ->whereNumber('vacancy')->name('pages.vacancies.show');
+
+    /*
+    | Recruiter Dashboard & Member Management Frontend Slice v5 — activates the
+    | canonical "Anggota Perusahaan" recruiter nav item (Dashboard was already
+    | routed at `/dashboard`). Page delivery only: the read reuses the frozen
+    | `company->members()->active()` model presented through
+    | `CompanyMemberPresenter`; every membership mutation still posts to the
+    | frozen `companies.members.*` JSON routes (FR-COMP-004, closed D-1).
+    */
+    Route::get('/anggota-perusahaan', [CompanyMemberPageController::class, 'index'])
+        ->name('pages.company.members');
 
     /*
     | Career Center Company Verification & Vacancy Moderation Frontend Slice v4
