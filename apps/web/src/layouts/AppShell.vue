@@ -93,18 +93,19 @@ const adminKepegawaianNav: NavItem[] = [
 ]
 
 // Super Admin — exactly 12 canonical items (FSD §4.6). v10 activated "Audit
-// Log"; v11 activates "Konfigurasi SMTP" (FR-NOTIF-005 / ADR-015 runtime).
-// The other ten stay deferred ("Segera hadir"): master-data writes are
-// deferred beyond MVP (API_SIZE_REVIEW.md DF-1) — covering Master Data, Unit
-// Organisasi, Program Studi; "Jenis Lowongan" is a frozen 3-value enum, not
-// configurable master data; Template Workflow, Template Notifikasi,
-// Integrasi, Retensi Data and Pengaturan Sistem have no frozen runtime.
+// Log"; v11 "Konfigurasi SMTP" (FR-NOTIF-005 / ADR-015); v12 "Jenis Lowongan"
+// as a READ-ONLY reference over the frozen VacancyType enum (PO decision
+// SUPER_ADMIN_VACANCY_TYPE_REFERENCE_MVP — not CRUD). The other nine stay
+// deferred ("Segera hadir"): master-data writes are deferred beyond MVP
+// (API_SIZE_REVIEW.md DF-1) — Master Data, Unit Organisasi, Program Studi;
+// Template Workflow, Template Notifikasi, Integrasi, Retensi Data and
+// Pengaturan Sistem have no frozen runtime.
 const superAdminNav: NavItem[] = [
     { label: 'Pengguna dan Role' },
     { label: 'Master Data' },
     { label: 'Unit Organisasi' },
     { label: 'Program Studi' },
-    { label: 'Jenis Lowongan' },
+    { label: 'Jenis Lowongan', href: '/jenis-lowongan' },
     { label: 'Template Workflow' },
     { label: 'Konfigurasi SMTP', href: '/konfigurasi-smtp' },
     { label: 'Template Notifikasi' },

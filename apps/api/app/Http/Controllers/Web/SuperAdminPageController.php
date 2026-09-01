@@ -12,6 +12,7 @@ use App\Domains\Identity\Enums\RoleCode;
 use App\Domains\Identity\Models\User;
 use App\Domains\Notification\Models\SmtpConfiguration;
 use App\Domains\Notification\Support\SmtpConfigurationPresenter;
+use App\Domains\Vacancy\Support\VacancyTypeReference;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Audit\ListAuditLogsRequest;
 use App\Http\Responses\ContractResponse;
@@ -75,6 +76,24 @@ final class SuperAdminPageController extends Controller
             'filters' => (object) $filters,
             'action_options' => $this->distinctColumn('action'),
             'object_type_options' => $this->distinctColumn('object_type'),
+        ]);
+    }
+
+    /**
+     * `GET /jenis-lowongan` — the Super Admin "Jenis Lowongan" page. Read-only
+     * reference over the frozen `VacancyType` enum (PO decision
+     * SUPER_ADMIN_VACANCY_TYPE_REFERENCE_MVP — API_CONTRACT.md Part X item 61).
+     * No mutation route exists; there is nothing to create, edit or delete.
+     */
+    public function vacancyTypeIndex(Request $request): Response|JsonResponse|SymfonyResponse
+    {
+        $actor = $this->actor($request);
+        if (! $actor->hasActiveRole(RoleCode::SuperAdmin)) {
+            return $this->forbidden($request);
+        }
+
+        return Inertia::render('super-admin/JenisLowongan', [
+            'types' => VacancyTypeReference::all(),
         ]);
     }
 

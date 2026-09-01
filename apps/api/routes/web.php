@@ -431,6 +431,15 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
         ->name('pages.super-admin.audit-log');
 
     /*
+    | Super Admin "Jenis Lowongan" (Frontend Slice v12) — read-only reference
+    | over the frozen VacancyType enum (PO decision
+    | SUPER_ADMIN_VACANCY_TYPE_REFERENCE_MVP, API_CONTRACT.md Part X item 61).
+    | GET only; no create/update/delete/reorder route exists. SUPER_ADMIN only.
+    */
+    Route::get('/jenis-lowongan', [SuperAdminPageController::class, 'vacancyTypeIndex'])
+        ->name('pages.super-admin.vacancy-types');
+
+    /*
     | SMTP Configuration Foundation (FR-NOTIF-005 / ADR-015) — runtime-managed
     | SMTP settings with an application-encrypted, write-only credential
     | (INV-035) and at most one active configuration (INV-036). Contract
