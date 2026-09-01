@@ -3,6 +3,7 @@
 use App\Domains\Candidate\Support\CandidateCollectionRegistry;
 use App\Http\Controllers\Auth\AuthenticationController;
 use App\Http\Controllers\Auth\AuthPageController;
+use App\Http\Controllers\Web\AccountSettingsPageController;
 use App\Http\Controllers\Web\ApplicationController;
 use App\Http\Controllers\Web\CandidateApplicationPageController;
 use App\Http\Controllers\Web\CandidateCollectionController;
@@ -307,6 +308,17 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
     */
     Route::get('/anggota-perusahaan', [CompanyMemberPageController::class, 'index'])
         ->name('pages.company.members');
+
+    /*
+    | Recruiter Account Settings Frontend Slice v6 — activates the canonical
+    | "Pengaturan Akun" recruiter nav item. Page delivery only: the read is the
+    | frozen `GET /me` shape (self scope); password change posts to the frozen
+    | `PUT /me/password`, verification resend to `POST /auth/resend-verification`
+    | and sign-out to `POST /auth/logout`. "Notifikasi" stays deferred —
+    | MODULE_BLOCKED_NOTIFIKASI (no INERTIA_WEB reclassification, no runtime).
+    */
+    Route::get('/pengaturan-akun', [AccountSettingsPageController::class, 'index'])
+        ->name('pages.account.settings');
 
     /*
     | Career Center Company Verification & Vacancy Moderation Frontend Slice v4

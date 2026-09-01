@@ -51,7 +51,7 @@ const recruiterNav: NavItem[] = [
     { label: 'Outcome Rekrutmen', href: '/outcome-rekrutmen' },
     { label: 'Anggota Perusahaan', href: '/anggota-perusahaan' },
     { label: 'Notifikasi' },
-    { label: 'Pengaturan Akun' },
+    { label: 'Pengaturan Akun', href: '/pengaturan-akun' },
 ]
 
 // Career Center — exactly 10 canonical items. Frontend Vertical Slice v4
