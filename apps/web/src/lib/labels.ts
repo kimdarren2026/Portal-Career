@@ -74,15 +74,24 @@ export const vacancyTypeLabel: Record<string, string> = {
 }
 
 /**
- * FE-4 (approved PO decision, 29 August 2026 — API_CONTRACT.md Part X row 50).
- * Approves the display label for `FULL_TIME` ONLY. `vacancies.employment_type`
- * remains vocabulary-pending (DATABASE_SCHEMA.md Part X item 7); every other
- * value falls through to its raw string via `statusLabel`, never a
+ * FE-9 (approved PO decision, 1 September 2026 — API_CONTRACT.md Part X row 55,
+ * completing FE-4 row 50). The recruiter company-vacancy authoring vocabulary
+ * for `vacancies.employment_type`: exactly these five codes are offered in the
+ * create/edit form and submitted raw. Display/authoring-control labels only —
+ * no CHECK, migration, backend `Rule::in`, or enum. An unknown legacy stored
+ * value still falls through to its raw string via `statusLabel`, never a
  * manufactured label.
  */
 export const employmentTypeLabel: Record<string, string> = {
     FULL_TIME: 'Penuh Waktu',
+    PART_TIME: 'Paruh Waktu',
+    CONTRACT: 'Kontrak',
+    FREELANCE: 'Freelance',
+    TEMPORARY: 'Sementara',
 }
+
+/** FE-9: the exact ordered option set the authoring form offers. Raw code is submitted. */
+export const employmentTypeOptions = ['FULL_TIME', 'PART_TIME', 'CONTRACT', 'FREELANCE', 'TEMPORARY'] as const
 
 /**
  * FE-7 (approved PO decision, 29 August 2026 — API_CONTRACT.md Part X row 53,
@@ -96,6 +105,97 @@ export const workplaceModeLabel: Record<string, string> = {
     ONSITE: 'On-site',
     HYBRID: 'Hybrid',
     REMOTE: 'Remote',
+}
+
+/** FE-7: the exact ordered option set the authoring form offers. Raw code is submitted. */
+export const workplaceModeOptions = ['ONSITE', 'HYBRID', 'REMOTE'] as const
+
+/**
+ * FE-10 (approved PO decision, 1 September 2026 — API_CONTRACT.md Part X row 56).
+ * Display labels for the fixed `companies.verification_status` enum
+ * (`App\Domains\Company\Enums\CompanyStatus`). Display only; stored values and
+ * the enum are unchanged. "Terverifikasi" is a verification state and carries
+ * no Mitra Kampus / partnership meaning. An unmapped value falls through to its
+ * raw string via `statusLabel`.
+ */
+export const companyStatusLabel: Record<string, string> = {
+    DRAFT: 'Draf',
+    PENDING_VERIFICATION: 'Menunggu Verifikasi',
+    REVISION_REQUIRED: 'Perlu Perbaikan',
+    VERIFIED: 'Terverifikasi',
+    REJECTED: 'Ditolak',
+    SUSPENDED: 'Ditangguhkan',
+}
+
+export const companyStatusBadgeClass: Record<string, string> = {
+    DRAFT: 'bg-slate-100 text-slate-700',
+    PENDING_VERIFICATION: 'bg-amber-100 text-amber-800',
+    REVISION_REQUIRED: 'bg-red-100 text-red-800',
+    VERIFIED: 'bg-green-100 text-green-800',
+    REJECTED: 'bg-red-100 text-red-800',
+    SUSPENDED: 'bg-slate-200 text-slate-700',
+}
+
+/**
+ * FE-11 (approved PO decision, 1 September 2026 — API_CONTRACT.md Part X row 57).
+ * Display labels for the fixed `vacancies.current_status` enum
+ * (`App\Domains\Vacancy\Enums\VacancyStatus`). Display only; stored values and
+ * the enum are unchanged. `SUBMITTED`/`DIAJUKAN` does not exist — submit is an
+ * action, never a status. An unmapped value falls through to its raw string.
+ */
+export const vacancyStatusLabel: Record<string, string> = {
+    DRAFT: 'Draf',
+    PENDING_REVIEW: 'Menunggu Tinjauan',
+    REVISION_REQUIRED: 'Perlu Perbaikan',
+    APPROVED: 'Disetujui',
+    SCHEDULED: 'Terjadwal',
+    PUBLISHED: 'Dipublikasikan',
+    REJECTED: 'Ditolak',
+    CLOSED: 'Ditutup',
+    EXPIRED: 'Kedaluwarsa',
+    SUSPENDED: 'Ditangguhkan',
+}
+
+export const vacancyStatusBadgeClass: Record<string, string> = {
+    DRAFT: 'bg-slate-100 text-slate-700',
+    PENDING_REVIEW: 'bg-amber-100 text-amber-800',
+    REVISION_REQUIRED: 'bg-red-100 text-red-800',
+    APPROVED: 'bg-sky-100 text-sky-800',
+    SCHEDULED: 'bg-sky-100 text-sky-800',
+    PUBLISHED: 'bg-green-100 text-green-800',
+    REJECTED: 'bg-red-100 text-red-800',
+    CLOSED: 'bg-slate-200 text-slate-700',
+    EXPIRED: 'bg-slate-200 text-slate-700',
+    SUSPENDED: 'bg-slate-200 text-slate-700',
+}
+
+/**
+ * FE-12 (approved PO decision, 1 September 2026 — API_CONTRACT.md Part X row 58).
+ * Display labels for the fixed `vacancies.target_audience` enum
+ * (`App\Domains\Vacancy\Enums\TargetAudience`, INV-006). Display and authoring
+ * option labels only; stored values and the enum are unchanged.
+ */
+export const targetAudienceLabel: Record<string, string> = {
+    PUBLIC: 'Publik',
+    ALUMNI_ONLY: 'Alumni',
+    FINAL_YEAR_AND_ALUMNI: 'Mahasiswa Tingkat Akhir & Alumni',
+    INTERNAL: 'Internal',
+}
+
+/** INV-006: the four values, offered in this order by the authoring form. Raw code submitted. */
+export const targetAudienceOptions = ['PUBLIC', 'ALUMNI_ONLY', 'FINAL_YEAR_AND_ALUMNI', 'INTERNAL'] as const
+
+/**
+ * `VacancyType::companyAuthorable()` — the two types a company may author
+ * (`POST /companies/{company}/vacancies`; `CAMPUS_EMPLOYMENT` is the separate
+ * campus flow, INV-018). Labels reuse the frozen FE-3 `vacancyTypeLabel` map.
+ */
+export const companyAuthorableVacancyTypes = ['COMPANY_EMPLOYMENT', 'INTERNSHIP'] as const
+
+/** `vacancies.application_method` display labels (FSD §9.1.5). */
+export const applicationMethodLabel: Record<string, string> = {
+    IN_PORTAL: 'Lamar via Portal',
+    EXTERNAL_ATS: 'Lamar via ATS Eksternal',
 }
 
 /**

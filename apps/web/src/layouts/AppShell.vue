@@ -41,11 +41,11 @@ const candidateNav: NavItem[] = [
 
 const recruiterNav: NavItem[] = [
     { label: 'Dashboard', href: '/dashboard' },
-    { label: 'Profil Perusahaan' },
-    { label: 'Status Verifikasi' },
+    { label: 'Profil Perusahaan', href: '/profil-perusahaan' },
+    { label: 'Status Verifikasi', href: '/status-verifikasi' },
     { label: 'Dokumen Legalitas' },
     { label: 'Kemitraan' },
-    { label: 'Lowongan' },
+    { label: 'Lowongan', href: '/kelola-lowongan' },
     { label: 'Pelamar', href: '/pelamar' },
     { label: 'Jadwal Seleksi', href: '/jadwal-seleksi' },
     { label: 'Outcome Rekrutmen', href: '/outcome-rekrutmen' },

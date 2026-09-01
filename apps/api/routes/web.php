@@ -11,11 +11,13 @@ use App\Http\Controllers\Web\CandidatePageController;
 use App\Http\Controllers\Web\CandidateProfileController;
 use App\Http\Controllers\Web\CompanyController;
 use App\Http\Controllers\Web\CompanyMemberController;
+use App\Http\Controllers\Web\CompanyPageController;
 use App\Http\Controllers\Web\DashboardPageController;
 use App\Http\Controllers\Web\EvaluationController;
 use App\Http\Controllers\Web\OfferController;
 use App\Http\Controllers\Web\PublicVacancyController;
 use App\Http\Controllers\Web\RecruiterApplicantPageController;
+use App\Http\Controllers\Web\RecruiterVacancyPageController;
 use App\Http\Controllers\Web\RecruitmentOutcomeController;
 use App\Http\Controllers\Web\RecruitmentOutcomePageController;
 use App\Http\Controllers\Web\RecruitmentStageController;
@@ -274,6 +276,24 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
     // recruiter nav item. Page delivery only; create/correct still post to the
     // JSON `recruitment-outcomes.*` routes above.
     Route::get('/outcome-rekrutmen', [RecruitmentOutcomePageController::class, 'index'])->name('pages.outcomes.index');
+
+    /*
+    | Recruiter Company & Vacancy Frontend Slice v3 — Inertia page delivery
+    | only. Activates the canonical "Profil Perusahaan", "Status Verifikasi"
+    | and "Lowongan" recruiter nav items. Each controller reuses the frozen
+    | Company/Vacancy Scope/Query/Presenter classes directly (never a loopback
+    | HTTP call) and mutates nothing; every mutation still posts to the JSON
+    | routes already registered above (`companies.*`, `vacancies.*`,
+    | `companies.vacancies.store`, `vacancies.submit-review`, `vacancies.close`).
+    | `/kelola-lowongan` is a private routing choice — the public discovery
+    | prefix `/lowongan` is untouched.
+    */
+    Route::get('/profil-perusahaan', [CompanyPageController::class, 'profile'])->name('pages.company.profile');
+    Route::get('/status-verifikasi', [CompanyPageController::class, 'verification'])->name('pages.company.verification');
+    Route::get('/kelola-lowongan', [RecruiterVacancyPageController::class, 'index'])->name('pages.vacancies.index');
+    Route::get('/kelola-lowongan/baru', [RecruiterVacancyPageController::class, 'create'])->name('pages.vacancies.create');
+    Route::get('/kelola-lowongan/{vacancy}', [RecruiterVacancyPageController::class, 'show'])
+        ->whereNumber('vacancy')->name('pages.vacancies.show');
 });
 
 /*
