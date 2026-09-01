@@ -41,6 +41,7 @@ use App\Domains\Company\Exceptions\CompanyMemberNotFound;
 use App\Domains\Company\Exceptions\CompanyNotFound;
 use App\Domains\Company\Exceptions\CompanyNotPublic;
 use App\Domains\Company\Exceptions\LastCompanyAdmin;
+use App\Domains\Notification\Exceptions\NotificationNotFound;
 use App\Domains\Recruitment\Evaluation\Exceptions\EvaluationAlreadySubmitted;
 use App\Domains\Recruitment\Evaluation\Exceptions\EvaluationNotFound;
 use App\Domains\Recruitment\Evaluation\Exceptions\EvaluationNotOwned;
@@ -154,7 +155,7 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->render(function (AuthenticationException $exception, Request $request) {
-            if (in_array($request->path(), ['me', 'me/password', 'auth/logout'], true) || $request->is('candidate/*') || $request->is('companies/*') || $request->is('companies') || $request->is('vacancies') || $request->is('vacancies/*') || $request->is('applications') || $request->is('applications/*')) {
+            if (in_array($request->path(), ['me', 'me/password', 'auth/logout'], true) || $request->is('candidate/*') || $request->is('companies/*') || $request->is('companies') || $request->is('vacancies') || $request->is('vacancies/*') || $request->is('applications') || $request->is('applications/*') || $request->is('notifications') || $request->is('notifications/*')) {
                 return ContractResponse::error($request, 'UNAUTHENTICATED', 401, 'Sesi autentikasi diperlukan.');
             }
         });
@@ -168,6 +169,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // company are indistinguishable — both are a plain 404.
         $exceptions->render(fn (CompanyNotPublic $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Perusahaan tidak ditemukan.'));
         $exceptions->render(fn (CompanyMemberNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Anggota perusahaan tidak ditemukan.'));
+        // A notification outside the actor's OWN set is indistinguishable from
+        // one that does not exist — both are a plain 404 (no cross-user leak).
+        $exceptions->render(fn (NotificationNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Notifikasi tidak ditemukan.'));
         $exceptions->render(fn (VacancyNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Lowongan tidak ditemukan.'));
         // Public discovery (§10): a non-existent slug and a slug that fails any
         // one visibility condition are indistinguishable — both are VACANCY_NOT_PUBLIC.

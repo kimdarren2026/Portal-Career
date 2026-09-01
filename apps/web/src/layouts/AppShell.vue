@@ -50,7 +50,7 @@ const recruiterNav: NavItem[] = [
     { label: 'Jadwal Seleksi', href: '/jadwal-seleksi' },
     { label: 'Outcome Rekrutmen', href: '/outcome-rekrutmen' },
     { label: 'Anggota Perusahaan', href: '/anggota-perusahaan' },
-    { label: 'Notifikasi' },
+    { label: 'Notifikasi', href: '/notifikasi' },
     { label: 'Pengaturan Akun', href: '/pengaturan-akun' },
 ]
 

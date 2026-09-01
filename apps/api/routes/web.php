@@ -15,6 +15,8 @@ use App\Http\Controllers\Web\CompanyController;
 use App\Http\Controllers\Web\CompanyMemberController;
 use App\Http\Controllers\Web\CompanyMemberPageController;
 use App\Http\Controllers\Web\CompanyPageController;
+use App\Http\Controllers\Web\NotificationController;
+use App\Http\Controllers\Web\NotificationPageController;
 use App\Http\Controllers\Web\DashboardPageController;
 use App\Http\Controllers\Web\EvaluationController;
 use App\Http\Controllers\Web\OfferController;
@@ -96,6 +98,22 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
     Route::post('/auth/logout', [AuthenticationController::class, 'logout'])->name('auth.logout');
     Route::get('/me', [AuthenticationController::class, 'me'])->name('auth.me');
     Route::put('/me/password', [AuthenticationController::class, 'changePassword'])->name('auth.password.update');
+
+    /*
+    | In-app notification centre (API_CONTRACT.md Part IX · FSD §4.2).
+    | Reclassified VERSIONED_API → INERTIA_WEB for the MVP browser portal by
+    | an approved Product Owner / SPEC-DOC decision (Part X decision row) — a
+    | transport classification only; OWN authorization and every business
+    | rule are unchanged. `GET /notifications` is the JSON contract shape
+    | (paginated + `meta.unread_count`); the `/notifikasi` Inertia page below
+    | is its browser realization. No email-verified gate — reading one's own
+    | notifications carries none. No idempotency header — mark-read is
+    | naturally idempotent.
+    */
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'read'])
+        ->whereNumber('notification')->name('notifications.read');
 });
 
 Route::middleware(['auth', 'account.status'])->prefix('companies')->name('companies.')->group(function (): void {
@@ -319,6 +337,16 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
     */
     Route::get('/pengaturan-akun', [AccountSettingsPageController::class, 'index'])
         ->name('pages.account.settings');
+
+    /*
+    | Recruiter Notification Frontend Slice v7 — activates the canonical
+    | "Notifikasi" recruiter nav item. Page delivery only: the read reuses the
+    | frozen ListNotifications / NotificationScope / NotificationPresenter
+    | (OWN by user_id); mark-read and mark-all-read post to the frozen
+    | `notifications.*` JSON routes above. Dokumen Legalitas and Kemitraan
+    | remain deferred (D-6 open; partnership lifecycle under-specified).
+    */
+    Route::get('/notifikasi', [NotificationPageController::class, 'index'])->name('pages.notifications');
 
     /*
     | Career Center Company Verification & Vacancy Moderation Frontend Slice v4
