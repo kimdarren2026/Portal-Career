@@ -61,11 +61,7 @@ Two headings in the contract are grouped-contract placeholders, not routable URI
 
 ## Notifications
 
-| Domain | Method | URI | Purpose / Contract Section | Primary Role |
-| --- | --- | --- | --- | --- |
-| Notifications | `GET` | `/api/v1/notifications` | GET /api/v1/notifications | Authenticated (OWN) |
-| Notifications | `POST` | `/api/v1/notifications/read-all` | GET /api/v1/notifications *(grouped)* | Authenticated (OWN) |
-| Notifications | `POST` | `/api/v1/notifications/{notification}/read` | GET /api/v1/notifications *(grouped)* | Authenticated (OWN) |
+The three notification operations (`GET /notifications`, `POST /notifications/{notification}/read`, `POST /notifications/read-all`) were reclassified `VERSIONED_API → INERTIA_WEB` on 1 September 2026 (`API_CONTRACT.md` Part X item 59 / SPEC-DOC-09) and now live in `INERTIA_ACTIONS.md`. Their `/api/v1` twins stay reserved and inactive; nothing is routed under `/api/v1` for this domain at MVP.
 
 ---
 
@@ -78,8 +74,7 @@ Two headings in the contract are grouped-contract placeholders, not routable URI
 | Public | 4 |
 | Application | 4 |
 | External Apply | 2 |
-| Notifications | 3 |
-| **Total** | **17** |
+| **Total** | **14** |
 
 ---
 

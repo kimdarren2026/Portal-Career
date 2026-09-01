@@ -1,7 +1,7 @@
 # Inertia Web Action Index — Internal Application Surface
 
 **Status:** Proposed — awaiting approval
-**Date:** 24 August 2026 · **Amended:** Candidate Core HTTP surface (SPEC-DOC-07 accepted) · Candidate Application MVP transport (SPEC-DOC-08 accepted, 26 August 2026) · Recruitment Stage Authoring role-grouping correction (RS-2, RS-6 accepted, 26 August 2026) · Selection Schedule read transport (SS-9 accepted, 27 August 2026) · Evaluation COMPANY_SCOPE correction (accepted, 27 August 2026) · Candidate offer response transport (OF-2 accepted, 27 August 2026)
+**Date:** 24 August 2026 · **Amended:** Candidate Core HTTP surface (SPEC-DOC-07 accepted) · Candidate Application MVP transport (SPEC-DOC-08 accepted, 26 August 2026) · Recruitment Stage Authoring role-grouping correction (RS-2, RS-6 accepted, 26 August 2026) · Selection Schedule read transport (SS-9 accepted, 27 August 2026) · Evaluation COMPANY_SCOPE correction (accepted, 27 August 2026) · Candidate offer response transport (OF-2 accepted, 27 August 2026) · In-app notification web surface (SPEC-DOC-09 / Part X item 59 accepted, 1 September 2026)
 **Generated from:** `API_CONTRACT.md` — verified programmatically in both directions.
 
 **This file lists only `INERTIA_WEB` operations.** These are internal Laravel + Inertia application routes:
@@ -32,7 +32,7 @@ Any of these may later be promoted to `VERSIONED_API`. Promotion is additive —
 
 | Total INERTIA_WEB operations |
 | --- |
-| **131** |
+| **134** |
 
 ## Authentication & Session
 
@@ -214,6 +214,16 @@ Recruitment Outcome Foundation v1 (OC-1, RC-2, H-5, approved and CLOSED) activat
 | Recruitment Outcome | `GET` | `/recruitment-outcomes/incomplete` | POST /api/v1/recruitment-outcomes *(grouped)* | COMPANY_SCOPE / ALLOW (Super Admin) / READ_ONLY (Auditor) |
 | Recruitment Outcome | `PATCH` | `/recruitment-outcomes/{outcome}` | POST /api/v1/recruitment-outcomes *(grouped)* | COMPANY_SCOPE / ALLOW (Super Admin) |
 
+## Notifications
+
+Reclassified `VERSIONED_API → INERTIA_WEB` on 1 September 2026 (`API_CONTRACT.md` Part X item 59 / SPEC-DOC-09) — transport only, `OWN` authorization by `notifications.user_id` unchanged, company membership never widens it. `GET /notifications` is the JSON contract shape (`data.{items,pagination}` + `meta.unread_count`); `GET /notifikasi` is its Inertia realization. The two mutations return `204` and carry no audit and no idempotency header.
+
+| Domain | Method | Route | Purpose / Contract Section | Primary Role |
+| --- | --- | --- | --- | --- |
+| Notifications | `GET` | `/notifications` | GET /api/v1/notifications | Authenticated (OWN) |
+| Notifications | `POST` | `/notifications/read-all` | GET /api/v1/notifications *(grouped)* | Authenticated (OWN) |
+| Notifications | `POST` | `/notifications/{notification}/read` | GET /api/v1/notifications *(grouped)* | Authenticated (OWN) |
+
 ## SMTP Configuration
 
 | Domain | Method | Route | Purpose / Contract Section | Primary Role |
@@ -271,8 +281,9 @@ Recruitment Outcome Foundation v1 (OC-1, RC-2, H-5, approved and CLOSED) activat
 | Evaluation | 3 |
 | Offering | 6 |
 | Recruitment Outcome | 4 |
+| Notifications | 3 |
 | SMTP Configuration | 3 |
 | Reporting | 8 |
 | Audit | 1 |
 | Administration | 6 |
-| **Total** | **131** |
+| **Total** | **134** |

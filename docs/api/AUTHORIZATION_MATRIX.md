@@ -305,7 +305,7 @@ Starting an external apply **creates no application row and sets no status to `A
 
 | Capability | PUBLIC | CANDIDATE | COMPANY_RECRUITER | COMPANY_ADMIN | CAREER_CENTER | HR_ADMIN | SELECTOR | AUDITOR | SUPER_ADMIN |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| List own notifications · unread count · mark read | D | **O** | **O** | **O** | **O** | **O** | **O** | **O** | **O** |
+| List own notifications · unread count · mark read ⁺ | D | **O** | **O** | **O** | **O** | **O** | **O** | **O** | **O** |
 | Recruiter dashboard reports | D | D | **C** | **C** | **D** | D | D | **R** | **A** |
 | Career Center reports | D | D | D | D | **A** | D | D | **R** | **A** |
 | Campus reports | D | D | D | D | **D** | **K** | D | **R** | **A** |
@@ -323,6 +323,8 @@ Starting an external apply **creates no application row and sets no status to `A
 ³⁰ Career Center's Time-to-Fill and export scope covers what FR-REP-002 defines; it is aggregate reporting, not applicant-level access.
 ³¹ Auditor may export within its permitted read scope. Every export is audited (FR-REP-005).
 ³² **No role can mutate the audit log — including Super Admin.** No create, update, or delete endpoint exists (INV-016). An audit trail that can be edited is not an audit trail.
+⁺ **Surface: `INERTIA_WEB`** as of 1 September 2026 (`API_CONTRACT.md` Part X item 59 / SPEC-DOC-09). The three operations — `GET /notifications`, `POST /notifications/{notification}/read`, `POST /notifications/read-all` — moved from the reserved `VERSIONED_API` surface to the browser session-guard surface. **`O` (`OWN` by `notifications.user_id`) is unchanged on every row above**; company membership never widens it, and there is no global-reader, Super Admin, or Auditor override — every persona reads only its own rows.
+
 ³³ Auditor does **not** reach SMTP configuration. It is system configuration, not audit data.
 ³⁴ **The SMTP credential is never returned, to anyone, ever** (INV-035). Reads return `secret_configured: true` — a boolean conveying neither the value nor its length. Updates accept a new secret and replace the ciphertext wholesale; omitting it preserves the existing value. Audit records `credential_changed: true|false`, never a value.
 ³⁵ Master data is read by many roles to render forms; **writes are Super Admin only** (FSD §4.6).
