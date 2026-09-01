@@ -15,6 +15,7 @@ use App\Http\Controllers\Web\CompanyController;
 use App\Http\Controllers\Web\CompanyMemberController;
 use App\Http\Controllers\Web\CompanyMemberPageController;
 use App\Http\Controllers\Web\CompanyPageController;
+use App\Http\Controllers\Web\HrVacancyController;
 use App\Http\Controllers\Web\NotificationController;
 use App\Http\Controllers\Web\NotificationPageController;
 use App\Http\Controllers\Web\DashboardPageController;
@@ -437,5 +438,35 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
             ->whereNumber('vacancy')->name('restore');
         Route::post('/{vacancy}/close', [VacancyLifecycleController::class, 'close'])
             ->whereNumber('vacancy')->name('close');
+    });
+});
+
+/*
+| Campus Recruitment Foundation — INERTIA_WEB.
+|
+| Activates the previously DEFERRED CAMPUS_SCOPE / HR_ADMIN runtime (approved
+| Product Owner / SPEC-DOC decision; see API_CONTRACT.md Part X). BRD/FSD
+| already require the Karier di Kampus track (FSD §5.5, FR-HR-001..007, §8.4).
+|
+| `POST /hr/vacancies` creates a campus vacancy. The five
+| `POST /hr/vacancies/{vacancy}/{action}` routes are the campus lifecycle
+| (FSD §8.4) — campus vacancies are NOT moderated and never touch Career
+| Center. Campus vacancy READ / EDIT / stages / screening reuse the shared
+| `/vacancies/*` surface (VacancyScope + VacancyPolicy already carry the
+| campus branch). Campus applicant processing, schedule, evaluation, offering
+| and outcome reuse their existing `/applications/*`, `/schedules/*`,
+| `/evaluations/*`, `/offers/*` and `/recruitment-outcomes/*` routes with the
+| CAMPUS_SCOPE branch now active in every scope.
+*/
+Route::middleware(['auth', 'account.status'])->prefix('hr')->name('hr.')->group(function (): void {
+    Route::post('/vacancies', [HrVacancyController::class, 'store'])
+        ->middleware('verified.email')->name('vacancies.store');
+
+    Route::prefix('vacancies/{vacancy}')->whereNumber('vacancy')->name('vacancies.')->group(function (): void {
+        Route::post('/publish', [HrVacancyController::class, 'publish'])->name('publish');
+        Route::post('/schedule', [HrVacancyController::class, 'schedule'])->name('schedule');
+        Route::post('/close', [HrVacancyController::class, 'close'])->name('close');
+        Route::post('/suspend', [HrVacancyController::class, 'suspend'])->name('suspend');
+        Route::post('/restore', [HrVacancyController::class, 'restore'])->name('restore');
     });
 });

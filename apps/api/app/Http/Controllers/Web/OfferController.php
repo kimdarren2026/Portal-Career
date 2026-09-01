@@ -130,7 +130,7 @@ final class OfferController extends CandidateController
 
     private function isRecruiterActor(User $actor): bool
     {
-        return OfferScope::isRecruiterOrAdmin($actor) || OfferScope::isSuperAdmin($actor);
+        return OfferScope::isRecruiterOrAdmin($actor) || OfferScope::isSuperAdmin($actor) || \App\Domains\Vacancy\Support\CampusScope::isCampusAdmin($actor); // CAMPUS_SCOPE (HR_ADMIN)
     }
 
     private function forbidden(Request $request): JsonResponse

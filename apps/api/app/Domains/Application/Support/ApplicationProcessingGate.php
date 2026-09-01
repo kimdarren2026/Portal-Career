@@ -26,10 +26,19 @@ final class ApplicationProcessingGate
 {
     private const PROCESSABLE_VACANCY_STATUSES = ['PUBLISHED', 'CLOSED', 'EXPIRED'];
 
-    /** @throws VacancyCompanyNotVerified|VacancyNotProcessable */
-    public static function assertProcessable(Company $company, Vacancy $vacancy): void
+    /**
+     * @param  ?Company  $company  the owning company for a COMPANY vacancy;
+     *                             `null` for a CAMPUS vacancy, which has none
+     *                             (FR-HR-001). For campus the RA-2 gate reduces
+     *                             to the vacancy-status check only — there is no
+     *                             company-verification component.
+     *
+     * @throws VacancyCompanyNotVerified|VacancyNotProcessable
+     */
+    public static function assertProcessable(?Company $company, Vacancy $vacancy): void
     {
-        if ($company->verification_status !== CompanyStatus::Verified) {
+        if ($vacancy->ownership_type === 'COMPANY'
+            && ($company === null || $company->verification_status !== CompanyStatus::Verified)) {
             throw new VacancyCompanyNotVerified();
         }
 

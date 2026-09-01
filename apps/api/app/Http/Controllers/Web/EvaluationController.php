@@ -115,7 +115,7 @@ final class EvaluationController extends Controller
 
     private function isRecruiterActor(User $actor): bool
     {
-        return EvaluationScope::isRecruiterOrAdmin($actor) || EvaluationScope::isSuperAdmin($actor);
+        return EvaluationScope::isRecruiterOrAdmin($actor) || EvaluationScope::isSuperAdmin($actor) || \App\Domains\Vacancy\Support\CampusScope::isCampusAdmin($actor); // CAMPUS_SCOPE (HR_ADMIN)
     }
 
     private function actor(Request $request): User

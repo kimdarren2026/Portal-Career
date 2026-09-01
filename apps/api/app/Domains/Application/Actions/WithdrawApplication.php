@@ -59,8 +59,14 @@ final class WithdrawApplication
                 'from_status' => $from?->value,
             ]);
 
-            $vacancyCompanyId = (int) $locked->vacancy()->value('company_id');
-            $this->notifier->withdrawn($locked, $actor, $vacancyCompanyId);
+            $vacancyRow = $locked->vacancy()->first(['company_id', 'created_by']);
+            $companyId = $vacancyRow?->company_id === null ? null : (int) $vacancyRow->company_id;
+            $this->notifier->withdrawn(
+                $locked,
+                $actor,
+                $companyId,
+                $companyId === null ? (int) ($vacancyRow?->created_by) : null,
+            );
 
             return $locked->refresh();
         });

@@ -192,7 +192,7 @@ final class ApplicationController extends CandidateController
 
     private function isRecruiterActor(User $actor): bool
     {
-        return RecruiterApplicationScope::isRecruiterOrAdmin($actor) || RecruiterApplicationScope::isSuperAdmin($actor);
+        return RecruiterApplicationScope::isRecruiterOrAdmin($actor) || RecruiterApplicationScope::isSuperAdmin($actor) || \App\Domains\Vacancy\Support\CampusScope::isCampusAdmin($actor); // CAMPUS_SCOPE (HR_ADMIN)
     }
 
     /** `If-Match` carries the history-row count the client last read (PATCH concurrency rule, mirrors VacancyController). */

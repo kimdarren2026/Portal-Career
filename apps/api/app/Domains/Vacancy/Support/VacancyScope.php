@@ -25,6 +25,13 @@ final class VacancyScope
             return Vacancy::query();
         }
 
+        // CAMPUS_SCOPE (HR_ADMIN / Admin Kepegawaian) — campus-owned vacancies
+        // only, never a company vacancy (mirrors how Career Center below gets
+        // company-only). Activated by the approved PO / SPEC-DOC decision.
+        if (self::hasAnyRole($user, [RoleCode::HrAdmin])) {
+            return Vacancy::query()->where('ownership_type', 'CAMPUS');
+        }
+
         // Career Center reads company vacancies for moderation; Auditor reads
         // read-only within its permitted scope. Neither reaches campus vacancies
         // through this phase's surface.

@@ -81,13 +81,20 @@ final class VacancyPublicationTest extends VacancyTestCase
         [$recruiter, $company] = $this->verifiedCompanyWithRecruiter('pub-route@example.test');
         $id = $this->scheduled($recruiter, $company, now()->addDay());
 
+        // B-4 is unchanged: NO company vacancy publish route exists. The campus
+        // lifecycle route `hr/vacancies/{vacancy}/publish` (CAMPUS_SCOPE
+        // activation) is a different surface and does not touch a company
+        // vacancy — `TransitionCampusVacancy` refuses one.
         self::assertNull(Route::getRoutes()->getByName('vacancies.publish'));
         $registered = collect(Route::getRoutes())->map(
             static fn ($route): string => strtoupper(implode('|', $route->methods())).' '.$route->uri(),
         );
-        self::assertFalse($registered->contains(fn (string $r): bool => str_contains($r, 'publish')));
+        self::assertFalse($registered->contains(
+            fn (string $r): bool => str_contains($r, 'publish') && ! str_contains($r, 'hr/vacancies'),
+        ));
 
-        // Owner, Career Center and Super Admin all reach nothing.
+        // Owner, Career Center and Super Admin all reach nothing on the company
+        // path.
         foreach ([
             $recruiter,
             $this->moderator('pub-route-cc@example.test'),

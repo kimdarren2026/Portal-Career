@@ -50,6 +50,15 @@ final class RecruitmentOutcomeScope
                 ->whereHas('application.vacancy', fn (Builder $q) => $q->where('ownership_type', 'COMPANY'));
         }
 
+        // CAMPUS_SCOPE (HR_ADMIN) — campus applications ARE INTERNAL_APPLICATION
+        // (no new source_type; schema unchanged). Campus-owned vacancies only.
+        if (\App\Domains\Vacancy\Support\CampusScope::isCampusAdmin($user)) {
+            return \App\Domains\Vacancy\Support\CampusScope::throughVacancy(
+                RecruitmentOutcome::query()->where('source_type', 'INTERNAL_APPLICATION'),
+                'application.vacancy',
+            );
+        }
+
         return RecruitmentOutcome::query()
             ->where('source_type', 'INTERNAL_APPLICATION')
             ->whereHas('application.vacancy', fn (Builder $q) => $q->where('ownership_type', 'COMPANY')
@@ -73,6 +82,10 @@ final class RecruitmentOutcomeScope
     {
         if (self::isSuperAdmin($user) || self::isAuditor($user)) {
             return Application::query()->whereHas('vacancy', fn (Builder $q) => $q->where('ownership_type', 'COMPANY'));
+        }
+
+        if (\App\Domains\Vacancy\Support\CampusScope::isCampusAdmin($user)) {
+            return \App\Domains\Vacancy\Support\CampusScope::throughVacancy(Application::query(), 'vacancy');
         }
 
         return Application::query()

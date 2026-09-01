@@ -93,31 +93,48 @@ final class PublicVacancyDiscoveryTest extends VacancyTestCase
         self::assertContains(DB::table('vacancies')->where('id', $publishedId)->value('slug'), $visibleSlugs);
     }
 
-    public function test_campus_ownership_is_never_publicly_visible(): void
+    /**
+     * CAMPUS_SCOPE activation (approved PO / SPEC-DOC): a PUBLISHED, in-window,
+     * non-INTERNAL campus vacancy IS publicly discoverable under Karier di
+     * Kampus — no company-verification gate applies (a campus vacancy has no
+     * company). A DRAFT campus vacancy stays hidden exactly like any other
+     * non-PUBLISHED row.
+     */
+    public function test_published_campus_vacancy_is_publicly_visible_but_draft_is_not(): void
     {
         $close = Carbon::parse('2026-11-01T09:00:00+00:00');
-        [$recruiter] = $this->verifiedCompanyWithRecruiter('campus-hidden@example.test');
+        [$recruiter] = $this->verifiedCompanyWithRecruiter('campus-public@example.test');
         $unitId = DB::table('organizational_units')->insertGetId([
             'code' => 'UNIT-PUB', 'name' => 'Unit Publik', 'active' => true, 'created_at' => now(), 'updated_at' => now(),
         ]);
-        $campusId = DB::table('vacancies')->insertGetId([
-            'vacancy_code' => 'VAC-CAMPUS-PUB', 'slug' => 'campus-public-fixture',
-            'vacancy_type' => 'CAMPUS_EMPLOYMENT', 'ownership_type' => 'CAMPUS',
-            'company_id' => null, 'organizational_unit_id' => $unitId,
-            'title' => 'Staf Kampus Publik', 'description' => 'Deskripsi.',
-            'employment_type' => 'FULL_TIME', 'openings_count' => 1,
-            'target_audience' => 'PUBLIC', 'application_method' => 'IN_PORTAL',
-            'current_status' => 'PUBLISHED', 'created_by' => $recruiter->id,
-            'open_at' => $close->copy()->subDays(20), 'close_at' => $close,
-            'published_at' => $close->copy()->subDays(20),
-            'created_at' => now(), 'updated_at' => now(),
-        ]);
+
+        $make = function (string $slug, string $status) use ($recruiter, $unitId, $close): void {
+            DB::table('vacancies')->insert([
+                'vacancy_code' => 'VAC-'.strtoupper($slug), 'slug' => $slug,
+                'vacancy_type' => 'CAMPUS_EMPLOYMENT', 'ownership_type' => 'CAMPUS',
+                'company_id' => null, 'organizational_unit_id' => $unitId,
+                'title' => 'Staf Kampus', 'description' => 'Deskripsi.',
+                'employment_type' => 'FULL_TIME', 'openings_count' => 1,
+                'target_audience' => 'PUBLIC', 'application_method' => 'IN_PORTAL',
+                'current_status' => $status, 'created_by' => $recruiter->id,
+                'open_at' => $close->copy()->subDays(20), 'close_at' => $close,
+                'published_at' => $status === 'PUBLISHED' ? $close->copy()->subDays(20) : null,
+                'created_at' => now(), 'updated_at' => now(),
+            ]);
+        };
+        $make('campus-live', 'PUBLISHED');
+        $make('campus-draft', 'DRAFT');
 
         Carbon::setTestNow($close->copy()->subDay());
-        $this->getJson('/api/v1/public/vacancies/campus-public-fixture')->assertNotFound()
+
+        $this->getJson('/api/v1/public/vacancies/campus-live')->assertOk()
+            ->assertJsonPath('data.vacancy_type', 'CAMPUS_EMPLOYMENT');
+        $this->getJson('/api/v1/public/vacancies/campus-draft')->assertNotFound()
             ->assertJsonPath('error.code', 'VACANCY_NOT_PUBLIC');
+
         $slugs = $this->getJson('/api/v1/public/vacancies?per_page=50')->assertOk()->json('data.items.*.slug');
-        self::assertNotContains('campus-public-fixture', $slugs);
+        self::assertContains('campus-live', $slugs);
+        self::assertNotContains('campus-draft', $slugs);
     }
 
     public function test_internal_audience_is_hidden_public_audience_is_visible(): void

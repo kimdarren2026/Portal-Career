@@ -56,8 +56,8 @@ final class TransitionApplication
 
             /** @var Vacancy $vacancy */
             $vacancy = Vacancy::query()->whereKey($locked->vacancy_id)->lockForUpdate()->firstOrFail();
-            /** @var Company $company */
-            $company = Company::query()->whereKey($vacancy->company_id)->lockForUpdate()->firstOrFail();
+            /** @var ?Company $company */
+            $company = $vacancy->company_id === null ? null : Company::query()->whereKey($vacancy->company_id)->lockForUpdate()->firstOrFail(); // CAMPUS vacancies have no company (FR-HR-001)
 
             $from = $locked->current_status;
             ApplicationTransitionGraph::assertLegal($from, $toStatus);

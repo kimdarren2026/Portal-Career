@@ -76,8 +76,8 @@ final class RescheduleSelectionSchedule
             /** @var RecruitmentStage $stage */
             $stage = RecruitmentStage::query()->whereKey($locked->recruitment_stage_id)->lockForUpdate()->firstOrFail();
 
-            /** @var Company $company */
-            $company = Company::query()->whereKey($vacancy->company_id)->lockForUpdate()->firstOrFail();
+            /** @var ?Company $company */
+            $company = $vacancy->company_id === null ? null : Company::query()->whereKey($vacancy->company_id)->lockForUpdate()->firstOrFail(); // CAMPUS vacancies have no company (FR-HR-001)
 
             ApplicationProcessingGate::assertProcessable($company, $vacancy);
 

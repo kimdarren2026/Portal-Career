@@ -25,6 +25,8 @@ use Illuminate\Support\Facades\DB;
  * the status is re-checked after the lock, so two concurrent runs cannot
  * publish the same vacancy twice or move `published_at` (INV-013).
  */
+// Campus vacancies (FSD §8.4 'SCHEDULED -> PUBLISHED, Reach open date') are
+// published by the same run — CAMPUS_SCOPE activation (PO / SPEC-DOC).
 final class PublishScheduledVacancies
 {
     public function __construct(private readonly PublishVacancy $publisher) {}
@@ -33,7 +35,7 @@ final class PublishScheduledVacancies
     public function execute(): int
     {
         $due = Vacancy::query()
-            ->where('ownership_type', 'COMPANY')
+            ->whereIn('ownership_type', ['COMPANY', 'CAMPUS'])
             ->where('current_status', VacancyStatus::Scheduled->value)
             ->whereNotNull('open_at')
             ->where('open_at', '<=', now())

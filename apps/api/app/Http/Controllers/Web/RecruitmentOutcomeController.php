@@ -97,7 +97,9 @@ final class RecruitmentOutcomeController extends Controller
     /** Create/correct: COMPANY_SCOPE (recruiter/admin) and SUPER_ADMIN. Auditor is read-only; Career Center is DENY (RC-2). */
     private function isWriteActor(User $actor): bool
     {
-        return RecruitmentOutcomeScope::isRecruiterOrAdmin($actor) || RecruitmentOutcomeScope::isSuperAdmin($actor);
+        return RecruitmentOutcomeScope::isRecruiterOrAdmin($actor)
+            || RecruitmentOutcomeScope::isSuperAdmin($actor)
+            || \App\Domains\Vacancy\Support\CampusScope::isCampusAdmin($actor); // CAMPUS_SCOPE (HR_ADMIN)
     }
 
     /** List: recruiter/admin, Super Admin, and Auditor (READ_ONLY). */
@@ -105,7 +107,8 @@ final class RecruitmentOutcomeController extends Controller
     {
         return RecruitmentOutcomeScope::isRecruiterOrAdmin($actor)
             || RecruitmentOutcomeScope::isSuperAdmin($actor)
-            || RecruitmentOutcomeScope::isAuditor($actor);
+            || RecruitmentOutcomeScope::isAuditor($actor)
+            || \App\Domains\Vacancy\Support\CampusScope::isCampusAdmin($actor); // CAMPUS_SCOPE (HR_ADMIN)
     }
 
     private function actor(Request $request): User

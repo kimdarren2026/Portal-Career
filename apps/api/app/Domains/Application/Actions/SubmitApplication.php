@@ -68,7 +68,12 @@ final class SubmitApplication
     {
         return DB::transaction(function () use ($actor, $profile, $vacancyId, $data): Application {
             $vacancy = $this->lockEligibleVacancy($vacancyId);
-            $company = $this->lockVerifiedCompany($vacancy);
+            // AD-1 (company VERIFIED gate) applies to company vacancies only.
+            // A campus vacancy has no company (FR-HR-001) — CAMPUS_SCOPE was
+            // activated by the approved PO / SPEC-DOC decision.
+            $company = $vacancy->ownership_type === 'COMPANY'
+                ? $this->lockVerifiedCompany($vacancy)
+                : null;
 
             $this->assertAudienceEligible($vacancy, $profile);
             $this->assertNoExistingLifecycle($profile, $vacancy);
@@ -125,7 +130,12 @@ final class SubmitApplication
                 'vacancy_id' => (int) $vacancy->getKey(),
             ]);
 
-            $this->notifier->submitted($application, $actor, (int) $company->getKey());
+            $this->notifier->submitted(
+                $application,
+                $actor,
+                $company !== null ? (int) $company->getKey() : null,
+                $company === null ? (int) $vacancy->created_by : null,
+            );
 
             return $application->refresh();
         });
@@ -136,12 +146,12 @@ final class SubmitApplication
         /** @var Vacancy|null $vacancy */
         $vacancy = Vacancy::query()->whereKey($vacancyId)->lockForUpdate()->first();
 
-        // A vacancy that does not exist, is not COMPANY-owned (Campus runtime
-        // does not exist in this milestone — see ConsentReceiver's docblock),
-        // is not PUBLISHED, or is outside its active window are all the same
-        // "not currently applicable" fact to the caller; none of them exists
-        // is ever leaked through a different error shape.
-        if ($vacancy === null || $vacancy->ownership_type !== 'COMPANY') {
+        // A vacancy that does not exist, has an unknown ownership type, is not
+        // PUBLISHED, or is outside its active window are all the same "not
+        // currently applicable" fact to the caller; which one is never leaked
+        // through a different error shape. CAMPUS is accepted the same as
+        // COMPANY — one application lifecycle serves both tracks.
+        if ($vacancy === null || ! in_array($vacancy->ownership_type, ['COMPANY', 'CAMPUS'], true)) {
             throw new VacancyNotOpenForApplication();
         }
 

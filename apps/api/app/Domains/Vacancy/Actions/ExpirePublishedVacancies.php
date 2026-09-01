@@ -34,6 +34,9 @@ use Illuminate\Support\Facades\DB;
  * status and date re-checked after the lock, so two concurrent runs cannot both
  * transition it and a repeated run writes no duplicate audit entry.
  */
+// Campus vacancies (FSD §8.4 'PUBLISHED -> EXPIRED, Pass close date') expire
+// by the same run — CAMPUS_SCOPE activation (PO / SPEC-DOC). Semantics are
+// identical: status + audit only, no notification, no version, no review row.
 final class ExpirePublishedVacancies
 {
     public function __construct(private readonly AuditWriter $audit) {}
@@ -49,7 +52,7 @@ final class ExpirePublishedVacancies
         // vacancies must never be materialised in memory at once.
         Vacancy::query()
             ->select('id')
-            ->where('ownership_type', 'COMPANY')
+            ->whereIn('ownership_type', ['COMPANY', 'CAMPUS'])
             ->where('current_status', VacancyStatus::Published->value)
             ->whereNotNull('close_at')
             ->where('close_at', '<=', now())
@@ -73,7 +76,7 @@ final class ExpirePublishedVacancies
             // manual close may have moved this row already. A race is a no-op,
             // never an error.
             if ($locked === null
-                || $locked->ownership_type !== 'COMPANY'
+                || ! in_array($locked->ownership_type, ['COMPANY', 'CAMPUS'], true)
                 || $locked->current_status !== VacancyStatus::Published
                 || $locked->close_at === null
                 || $locked->close_at > now()) {

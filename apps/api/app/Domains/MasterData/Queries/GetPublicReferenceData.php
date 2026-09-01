@@ -25,6 +25,10 @@ final class GetPublicReferenceData
             'organization_types' => $this->rows('organization_types', ['id', 'code', 'name']),
             'geographic_areas' => $this->rows('geographic_areas', ['id', 'parent_geographic_area_id', 'code', 'name', 'area_type']),
             'skills' => $this->rows('skills', ['id', 'name']),
+            // Campus organizational units (FR-HR-002) — active master data for
+            // the Admin Kepegawaian vacancy authoring form. May legitimately be
+            // empty until the institution seeds its units.
+            'organizational_units' => $this->rows('organizational_units', ['id', 'parent_unit_id', 'code', 'name']),
         ];
     }
 

@@ -26,17 +26,24 @@ final class ApplicationNotifier
 {
     public function __construct(private readonly OutboxWriter $outbox) {}
 
-    public function submitted(Application $application, User $candidateUser, int $companyId): void
+    public function submitted(Application $application, User $candidateUser, ?int $companyId, ?int $campusOwnerUserId = null): void
     {
-        $this->queueBoth($application, $candidateUser, $companyId, 'APPLICATION_SUBMITTED', 'application.submitted');
+        $this->queueBoth($application, $candidateUser, $companyId, $campusOwnerUserId, 'APPLICATION_SUBMITTED', 'application.submitted');
     }
 
-    public function withdrawn(Application $application, User $candidateUser, int $companyId): void
+    public function withdrawn(Application $application, User $candidateUser, ?int $companyId, ?int $campusOwnerUserId = null): void
     {
-        $this->queueBoth($application, $candidateUser, $companyId, 'APPLICATION_WITHDRAWN', 'application.withdrawn');
+        $this->queueBoth($application, $candidateUser, $companyId, $campusOwnerUserId, 'APPLICATION_WITHDRAWN', 'application.withdrawn');
     }
 
-    private function queueBoth(Application $application, User $candidateUser, int $companyId, string $type, string $templatePrefix): void
+    /**
+     * Recipients: the candidate, plus the vacancy owner. For a COMPANY vacancy
+     * the owner is every active member of the owning company; for a CAMPUS
+     * vacancy (`$companyId` null) it is the single Admin Kepegawaian who
+     * authored it (`$campusOwnerUserId`, `vacancies.created_by`). FR-NOTIF-002
+     * "Application berhasil -> Kandidat dan owner lowongan".
+     */
+    private function queueBoth(Application $application, User $candidateUser, ?int $companyId, ?int $campusOwnerUserId, string $type, string $templatePrefix): void
     {
         $payload = [
             'application_id' => (int) $application->getKey(),
@@ -47,9 +54,23 @@ final class ApplicationNotifier
 
         $this->queueOne((string) $candidateUser->email, (int) $candidateUser->getKey(), $application, $type, $templatePrefix.'.candidate', $payload);
 
-        foreach ($this->companyMemberEmails($companyId) as $userId => $email) {
+        $owners = $companyId !== null
+            ? $this->companyMemberEmails($companyId)
+            : $this->campusOwnerEmail($campusOwnerUserId);
+
+        foreach ($owners as $userId => $email) {
             $this->queueOne((string) $email, (int) $userId, $application, $type, $templatePrefix.'.owner', $payload);
         }
+    }
+
+    /** @return \Illuminate\Support\Collection<int, string> */
+    private function campusOwnerEmail(?int $userId)
+    {
+        if ($userId === null) {
+            return collect();
+        }
+
+        return DB::table('users')->where('id', $userId)->pluck('email', 'id');
     }
 
     /** @param array<string, mixed> $payload */

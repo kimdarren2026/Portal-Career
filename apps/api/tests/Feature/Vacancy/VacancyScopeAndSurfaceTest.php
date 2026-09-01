@@ -137,16 +137,17 @@ final class VacancyScopeAndSurfaceTest extends VacancyTestCase
         // The contract defines no DELETE for screening questions.
         $this->assertFalse($registered->contains(fn (string $r): bool => str_contains($r, 'DELETE') && str_contains($r, 'screening-questions')));
 
-        // B-4: a company vacancy publishes only through approval-in-window or
-        // the scheduler, so no publish route exists for any actor. Moderation
-        // history has no read route in this phase. Public discovery
-        // (api/v1/public/vacancies) is intentionally now active — see
-        // PublicVacancyDiscoveryTest — and is deliberately excluded from this
-        // absence check.
+        // B-4: a COMPANY vacancy publishes only through approval-in-window or
+        // the scheduler, so no company publish route exists for any actor. The
+        // campus lifecycle surface `hr/vacancies/{vacancy}/publish`
+        // (CAMPUS_SCOPE activation, FSD §8.4) is a separate namespace and is
+        // deliberately excluded here. Moderation history has no read route in
+        // this phase. Public discovery (api/v1/public/vacancies) is active —
+        // see PublicVacancyDiscoveryTest — and is excluded from this check.
         foreach (['publish', 'moderation-history'] as $absent) {
             $this->assertFalse(
-                $registered->contains(fn (string $r): bool => str_contains($r, $absent)),
-                "No route may exist for {$absent} in this phase.",
+                $registered->contains(fn (string $r): bool => str_contains($r, $absent) && ! str_contains($r, 'hr/vacancies')),
+                "No company route may exist for {$absent} in this phase.",
             );
         }
 
@@ -166,14 +167,25 @@ final class VacancyScopeAndSurfaceTest extends VacancyTestCase
         // `{vacancy}`). Each delivers a page shell and mutates nothing — the
         // same category as `/pelamar` and `/outcome-rekrutmen` — so both are
         // excluded from the authoring/lifecycle surface count.
+        // Campus Recruitment Foundation adds the `hr/vacancies` authoring +
+        // lifecycle namespace (CAMPUS_SCOPE activation, FSD §8.4) — a separate
+        // Admin Kepegawaian surface, not the company vacancy surface — so it is
+        // excluded from this company-surface count.
         $this->assertSame(15, $registered->filter(
             static fn (string $r): bool => str_contains($r, 'vacanc')
                 && ! str_contains($r, 'api/v1/public')
                 && ! str_contains($r, 'applications')
                 && ! str_contains($r, 'stages')
                 && ! str_contains($r, 'kelola-lowongan')
-                && ! str_contains($r, 'moderasi-lowongan'),
+                && ! str_contains($r, 'moderasi-lowongan')
+                && ! str_contains($r, 'hr/vacancies'),
         )->count(), 'The eight authoring routes plus the seven lifecycle routes.');
+
+        // Campus Recruitment Foundation: exactly the six frozen campus routes
+        // (create + publish/schedule/close/suspend/restore).
+        $this->assertSame(6, $registered->filter(
+            static fn (string $r): bool => str_contains($r, 'hr/vacancies'),
+        )->count(), 'Only POST /hr/vacancies and its five lifecycle actions may exist.');
 
         // Public Vacancy Discovery Foundation: exactly the two frozen public
         // vacancy routes (listing and detail-by-slug), no more.

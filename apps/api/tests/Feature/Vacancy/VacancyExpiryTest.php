@@ -202,10 +202,11 @@ final class VacancyExpiryTest extends VacancyTestCase
         self::assertSame($before, (array) DB::table('applications')->where('vacancy_id', $id)->first());
     }
 
-    public function test_a_campus_vacancy_is_never_processed_by_the_company_expiry_command(): void
+    public function test_a_campus_vacancy_past_close_date_is_expired_by_the_scheduler(): void
     {
-        // Fixture row only. Campus vacancy lifecycle is a later phase and is not
-        // implemented here; this proves the query is scoped to COMPANY.
+        // CAMPUS_SCOPE activation (approved PO / SPEC-DOC): FSD §8.4
+        // "PUBLISHED | Pass close date | EXPIRED" applies to campus too. Same
+        // semantics as company: status + audit only, no notification.
         [$recruiter, $company] = $this->verifiedCompanyWithRecruiter('expiry-campus@example.test');
         $close = Carbon::parse('2026-10-01T09:00:00+00:00');
         $unitId = DB::table('organizational_units')->insertGetId([
@@ -226,10 +227,10 @@ final class VacancyExpiryTest extends VacancyTestCase
         ]);
 
         Carbon::setTestNow($close->copy()->addDay());
-        self::assertSame(0, app(ExpirePublishedVacancies::class)->execute());
+        self::assertSame(1, app(ExpirePublishedVacancies::class)->execute());
 
-        self::assertSame('PUBLISHED', DB::table('vacancies')->where('id', $campusId)->value('current_status'));
-        self::assertSame(0, $this->auditCount('vacancy_expired', $campusId));
+        self::assertSame('EXPIRED', DB::table('vacancies')->where('id', $campusId)->value('current_status'));
+        self::assertSame(1, $this->auditCount('vacancy_expired', $campusId));
     }
 
     public function test_application_data_survives_both_terminal_routes(): void

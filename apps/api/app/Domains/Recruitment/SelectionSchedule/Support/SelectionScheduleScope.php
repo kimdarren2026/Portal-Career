@@ -46,6 +46,11 @@ final class SelectionScheduleScope
             return SelectionSchedule::query()->whereHas('application.vacancy', fn (Builder $q) => $q->where('ownership_type', 'COMPANY'));
         }
 
+        // CAMPUS_SCOPE (HR_ADMIN) — campus-owned vacancies only (PO / SPEC-DOC).
+        if (\App\Domains\Vacancy\Support\CampusScope::isCampusAdmin($user)) {
+            return \App\Domains\Vacancy\Support\CampusScope::throughVacancy(SelectionSchedule::query(), 'application.vacancy');
+        }
+
         return SelectionSchedule::query()
             ->whereHas('application.vacancy', fn (Builder $q) => $q->where('ownership_type', 'COMPANY')
                 ->whereIn('company_id', self::activeCompanyIds($user)));

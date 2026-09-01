@@ -61,8 +61,8 @@ final class SubmitEvaluation
             /** @var Vacancy $vacancy */
             $vacancy = Vacancy::query()->whereKey($lockedApplication->vacancy_id)->lockForUpdate()->firstOrFail();
 
-            /** @var Company $company */
-            $company = Company::query()->whereKey($vacancy->company_id)->lockForUpdate()->firstOrFail();
+            /** @var ?Company $company */
+            $company = $vacancy->company_id === null ? null : Company::query()->whereKey($vacancy->company_id)->lockForUpdate()->firstOrFail(); // CAMPUS vacancies have no company (FR-HR-001)
 
             ApplicationProcessingGate::assertProcessable($company, $vacancy);
 
@@ -73,7 +73,10 @@ final class SubmitEvaluation
             $this->audit->record('evaluation_submitted', $actor, 'evaluation', (int) $locked->getKey(), []);
 
             $locked->refresh();
-            $this->notifier->submitted($locked, (int) $company->getKey());
+            // A CAMPUS vacancy has no owning company — the owner-side
+            // evaluation notification has no company member set to reach; the
+            // candidate is not an evaluation recipient by contract either.
+            $this->notifier->submitted($locked, $company !== null ? (int) $company->getKey() : 0);
 
             return $locked->load('items');
         });

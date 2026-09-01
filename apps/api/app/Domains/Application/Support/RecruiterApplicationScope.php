@@ -7,6 +7,7 @@ namespace App\Domains\Application\Support;
 use App\Domains\Application\Models\Application;
 use App\Domains\Identity\Enums\RoleCode;
 use App\Domains\Identity\Models\User;
+use App\Domains\Vacancy\Support\CampusScope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
@@ -35,6 +36,13 @@ final class RecruiterApplicationScope
     {
         if (self::isSuperAdmin($user)) {
             return Application::query()->whereHas('vacancy', fn (Builder $q) => $q->where('ownership_type', 'COMPANY'));
+        }
+
+        // CAMPUS_SCOPE (HR_ADMIN / Admin Kepegawaian) — applications on
+        // campus-owned vacancies only, never a company vacancy. Activated by
+        // the approved PO / SPEC-DOC decision; FR-HR-005.
+        if (CampusScope::isCampusAdmin($user)) {
+            return CampusScope::throughVacancy(Application::query(), 'vacancy');
         }
 
         return Application::query()

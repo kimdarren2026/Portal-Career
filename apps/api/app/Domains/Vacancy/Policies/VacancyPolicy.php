@@ -37,6 +37,12 @@ final class VacancyPolicy
 
     public function update(User $user, Vacancy $vacancy): bool
     {
+        // CAMPUS_SCOPE: a campus vacancy is authored/edited by HR_ADMIN
+        // (Admin Kepegawaian), no company membership involved (FR-HR-001).
+        if ($vacancy->ownership_type === 'CAMPUS') {
+            return $user->hasActiveRole(RoleCode::HrAdmin);
+        }
+
         return $vacancy->isCompanyOwned()
             && $this->activeMemberOf($user, (int) $vacancy->company_id);
     }

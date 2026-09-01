@@ -165,7 +165,7 @@ final class SelectionScheduleController extends CandidateController
 
     private function isRecruiterActor(User $actor): bool
     {
-        return SelectionScheduleScope::isRecruiterOrAdmin($actor) || SelectionScheduleScope::isSuperAdmin($actor);
+        return SelectionScheduleScope::isRecruiterOrAdmin($actor) || SelectionScheduleScope::isSuperAdmin($actor) || \App\Domains\Vacancy\Support\CampusScope::isCampusAdmin($actor); // CAMPUS_SCOPE (HR_ADMIN)
     }
 
     /** Read-eligible non-candidate actors: recruiter/admin, Super Admin, and Auditor (READ_ONLY). */
@@ -173,7 +173,8 @@ final class SelectionScheduleController extends CandidateController
     {
         return SelectionScheduleScope::isRecruiterOrAdmin($actor)
             || SelectionScheduleScope::isSuperAdmin($actor)
-            || SelectionScheduleScope::isAuditor($actor);
+            || SelectionScheduleScope::isAuditor($actor)
+            || \App\Domains\Vacancy\Support\CampusScope::isCampusAdmin($actor); // CAMPUS_SCOPE (HR_ADMIN)
     }
 
     /** `If-Match` carries the `revision_number` the client last read, mirroring `ApplicationController`. */
