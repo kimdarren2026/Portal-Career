@@ -8,6 +8,8 @@ use App\Domains\Application\Support\ApplicationScope;
 use App\Domains\Application\Support\RecruiterApplicationScope;
 use App\Domains\Candidate\Support\CandidateProfileResolver;
 use App\Domains\Company\Enums\CompanyStatus;
+use App\Domains\Company\Support\CompanyScope;
+use App\Domains\Identity\Enums\RoleCode;
 use App\Domains\Identity\Models\User;
 use App\Domains\Recruitment\Outcome\Queries\ListIncompleteRecruitmentOutcomes;
 use App\Domains\Recruitment\Outcome\Support\RecruitmentOutcomeScope;
@@ -39,6 +41,13 @@ final class DashboardPageController extends CandidateController
     {
         $actor = $this->actor($request);
 
+        // Career Center Frontend Slice v9 — the "Dashboard" nav destination
+        // for the Career Center persona. Checked before the recruiter branch
+        // so a Career Center actor is never mis-routed to a recruiter view.
+        if ($actor->hasActiveRole(RoleCode::CareerCenterStaff) || $actor->hasActiveRole(RoleCode::CareerCenterManager)) {
+            return Inertia::render('career-center/Dashboard', $this->careerCenterSnapshot($actor));
+        }
+
         if (RecruiterApplicationScope::isRecruiterOrAdmin($actor) || RecruiterApplicationScope::isSuperAdmin($actor)) {
             return Inertia::render('recruiter/Dashboard', $this->recruiterSnapshot($actor, $incompleteOutcomes));
         }
@@ -60,6 +69,49 @@ final class DashboardPageController extends CandidateController
         }
 
         return Inertia::render('candidate/Dashboard', ['counts' => []]);
+    }
+
+    /**
+     * FR-REP-002 operational snapshot for Career Center — the subset of the
+     * FR-REP-002 list that maps to a literal count over data this persona is
+     * already authorised to read (`CompanyScope` / `VacancyScope` are both
+     * global readers for Career Center). Nothing is invented: "active Mitra
+     * Kampus", "alumni in process/hired", "external apply started vs
+     * confirmed" and "incomplete outcome" are FR-REP-002 items whose runtime
+     * is deferred (Partnership, alumni verification / RC-2, External Apply),
+     * so they are omitted here rather than fabricated. No risk score, SLA,
+     * verification-performance or approval-rate metric is derived.
+     *
+     * @return array<string, mixed>
+     */
+    private function careerCenterSnapshot(User $actor): array
+    {
+        /** @var array<string, int> $companiesByStatus */
+        $companiesByStatus = CompanyScope::queryFor($actor)
+            ->select('verification_status', DB::raw('count(*) as aggregate'))
+            ->groupBy('verification_status')
+            ->pluck('aggregate', 'verification_status')
+            ->map(static fn ($c): int => (int) $c)->all();
+
+        /** @var array<string, int> $vacanciesByStatus */
+        $vacanciesByStatus = VacancyScope::queryFor($actor)
+            ->select('current_status', DB::raw('count(*) as aggregate'))
+            ->groupBy('current_status')
+            ->pluck('aggregate', 'current_status')
+            ->map(static fn ($c): int => (int) $c)->all();
+
+        return [
+            'companies_by_status' => $companiesByStatus,
+            'vacancies_by_status' => $vacanciesByStatus,
+            'counts' => [
+                'verification_queue' => $companiesByStatus['PENDING_VERIFICATION'] ?? 0,
+                'company_revision_required' => $companiesByStatus['REVISION_REQUIRED'] ?? 0,
+                'verified_companies' => $companiesByStatus['VERIFIED'] ?? 0,
+                'moderation_queue' => $vacanciesByStatus['PENDING_REVIEW'] ?? 0,
+                'vacancy_revision_required' => $vacanciesByStatus['REVISION_REQUIRED'] ?? 0,
+                'published_vacancies' => $vacanciesByStatus['PUBLISHED'] ?? 0,
+            ],
+        ];
     }
 
     /**

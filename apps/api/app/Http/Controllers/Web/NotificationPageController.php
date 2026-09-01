@@ -39,11 +39,18 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
  */
 final class NotificationPageController extends Controller
 {
-    /** `GET /notifikasi`. */
+    /** `GET /notifikasi` — persona-multiplexed, OWN-scoped for every persona. */
     public function index(ListNotificationsRequest $request, ListNotifications $query): Response|JsonResponse|SymfonyResponse
     {
         $actor = $this->actor($request);
-        if (! $this->isRecruiterActor($actor)) {
+
+        if ($this->isRecruiterActor($actor)) {
+            $component = 'recruiter/Notifikasi';
+            $linker = self::link(...);
+        } elseif ($this->isCareerCenter($actor)) {
+            $component = 'career-center/Notifikasi';
+            $linker = self::careerCenterLink(...);
+        } else {
             return $this->forbidden($request);
         }
 
@@ -52,10 +59,10 @@ final class NotificationPageController extends Controller
 
         $items = collect($page->items())
             ->map(NotificationPresenter::summary(...))
-            ->map(fn (array $row): array => $row + ['link' => self::link($row)])
+            ->map(fn (array $row): array => $row + ['link' => $linker($row)])
             ->values()->all();
 
-        return Inertia::render('recruiter/Notifikasi', [
+        return Inertia::render($component, [
             'items' => $items,
             'pagination' => [
                 'page' => $page->currentPage(),
@@ -91,11 +98,34 @@ final class NotificationPageController extends Controller
         };
     }
 
+    /**
+     * Career Center deep-link map — only the two `related_object_type` values
+     * that have an authorised Career Center page. Everything else → no link.
+     *
+     * @param array<string, mixed> $row
+     */
+    private static function careerCenterLink(array $row): ?string
+    {
+        $id = $row['related_object_id'] ?? null;
+
+        return match ($row['related_object_type'] ?? null) {
+            'company' => $id === null ? null : "/verifikasi-perusahaan/{$id}",
+            'vacancy' => $id === null ? null : "/moderasi-lowongan/{$id}",
+            default => null,
+        };
+    }
+
     private function isRecruiterActor(User $actor): bool
     {
         return $actor->hasActiveRole(RoleCode::CompanyRecruiter)
             || $actor->hasActiveRole(RoleCode::CompanyAdmin)
             || $actor->hasActiveRole(RoleCode::SuperAdmin);
+    }
+
+    private function isCareerCenter(User $actor): bool
+    {
+        return $actor->hasActiveRole(RoleCode::CareerCenterStaff)
+            || $actor->hasActiveRole(RoleCode::CareerCenterManager);
     }
 
     private function actor(Request $request): User

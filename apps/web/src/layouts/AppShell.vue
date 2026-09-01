@@ -57,15 +57,21 @@ const recruiterNav: NavItem[] = [
 // Career Center — exactly 10 canonical items. Frontend Vertical Slice v4
 // activates "Verifikasi Perusahaan" and "Moderasi Lowongan" only; the rest
 // stay deferred ("Segera hadir") per the no-dead-link rule.
+// Career Center — exactly 10 canonical items. v9 activates Dashboard, Data
+// Perusahaan and Notifikasi; Kemitraan, Alumni & Outcome, Laporan, Template
+// Email and Pengaturan Moderasi stay deferred ("Segera hadir") — no frozen
+// runtime (partnership lifecycle under-specified; alumni verification /
+// RC-2 not activated; FR-REP reporting deferred; no template/moderation
+// settings contract).
 const careerCenterNav: NavItem[] = [
-    { label: 'Dashboard' },
+    { label: 'Dashboard', href: '/dashboard' },
     { label: 'Verifikasi Perusahaan', href: '/verifikasi-perusahaan' },
     { label: 'Moderasi Lowongan', href: '/moderasi-lowongan' },
-    { label: 'Data Perusahaan' },
+    { label: 'Data Perusahaan', href: '/data-perusahaan' },
     { label: 'Kemitraan' },
     { label: 'Alumni & Outcome' },
     { label: 'Laporan' },
-    { label: 'Notifikasi' },
+    { label: 'Notifikasi', href: '/notifikasi' },
     { label: 'Template Email' },
     { label: 'Pengaturan Moderasi' },
 ]

@@ -106,6 +106,62 @@ final class CareerCenterPageController extends Controller
         ]);
     }
 
+    /**
+     * `GET /data-perusahaan` — Career Center Frontend Slice v9.
+     *
+     * Read-only company directory: EVERY company, any verification status,
+     * through the frozen `CompanyScope` (Career Center is a global reader —
+     * `GET /api/v1/companies/{company}` grants Career Center `ALLOW` read).
+     * This is the reference surface — it carries NO `eligible_actions` and no
+     * review controls; the moderation queue and actions live in "Verifikasi
+     * Perusahaan". Paginated. No candidate data, no secrets.
+     */
+    public function companyDirectoryIndex(Request $request): Response|JsonResponse|SymfonyResponse
+    {
+        $actor = $this->actor($request);
+        if (! $this->isCareerCenter($actor)) {
+            return $this->forbidden($request);
+        }
+
+        $status = $request->string('status')->toString();
+        $status = in_array($status, self::COMPANY_STATUSES, true) ? $status : null;
+        $q = trim($request->string('q')->toString());
+
+        $page = CompanyScope::queryFor($actor)
+            ->when($status !== null, fn (Builder $b) => $b->where('verification_status', $status))
+            ->when($q !== '', fn (Builder $b) => $b->whereRaw('lower(name) like ?', ['%'.mb_strtolower($q).'%']))
+            ->orderBy('name')->orderBy('id')
+            ->paginate(20)->withQueryString();
+
+        return Inertia::render('career-center/DataPerusahaan', [
+            'items' => collect($page->items())
+                ->map(static fn ($c): array => CompanyModerationPresenter::summary($c))
+                ->values()->all(),
+            'pagination' => self::pagination($page),
+            'filters' => (object) array_filter(['status' => $status, 'q' => $q === '' ? null : $q]),
+        ]);
+    }
+
+    /** `GET /data-perusahaan/{company}` — read-only company reference detail. */
+    public function companyDirectoryShow(Request $request, int $company): Response|JsonResponse|SymfonyResponse
+    {
+        $actor = $this->actor($request);
+        if (! $this->isCareerCenter($actor)) {
+            return $this->forbidden($request);
+        }
+
+        $model = CompanyScope::findFor($actor, $company);
+        if ($model === null) {
+            return $this->notFound($request, 'Perusahaan tidak ditemukan.');
+        }
+
+        return Inertia::render('career-center/DataPerusahaanDetail', [
+            // Same frozen read model the Tinjau Perusahaan page uses, minus
+            // `eligible_actions` — this surface is reference-only.
+            'company' => CompanyModerationPresenter::detail($model),
+        ]);
+    }
+
     /** `GET /moderasi-lowongan`. */
     public function vacancyIndex(Request $request, ListVacancies $query): Response|JsonResponse|SymfonyResponse
     {

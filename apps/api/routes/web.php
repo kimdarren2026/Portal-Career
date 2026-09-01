@@ -395,6 +395,20 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
         ->name('pages.career-center.vacancies.index');
     Route::get('/moderasi-lowongan/{vacancy}', [CareerCenterPageController::class, 'vacancyShow'])
         ->whereNumber('vacancy')->name('pages.career-center.vacancies.show');
+
+    /*
+    | Career Center Frontend Slice v9 — activates the canonical "Data
+    | Perusahaan" nav item (read-only company reference directory; Career
+    | Center is a global reader in `CompanyScope`). "Dashboard" and
+    | "Notifikasi" for the Career Center persona are served by the shared
+    | `/dashboard` and `/notifikasi` controllers, persona-branched.
+    | Kemitraan, Alumni & Outcome, Laporan, Template Email and Pengaturan
+    | Moderasi remain deferred (no frozen runtime).
+    */
+    Route::get('/data-perusahaan', [CareerCenterPageController::class, 'companyDirectoryIndex'])
+        ->name('pages.career-center.companies.directory');
+    Route::get('/data-perusahaan/{company}', [CareerCenterPageController::class, 'companyDirectoryShow'])
+        ->whereNumber('company')->name('pages.career-center.companies.directory-show');
 });
 
 /*
