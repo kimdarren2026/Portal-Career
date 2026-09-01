@@ -185,6 +185,40 @@ final class RecruiterCompanyVacancyPagesTest extends VacancyTestCase
         );
     }
 
+    public function test_kelola_lowongan_denies_career_center_persona_but_moderasi_lowongan_allows_it(): void
+    {
+        // A COMPANY vacancy exists, owned by someone else. Career Center is a
+        // global reader in VacancyScope/CompanyScope — without the page-persona
+        // gate it would be handed the recruiter workspace and every row in it.
+        [$recruiter, $company] = $this->verifiedCompanyWithRecruiter('hard-cc-owner@example.test');
+        $vacancyId = $this->vacancyAt($recruiter, $company, 'DRAFT');
+
+        $careerCenter = $this->makeUser('hard-cc@example.test', UserStatus::Active);
+        $this->assignRole($careerCenter, RoleCode::CareerCenterStaff);
+
+        $this->actingAs($careerCenter)->get('/kelola-lowongan')->assertStatus(403);
+        $this->actingAs($careerCenter)->get('/kelola-lowongan/baru')->assertStatus(403);
+        $this->actingAs($careerCenter)->get("/kelola-lowongan/{$vacancyId}")->assertStatus(403);
+
+        // The Career Center moderation surface is unaffected.
+        $this->actingAs($careerCenter)->get('/moderasi-lowongan')->assertOk()->assertInertia(
+            fn (Assert $page) => $page->component('career-center/ModerasiLowongan'),
+        );
+    }
+
+    public function test_kelola_lowongan_denies_candidate_persona(): void
+    {
+        [$recruiter, $company] = $this->verifiedCompanyWithRecruiter('hard-cand-owner@example.test');
+        $vacancyId = $this->vacancyAt($recruiter, $company, 'DRAFT');
+
+        $candidate = $this->makeUser('hard-cand@example.test', UserStatus::Active);
+        $this->assignRole($candidate, RoleCode::CandidateAlumni);
+
+        $this->actingAs($candidate)->get('/kelola-lowongan')->assertStatus(403);
+        $this->actingAs($candidate)->get('/kelola-lowongan/baru')->assertStatus(403);
+        $this->actingAs($candidate)->get("/kelola-lowongan/{$vacancyId}")->assertStatus(403);
+    }
+
     public function test_non_verified_company_cannot_author_vacancy_gate_is_communicated(): void
     {
         [$recruiter] = $this->companyWithRecruiter('v3-unverified@example.test', CompanyStatus::PendingVerification);

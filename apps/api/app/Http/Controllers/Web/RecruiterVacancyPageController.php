@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Web;
 
 use App\Domains\Company\Enums\CompanyStatus;
 use App\Domains\Company\Support\CompanyScope;
+use App\Domains\Identity\Enums\RoleCode;
 use App\Domains\Identity\Models\User;
 use App\Domains\MasterData\Queries\GetPublicReferenceData;
 use App\Domains\Vacancy\Enums\VacancyStatus;
@@ -44,6 +45,15 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
  * The VERIFIED-company authoring gate is enforced by the backend
  * (`CreateCompanyVacancy` → `VACANCY_COMPANY_NOT_VERIFIED`); this controller
  * only communicates it so the recruiter is not surprised.
+ *
+ * PERSONA BOUNDARY — this is the recruiter workspace surface. `VacancyScope`
+ * and `CompanyScope` are global readers for Career Center / Auditor (they
+ * moderate through `/moderasi-lowongan`), so query-scope alone would leak
+ * every COMPANY vacancy onto this recruiter page. Each action therefore
+ * gates on the recruiter persona first — recruiter/admin or Super Admin —
+ * exactly like `RecruiterApplicantPageController` (`/pelamar`). Career
+ * Center, Auditor and Candidate are DENY. This changes no Scope, Policy,
+ * Action or Career Center authority.
  */
 final class RecruiterVacancyPageController extends Controller
 {
@@ -51,6 +61,9 @@ final class RecruiterVacancyPageController extends Controller
     public function index(Request $request, ListVacancies $query): Response|JsonResponse|SymfonyResponse
     {
         $actor = $this->actor($request);
+        if (! $this->isRecruiterActor($actor)) {
+            return $this->forbidden($request);
+        }
         $company = CompanyScope::queryFor($actor)->orderBy('id')->first();
 
         $filters = array_intersect_key($request->query(), array_flip(['status', 'q']));
@@ -78,6 +91,9 @@ final class RecruiterVacancyPageController extends Controller
     public function create(Request $request, GetPublicReferenceData $referenceData): Response|JsonResponse|SymfonyResponse
     {
         $actor = $this->actor($request);
+        if (! $this->isRecruiterActor($actor)) {
+            return $this->forbidden($request);
+        }
         $company = CompanyScope::queryFor($actor)->orderBy('id')->first();
 
         if ($company === null) {
@@ -104,6 +120,9 @@ final class RecruiterVacancyPageController extends Controller
     public function show(Request $request, int $vacancy, GetVacancy $query, GetPublicReferenceData $referenceData): Response|JsonResponse|SymfonyResponse
     {
         $actor = $this->actor($request);
+        if (! $this->isRecruiterActor($actor)) {
+            return $this->forbidden($request);
+        }
         $model = VacancyScope::findFor($actor, $vacancy) ?? throw new VacancyNotFound();
 
         $detail = $query->execute($actor, $model, ['requirements', 'screening_questions', 'versions']);
@@ -187,6 +206,18 @@ final class RecruiterVacancyPageController extends Controller
         $user = $request->user();
 
         return $user;
+    }
+
+    /**
+     * Recruiter workspace persona — mirrors `RecruiterApplicantPageController`.
+     * Career Center / Auditor (global readers in `VacancyScope`) and Candidate
+     * are denied; they have no authoring surface here.
+     */
+    private function isRecruiterActor(User $actor): bool
+    {
+        return $actor->hasActiveRole(RoleCode::CompanyRecruiter)
+            || $actor->hasActiveRole(RoleCode::CompanyAdmin)
+            || $actor->hasActiveRole(RoleCode::SuperAdmin);
     }
 
     private function forbidden(Request $request): Response|JsonResponse|SymfonyResponse
