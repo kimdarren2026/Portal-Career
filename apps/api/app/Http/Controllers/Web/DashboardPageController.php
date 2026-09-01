@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 /**
  * `GET /dashboard` — landing page per persona (Frontend Vertical Slice v1;
@@ -37,7 +38,7 @@ final class DashboardPageController extends CandidateController
 {
     public function __construct(CandidateProfileResolver $profiles) { parent::__construct($profiles); }
 
-    public function index(Request $request, ListIncompleteRecruitmentOutcomes $incompleteOutcomes): Response
+    public function index(Request $request, ListIncompleteRecruitmentOutcomes $incompleteOutcomes): Response|SymfonyResponse
     {
         $actor = $this->actor($request);
 
@@ -48,8 +49,20 @@ final class DashboardPageController extends CandidateController
             return Inertia::render('career-center/Dashboard', $this->careerCenterSnapshot($actor));
         }
 
-        if (RecruiterApplicationScope::isRecruiterOrAdmin($actor) || RecruiterApplicationScope::isSuperAdmin($actor)) {
+        // Recruiter branch is membership/role based (CompanyRecruiter |
+        // CompanyAdmin). A Super Admin who also holds an ACTIVE company
+        // membership matches here and keeps the recruiter dashboard, exactly
+        // as before; a pure Super Admin does NOT — see the redirect below.
+        if (RecruiterApplicationScope::isRecruiterOrAdmin($actor)) {
             return Inertia::render('recruiter/Dashboard', $this->recruiterSnapshot($actor, $incompleteOutcomes));
+        }
+
+        // Super Admin Control Plane v10 — the canonical Super Admin navigation
+        // has no "Dashboard" item (FSD §4.6). A pure Super Admin landing on the
+        // shared `/dashboard` is redirected to the first ACTIVE canonical
+        // Super Admin module rather than rendered a recruiter persona page.
+        if (RecruiterApplicationScope::isSuperAdmin($actor)) {
+            return redirect()->route('pages.super-admin.audit-log');
         }
 
         if (ApplicationScope::isCandidateActor($actor)) {

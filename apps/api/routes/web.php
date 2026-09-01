@@ -30,6 +30,7 @@ use App\Http\Controllers\Web\RecruitmentOutcomePageController;
 use App\Http\Controllers\Web\RecruitmentStageController;
 use App\Http\Controllers\Web\SelectionScheduleController;
 use App\Http\Controllers\Web\SelectionSchedulePageController;
+use App\Http\Controllers\Web\SuperAdminPageController;
 use App\Http\Controllers\Web\VacancyController;
 use App\Http\Controllers\Web\VacancyLifecycleController;
 use App\Http\Controllers\Web\VacancyScreeningQuestionController;
@@ -409,6 +410,24 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
         ->name('pages.career-center.companies.directory');
     Route::get('/data-perusahaan/{company}', [CareerCenterPageController::class, 'companyDirectoryShow'])
         ->whereNumber('company')->name('pages.career-center.companies.directory-show');
+
+    /*
+    | Super Admin Control Plane Frontend Slice v10 — Inertia page delivery
+    | only. Activates the single canonical Super Admin nav item with a frozen
+    | runtime: "Audit Log" (FSD §4.6, §5.13 FR-AUD-001; API_CONTRACT.md
+    | `GET /api/v1/audit-logs`). Read-only — `audit_logs` is physically
+    | append-only and no mutation endpoint exists for any role, Super Admin
+    | included (INV-016). Gated to SUPER_ADMIN or AUDITOR (both READ_ONLY,
+    | AUTHORIZATION_MATRIX.md §4.9). The remaining eleven Super Admin nav
+    | items stay deferred: master-data writes are deferred beyond MVP
+    | (API_SIZE_REVIEW.md DF-1), "Jenis Lowongan" is a frozen enum, and
+    | Template Workflow / Konfigurasi SMTP runtime / Template Notifikasi /
+    | Integrasi / Retensi Data / Pengaturan Sistem have no frozen runtime.
+    | "Dashboard" and "Notifikasi" for Super Admin are served by the shared
+    | `/dashboard` (redirect) and `/notifikasi` (persona-branched) controllers.
+    */
+    Route::get('/audit-log', [SuperAdminPageController::class, 'auditLogIndex'])
+        ->name('pages.super-admin.audit-log');
 });
 
 /*

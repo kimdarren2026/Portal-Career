@@ -50,6 +50,13 @@ final class NotificationPageController extends Controller
         } elseif ($this->isCareerCenter($actor)) {
             $component = 'career-center/Notifikasi';
             $linker = self::careerCenterLink(...);
+        } elseif ($this->isSuperAdmin($actor)) {
+            // Super Admin holds OWN notification access (AUTHORIZATION_MATRIX.md
+            // §4.9 — every persona reads only its own rows; SPEC-DOC-09). It
+            // gets a dedicated Super Admin inbox, never the recruiter page as a
+            // fallback. "Notifikasi" is not a canonical Super Admin nav item.
+            $component = 'super-admin/Notifikasi';
+            $linker = self::superAdminLink(...);
         } else {
             return $this->forbidden($request);
         }
@@ -115,17 +122,38 @@ final class NotificationPageController extends Controller
         };
     }
 
+    /**
+     * Super Admin deep-link map. No canonical Super Admin page takes a
+     * per-object route yet (Audit Log is a filtered list, not an object view),
+     * so every notification type resolves to no link — the row still renders,
+     * just without a "Lihat detail" affordance.
+     *
+     * @param array<string, mixed> $row
+     */
+    private static function superAdminLink(array $row): ?string
+    {
+        return null;
+    }
+
     private function isRecruiterActor(User $actor): bool
     {
+        // Super Admin is intentionally NOT here — a pure Super Admin must never
+        // render the recruiter Notifikasi page as a shared-controller fallback
+        // (Super Admin Control Plane v10, Phase 0). A Super Admin who also holds
+        // an active company recruiter/admin role still matches on that role.
         return $actor->hasActiveRole(RoleCode::CompanyRecruiter)
-            || $actor->hasActiveRole(RoleCode::CompanyAdmin)
-            || $actor->hasActiveRole(RoleCode::SuperAdmin);
+            || $actor->hasActiveRole(RoleCode::CompanyAdmin);
     }
 
     private function isCareerCenter(User $actor): bool
     {
         return $actor->hasActiveRole(RoleCode::CareerCenterStaff)
             || $actor->hasActiveRole(RoleCode::CareerCenterManager);
+    }
+
+    private function isSuperAdmin(User $actor): bool
+    {
+        return $actor->hasActiveRole(RoleCode::SuperAdmin);
     }
 
     private function actor(Request $request): User

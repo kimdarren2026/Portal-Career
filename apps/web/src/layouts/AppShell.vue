@@ -19,7 +19,7 @@ import { authRequest } from '@/lib/auth'
 type NavItem = { label: string; href?: string; active?: boolean }
 
 const props = defineProps<{
-    persona: 'candidate' | 'recruiter' | 'career-center' | 'admin-kepegawaian'
+    persona: 'candidate' | 'recruiter' | 'career-center' | 'admin-kepegawaian' | 'super-admin'
     active: string
     title: string
 }>()
@@ -92,10 +92,34 @@ const adminKepegawaianNav: NavItem[] = [
     { label: 'Pengaturan', href: '/kepegawaian/pengaturan' },
 ]
 
+// Super Admin — exactly 12 canonical items (FSD §4.6). Super Admin Control
+// Plane Frontend Slice v10 activates "Audit Log" only (frozen read contract
+// GET /api/v1/audit-logs). The other eleven stay deferred ("Segera hadir"):
+// master-data writes are deferred beyond MVP (API_SIZE_REVIEW.md DF-1) —
+// covering Master Data, Unit Organisasi, Program Studi; "Jenis Lowongan" is a
+// frozen 3-value enum, not configurable master data; Template Workflow,
+// Konfigurasi SMTP runtime, Template Notifikasi, Integrasi, Retensi Data and
+// Pengaturan Sistem have no frozen runtime.
+const superAdminNav: NavItem[] = [
+    { label: 'Pengguna dan Role' },
+    { label: 'Master Data' },
+    { label: 'Unit Organisasi' },
+    { label: 'Program Studi' },
+    { label: 'Jenis Lowongan' },
+    { label: 'Template Workflow' },
+    { label: 'Konfigurasi SMTP' },
+    { label: 'Template Notifikasi' },
+    { label: 'Integrasi' },
+    { label: 'Audit Log', href: '/audit-log' },
+    { label: 'Retensi Data' },
+    { label: 'Pengaturan Sistem' },
+]
+
 const items = computed(() => {
     if (props.persona === 'recruiter') return recruiterNav
     if (props.persona === 'career-center') return careerCenterNav
     if (props.persona === 'admin-kepegawaian') return adminKepegawaianNav
+    if (props.persona === 'super-admin') return superAdminNav
     return candidateNav
 })
 
@@ -103,6 +127,7 @@ const personaSubtitle = computed(() => {
     if (props.persona === 'recruiter') return 'Ruang Kerja Recruiter'
     if (props.persona === 'career-center') return 'Back-office Career Center'
     if (props.persona === 'admin-kepegawaian') return 'Back Office Kepegawaian'
+    if (props.persona === 'super-admin') return 'Kontrol Sistem Super Admin'
     return 'Portal Karir Terpadu'
 })
 
