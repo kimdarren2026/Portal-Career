@@ -7,7 +7,6 @@ namespace App\Http\Controllers\Web;
 use App\Domains\Company\Enums\CompanyStatus;
 use App\Domains\Company\Models\Company;
 use App\Domains\Company\Support\CompanyProfilePresenter;
-use App\Domains\Company\Support\CompanyScope;
 use App\Domains\Identity\Models\User;
 use App\Domains\MasterData\Queries\GetPublicReferenceData;
 use App\Http\Controllers\Controller;
@@ -25,8 +24,8 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
  *
  * Every mutation still posts to the frozen JSON routes (`companies.store`,
  * `companies.update`, `companies.submit`). This controller reads only what a
- * recruiter is already authorized to see: the company is resolved through
- * `CompanyScope` (ACTIVE membership; out-of-scope rows are absent → 404), and
+ * recruiter is already authorized to see: the company is resolved by the
+ * actor's own ACTIVE membership (never the global-reader scope), and
  * `CompanyProfilePresenter` never returns `internal_note` or any
  * Career-Center-internal verification field.
  *
@@ -41,7 +40,7 @@ final class CompanyPageController extends Controller
     public function profile(Request $request, GetPublicReferenceData $referenceData): Response|JsonResponse|SymfonyResponse
     {
         $actor = $this->actor($request);
-        $company = CompanyScope::queryFor($actor)->orderBy('id')->first();
+        $company = $this->membershipCompany($actor);
 
         if ($company === null) {
             if (! $this->mayOnboard($actor)) {
@@ -69,7 +68,7 @@ final class CompanyPageController extends Controller
     public function verification(Request $request): Response|JsonResponse|SymfonyResponse
     {
         $actor = $this->actor($request);
-        $company = CompanyScope::queryFor($actor)->orderBy('id')->first();
+        $company = $this->membershipCompany($actor);
 
         if ($company === null) {
             if (! $this->mayOnboard($actor)) {
@@ -103,6 +102,24 @@ final class CompanyPageController extends Controller
     private function isEditableState(Company $company): bool
     {
         return in_array($company->verification_status, [CompanyStatus::Draft, CompanyStatus::RevisionRequired], true);
+    }
+
+    /**
+     * The recruiter's OWN company — the one they hold an ACTIVE membership of
+     * (OL-1). Never `CompanyScope::queryFor`, whose global-reader branch would
+     * hand a Career Center / Auditor / Super Admin actor an arbitrary company
+     * as if it were theirs; this page is the recruiter's own-company surface.
+     * A recruiter has at most one company (`COMPANY_ALREADY_EXISTS_FOR_USER`).
+     */
+    private function membershipCompany(User $actor): ?Company
+    {
+        return Company::query()
+            ->whereHas('members', fn ($q) => $q
+                ->where('user_id', $actor->getKey())
+                ->where('status', 'ACTIVE')
+                ->whereNull('revoked_at'))
+            ->orderBy('id')
+            ->first();
     }
 
     private function mayOnboard(User $actor): bool

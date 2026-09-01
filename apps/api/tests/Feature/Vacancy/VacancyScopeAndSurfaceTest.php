@@ -160,17 +160,19 @@ final class VacancyScopeAndSurfaceTest extends VacancyTestCase
         // and is deliberately excluded from this count.
         //
         // Recruiter Company & Vacancy Frontend Slice v3 adds the read-only
-        // Inertia page `GET /kelola-lowongan/{vacancy}` (matched here only
-        // because its path parameter is named `{vacancy}`). It delivers a page
-        // shell and mutates nothing — the same category as `/pelamar` and
-        // `/outcome-rekrutmen` — so it is excluded from the authoring/lifecycle
-        // surface count.
+        // Inertia page `GET /kelola-lowongan/{vacancy}`, and Career Center
+        // Moderation Frontend Slice v4 adds `GET /moderasi-lowongan/{vacancy}`
+        // (both matched here only because their path parameter is named
+        // `{vacancy}`). Each delivers a page shell and mutates nothing — the
+        // same category as `/pelamar` and `/outcome-rekrutmen` — so both are
+        // excluded from the authoring/lifecycle surface count.
         $this->assertSame(15, $registered->filter(
             static fn (string $r): bool => str_contains($r, 'vacanc')
                 && ! str_contains($r, 'api/v1/public')
                 && ! str_contains($r, 'applications')
                 && ! str_contains($r, 'stages')
-                && ! str_contains($r, 'kelola-lowongan'),
+                && ! str_contains($r, 'kelola-lowongan')
+                && ! str_contains($r, 'moderasi-lowongan'),
         )->count(), 'The eight authoring routes plus the seven lifecycle routes.');
 
         // Public Vacancy Discovery Foundation: exactly the two frozen public

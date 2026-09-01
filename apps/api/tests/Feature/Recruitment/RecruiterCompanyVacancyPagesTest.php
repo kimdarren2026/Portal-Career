@@ -59,6 +59,21 @@ final class RecruiterCompanyVacancyPagesTest extends VacancyTestCase
         $this->actingAs($candidate)->get('/profil-perusahaan')->assertStatus(403);
     }
 
+    public function test_recruiter_company_pages_are_scoped_to_membership_not_global_reader(): void
+    {
+        // A company exists, owned by someone else.
+        $this->companyWithRecruiter('v3-scope-owner@example.test', CompanyStatus::Verified);
+
+        // Career Center is a global reader in CompanyScope, but these pages are
+        // the recruiter's own-company surface — a CC actor with no membership
+        // must not be handed an arbitrary company; it is simply forbidden.
+        $careerCenter = $this->makeUser('v3-scope-cc@example.test', UserStatus::Active);
+        $this->assignRole($careerCenter, RoleCode::CareerCenterStaff);
+
+        $this->actingAs($careerCenter)->get('/profil-perusahaan')->assertStatus(403);
+        $this->actingAs($careerCenter)->get('/status-verifikasi')->assertStatus(403);
+    }
+
     public function test_status_verifikasi_exposes_recruiter_safe_trail_only(): void
     {
         [$recruiter, $company] = $this->companyWithRecruiter('v3-verif@example.test', CompanyStatus::RevisionRequired);

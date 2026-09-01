@@ -19,7 +19,7 @@ import { authRequest } from '@/lib/auth'
 type NavItem = { label: string; href?: string; active?: boolean }
 
 const props = defineProps<{
-    persona: 'candidate' | 'recruiter'
+    persona: 'candidate' | 'recruiter' | 'career-center'
     active: string
     title: string
 }>()
@@ -54,7 +54,33 @@ const recruiterNav: NavItem[] = [
     { label: 'Pengaturan Akun' },
 ]
 
-const items = computed(() => props.persona === 'recruiter' ? recruiterNav : candidateNav)
+// Career Center — exactly 10 canonical items. Frontend Vertical Slice v4
+// activates "Verifikasi Perusahaan" and "Moderasi Lowongan" only; the rest
+// stay deferred ("Segera hadir") per the no-dead-link rule.
+const careerCenterNav: NavItem[] = [
+    { label: 'Dashboard' },
+    { label: 'Verifikasi Perusahaan', href: '/verifikasi-perusahaan' },
+    { label: 'Moderasi Lowongan', href: '/moderasi-lowongan' },
+    { label: 'Data Perusahaan' },
+    { label: 'Kemitraan' },
+    { label: 'Alumni & Outcome' },
+    { label: 'Laporan' },
+    { label: 'Notifikasi' },
+    { label: 'Template Email' },
+    { label: 'Pengaturan Moderasi' },
+]
+
+const items = computed(() => {
+    if (props.persona === 'recruiter') return recruiterNav
+    if (props.persona === 'career-center') return careerCenterNav
+    return candidateNav
+})
+
+const personaSubtitle = computed(() => {
+    if (props.persona === 'recruiter') return 'Ruang Kerja Recruiter'
+    if (props.persona === 'career-center') return 'Back-office Career Center'
+    return 'Portal Karir Terpadu'
+})
 
 function isActive(item: NavItem): boolean {
     return !!item.href && item.href.split('#')[0].split('?')[0] === '/' + props.active
@@ -168,7 +194,7 @@ onBeforeUnmount(() => {
                     <div class="flex items-start justify-between gap-4">
                         <div>
                             <span class="text-xl font-bold">Portal Karir Kampus</span>
-                            <p class="mt-1 text-sm text-blue-100">{{ persona === 'recruiter' ? 'Ruang Kerja Recruiter' : 'Portal Karir Terpadu' }}</p>
+                            <p class="mt-1 text-sm text-blue-100">{{ personaSubtitle }}</p>
                         </div>
                         <button
                             type="button"
@@ -214,7 +240,7 @@ onBeforeUnmount(() => {
 
         <aside class="fixed inset-y-0 z-10 hidden w-72 flex-col bg-[#1B2D4F] p-6 text-white md:flex">
             <span class="text-xl font-bold">Portal Karir Kampus</span>
-            <p class="mt-1 text-sm text-blue-100">{{ persona === 'recruiter' ? 'Ruang Kerja Recruiter' : 'Portal Karir Terpadu' }}</p>
+            <p class="mt-1 text-sm text-blue-100">{{ personaSubtitle }}</p>
             <nav class="mt-10 flex-1 space-y-1 overflow-y-auto" aria-label="Navigasi utama">
                 <template v-for="item in items" :key="item.label">
                     <Link

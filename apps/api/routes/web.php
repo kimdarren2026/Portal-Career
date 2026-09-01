@@ -9,6 +9,7 @@ use App\Http\Controllers\Web\CandidateCollectionController;
 use App\Http\Controllers\Web\CandidateDocumentController;
 use App\Http\Controllers\Web\CandidatePageController;
 use App\Http\Controllers\Web\CandidateProfileController;
+use App\Http\Controllers\Web\CareerCenterPageController;
 use App\Http\Controllers\Web\CompanyController;
 use App\Http\Controllers\Web\CompanyMemberController;
 use App\Http\Controllers\Web\CompanyPageController;
@@ -294,6 +295,26 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
     Route::get('/kelola-lowongan/baru', [RecruiterVacancyPageController::class, 'create'])->name('pages.vacancies.create');
     Route::get('/kelola-lowongan/{vacancy}', [RecruiterVacancyPageController::class, 'show'])
         ->whereNumber('vacancy')->name('pages.vacancies.show');
+
+    /*
+    | Career Center Company Verification & Vacancy Moderation Frontend Slice v4
+    | — Inertia page delivery only. Activates the canonical Career Center nav
+    | items "Verifikasi Perusahaan" and "Moderasi Lowongan". Each read reuses
+    | the frozen Company/Vacancy Scope/Query classes directly (Career Center is
+    | a global reader in both) and mutates nothing; every moderation mutation
+    | still posts to the JSON routes already registered above
+    | (`companies.review`, `vacancies.approve|request-revision|reject|suspend|
+    | restore|close`). No publish route exists — a company vacancy publishes
+    | only through approval-in-window or the scheduler (B-4).
+    */
+    Route::get('/verifikasi-perusahaan', [CareerCenterPageController::class, 'companyIndex'])
+        ->name('pages.career-center.companies.index');
+    Route::get('/verifikasi-perusahaan/{company}', [CareerCenterPageController::class, 'companyShow'])
+        ->whereNumber('company')->name('pages.career-center.companies.show');
+    Route::get('/moderasi-lowongan', [CareerCenterPageController::class, 'vacancyIndex'])
+        ->name('pages.career-center.vacancies.index');
+    Route::get('/moderasi-lowongan/{vacancy}', [CareerCenterPageController::class, 'vacancyShow'])
+        ->whereNumber('vacancy')->name('pages.career-center.vacancies.show');
 });
 
 /*

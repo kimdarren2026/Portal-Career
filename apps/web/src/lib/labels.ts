@@ -199,6 +199,34 @@ export const applicationMethodLabel: Record<string, string> = {
 }
 
 /**
+ * Career Center moderation action button labels (Frontend Vertical Slice v4).
+ * Keys are the frozen route segments; the value set is the frozen transition
+ * graph (`ReviewCompanyVerification` / `ModerateVacancy`) — no action is
+ * invented and eligibility is server-derived (`eligible_actions`).
+ */
+export const moderationActionLabel: Record<string, string> = {
+    verify: 'Verifikasi Perusahaan',
+    approve: 'Setujui',
+    'request-revision': 'Minta Perbaikan',
+    reject: 'Tolak',
+    suspend: 'Tangguhkan',
+    restore: 'Pulihkan',
+    close: 'Tutup Lowongan',
+}
+
+/** `company_verification_reviews.action` / `vacancy_moderation_reviews.action` history labels. */
+export const reviewActionLabel: Record<string, string> = {
+    SUBMIT: 'Diajukan',
+    VERIFY: 'Diverifikasi',
+    APPROVE: 'Disetujui',
+    REQUEST_REVISION: 'Perbaikan diminta',
+    REJECT: 'Ditolak',
+    SUSPEND: 'Ditangguhkan',
+    RESTORE: 'Dipulihkan',
+    CLOSE: 'Ditutup',
+}
+
+/**
  * FE-6 (approved PO decision, 29 August 2026 — API_CONTRACT.md Part X row 52).
  * Recruiter application-history row label. `STAGE_CHANGED` is a stage-only
  * event with no application status — it must never be passed through the
