@@ -92,14 +92,13 @@ const adminKepegawaianNav: NavItem[] = [
     { label: 'Pengaturan', href: '/kepegawaian/pengaturan' },
 ]
 
-// Super Admin — exactly 12 canonical items (FSD §4.6). Super Admin Control
-// Plane Frontend Slice v10 activates "Audit Log" only (frozen read contract
-// GET /api/v1/audit-logs). The other eleven stay deferred ("Segera hadir"):
-// master-data writes are deferred beyond MVP (API_SIZE_REVIEW.md DF-1) —
-// covering Master Data, Unit Organisasi, Program Studi; "Jenis Lowongan" is a
-// frozen 3-value enum, not configurable master data; Template Workflow,
-// Konfigurasi SMTP runtime, Template Notifikasi, Integrasi, Retensi Data and
-// Pengaturan Sistem have no frozen runtime.
+// Super Admin — exactly 12 canonical items (FSD §4.6). v10 activated "Audit
+// Log"; v11 activates "Konfigurasi SMTP" (FR-NOTIF-005 / ADR-015 runtime).
+// The other ten stay deferred ("Segera hadir"): master-data writes are
+// deferred beyond MVP (API_SIZE_REVIEW.md DF-1) — covering Master Data, Unit
+// Organisasi, Program Studi; "Jenis Lowongan" is a frozen 3-value enum, not
+// configurable master data; Template Workflow, Template Notifikasi,
+// Integrasi, Retensi Data and Pengaturan Sistem have no frozen runtime.
 const superAdminNav: NavItem[] = [
     { label: 'Pengguna dan Role' },
     { label: 'Master Data' },
@@ -107,7 +106,7 @@ const superAdminNav: NavItem[] = [
     { label: 'Program Studi' },
     { label: 'Jenis Lowongan' },
     { label: 'Template Workflow' },
-    { label: 'Konfigurasi SMTP' },
+    { label: 'Konfigurasi SMTP', href: '/konfigurasi-smtp' },
     { label: 'Template Notifikasi' },
     { label: 'Integrasi' },
     { label: 'Audit Log', href: '/audit-log' },

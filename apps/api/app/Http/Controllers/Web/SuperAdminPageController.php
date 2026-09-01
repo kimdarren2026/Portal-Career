@@ -8,7 +8,10 @@ use App\Domains\Audit\Models\AuditLog;
 use App\Domains\Audit\Queries\ListAuditLogs;
 use App\Domains\Audit\Support\AuditLogPresenter;
 use App\Domains\Audit\Support\AuditLogScope;
+use App\Domains\Identity\Enums\RoleCode;
 use App\Domains\Identity\Models\User;
+use App\Domains\Notification\Models\SmtpConfiguration;
+use App\Domains\Notification\Support\SmtpConfigurationPresenter;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Audit\ListAuditLogsRequest;
 use App\Http\Responses\ContractResponse;
@@ -72,6 +75,25 @@ final class SuperAdminPageController extends Controller
             'filters' => (object) $filters,
             'action_options' => $this->distinctColumn('action'),
             'object_type_options' => $this->distinctColumn('object_type'),
+        ]);
+    }
+
+    /** `GET /konfigurasi-smtp` — the Super Admin "Konfigurasi SMTP" page. */
+    public function smtpConfigurationIndex(Request $request): Response|JsonResponse|SymfonyResponse
+    {
+        $actor = $this->actor($request);
+        if (! $actor->hasActiveRole(RoleCode::SuperAdmin)) {
+            return $this->forbidden($request);
+        }
+
+        $current = SmtpConfiguration::query()->where('is_active', true)->first()
+            ?? SmtpConfiguration::query()->orderByDesc('id')->first();
+
+        return Inertia::render('super-admin/KonfigurasiSmtp', [
+            // Safe metadata only — never `encrypted_password`. `secret_configured`
+            // is the sole signal that a credential exists (INV-035). `null` when
+            // no configuration has been established.
+            'configuration' => $current === null ? null : SmtpConfigurationPresenter::safe($current),
         ]);
     }
 

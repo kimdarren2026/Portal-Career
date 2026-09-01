@@ -437,9 +437,11 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
     | endpoints already carry `Surface: INERTIA_WEB`; the browser paths are
     | the contract URIs with `/api/v1` removed. SUPER_ADMIN only on every
     | route (Policy-checked); Auditor is denied (matrix §4.9 footnote 33).
-    | The Super Admin "Konfigurasi SMTP" page route is activated by the
-    | frontend slice.
+    | `/konfigurasi-smtp` is the Super Admin page (Frontend Slice v11); the
+    | mutations post to the JSON routes below.
     */
+    Route::get('/konfigurasi-smtp', [SuperAdminPageController::class, 'smtpConfigurationIndex'])
+        ->name('pages.super-admin.smtp');
     Route::get('/admin/smtp-configuration', [SmtpConfigurationController::class, 'show'])
         ->name('admin.smtp-configuration.show');
     Route::put('/admin/smtp-configuration', [SmtpConfigurationController::class, 'update'])
