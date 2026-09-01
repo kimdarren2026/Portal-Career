@@ -172,7 +172,11 @@ return [
             'username' => env('REDIS_USERNAME'),
             'password' => env('REDIS_PASSWORD'),
             'port' => env('REDIS_PORT', '6379'),
-            'database' => env('REDIS_CACHE_DB', '1'),
+            // Default 0, NOT 1: the queue connection defaults to database 1, and
+            // DEPLOYMENT_ARCHITECTURE.md §4/§5 requires cache and queue on
+            // separate logical databases so a cache flush cannot destroy
+            // queued work. This default matches apps/api/.env.example.
+            'database' => env('REDIS_CACHE_DB', '0'),
             'max_retries' => env('REDIS_MAX_RETRIES', 3),
             'backoff_algorithm' => env('REDIS_BACKOFF_ALGORITHM', 'decorrelated_jitter'),
             'backoff_base' => env('REDIS_BACKOFF_BASE', 100),
