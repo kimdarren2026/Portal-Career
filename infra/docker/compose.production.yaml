@@ -1,0 +1,227 @@
+# Portal Career — CONTROLLED PRODUCTION / SOFT-LAUNCH stack.
+#
+# Dokploy Compose path:  infra/docker/compose.production.yaml
+# Local development only: infra/docker/compose.yaml  (never use in production).
+#
+# ONE Portal Career release, two runtime image profiles built from the same
+# infra/docker/Dockerfile at the same commit:
+#   app-runtime  PHP 8.3 · PHP-FPM + nginx co-located   -> web, worker, scheduler
+#   ssr-runtime  Node 22 · Inertia SSR renderer only    -> ssr
+# web / worker / scheduler share ONE image digest (image: portal-career-app).
+#
+# Isolation: every service is attached only to the compose-scoped
+# "portal-career" network. postgres and redis publish NO host ports.
+#
+# Secrets: all sensitive values are ${VAR} — resolved from the Dokploy
+# environment/secret facility. No secret literal appears in this file.
+# ${VAR:?...} means "deployment must supply this".
+#
+# Two-principal database model (infra/deployment/README.md):
+#   - POSTGRES_USER / POSTGRES_PASSWORD  = cluster/migration owner (this file
+#     bootstraps the cluster with it).
+#   - DB_USERNAME / DB_PASSWORD          = restricted runtime role
+#     (portal_karir_app), provisioned out of band, used by the long-running
+#     services below. It is NOT the migration owner.
+#
+# Migrations are NOT run by any service here. `php artisan migrate --force` is a
+# one-shot release step run out of band with the migration-owner credential.
+
+name: portal-career-production
+
+# --- shared application runtime environment (web / worker / scheduler) --------
+x-app-env: &app-env
+  APP_NAME: ${APP_NAME:-Portal Karir Kampus}
+  APP_ENV: production
+  APP_DEBUG: "false"
+  APP_KEY: ${APP_KEY:?APP_KEY is required — new production key, base64:...}
+  APP_URL: ${APP_URL:?APP_URL is required — https://<production-host>}
+  APP_TIMEZONE: UTC
+  TRUSTED_PROXIES: ${TRUSTED_PROXIES:-*}
+
+  LOG_CHANNEL: stderr
+  LOG_STDERR_FORMATTER: Monolog\Formatter\JsonFormatter
+  LOG_LEVEL: ${LOG_LEVEL:-info}
+
+  DB_CONNECTION: pgsql
+  DB_HOST: postgres
+  DB_PORT: "5432"
+  DB_DATABASE: ${DB_DATABASE:?DB_DATABASE is required}
+  DB_USERNAME: ${DB_USERNAME:?DB_USERNAME is required — the restricted runtime role, not the migration owner}
+  DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+  # RUNBOOK.md §2 recommends "require" once the DB endpoint offers TLS;
+  # .env.example ships "prefer". Set explicitly per the deployment's DB TLS posture.
+  DB_SSLMODE: ${DB_SSLMODE:-prefer}
+
+  SESSION_DRIVER: database
+  SESSION_ENCRYPT: "true"
+  SESSION_SECURE_COOKIE: "true"
+
+  REDIS_CLIENT: predis
+  REDIS_HOST: redis
+  REDIS_PORT: "6379"
+  REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
+  REDIS_CACHE_DB: "0"
+  REDIS_QUEUE_DB: "1"
+  REDIS_LOCK_DB: "2"
+  CACHE_STORE: redis
+  QUEUE_CONNECTION: redis
+
+  FILESYSTEM_DISK: s3
+  AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:?real private S3-compatible credentials required (PRODUCTION_OBJECT_STORAGE_REQUIRED)}
+  AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:?PRODUCTION_OBJECT_STORAGE_REQUIRED}
+  AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:?PRODUCTION_OBJECT_STORAGE_REQUIRED}
+  AWS_BUCKET: ${AWS_BUCKET:?private bucket name required (PRODUCTION_OBJECT_STORAGE_REQUIRED)}
+  AWS_ENDPOINT: ${AWS_ENDPOINT:?PRODUCTION_OBJECT_STORAGE_REQUIRED}
+  AWS_USE_PATH_STYLE_ENDPOINT: ${AWS_USE_PATH_STYLE_ENDPOINT:-true}
+
+  # Deployment fallback only; runtime SMTP is Super Admin-managed (ADR-015).
+  MAIL_MAILER: ${MAIL_MAILER:-log}
+  SMTP_CONFIG_ENCRYPTION_KEY: ${SMTP_CONFIG_ENCRYPTION_KEY:?SMTP_CONFIG_ENCRYPTION_KEY is required (INV-035)}
+
+  INERTIA_SSR_ENABLED: "true"
+  INERTIA_SSR_URL: http://ssr:13714
+
+# --- shared build/wiring for the PHP application roles -----------------------
+x-app-common: &app-common
+  image: portal-career-app:${RELEASE_TAG:-local}
+  build:
+    context: ../..
+    dockerfile: infra/docker/Dockerfile
+    target: app-runtime
+    args:
+      GIT_REVISION: ${GIT_REVISION:-unknown}
+  restart: unless-stopped
+  environment: *app-env
+  networks:
+    - portal-career
+  depends_on:
+    postgres:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+
+services:
+
+  # Web/API — PHP-FPM + nginx co-located in one container (supervisord).
+  # nginx listens on 8080; that is the port Dokploy/Traefik routes to once the
+  # production hostname is configured in the Dokploy Domains UI. No host port.
+  web:
+    <<: *app-common
+    command: ["supervisord", "-c", "/etc/supervisord.conf"]
+    expose:
+      - "8080"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8080/health/ready"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  # Inertia SSR renderer (ADR-017) — Node 22, no PHP, no nginx, no DB.
+  ssr:
+    image: portal-career-ssr:${RELEASE_TAG:-local}
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile
+      target: ssr-runtime
+      args:
+        GIT_REVISION: ${GIT_REVISION:-unknown}
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+    networks:
+      - portal-career
+    expose:
+      - "13714"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:13714/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  # Queue worker — frozen command (RUNBOOK.md §1). May be scaled horizontally
+  # later. No email-outbox delivery worker exists yet (B-5 unresolved).
+  worker:
+    <<: *app-common
+    command:
+      - php
+      - artisan
+      - queue:work
+      - --queue=mail,notifications,default
+      - --max-time=3600
+      - --tries=1
+      - --backoff=0
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f 'artisan queue:work' > /dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  # Scheduler — EXACTLY ONE instance (DEPLOYMENT_ARCHITECTURE.md §2). One
+  # service, no replicas / no scaling directive.
+  scheduler:
+    <<: *app-common
+    command: ["php", "artisan", "schedule:work"]
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f 'artisan schedule:work' > /dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  # PostgreSQL 16 — Portal Career only, private network, no host port.
+  # Credentials here are the cluster/migration owner.
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    command: ["postgres", "-c", "timezone=UTC", "-c", "log_timezone=UTC"]
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?POSTGRES_DB is required}
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER is required — cluster/migration owner}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      TZ: UTC
+      PGTZ: UTC
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - portal-career
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # Redis 7 — Portal Career only, private network, no host port.
+  # AUTH required; AOF persistence; noeviction so the queue DB never drops jobs.
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
+    command:
+      - sh
+      - -c
+      - exec redis-server --requirepass "$$REDIS_PASSWORD" --appendonly yes --maxmemory-policy noeviction --save "60 1"
+    volumes:
+      - redis-data:/data
+    networks:
+      - portal-career
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" ping | grep -q PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+# Compose-scoped (project-prefixed) — never collides with another Dokploy
+# project's network/volumes; never reuses HRIS / Finance Cloud / wordpress.
+networks:
+  portal-career:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  redis-data:

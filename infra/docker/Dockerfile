@@ -1,20 +1,26 @@
 # syntax=docker/dockerfile:1
 #
-# Portal Karir Kampus — production application image.
+# Portal Karir Kampus — production runtime images.
 #
-# ONE immutable image, run with different commands for the Laravel process
-# roles (DEPLOYMENT_ARCHITECTURE.md §2, SYSTEM_ARCHITECTURE.md §1):
+# ONE Portal Career release, built from ONE Dockerfile at ONE commit, exposing
+# two runtime profiles (DEPLOYMENT_ARCHITECTURE.md §2, SYSTEM_ARCHITECTURE.md §1,
+# ADR-017):
 #
-#   web        : php-fpm                              (fronted by nginx — infra/docker/nginx.conf)
-#   worker     : php artisan queue:work --max-time=3600 --tries=1
-#   scheduler  : while true; do php artisan schedule:run; sleep 60; done   (exactly one instance)
+#   target: app-runtime   PHP 8.3 · PHP-FPM + nginx co-located (one instance)
+#     web        : supervisord -> php-fpm -F  +  nginx -g 'daemon off;'
+#     worker     : php artisan queue:work --queue=mail,notifications,default --max-time=3600 --tries=1 --backoff=0
+#     scheduler  : php artisan schedule:work            (exactly one instance)
 #
-# The Inertia SSR renderer (4th role, ADR-017) is a Node process that runs the
-# bundle at apps/api/bootstrap/ssr/ssr.js; it ships in this same build but has
-# its own small image profile — see the runbook.
+#   target: ssr-runtime   Node 22 · Inertia SSR renderer only (ADR-017)
+#     ssr        : node bootstrap/ssr/ssr.js            (no PHP, no nginx, no DB)
+#
+# The two targets are built together, in lockstep, from the same source tree by
+# infra/docker/compose.production.yaml. org.opencontainers.image.revision is
+# stamped on both from the same GIT_REVISION build arg as an audit aid.
 #
 # Build context is the repository root:
-#   docker build -f infra/docker/Dockerfile -t portal-karir-kampus:<sha> .
+#   docker build -f infra/docker/Dockerfile --target app-runtime -t portal-career-app:<sha> .
+#   docker build -f infra/docker/Dockerfile --target ssr-runtime -t portal-career-ssr:<sha> .
 
 # ----------------------------------------------------------------------------
 # Stage 1 — PHP dependencies (no dev, optimized autoloader)
@@ -42,13 +48,44 @@ COPY apps/web ./apps/web
 RUN npm run build && npm run build:ssr
 
 # ----------------------------------------------------------------------------
-# Stage 3 — Runtime (PHP-FPM, no build toolchain, non-root)
+# Stage 3 — SSR runtime (Node 22, renderer only; ADR-017)
 # ----------------------------------------------------------------------------
-FROM php:8.3-fpm-alpine AS runtime
+# vite.config.ts sets `ssr.noExternal: true`, so bootstrap/ssr/ssr.js is a
+# single self-contained bundle — its only imports are Node built-ins. No
+# node_modules, no PHP, no nginx, no Composer in this image.
+FROM node:22-alpine AS ssr-runtime
+
+ARG GIT_REVISION=unknown
+LABEL org.opencontainers.image.title="Portal Karir Kampus — SSR renderer" \
+      org.opencontainers.image.revision="${GIT_REVISION}"
+
+RUN apk add --no-cache tini
+
+ENV NODE_ENV=production
+WORKDIR /var/www/app
+COPY --from=frontend /app/apps/api/bootstrap/ssr ./bootstrap/ssr
+
+USER node
+EXPOSE 13714
+ENTRYPOINT ["/sbin/tini", "--"]
+# @inertiajs/vue3/server listens on 0.0.0.0:13714 and answers GET /health.
+CMD ["node", "bootstrap/ssr/ssr.js"]
+
+# ----------------------------------------------------------------------------
+# Stage 4 — Application runtime (PHP-FPM + nginx co-located, non-root)
+# ----------------------------------------------------------------------------
+FROM php:8.3-fpm-alpine AS app-runtime
+
+ARG GIT_REVISION=unknown
+LABEL org.opencontainers.image.title="Portal Karir Kampus — application" \
+      org.opencontainers.image.revision="${GIT_REVISION}"
 
 # Runtime libraries only. Build deps are installed, used, then dropped.
+# nginx + supervisor support the co-located web role (DEPLOYMENT_ARCHITECTURE.md
+# §2: one "PHP-FPM + Nginx" instance). worker/scheduler override CMD and never
+# start nginx or supervisor.
 RUN set -eux; \
-    apk add --no-cache icu-libs postgresql-libs oniguruma tini; \
+    apk add --no-cache icu-libs postgresql-libs oniguruma tini nginx supervisor; \
     apk add --no-cache --virtual .build-deps \
       $PHPIZE_DEPS icu-dev postgresql-dev oniguruma-dev linux-headers; \
     docker-php-ext-configure intl; \
@@ -73,8 +110,20 @@ RUN { \
       echo 'expose_php=Off'; \
     } > /usr/local/etc/php/conf.d/zz-app.ini
 
+# Co-located web role: nginx runs as the same non-root www-data user as php-fpm
+# and reaches it over 127.0.0.1:9000. The FROZEN app-tier vhost
+# (infra/docker/nginx.conf) is copied byte-for-byte; nginx.main.conf only wraps
+# it in http{} and relocates writable paths so no root is needed.
+COPY infra/docker/nginx.conf       /etc/nginx/http.d/app.conf
+COPY infra/docker/nginx.main.conf  /etc/nginx/nginx.conf
+COPY infra/docker/supervisord.conf /etc/supervisord.conf
+RUN set -eux; \
+    mkdir -p /tmp/nginx/client_body /tmp/nginx/proxy /tmp/nginx/fastcgi \
+             /tmp/nginx/uwsgi /tmp/nginx/scgi; \
+    chown -R www-data:www-data /tmp/nginx /var/lib/nginx /var/log/nginx
+
 WORKDIR /var/www/app
-COPY --from=php-deps  /app/apps/api            ./
+COPY --from=php-deps  /app/apps/api                   ./
 COPY --from=frontend  /app/apps/api/public/build      ./public/build
 COPY --from=frontend  /app/apps/api/bootstrap/ssr     ./bootstrap/ssr
 
@@ -86,6 +135,7 @@ RUN set -eux; \
     chmod -R ug+rw storage bootstrap/cache
 
 USER www-data
-EXPOSE 9000
+# 8080 = nginx (the ingress Dokploy/Traefik routes to); 9000 = php-fpm (internal).
+EXPOSE 8080 9000
 ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["php-fpm"]
+CMD ["supervisord", "-c", "/etc/supervisord.conf"]
