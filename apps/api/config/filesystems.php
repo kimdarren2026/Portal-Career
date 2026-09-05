@@ -58,6 +58,12 @@ return [
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
             'throw' => false,
             'report' => false,
+            // Fail fast on an unreachable/misconfigured endpoint instead of
+            // blocking a php-fpm worker on the SDK's default (no) timeout.
+            'http' => [
+                'connect_timeout' => env('AWS_CONNECT_TIMEOUT', 5),
+                'timeout' => env('AWS_REQUEST_TIMEOUT', 10),
+            ],
         ],
 
     ],

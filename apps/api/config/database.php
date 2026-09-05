@@ -97,6 +97,11 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'prefer'),
+            // Fail fast on an unreachable host instead of hanging on TCP
+            // retries for the OS-level connect timeout (can be 20s+).
+            'options' => [
+                PDO::ATTR_TIMEOUT => env('DB_CONNECT_TIMEOUT', 5),
+            ],
         ],
 
         'sqlsrv' => [
@@ -164,6 +169,10 @@ return [
             'backoff_algorithm' => env('REDIS_BACKOFF_ALGORITHM', 'decorrelated_jitter'),
             'backoff_base' => env('REDIS_BACKOFF_BASE', 100),
             'backoff_cap' => env('REDIS_BACKOFF_CAP', 1000),
+            // Fail fast on an unreachable host (both phpredis and predis
+            // accept these keys) instead of blocking on the connect/read.
+            'timeout' => env('REDIS_CONNECT_TIMEOUT', 5),
+            'read_timeout' => env('REDIS_READ_TIMEOUT', 5),
         ],
 
         'cache' => [
@@ -181,6 +190,10 @@ return [
             'backoff_algorithm' => env('REDIS_BACKOFF_ALGORITHM', 'decorrelated_jitter'),
             'backoff_base' => env('REDIS_BACKOFF_BASE', 100),
             'backoff_cap' => env('REDIS_BACKOFF_CAP', 1000),
+            // Fail fast on an unreachable host (both phpredis and predis
+            // accept these keys) instead of blocking on the connect/read.
+            'timeout' => env('REDIS_CONNECT_TIMEOUT', 5),
+            'read_timeout' => env('REDIS_READ_TIMEOUT', 5),
         ],
 
         'queue' => [
@@ -194,6 +207,10 @@ return [
             'backoff_algorithm' => env('REDIS_BACKOFF_ALGORITHM', 'decorrelated_jitter'),
             'backoff_base' => env('REDIS_BACKOFF_BASE', 100),
             'backoff_cap' => env('REDIS_BACKOFF_CAP', 1000),
+            // Fail fast on an unreachable host (both phpredis and predis
+            // accept these keys) instead of blocking on the connect/read.
+            'timeout' => env('REDIS_CONNECT_TIMEOUT', 5),
+            'read_timeout' => env('REDIS_READ_TIMEOUT', 5),
         ],
 
         'lock' => [
@@ -207,6 +224,10 @@ return [
             'backoff_algorithm' => env('REDIS_BACKOFF_ALGORITHM', 'decorrelated_jitter'),
             'backoff_base' => env('REDIS_BACKOFF_BASE', 100),
             'backoff_cap' => env('REDIS_BACKOFF_CAP', 1000),
+            // Fail fast on an unreachable host (both phpredis and predis
+            // accept these keys) instead of blocking on the connect/read.
+            'timeout' => env('REDIS_CONNECT_TIMEOUT', 5),
+            'read_timeout' => env('REDIS_READ_TIMEOUT', 5),
         ],
 
     ],
