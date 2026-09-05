@@ -5,7 +5,7 @@
 #
 # ONE Portal Career release, two runtime image profiles built from the same
 # infra/docker/Dockerfile at the same commit:
-#   app-runtime  PHP 8.3 · PHP-FPM + nginx co-located   -> web, worker, scheduler
+#   app-runtime  PHP 8.4 · PHP-FPM + nginx co-located   -> web, worker, scheduler
 #   ssr-runtime  Node 22 · Inertia SSR renderer only    -> ssr
 # web / worker / scheduler share ONE image digest (image: portal-career-app).
 #

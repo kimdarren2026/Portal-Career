@@ -83,7 +83,7 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: '8.4'
           extensions: mbstring, openssl, fileinfo, pdo, pdo_pgsql, pgsql, ctype, json, bcmath, intl
           coverage: none
           ini-values: error_reporting=E_ALL

@@ -18,7 +18,7 @@ One release, one commit, built in lockstep by `compose.production.yaml`:
 
 | Target | Base | Runs | Roles |
 | --- | --- | --- | --- |
-| `app-runtime` | `php:8.3-fpm-alpine` | PHP-FPM **and** nginx co-located (`supervisord`); `fastcgi_pass 127.0.0.1:9000`; nginx on `:8080` | `web`, `worker`, `scheduler` |
+| `app-runtime` | `php:8.4-fpm-alpine` | PHP-FPM **and** nginx co-located (`supervisord`); `fastcgi_pass 127.0.0.1:9000`; nginx on `:8080` | `web`, `worker`, `scheduler` |
 | `ssr-runtime` | `node:22-alpine` | `node bootstrap/ssr/ssr.js` (Inertia SSR renderer, ADR-017) — no PHP, no nginx, no DB | `ssr` |
 
 `web`, `worker`, `scheduler` share one image digest (`portal-career-app`). `ssr`

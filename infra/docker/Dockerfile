@@ -6,7 +6,7 @@
 # two runtime profiles (DEPLOYMENT_ARCHITECTURE.md §2, SYSTEM_ARCHITECTURE.md §1,
 # ADR-017):
 #
-#   target: app-runtime   PHP 8.3 · PHP-FPM + nginx co-located (one instance)
+#   target: app-runtime   PHP 8.4 · PHP-FPM + nginx co-located (one instance)
 #     web        : supervisord -> php-fpm -F  +  nginx -g 'daemon off;'
 #     worker     : php artisan queue:work --queue=mail,notifications,default --max-time=3600 --tries=1 --backoff=0
 #     scheduler  : php artisan schedule:work            (exactly one instance)
@@ -74,7 +74,7 @@ CMD ["node", "bootstrap/ssr/ssr.js"]
 # ----------------------------------------------------------------------------
 # Stage 4 — Application runtime (PHP-FPM + nginx co-located, non-root)
 # ----------------------------------------------------------------------------
-FROM php:8.3-fpm-alpine AS app-runtime
+FROM php:8.4-fpm-alpine AS app-runtime
 
 ARG GIT_REVISION=unknown
 LABEL org.opencontainers.image.title="Portal Karir Kampus — application" \
