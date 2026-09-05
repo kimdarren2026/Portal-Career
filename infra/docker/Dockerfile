@@ -74,23 +74,33 @@ CMD ["node", "bootstrap/ssr/ssr.js"]
 # ----------------------------------------------------------------------------
 # Stage 4 — Application runtime (PHP-FPM + nginx co-located, non-root)
 # ----------------------------------------------------------------------------
-FROM php:8.4-fpm-alpine AS app-runtime
+FROM php:8.4-fpm AS app-runtime
 
 ARG GIT_REVISION=unknown
 LABEL org.opencontainers.image.title="Portal Karir Kampus — application" \
       org.opencontainers.image.revision="${GIT_REVISION}"
 
-# Runtime libraries only. Build deps are installed, used, then dropped.
+# Debian (glibc), not Alpine (musl): musl's stub resolver has long-standing
+# slow/hanging DNS lookups under some container network setups, for BOTH
+# compose-internal service names and external hosts — observed in production
+# as every dependency check (Postgres, Redis, S3) blocking for tens of
+# seconds. glibc's resolver does not share this failure mode.
+#
 # nginx + supervisor support the co-located web role (DEPLOYMENT_ARCHITECTURE.md
 # §2: one "PHP-FPM + Nginx" instance). worker/scheduler override CMD and never
-# start nginx or supervisor.
+# start nginx or supervisor. $PHPIZE_DEPS (build toolchain) is purged after the
+# extensions are built; the -dev libs stay installed so their runtime .so's
+# remain available — simpler and safer than tracking Debian's versioned
+# runtime package names (e.g. libicu72) across releases.
 RUN set -eux; \
-    apk add --no-cache icu-libs postgresql-libs oniguruma tini nginx supervisor; \
-    apk add --no-cache --virtual .build-deps \
-      $PHPIZE_DEPS icu-dev postgresql-dev oniguruma-dev linux-headers; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+      ca-certificates tini nginx supervisor wget procps \
+      libicu-dev libpq-dev libonig-dev $PHPIZE_DEPS; \
     docker-php-ext-configure intl; \
     docker-php-ext-install -j"$(nproc)" pdo_pgsql pgsql intl bcmath pcntl opcache; \
-    apk del .build-deps
+    apt-get purge -y --auto-remove $PHPIZE_DEPS; \
+    rm -rf /var/lib/apt/lists/*
 
 # Opcache tuned for an immutable image: code never changes at runtime.
 RUN { \
@@ -119,7 +129,7 @@ COPY infra/docker/nginx.main.conf  /etc/nginx/nginx.conf
 COPY infra/docker/supervisord.conf /etc/supervisord.conf
 RUN set -eux; \
     mkdir -p /tmp/nginx/client_body /tmp/nginx/proxy /tmp/nginx/fastcgi \
-             /tmp/nginx/uwsgi /tmp/nginx/scgi; \
+             /tmp/nginx/uwsgi /tmp/nginx/scgi /var/lib/nginx /var/log/nginx; \
     chown -R www-data:www-data /tmp/nginx /var/lib/nginx /var/log/nginx
 
 WORKDIR /var/www/app
@@ -137,5 +147,6 @@ RUN set -eux; \
 USER www-data
 # 8080 = nginx (the ingress Dokploy/Traefik routes to); 9000 = php-fpm (internal).
 EXPOSE 8080 9000
-ENTRYPOINT ["/sbin/tini", "--"]
+# Debian's tini package installs to /usr/bin/tini (Alpine's is /sbin/tini).
+ENTRYPOINT ["/usr/bin/tini", "--"]
 CMD ["supervisord", "-c", "/etc/supervisord.conf"]
