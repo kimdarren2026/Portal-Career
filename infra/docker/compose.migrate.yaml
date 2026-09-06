@@ -1,0 +1,39 @@
+# Portal Karir Kampus — one-off production migration overlay.
+#
+# Overlay applied ON TOP OF infra/docker/compose.production.yaml for a single
+# out-of-band release step (infra/deployment/README.md, "Release order" step 2):
+#
+#   docker compose \
+#     --project-directory <repo>/infra/docker \
+#     -f <repo>/infra/docker/compose.production.yaml \
+#     -f <repo>/infra/docker/compose.migrate.yaml \
+#     run --rm --no-deps --build web
+#
+# --project-directory is the directory holding this file, not the repository
+# root, so the production file's build context ("../..") still resolves to the
+# repository root. compose.production.yaml is never edited to compensate.
+#
+# This overrides the existing web service in exactly two ways:
+#
+#   1. DB_DATABASE / DB_USERNAME / DB_PASSWORD are temporarily the
+#      cluster/migration owner (POSTGRES_*), because migrations are DDL and the
+#      restricted runtime role portal_karir_app must never own schema objects.
+#   2. The command runs the migration once and reports status instead of
+#      starting supervisord.
+#
+# Compose merge semantics keep every other setting of web — APP_KEY, Redis, S3,
+# SMTP, image, build, networks — inherited from the production file. Nothing is
+# duplicated here and no secret literal appears here.
+#
+# Used only with "run --rm", so it never joins the running stack.
+
+services:
+  web:
+    environment:
+      DB_DATABASE: ${POSTGRES_DB:?POSTGRES_DB is required}
+      DB_USERNAME: ${POSTGRES_USER:?POSTGRES_USER is required}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+    command:
+      - sh
+      - -lc
+      - php artisan migrate --force && php artisan migrate:status
