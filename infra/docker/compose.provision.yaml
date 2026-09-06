@@ -1,0 +1,16 @@
+services:
+  db-provision:
+    image: postgres:16-alpine
+    restart: "no"
+    environment:
+      PGHOST: postgres
+      PGPORT: "5432"
+      PGDATABASE: ${POSTGRES_DB:?POSTGRES_DB is required}
+      PGUSER: ${POSTGRES_USER:?POSTGRES_USER is required}
+      PGPASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      PORTAL_KARIR_RUNTIME_DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+    volumes:
+      - ./infra/deployment/provision-runtime-db-role.sql:/opt/portal-career/provision-runtime-db-role.sql:ro
+    networks:
+      - portal-career
+    command: ["psql", "-v", "ON_ERROR_STOP=1", "-f", "/opt/portal-career/provision-runtime-db-role.sql"]
