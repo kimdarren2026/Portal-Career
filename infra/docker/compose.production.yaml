@@ -181,6 +181,12 @@ services:
       - postgres-data:/var/lib/postgresql/data
     networks:
       - portal-career
+      # Dokploy's Domain feature rewrites the `web` service's `networks:` key
+      # to [dokploy-network, default] on every deploy, dropping portal-career.
+      # Also joining `default` here keeps web able to reach postgres
+      # regardless of that override — no manual `docker network connect`
+      # needed after a redeploy.
+      - default
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
       interval: 10s
@@ -203,6 +209,9 @@ services:
       - redis-data:/data
     networks:
       - portal-career
+      # See postgres above: keeps web reachable after Dokploy's Domain
+      # feature drops portal-career from web's network list on redeploy.
+      - default
     healthcheck:
       test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" ping | grep -q PONG"]
       interval: 10s
