@@ -1,0 +1,34 @@
+# Portal Career — one-off runtime database privilege VERIFIER overlay.
+#
+# Applied ON TOP OF infra/docker/compose.production.yaml so it joins the same
+# private "portal-career" network and can reach the postgres service:
+#
+#   docker compose \
+#     -f <repo>/infra/docker/compose.production.yaml \
+#     -f <repo>/infra/docker/compose.verify-db.yaml \
+#     run --rm db-verify
+#
+# READ-ONLY: db-verify runs infra/deployment/verify-runtime-db-role.sql, which
+# only SELECTs from catalogs / calls has_*_privilege(). It performs no DDL/DML.
+# It inspects with the owner/bootstrap credentials (POSTGRES_*), never the
+# runtime role's own credentials. No secret literal appears here.
+#
+# Not part of the running stack — "run --rm" only. Adds no service to
+# compose.production.yaml's topology (still web, ssr, worker, scheduler,
+# postgres, redis).
+
+services:
+  db-verify:
+    image: postgres:16-alpine
+    restart: "no"
+    environment:
+      PGHOST: postgres
+      PGPORT: "5432"
+      PGDATABASE: ${POSTGRES_DB:?POSTGRES_DB is required}
+      PGUSER: ${POSTGRES_USER:?POSTGRES_USER is required — owner/bootstrap principal}
+      PGPASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+    volumes:
+      - ./infra/deployment/verify-runtime-db-role.sql:/opt/portal-career/verify-runtime-db-role.sql:ro
+    networks:
+      - portal-career
+    command: ["psql", "-v", "ON_ERROR_STOP=1", "-f", "/opt/portal-career/verify-runtime-db-role.sql"]
