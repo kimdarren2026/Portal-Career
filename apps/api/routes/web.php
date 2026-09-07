@@ -47,11 +47,14 @@ use Inertia\Inertia;
 | docs/api/API_CONTRACT.md regardless of surface, and both surfaces call the
 | same Actions and Policies — no business rule is ever implemented twice.
 |
-| BOOTSTRAP PHASE: no business route exists yet. The single route below proves
-| the Laravel → Inertia → Vue → TypeScript → Tailwind → Vite chain is wired.
+| BOOTSTRAP PHASE: no business route exists yet. '/' redirects to the public
+| vacancy listing; the bootstrap health check moved to /bootstrap-health so it
+| no longer occupies the root path.
 */
 
-Route::get('/', function () {
+Route::redirect('/', '/lowongan');
+
+Route::get('/bootstrap-health', function () {
     return Inertia::render('Health', [
         'application' => config('app.name'),
         'laravel' => app()->version(),
