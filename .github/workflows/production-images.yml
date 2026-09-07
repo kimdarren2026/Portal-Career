@@ -1,0 +1,76 @@
+name: Production images
+
+# Build BOTH production runtime image profiles from infra/docker/Dockerfile at
+# ONE commit and push them to GHCR, so neither shared ~3.6 GiB Dokploy VPS ever
+# has to build an application image.
+#
+#   ghcr.io/kimdarren2026/portal-career-app   <- target: app-runtime
+#   ghcr.io/kimdarren2026/portal-career-ssr   <- target: ssr-runtime
+#
+# The Dockerfile already performs the frozen build gate — Composer locked
+# --no-dev install (php-deps stage), npm ci + client build + SSR build
+# (frontend stage) — so this workflow only wires registry auth, traceability
+# and cache around `docker buildx build`.
+#
+# workflow_dispatch only. A git-tag trigger is deliberately NOT added: this
+# repository has no approved release-tag convention, and firing on tag pushes
+# would invent one (and could re-fire on existing frozen tags).
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: production-images-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build & push ${{ matrix.image }} (${{ matrix.target }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: portal-career-app
+            target: app-runtime
+          - image: portal-career-ssr
+            target: ssr-runtime
+
+    steps:
+      - name: Checkout ${{ github.sha }}
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push ${{ matrix.image }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: infra/docker/Dockerfile
+          target: ${{ matrix.target }}
+          push: true
+          provenance: false
+          # Stamps org.opencontainers.image.revision on the target with the real
+          # commit SHA (Dockerfile ARG GIT_REVISION, default "unknown").
+          build-args: |
+            GIT_REVISION=${{ github.sha }}
+          # Immutable commit-SHA tag is authoritative. production-candidate is a
+          # mutable convenience pointer and does NOT imply production approval.
+          tags: |
+            ghcr.io/kimdarren2026/${{ matrix.image }}:${{ github.sha }}
+            ghcr.io/kimdarren2026/${{ matrix.image }}:production-candidate
+          cache-from: type=gha,scope=${{ matrix.target }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.target }}
