@@ -14,17 +14,21 @@
 
 ## Runtime image profiles (`Dockerfile`)
 
-One release, one commit, built in lockstep by `compose.production.yaml`:
+One release, one commit. Built in GitHub Actions
+(`.github/workflows/production-images.yml`) and pushed to GHCR;
+`compose.production.yaml` **pulls** both by immutable `sha256` digest and never
+builds on the VPS:
 
 | Target | Base | Runs | Roles |
 | --- | --- | --- | --- |
 | `app-runtime` | `php:8.4-fpm` (Debian/glibc — see Dockerfile comment) | PHP-FPM **and** nginx co-located (`supervisord`); `fastcgi_pass 127.0.0.1:9000`; nginx on `:8080` | `web`, `worker`, `scheduler` |
 | `ssr-runtime` | `node:22-alpine` | `node bootstrap/ssr/ssr.js` (Inertia SSR renderer, ADR-017) — no PHP, no nginx, no DB | `ssr` |
 
-`web`, `worker`, `scheduler` share one image digest (`portal-career-app`). `ssr`
-is a dedicated small Node image (`portal-career-ssr`) built from the same
+`web`, `worker`, `scheduler` share one image digest
+(`ghcr.io/kimdarren2026/portal-career-app`). `ssr` is a dedicated small Node
+image (`ghcr.io/kimdarren2026/portal-career-ssr`) built from the same
 `Dockerfile` and commit. `org.opencontainers.image.revision` is stamped on both
-from the `GIT_REVISION` build arg.
+from the `GIT_REVISION` build arg (the workflow passes `github.sha`).
 
 The co-located web model is the frozen `DEPLOYMENT_ARCHITECTURE.md §2` topology
 ("PHP-FPM + Nginx" as one instance). `nginx.conf` is unchanged; `nginx.main.conf`
@@ -36,7 +40,7 @@ the non-root `www-data` user.
 - Secrets: `${VAR}` only, from the Dokploy secret facility. Nothing sensitive is committed.
 - `postgres` / `redis`: attached only to the compose-scoped `portal-career` network; **no host ports**.
 - Database: two-principal model (`infra/deployment/README.md`). `POSTGRES_*` = cluster/migration owner; `DB_*` = restricted runtime role.
-- Migrations: **not** run by any long-running service. One-shot `php artisan migrate --force` with the migration-owner credential, out of band.
+- Migrations: **not** run by any long-running service. One-shot `php artisan migrate --force` with the migration-owner credential, out of band, via `compose.migrate.yaml` (`run --rm --no-deps web`, no `--build` — the pinned GHCR image is used).
 - Object storage: external private S3-compatible only. No MinIO. No local candidate-document store.
 - Transactional email delivery worker: not implemented (B-5 unresolved). In-app notifications, SMTP config, SMTP test-send, and `email_outbox` persistence work.
 - Public routing (hostname + TLS) is configured later via the Dokploy Domains UI; no hostname or Traefik rule is baked in.

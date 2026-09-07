@@ -4,14 +4,13 @@
 # out-of-band release step (infra/deployment/README.md, "Release order" step 2):
 #
 #   docker compose \
-#     --project-directory <repo>/infra/docker \
 #     -f <repo>/infra/docker/compose.production.yaml \
 #     -f <repo>/infra/docker/compose.migrate.yaml \
-#     run --rm --no-deps --build web
+#     run --rm --no-deps web
 #
-# --project-directory is the directory holding this file, not the repository
-# root, so the production file's build context ("../..") still resolves to the
-# repository root. compose.production.yaml is never edited to compensate.
+# No --build: web now inherits the immutable GHCR app digest from
+# compose.production.yaml, so this step pulls that exact prebuilt image and
+# never builds on the VPS.
 #
 # This overrides the existing web service in exactly two ways:
 #
@@ -22,7 +21,7 @@
 #      starting supervisord.
 #
 # Compose merge semantics keep every other setting of web — APP_KEY, Redis, S3,
-# SMTP, image, build, networks — inherited from the production file. Nothing is
+# SMTP, image, networks — inherited from the production file. Nothing is
 # duplicated here and no secret literal appears here.
 #
 # Used only with "run --rm", so it never joins the running stack.

@@ -3,11 +3,13 @@
 # Dokploy Compose path:  infra/docker/compose.production.yaml
 # Local development only: infra/docker/compose.yaml  (never use in production).
 #
-# ONE Portal Career release, two runtime image profiles built from the same
-# infra/docker/Dockerfile at the same commit:
+# ONE Portal Career release, two runtime image profiles from the same
+# infra/docker/Dockerfile at the same commit, built in GitHub Actions
+# (.github/workflows/production-images.yml) and PULLED from GHCR by immutable
+# sha256 digest. The production VPS never builds an application image.
 #   app-runtime  PHP 8.4 · PHP-FPM + nginx co-located   -> web, worker, scheduler
 #   ssr-runtime  Node 22 · Inertia SSR renderer only    -> ssr
-# web / worker / scheduler share ONE image digest (image: portal-career-app).
+# web / worker / scheduler share ONE image digest (ghcr.io/.../portal-career-app).
 #
 # Isolation: every service is attached only to the compose-scoped
 # "portal-career" network. postgres and redis publish NO host ports.
@@ -81,15 +83,11 @@ x-app-env: &app-env
   INERTIA_SSR_ENABLED: "true"
   INERTIA_SSR_URL: http://ssr:13714
 
-# --- shared build/wiring for the PHP application roles -----------------------
+# --- shared wiring for the PHP application roles ----------------------------
+# Immutable GHCR digest (source SHA 8c40f547ce01ab7bd845130ac70347efe6c080fe).
+# No build directive: the VPS pulls this exact digest, never builds it.
 x-app-common: &app-common
-  image: portal-career-app:${RELEASE_TAG:-local}
-  build:
-    context: ../..
-    dockerfile: infra/docker/Dockerfile
-    target: app-runtime
-    args:
-      GIT_REVISION: ${GIT_REVISION:-unknown}
+  image: ghcr.io/kimdarren2026/portal-career-app@sha256:1fd3a8769ad1bee5d7ee86f087a8c31860c41beb26cfe8f6fd3656fe51a198e0
   restart: unless-stopped
   environment: *app-env
   networks:
@@ -119,13 +117,9 @@ services:
 
   # Inertia SSR renderer (ADR-017) — Node 22, no PHP, no nginx, no DB.
   ssr:
-    image: portal-career-ssr:${RELEASE_TAG:-local}
-    build:
-      context: ../..
-      dockerfile: infra/docker/Dockerfile
-      target: ssr-runtime
-      args:
-        GIT_REVISION: ${GIT_REVISION:-unknown}
+    # Immutable GHCR digest (source SHA 8c40f547ce01ab7bd845130ac70347efe6c080fe).
+    # No build directive: the VPS pulls this exact digest, never builds it.
+    image: ghcr.io/kimdarren2026/portal-career-ssr@sha256:74e3c694e33518ee2ba502d5cc725fb787e4baef74fd01f30411881861827bca
     restart: unless-stopped
     environment:
       NODE_ENV: production
