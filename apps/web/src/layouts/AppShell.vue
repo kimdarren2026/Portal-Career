@@ -92,27 +92,26 @@ const adminKepegawaianNav: NavItem[] = [
     { label: 'Pengaturan', href: '/kepegawaian/pengaturan' },
 ]
 
-// Super Admin — exactly 12 canonical items (FSD §4.6). v10 activated "Audit
-// Log"; v11 "Konfigurasi SMTP" (FR-NOTIF-005 / ADR-015); v12 "Jenis Lowongan"
-// as a READ-ONLY reference over the frozen VacancyType enum (PO decision
-// SUPER_ADMIN_VACANCY_TYPE_REFERENCE_MVP — not CRUD). The other nine stay
-// deferred ("Segera hadir"): master-data writes are deferred beyond MVP
-// (API_SIZE_REVIEW.md DF-1) — Master Data, Unit Organisasi, Program Studi;
-// Template Workflow, Template Notifikasi, Integrasi, Retensi Data and
-// Pengaturan Sistem have no frozen runtime.
+// Super Admin — exactly 12 canonical items (FSD §4.6), all activated. Menu/page
+// activation is distinct from full CRUD availability: where a writable contract
+// is unresolved the page is a READ_ONLY_REFERENCE or PARTIAL_FUNCTIONAL surface
+// (master-data writes DEFERRED — API_SIZE_REVIEW.md DF-1; no user directory /
+// suspend-restore contract; no workflow-template, notification-template,
+// integration-connector, retention-workflow, or system-settings entity), never
+// a dead "Segera hadir" entry.
 const superAdminNav: NavItem[] = [
-    { label: 'Pengguna dan Role' },
-    { label: 'Master Data' },
-    { label: 'Unit Organisasi' },
-    { label: 'Program Studi' },
+    { label: 'Pengguna dan Role', href: '/pengguna-role' },
+    { label: 'Master Data', href: '/master-data' },
+    { label: 'Unit Organisasi', href: '/unit-organisasi' },
+    { label: 'Program Studi', href: '/program-studi' },
     { label: 'Jenis Lowongan', href: '/jenis-lowongan' },
-    { label: 'Template Workflow' },
+    { label: 'Template Workflow', href: '/template-workflow' },
     { label: 'Konfigurasi SMTP', href: '/konfigurasi-smtp' },
-    { label: 'Template Notifikasi' },
-    { label: 'Integrasi' },
+    { label: 'Template Notifikasi', href: '/template-notifikasi' },
+    { label: 'Integrasi', href: '/integrasi' },
     { label: 'Audit Log', href: '/audit-log' },
-    { label: 'Retensi Data' },
-    { label: 'Pengaturan Sistem' },
+    { label: 'Retensi Data', href: '/retensi-data' },
+    { label: 'Pengaturan Sistem', href: '/pengaturan-sistem' },
 ]
 
 const items = computed(() => {
