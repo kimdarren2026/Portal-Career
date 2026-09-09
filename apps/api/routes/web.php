@@ -52,13 +52,9 @@ use Inertia\Inertia;
 */
 
 Route::get('/', function () {
-    return Inertia::render('Health', [
-        'application' => config('app.name'),
-        'laravel' => app()->version(),
-        'php' => PHP_VERSION,
-        'environment' => app()->environment(),
-    ]);
-})->name('bootstrap.health');
+    // Keep the first visit useful even before local development data exists.
+    return Inertia::render('public/Home');
+})->name('home');
 
 /*
 | Public Vacancy Discovery — browser-facing, Inertia SSR (ADR-017).
@@ -72,7 +68,7 @@ Route::get('/', function () {
 */
 Route::get('/lowongan', [PublicVacancyController::class, 'index'])->name('lowongan.index');
 Route::get('/lowongan/{slug}', [PublicVacancyController::class, 'show'])
-    ->where('slug', '[a-z0-9-]+')->name('lowongan.show');
+    ->where('slug', '[A-Za-z0-9-]+')->name('lowongan.show');
 
 // Page delivery only: these routes do not consume a verification or reset token.
 Route::get('/login', [AuthPageController::class, 'login'])->name('auth.login.page');

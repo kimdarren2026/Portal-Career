@@ -16,12 +16,17 @@ import { fileURLToPath } from 'node:url'
  */
 const here = path.dirname(fileURLToPath(import.meta.url))
 const web = path.resolve(here, '../web/src')
+const clientEntry = path.resolve(web, 'app.ts')
+const ssrEntry = path.resolve(web, 'ssr.ts')
 
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['../web/src/app.ts'],
-            ssr: '../web/src/ssr.ts',
+            // The frontend source is outside Vite's root. Use canonical
+            // absolute paths so the dev server emits Vite's /@fs/ URL rather
+            // than a browser-normalized `../web/...` URL that returns 404.
+            input: [clientEntry],
+            ssr: ssrEntry,
             refresh: true,
         }),
         vue({ template: { transformAssetUrls: { base: null, includeAbsolute: false } } }),
@@ -37,6 +42,11 @@ export default defineConfig({
         noExternal: true,
     },
     server: {
+        host: '127.0.0.1',
+        origin: 'http://127.0.0.1:5173',
+        cors: {
+            origin: ['http://127.0.0.1:8000', 'http://localhost:8000'],
+        },
         fs: { allow: [path.resolve(here, '..')] },
     },
 })

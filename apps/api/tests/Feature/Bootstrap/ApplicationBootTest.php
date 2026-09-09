@@ -8,8 +8,7 @@ use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
 /**
- * Bootstrap verification only. No domain behaviour is tested here — the business
- * domains are not implemented in this phase.
+ * Runtime smoke tests for the Laravel/Inertia application shell.
  */
 final class ApplicationBootTest extends TestCase
 {
@@ -24,14 +23,14 @@ final class ApplicationBootTest extends TestCase
         $this->get('/up')->assertOk();
     }
 
-    public function test_inertia_page_renders_through_vue_root_view(): void
+    public function test_public_home_renders_through_vue_root_view(): void
     {
         $response = $this->get('/');
 
         $response->assertOk();
         // Inertia's root view carries the page payload in a data-page attribute.
         $response->assertSee('data-page', escape: false);
-        $response->assertSee('Health', escape: false);
+        $response->assertSee('public\\/Home', escape: false);
     }
 
     public function test_correlation_id_is_returned_on_every_response(): void

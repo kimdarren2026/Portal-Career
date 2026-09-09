@@ -202,8 +202,8 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <div class="min-h-screen bg-[#f7fafc] text-[#181c1e]">
-        <header class="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 md:hidden">
+    <div class="min-h-screen bg-[#f6f8fc] text-[#172033]">
+        <header class="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-200/80 bg-white/90 px-4 shadow-sm backdrop-blur md:hidden">
             <div class="flex items-center gap-2">
                 <button
                     ref="menuTrigger"
@@ -218,7 +218,7 @@ onBeforeUnmount(() => {
                         <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                     </svg>
                 </button>
-                <span class="font-bold text-[#002045]">Portal Karir Kampus</span>
+                <span class="font-bold tracking-tight text-[#002045]">Portal Karir Kampus</span>
             </div>
             <span class="text-sm font-medium text-slate-600">{{ title }}</span>
         </header>
@@ -238,7 +238,7 @@ onBeforeUnmount(() => {
                     role="dialog"
                     aria-modal="true"
                     aria-label="Menu navigasi"
-                    class="absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col bg-[#1B2D4F] p-6 text-white shadow-xl transition-transform duration-200 ease-out motion-reduce:transition-none"
+                    class="absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col bg-gradient-to-b from-[#062247] via-[#0b3769] to-[#061d3d] p-6 text-white shadow-2xl transition-transform duration-200 ease-out motion-reduce:transition-none"
                 >
                     <div class="flex items-start justify-between gap-4">
                         <div>
@@ -287,23 +287,26 @@ onBeforeUnmount(() => {
             </div>
         </Transition>
 
-        <aside class="fixed inset-y-0 z-10 hidden w-72 flex-col bg-[#1B2D4F] p-6 text-white md:flex">
-            <span class="text-xl font-bold">Portal Karir Kampus</span>
-            <p class="mt-1 text-sm text-blue-100">{{ personaSubtitle }}</p>
-            <nav class="mt-10 flex-1 space-y-1 overflow-y-auto" aria-label="Navigasi utama">
+        <aside class="fixed inset-y-0 z-10 hidden w-72 flex-col bg-gradient-to-b from-[#062247] via-[#0b3769] to-[#061d3d] p-6 text-white shadow-[12px_0_34px_rgba(15,23,42,0.08)] md:flex">
+            <div class="flex items-center gap-3">
+                <span class="grid h-10 w-10 place-items-center rounded-xl bg-white/12 text-sm font-extrabold tracking-tight ring-1 ring-white/20">PK</span>
+                <div><span class="block text-lg font-bold tracking-tight">Portal Karir</span><span class="text-xs font-medium text-blue-100">Kampus</span></div>
+            </div>
+            <p class="mt-7 text-xs font-semibold uppercase tracking-[0.14em] text-blue-200/80">{{ personaSubtitle }}</p>
+            <nav class="mt-5 flex-1 space-y-1 overflow-y-auto pr-1" aria-label="Navigasi utama">
                 <template v-for="item in items" :key="item.label">
                     <Link
                         v-if="item.href"
                         :href="item.href"
-                        class="flex rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors"
-                        :class="isActive(item) ? 'bg-[#66affe] text-[#004172]' : 'text-white/80 hover:bg-white/10'"
+                        class="flex rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-150"
+                        :class="isActive(item) ? 'bg-white text-[#06305b] shadow-sm' : 'text-white/80 hover:bg-white/10 hover:text-white'"
                         :aria-current="isActive(item) ? 'page' : undefined"
                     >
                         {{ item.label }}
                     </Link>
                     <span
                         v-else
-                        class="flex cursor-not-allowed items-center justify-between rounded-lg px-4 py-2.5 text-sm font-medium text-white/40"
+                        class="flex cursor-not-allowed items-center justify-between rounded-xl px-4 py-2.5 text-sm font-medium text-white/40"
                         aria-disabled="true"
                         :title="'Fitur ' + item.label + ' akan hadir pada tahap berikutnya.'"
                     >
@@ -312,13 +315,13 @@ onBeforeUnmount(() => {
                     </span>
                 </template>
             </nav>
-            <div class="mt-auto border-t border-white/10 pt-4 text-xs text-white/70">
-                <p class="truncate font-medium text-white">{{ userName }}</p>
-                <button type="button" class="mt-2 text-white/70 underline-offset-2 hover:underline" @click="logout">Keluar</button>
+            <div class="mt-auto rounded-xl border border-white/10 bg-white/7 p-3 text-xs text-white/70">
+                <p class="truncate font-semibold text-white">{{ userName }}</p>
+                <button type="button" class="mt-2 font-medium text-blue-100 underline-offset-2 hover:text-white hover:underline" @click="logout">Keluar</button>
             </div>
         </aside>
 
-        <main class="mx-auto max-w-6xl p-4 md:ml-72 md:p-10">
+        <main class="mx-auto max-w-7xl p-4 sm:p-6 md:ml-72 md:p-10 lg:p-12">
             <slot />
         </main>
     </div>

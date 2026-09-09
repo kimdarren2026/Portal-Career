@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Web;
 
+use App\Domains\MasterData\Queries\GetPublicReferenceData;
 use App\Domains\Vacancy\Exceptions\VacancyNotPublic;
 use App\Domains\Vacancy\Queries\GetPublicVacancy;
 use App\Domains\Vacancy\Queries\ListPublicVacancies;
 use App\Domains\Vacancy\Support\PublicVacancyRequestFilters;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -22,7 +25,7 @@ use Inertia\Response;
  */
 final class PublicVacancyController extends Controller
 {
-    public function index(Request $request, ListPublicVacancies $query): Response
+    public function index(Request $request, ListPublicVacancies $query, GetPublicReferenceData $referenceData): Response
     {
         // Unknown/invalid query parameters are tolerated (dropped or
         // defaulted) rather than hard-rejected here: a browsable public page
@@ -38,6 +41,8 @@ final class PublicVacancyController extends Controller
             $parsed['perPage'],
         );
 
+        $references = $referenceData->execute();
+
         return Inertia::render('public/VacancyList', [
             'items' => $vacancies->items(),
             'pagination' => [
@@ -49,11 +54,27 @@ final class PublicVacancyController extends Controller
             'filters' => (object) $parsed['filters'],
             'sort' => $parsed['sort'],
             'direction' => $parsed['direction'],
+            // Only reference data that has a corresponding public filter is
+            // sent to the page. Company is intentionally absent: the public
+            // API has no company directory from which a safe selector could be
+            // built.
+            'reference_data' => [
+                'geographic_areas' => $references['geographic_areas'],
+                'industries' => $references['industries'],
+                'study_programs' => $references['study_programs'],
+            ],
         ]);
     }
 
-    public function show(string $slug, GetPublicVacancy $query): Response
+    public function show(Request $request, string $slug, GetPublicVacancy $query): Response|RedirectResponse
     {
+        // Slugs are generated lowercase. Redirect mistyped uppercase versions
+        // so every public vacancy has exactly one canonical URL.
+        $canonicalSlug = Str::lower($slug);
+        if ($slug !== $canonicalSlug) {
+            return redirect()->to('/lowongan/'.$canonicalSlug, 301);
+        }
+
         try {
             $vacancy = $query->execute($slug);
         } catch (VacancyNotPublic) {

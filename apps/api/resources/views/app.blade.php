@@ -9,7 +9,14 @@
         <meta name="robots" content="noindex">
     @endif
 
-    @vite(['../web/src/app.ts'])
+    {{-- This source intentionally lives outside the Laravel root. Development
+         uses a canonical absolute path so Vite serves it correctly; production
+         keeps the stable manifest key generated from the relative path. --}}
+    @if (file_exists(public_path('hot')))
+        @vite([realpath(base_path('../web/src/app.ts'))])
+    @else
+        @vite(['../web/src/app.ts'])
+    @endif
     @inertiaHead
 </head>
 <body class="antialiased">

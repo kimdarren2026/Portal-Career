@@ -74,14 +74,15 @@ const isCandidate = computed(() => ((page.props as any).auth?.roles ?? []).some(
     <Head :title="`${vacancy.title} — ${vacancy.company.name}`">
         <meta name="description" :content="metaDescription" />
     </Head>
-    <main class="min-h-screen bg-slate-50 py-10">
-        <div class="mx-auto max-w-4xl px-4">
-            <a href="/lowongan" class="text-sm font-medium text-slate-600 hover:underline">&larr; Kembali ke Cari Lowongan</a>
+    <main class="min-h-screen bg-[#f6f8fc] py-8 sm:py-12">
+        <div class="mx-auto max-w-5xl px-4 sm:px-6">
+            <Link href="/lowongan" class="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 transition hover:text-[#0061a5]"><span aria-hidden="true">←</span> Kembali ke Cari Lowongan</Link>
 
-            <div class="mt-4 grid grid-cols-1 gap-6 md:grid-cols-3">
+            <div class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
                 <div class="md:col-span-2">
-                    <div class="rounded-lg border border-slate-200 bg-white p-6">
-                        <h1 class="text-2xl font-semibold text-slate-900">{{ vacancy.title }}</h1>
+                    <div class="surface-card p-6 sm:p-8">
+                        <p class="page-eyebrow">{{ statusLabel(vacancyTypeLabel, vacancy.vacancy_type) }}</p>
+                        <h1 class="mt-3 text-3xl font-bold tracking-tight text-[#002045]">{{ vacancy.title }}</h1>
                         <p class="mt-1 text-slate-600">{{ vacancy.company.name }}<span v-if="vacancy.location"> · {{ vacancy.location }}</span></p>
                         <div class="mt-3 flex flex-wrap gap-2 text-xs">
                             <span v-if="vacancy.employment_type" class="rounded-full bg-slate-100 px-2 py-1 text-slate-700">{{ statusLabel(employmentTypeLabel, vacancy.employment_type) }}</span>
@@ -90,19 +91,19 @@ const isCandidate = computed(() => ((page.props as any).auth?.roles ?? []).some(
                             <span v-if="vacancy.company.mitra_kampus_active" class="rounded-full bg-emerald-100 px-2 py-1 text-emerald-800">Mitra Kampus</span>
                         </div>
 
-                        <h2 class="mt-6 border-b border-slate-200 pb-2 text-lg font-semibold text-slate-900">Deskripsi Pekerjaan</h2>
-                        <p class="mt-3 whitespace-pre-line text-sm text-slate-700">{{ vacancy.description }}</p>
+                        <h2 class="mt-8 border-b border-slate-200 pb-3 text-lg font-bold text-[#002045]">Deskripsi Pekerjaan</h2>
+                        <p class="mt-4 whitespace-pre-line leading-7 text-slate-700">{{ vacancy.description }}</p>
 
                         <template v-if="vacancy.responsibilities">
-                            <h3 class="mt-6 text-base font-semibold text-slate-900">Tanggung Jawab Utama</h3>
-                            <p class="mt-2 whitespace-pre-line text-sm text-slate-700">{{ vacancy.responsibilities }}</p>
+                            <h3 class="mt-8 text-base font-bold text-[#002045]">Tanggung Jawab Utama</h3>
+                            <p class="mt-3 whitespace-pre-line leading-7 text-slate-700">{{ vacancy.responsibilities }}</p>
                         </template>
 
                         <template v-if="vacancy.requirements.length">
-                            <h2 class="mt-6 border-b border-slate-200 pb-2 text-lg font-semibold text-slate-900">Kualifikasi</h2>
-                            <ul class="mt-3 list-inside list-disc space-y-1 text-sm text-slate-700">
+                            <h2 class="mt-8 border-b border-slate-200 pb-3 text-lg font-bold text-[#002045]">Kualifikasi</h2>
+                            <ul class="mt-4 space-y-3 text-sm text-slate-700">
                                 <li v-for="(req, i) in vacancy.requirements" :key="i">
-                                    <span v-if="req.education_level">Pendidikan: {{ req.education_level }}</span>
+                                    <span class="mr-2 text-[#0061a5]">✓</span><span v-if="req.education_level">Pendidikan: {{ req.education_level }}</span>
                                     <span v-else-if="req.minimum_years_experience !== null">Pengalaman minimal {{ req.minimum_years_experience }} tahun</span>
                                     <span v-else-if="req.value_text">{{ req.value_text }}</span>
                                     <span v-if="!req.required" class="text-slate-400"> (opsional)</span>
@@ -113,8 +114,8 @@ const isCandidate = computed(() => ((page.props as any).auth?.roles ?? []).some(
                 </div>
 
                 <aside class="space-y-4">
-                    <div class="rounded-lg border border-slate-200 bg-white p-5">
-                        <h3 class="text-sm font-semibold text-slate-900">Informasi Lowongan</h3>
+                    <div class="surface-card p-5 sm:p-6">
+                        <h3 class="text-base font-bold text-[#002045]">Informasi Lowongan</h3>
                         <dl class="mt-3 space-y-2 text-sm">
                             <div class="flex justify-between"><dt class="text-slate-500">Jenis</dt><dd class="text-slate-800">{{ statusLabel(vacancyTypeLabel, vacancy.vacancy_type) }}</dd></div>
                             <div class="flex justify-between"><dt class="text-slate-500">Kebutuhan</dt><dd class="text-slate-800">{{ vacancy.openings_count }} orang</dd></div>
@@ -129,17 +130,17 @@ const isCandidate = computed(() => ((page.props as any).auth?.roles ?? []).some(
                         </p>
 
                         <template v-if="!vacancy.applies_externally">
-                            <Link v-if="isAuthenticated && isCandidate" :href="`/lowongan/${vacancy.slug}/lamar`" class="mt-4 block rounded-lg bg-[#0061a5] px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-[#004172]">
+                            <Link v-if="isAuthenticated && isCandidate" :href="`/lowongan/${vacancy.slug}/lamar`" class="mt-5 block rounded-xl bg-[#0061a5] px-4 py-3 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-[#004172]">
                                 Lamar Sekarang
                             </Link>
-                            <a v-else-if="!isAuthenticated" href="/login" class="mt-4 block rounded-lg bg-[#0061a5] px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-[#004172]">
+                            <Link v-else-if="!isAuthenticated" href="/login" class="mt-5 block rounded-xl bg-[#0061a5] px-4 py-3 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-[#004172]">
                                 Masuk untuk Melamar
-                            </a>
+                            </Link>
                         </template>
                     </div>
 
-                    <div class="rounded-lg border border-slate-200 bg-white p-5">
-                        <h3 class="text-sm font-semibold text-slate-900">Tentang Perusahaan</h3>
+                    <div class="surface-card p-5 sm:p-6">
+                        <h3 class="text-base font-bold text-[#002045]">Tentang Perusahaan</h3>
                         <p class="mt-2 text-sm text-slate-700">{{ vacancy.company.name }}</p>
                     </div>
                 </aside>

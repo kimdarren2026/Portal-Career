@@ -1,8 +1,8 @@
 # Project Structure — Portal Karir Kampus
 
 This document describes the repository layout and the purpose of every top-level folder.
-It reflects the approved bootstrap foundation: runtime and framework infrastructure exist, while
-business-domain implementation and business migrations do not.
+It reflects the implemented Laravel/Vue modular-monolith: public discovery, identity, company,
+candidate, vacancy, recruitment, notification, and administration foundations are present.
 
 ---
 
@@ -17,7 +17,7 @@ portal-career/
 │   └── worker/                            # Process/runtime documentation, not a codebase
 │       └── README.md
 │
-├── packages/                              # SHARED CODE (all reserved, intentionally empty)
+├── packages/                              # Shared package boundaries (currently documentation-only)
 │   ├── ui/                                # Shared frontend components
 │   ├── types/                             # Shared types, enums, DTOs
 │   ├── shared/                            # Shared utilities and constants
@@ -28,11 +28,12 @@ portal-career/
 │   │   ├── BRD_Portal_Karir_Kampus_v1.1.md
 │   │   ├── FSD_Portal_Karir_Kampus_v1.1.md
 │   │   └── README.md
-│   ├── architecture/                      # Reserved — SYSTEM/AUTH/SECURITY/NOTIFICATION/FILE_STORAGE
-│   ├── database/                          # Reserved — ERD, DATA_DICTIONARY, SCHEMA, MIGRATION_STRATEGY
-│   ├── api/                               # Reserved — CONTRACT, ENDPOINTS, ERROR_CODES, AUTHORIZATION_MATRIX
-│   ├── decisions/                         # Reserved — ADR-001 … ADR-005 (none written)
-│   └── testing/                           # Reserved — UAT, strategy, authz/security/regression plans
+│   ├── architecture/                      # Runtime, security, deployment, and technical architecture
+│   ├── database/                          # ERD, data dictionary, constraints, migration and index strategy
+│   ├── api/                               # API contracts, endpoints, errors, authorization, Inertia actions
+│   ├── decisions/                         # Decision register
+│   ├── operations/                        # Operational runbook
+│   └── testing/                           # Test documentation and plans
 │
 ├── design/                                # DESIGN REFERENCE (not production code)
 │   ├── stitch/                            # Frozen Google Stitch functional baseline
@@ -52,7 +53,7 @@ portal-career/
 │
 ├── scripts/                               # Reserved — setup, seed, migration, CI helpers
 │
-├── tests/                                 # Cross-application test space (reserved)
+├── tests/                                 # Cross-application test space (documentation/placeholders)
 │   ├── e2e/
 │   ├── integration/
 │   ├── security/
@@ -106,8 +107,10 @@ references only.
 ### `apps/api`
 
 The single Laravel 13 modular-monolith deployable. It contains the Laravel web runtime, Vite
-integration that resolves `apps/web` source, framework-only infrastructure migrations, and bootstrap
-verification tests. It has no business-domain migrations, models, controllers, or `/api/v1` routes.
+integration that resolves `apps/web` source, application configuration, database migrations, domain
+models/actions/policies/queries, HTTP controllers and requests, queue/scheduled commands, and the
+Laravel feature test suite. Public discovery endpoints live under `/api/v1/public`; authenticated
+browser actions are delivered through Inertia web routes.
 
 ---
 
@@ -143,7 +146,8 @@ The approved deployment uses four processes from the Laravel release:
 | `packages/shared` | Utilities and constants used by more than one app |
 | `packages/config` | Shared lint/format/compiler/test configuration |
 
-All four are intentionally empty. No speculative production code was added.
+All four currently contain README boundary notes only. Shared production code should move here only
+when it is genuinely consumed by more than one application boundary.
 
 ---
 
@@ -152,8 +156,8 @@ All four are intentionally empty. No speculative production code was added.
 ### `docs`
 
 `docs/requirements/` holds the approved BRD v1.1 and FSD v1.1 — the current business and functional
-source of truth, moved here unchanged. `docs/database/` contains the approved logical ERD design;
-architecture, API, decision, and test documentation remain governed by their respective approvals.
+source of truth. The architecture, database, API, decision, testing, and operational folders contain
+the technical documents that support the implementation.
 
 ---
 
@@ -184,8 +188,9 @@ passwords, and private tokens must never be committed to this repository.**
 
 ### `tests`
 
-`e2e/`, `integration/`, `security/`, and `uat/` remain reserved. Laravel bootstrap tests live in
-`apps/api/tests/`; they verify runtime configuration without introducing business behaviour. Test
+`e2e/`, `integration/`, `security/`, and `uat/` remain reserved for cross-application suites. The
+active Laravel test suite lives in `apps/api/tests/` and includes bootstrap, identity, company,
+candidate, vacancy, recruitment, notification, database-constraint, and security coverage. Test
 plans and UAT scenarios are documented separately in `docs/testing/`.
 
 ---
