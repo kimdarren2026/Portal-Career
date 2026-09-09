@@ -4,6 +4,7 @@ use App\Domains\Candidate\Support\CandidateCollectionRegistry;
 use App\Http\Controllers\Auth\AuthenticationController;
 use App\Http\Controllers\Auth\AuthPageController;
 use App\Http\Controllers\Web\AccountSettingsPageController;
+use App\Http\Controllers\Web\AdminUserRoleController;
 use App\Http\Controllers\Web\ApplicationController;
 use App\Http\Controllers\Web\CandidateApplicationPageController;
 use App\Http\Controllers\Web\CandidateCollectionController;
@@ -457,6 +458,49 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
         ->name('admin.smtp-configuration.update');
     Route::post('/admin/smtp-configuration/test', [SmtpConfigurationController::class, 'test'])
         ->name('admin.smtp-configuration.test');
+
+    /*
+    | Super Admin Full Activation — every FSD §4.6 navigation item now opens a
+    | real page. Menu/page activation is distinct from full CRUD availability:
+    | where a writable contract is unresolved the page is a READ_ONLY_REFERENCE
+    | or PARTIAL_FUNCTIONAL surface, never a dead "Segera hadir" entry. Each
+    | page controller gates SUPER_ADMIN and mutates nothing. Unresolved write /
+    | destructive operations remain unrouted.
+    |
+    | - Pengguna dan Role: PARTIAL_FUNCTIONAL — role catalogue + assign/revoke
+    |   (`POST /admin/users/{user}/roles` + revoke pair, frozen contract,
+    |   Idempotency-Key, 409 on active duplicate, audit `role_changed`,
+    |   affected user notified). No user directory (`GET /admin/users` has no
+    |   frozen field/filter/pagination contract); no suspend/restore/DISABLED.
+    | - Master Data / Unit Organisasi / Program Studi: READ_ONLY_REFERENCE over
+    |   `GET /admin/master-data/{collection}`; writes DEFERRED (DF-1).
+    | - Template Workflow / Template Notifikasi / Integrasi / Retensi Data /
+    |   Pengaturan Sistem: READ_ONLY_REFERENCE — truthful capability/policy
+    |   state, no invented schema, no fake values.
+    */
+    Route::get('/pengguna-role', [SuperAdminPageController::class, 'userRoleIndex'])
+        ->name('pages.super-admin.user-roles');
+    Route::post('/admin/users/{user}/roles', [AdminUserRoleController::class, 'assign'])
+        ->whereNumber('user')->name('admin.users.roles.assign');
+    Route::post('/admin/users/{user}/roles/{role}/revoke', [AdminUserRoleController::class, 'revoke'])
+        ->whereNumber('user')->name('admin.users.roles.revoke');
+
+    Route::get('/master-data', [SuperAdminPageController::class, 'masterDataIndex'])
+        ->name('pages.super-admin.master-data');
+    Route::get('/unit-organisasi', [SuperAdminPageController::class, 'organizationalUnitIndex'])
+        ->name('pages.super-admin.organizational-units');
+    Route::get('/program-studi', [SuperAdminPageController::class, 'studyProgramIndex'])
+        ->name('pages.super-admin.study-programs');
+    Route::get('/template-workflow', [SuperAdminPageController::class, 'templateWorkflowIndex'])
+        ->name('pages.super-admin.template-workflow');
+    Route::get('/template-notifikasi', [SuperAdminPageController::class, 'templateNotifikasiIndex'])
+        ->name('pages.super-admin.template-notifikasi');
+    Route::get('/integrasi', [SuperAdminPageController::class, 'integrationIndex'])
+        ->name('pages.super-admin.integrations');
+    Route::get('/retensi-data', [SuperAdminPageController::class, 'dataRetentionIndex'])
+        ->name('pages.super-admin.data-retention');
+    Route::get('/pengaturan-sistem', [SuperAdminPageController::class, 'systemSettingsIndex'])
+        ->name('pages.super-admin.system-settings');
 });
 
 /*
