@@ -21,6 +21,7 @@ use App\Http\Controllers\Web\HrVacancyController;
 use App\Http\Controllers\Web\NotificationController;
 use App\Http\Controllers\Web\NotificationPageController;
 use App\Http\Controllers\Web\DashboardPageController;
+use App\Http\Controllers\Web\ApplicationDocumentController;
 use App\Http\Controllers\Web\EvaluationController;
 use App\Http\Controllers\Web\HomePageController;
 use App\Http\Controllers\Web\ExternalApplyController;
@@ -300,6 +301,15 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
     | of "Authentication: Required" without an email gate. The EXTERNAL_APPLY
     | recruitment-outcome path stays deferred (Part X item 46) — no route.
     */
+    /*
+    | Application-shared document download (PGC-V1 / PD-A — supersedes RA-3
+    | for the download operation, API_CONTRACT.md Part X items 22 / 62).
+    | Streams the immutable application_documents snapshot; all authorization
+    | (matrix 4.6), auditing and the enumeration-safe 404 live in the Action.
+    */
+    Route::get('/application-documents/{applicationDocument}/download', [ApplicationDocumentController::class, 'download'])
+        ->whereNumber('applicationDocument')->name('application-documents.download');
+
     Route::post('/vacancies/{vacancy}/external-apply/start', [ExternalApplyController::class, 'start'])
         ->whereNumber('vacancy')->middleware('verified.email')->name('vacancies.external-apply.start');
     Route::post('/external-apply-events/{event}/confirm', [ExternalApplyController::class, 'confirm'])

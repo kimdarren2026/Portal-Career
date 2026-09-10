@@ -80,6 +80,7 @@ use App\Domains\Vacancy\Exceptions\SelectionStageAssignmentNotFound;
 use App\Domains\Vacancy\Exceptions\SelectorAssignmentAlreadyActive;
 use App\Domains\Vacancy\Exceptions\SelectorAssignmentUserNotFound;
 use App\Domains\Vacancy\Exceptions\SelectorRoleRequired;
+use App\Domains\Application\Exceptions\ApplicationDocumentNotFound;
 use App\Domains\ExternalApply\Exceptions\ExternalApplyConfirmationForbidden;
 use App\Domains\ExternalApply\Exceptions\ExternalApplyEventAlreadyConfirmed;
 use App\Domains\ExternalApply\Exceptions\ExternalApplyEventNotFound;
@@ -195,7 +196,7 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->render(function (AuthenticationException $exception, Request $request) {
-            if (in_array($request->path(), ['me', 'me/password', 'auth/logout'], true) || $request->is('candidate/*') || $request->is('companies/*') || $request->is('companies') || $request->is('vacancies') || $request->is('vacancies/*') || $request->is('applications') || $request->is('applications/*') || $request->is('notifications') || $request->is('notifications/*') || $request->is('stages/*') || $request->is('selector-assignments/*') || $request->is('external-apply-events/*')) {
+            if (in_array($request->path(), ['me', 'me/password', 'auth/logout'], true) || $request->is('candidate/*') || $request->is('companies/*') || $request->is('companies') || $request->is('vacancies') || $request->is('vacancies/*') || $request->is('applications') || $request->is('applications/*') || $request->is('notifications') || $request->is('notifications/*') || $request->is('stages/*') || $request->is('selector-assignments/*') || $request->is('external-apply-events/*') || $request->is('application-documents/*')) {
                 return ContractResponse::error($request, 'UNAUTHENTICATED', 401, 'Sesi autentikasi diperlukan.');
             }
         });
@@ -290,6 +291,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(fn (ExternalApplyEventNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Aktivitas lamaran eksternal tidak ditemukan.'));
         $exceptions->render(fn (ExternalApplyEventAlreadyConfirmed $exception, Request $request) => ContractResponse::error($request, 'EXTERNAL_APPLY_EVENT_ALREADY_CONFIRMED', 409, 'Aktivitas lamaran eksternal ini sudah dikonfirmasi.'));
         $exceptions->render(fn (ExternalApplyConfirmationForbidden $exception, Request $request) => ContractResponse::error($request, 'EXTERNAL_APPLY_CONFIRMATION_FORBIDDEN', 403, 'Anda bukan sumber konfirmasi yang sah.'));
+        // PGC-V1 / PD-A — application-shared document download. Out-of-scope,
+        // revoked, non-existent and missing-object are one enumeration-safe 404.
+        $exceptions->render(fn (ApplicationDocumentNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Dokumen lamaran tidak ditemukan.'));
         $exceptions->render(fn (CandidateCollectionNotFoundException $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Data tidak ditemukan.'));
         $exceptions->render(fn (CandidateDocumentNotOwnedException $exception, Request $request) => ContractResponse::error($request, 'DOCUMENT_NOT_OWNED', 403, 'Dokumen bukan milik kandidat ini.'));
         $exceptions->render(fn (CandidateDocumentUnsupportedMediaTypeException $exception, Request $request) => ContractResponse::error($request, 'UNSUPPORTED_MEDIA_TYPE', 415, 'Dokumen harus berupa PDF.'));

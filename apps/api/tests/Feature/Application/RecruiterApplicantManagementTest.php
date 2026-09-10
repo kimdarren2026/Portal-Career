@@ -43,7 +43,11 @@ final class RecruiterApplicantManagementTest extends VacancyTestCase
         // move-stage is now routed — Application Stage Movement Foundation
         // v1 (MS-3, MS-4) — see ApplicationStageMovementTest for its own
         // route-existence assertion.
-        foreach (['bulk-transition', 'application-documents', 'reopen'] as $absent) {
+        // application-documents download is now routed (PGC-V1 / PD-A, supersedes
+        // RA-3 for the download operation — API_CONTRACT.md Part X items 22 / 62).
+        self::assertTrue($registered->contains('GET|HEAD application-documents/{applicationDocument}/download'));
+
+        foreach (['bulk-transition', 'reopen'] as $absent) {
             self::assertFalse(
                 $registered->contains(fn (string $r): bool => str_contains($r, $absent)),
                 "No route may exist for {$absent} in this milestone.",
