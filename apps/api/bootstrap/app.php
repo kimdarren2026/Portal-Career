@@ -89,6 +89,7 @@ use App\Domains\Vacancy\Exceptions\SelectorAssignmentUserNotFound;
 use App\Domains\Vacancy\Exceptions\SelectorRoleRequired;
 use App\Domains\Application\Exceptions\ApplicationDocumentNotFound;
 use App\Domains\Notification\Exceptions\EmailOutboxMessageNotFound;
+use App\Domains\Identity\Exceptions\UserAccountInvalidTransition;
 use App\Domains\VacancyReport\Exceptions\VacancyReportInvalidTransition;
 use App\Domains\VacancyReport\Exceptions\VacancyReportNotFound;
 use App\Domains\VacancyReport\Exceptions\VacancyReportSelfReview;
@@ -316,6 +317,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(fn (ApplicationDocumentNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Dokumen lamaran tidak ditemukan.'));
         // PGC-V1 / PD-B — Super Admin email-outbox requeue.
         $exceptions->render(fn (EmailOutboxMessageNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Pesan email tidak ditemukan atau tidak dapat dikirim ulang.'));
+        // PGC-V1 / PD-F - Super Admin account lifecycle: ACTIVE <-> SUSPENDED only.
+        $exceptions->render(fn (UserAccountInvalidTransition $exception, Request $request) => ContractResponse::error($request, 'CONFLICT', 409, 'Perubahan status akun tidak sah dari status saat ini.'));
         // PGC-V1 / PD-C — Laporkan Lowongan.
         $exceptions->render(fn (VacancyReportVacancyNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Lowongan tidak ditemukan.'));
         $exceptions->render(fn (VacancyReportNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Laporan tidak ditemukan.'));

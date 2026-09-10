@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\AuthenticationController;
 use App\Http\Controllers\Auth\AuthPageController;
 use App\Http\Controllers\Web\AccountSettingsPageController;
 use App\Http\Controllers\Web\AdminEmailOutboxController;
+use App\Http\Controllers\Web\AdminUserController;
 use App\Http\Controllers\Web\AdminUserRoleController;
 use App\Http\Controllers\Web\ApplicationController;
 use App\Http\Controllers\Web\CandidateApplicationPageController;
@@ -576,6 +577,19 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
         ->whereNumber('user')->name('admin.users.roles.assign');
     Route::post('/admin/users/{user}/roles/{role}/revoke', [AdminUserRoleController::class, 'revoke'])
         ->whereNumber('user')->name('admin.users.roles.revoke');
+
+    /*
+    | Super Admin user directory + account lifecycle (PGC-V1 / PD-F,
+    | API_CONTRACT.md Part X item 67). SUPER_ADMIN only. MVP lifecycle is
+    | ACTIVE <-> SUSPENDED only; DISABLED stays deferred. Suspension is
+    | immediate (server-side session rows cleared + OL-10 per-request check),
+    | never notifies the user, and is audited.
+    */
+    Route::get('/admin/users', [AdminUserController::class, 'index'])->name('admin.users.index');
+    Route::post('/admin/users/{user}/suspend', [AdminUserController::class, 'suspend'])
+        ->whereNumber('user')->name('admin.users.suspend');
+    Route::post('/admin/users/{user}/restore', [AdminUserController::class, 'restore'])
+        ->whereNumber('user')->name('admin.users.restore');
 
     /*
     | Transactional email outbox operations (PGC-V1 / PD-B). SUPER_ADMIN only.

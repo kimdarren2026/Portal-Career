@@ -139,8 +139,21 @@ final class SuperAdminPageController extends Controller
             return $this->forbidden($request);
         }
 
+        $users = app(\App\Domains\Identity\Queries\ListUsers::class)->execute([]);
+
         return Inertia::render('super-admin/PenggunaRole', [
             'roles' => RoleCatalogue::all(),
+            // PGC-V1 / PD-F — initial user-directory page; the page refetches
+            // `GET /admin/users` with filters as the admin searches.
+            'users' => [
+                'items' => $users->items(),
+                'pagination' => [
+                    'page' => $users->currentPage(),
+                    'per_page' => $users->perPage(),
+                    'total' => $users->total(),
+                    'last_page' => $users->lastPage(),
+                ],
+            ],
         ]);
     }
 
