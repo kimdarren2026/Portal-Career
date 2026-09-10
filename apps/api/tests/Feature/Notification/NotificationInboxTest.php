@@ -167,7 +167,9 @@ final class NotificationInboxTest extends VacancyTestCase
     {
         [$recruiter, $company] = $this->companyWithRecruiter('notif-real@example.test', \App\Domains\Company\Enums\CompanyStatus::Verified);
 
-        app(CompanyVerificationNotifier::class)->queue($company, 'verified');
+        // Use a real runtime event value (CompanyReviewAction::Verify->value);
+        // OutboxWriter now rejects a reference with no template renderer.
+        app(CompanyVerificationNotifier::class)->queue($company, 'VERIFY');
 
         $this->actingAs($recruiter)->getJson('/notifications')->assertOk()
             ->assertJsonPath('data.items.0.type', 'COMPANY_VERIFICATION')

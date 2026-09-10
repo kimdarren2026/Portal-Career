@@ -22,3 +22,10 @@ Artisan::command('inspire', function () {
 */
 Schedule::command('vacancies:publish-scheduled')->everyFiveMinutes()->withoutOverlapping();
 Schedule::command('vacancies:expire')->everyFiveMinutes()->withoutOverlapping();
+
+/*
+| Transactional email outbox sweep (PGC-V1 / PD-B). Re-drives PENDING /
+| FAILED_RETRYABLE rows whose backoff has elapsed — a safety net over the
+| afterCommit dispatch for rows written while a worker was down.
+*/
+Schedule::command('outbox:sweep')->everyMinute()->withoutOverlapping();

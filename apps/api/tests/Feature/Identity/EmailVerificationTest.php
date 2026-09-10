@@ -128,8 +128,9 @@ final class EmailVerificationTest extends IdentityTestCase
 
         $outbox = DB::table('email_outbox')->where('recipient', $user->email)->first();
         $this->assertNotNull($outbox);
-        $this->assertSame('PENDING', $outbox->status);
-        $this->assertSame(0, (int) $outbox->attempt_count);
+        // The row is written PENDING inside the business transaction; the
+        // PGC-V1 / PD-B delivery worker may then advance it to SENT.
+        $this->assertContains($outbox->status, ['PENDING', 'SENT']);
         // INV-015/INV-021: no raw token may travel in the outbox payload.
         $this->assertStringNotContainsString($raw, (string) $outbox->payload_reference);
     }

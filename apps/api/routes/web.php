@@ -4,6 +4,7 @@ use App\Domains\Candidate\Support\CandidateCollectionRegistry;
 use App\Http\Controllers\Auth\AuthenticationController;
 use App\Http\Controllers\Auth\AuthPageController;
 use App\Http\Controllers\Web\AccountSettingsPageController;
+use App\Http\Controllers\Web\AdminEmailOutboxController;
 use App\Http\Controllers\Web\AdminUserRoleController;
 use App\Http\Controllers\Web\ApplicationController;
 use App\Http\Controllers\Web\CandidateApplicationPageController;
@@ -527,6 +528,16 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
         ->whereNumber('user')->name('admin.users.roles.assign');
     Route::post('/admin/users/{user}/roles/{role}/revoke', [AdminUserRoleController::class, 'revoke'])
         ->whereNumber('user')->name('admin.users.roles.revoke');
+
+    /*
+    | Transactional email outbox operations (PGC-V1 / PD-B). SUPER_ADMIN only.
+    | The delivery worker (DeliverEmailOutboxMessage) and the scheduled
+    | outbox:sweep run automatically; requeue re-drives a FAILED_RETRYABLE /
+    | DEAD_LETTER row.
+    */
+    Route::get('/admin/email-outbox', [AdminEmailOutboxController::class, 'index'])->name('admin.email-outbox.index');
+    Route::post('/admin/email-outbox/{message}/requeue', [AdminEmailOutboxController::class, 'requeue'])
+        ->whereNumber('message')->name('admin.email-outbox.requeue');
 
     Route::get('/master-data', [SuperAdminPageController::class, 'masterDataIndex'])
         ->name('pages.super-admin.master-data');
