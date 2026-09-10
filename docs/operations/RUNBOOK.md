@@ -20,9 +20,13 @@ same release:
 | **ssr** | `node bootstrap/ssr/ssr.js` (Node 22) | horizontal, small | **restart on every deploy**; no DB, no API |
 
 Queue worker retry policy is driven by `smtp_configurations.max_attempts` /
-`retry_backoff_seconds` once the email-outbox delivery worker ships (see §9 —
-it is a documented product blocker, B-5). Today no job class is dispatched, so
-the worker is idle; keep it deployed so it is ready.
+`retry_backoff_seconds`. The email-outbox delivery worker **has shipped**
+(Product Owner decision PGC-V1 / PD-D — supersedes the earlier `B-5` blocker
+note; `docs/decisions/PRODUCT_OWNER_DECISIONS.md`): `App\Jobs\DeliverEmailOutboxMessage`
+is dispatched after each business transaction commits, and the scheduled
+`outbox:sweep` command re-drives any `PENDING` / `FAILED_RETRYABLE` row whose
+`next_attempt_at` has elapsed. Keep the `mail` queue worker and the scheduler
+both running.
 
 ---
 
@@ -206,9 +210,10 @@ archiving makes a small RPO achievable — state the target explicitly.
 - **Stuck queue:** workers restart safely (`--max-time` bounded); a lost Redis
   queue DB is not a data-loss event — the outbox is the authority.
 - **`email_outbox`:** `PENDING` / `FAILED_RETRYABLE` rows are the source of
-  truth for undelivered transactional mail. Once the delivery worker ships
-  (B-5), it re-drives them; until then these rows accumulate and **no
-  transactional email is sent** — see §11.
+  truth for undelivered transactional mail. The delivery worker
+  (`DeliverEmailOutboxMessage`) and the scheduled `outbox:sweep` re-drive them
+  (PGC-V1 / PD-D). A `DEAD_LETTER` row has exhausted `max_attempts`; a Super
+  Admin can requeue it (`POST /admin/email-outbox/{message}/requeue`). See §11.
 
 ---
 

@@ -22,6 +22,7 @@ use App\Http\Controllers\Web\NotificationController;
 use App\Http\Controllers\Web\NotificationPageController;
 use App\Http\Controllers\Web\DashboardPageController;
 use App\Http\Controllers\Web\EvaluationController;
+use App\Http\Controllers\Web\HomePageController;
 use App\Http\Controllers\Web\ExternalApplyController;
 use App\Http\Controllers\Web\OfferController;
 use App\Http\Controllers\Web\PublicVacancyController;
@@ -39,7 +40,6 @@ use App\Http\Controllers\Web\VacancyController;
 use App\Http\Controllers\Web\VacancyLifecycleController;
 use App\Http\Controllers\Web\VacancyScreeningQuestionController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,19 +49,17 @@ use Inertia\Inertia;
 | backward-compatibility promise. Behaviour for every operation is defined by
 | docs/api/API_CONTRACT.md regardless of surface, and both surfaces call the
 | same Actions and Policies — no business rule is ever implemented twice.
-|
-| BOOTSTRAP PHASE: no business route exists yet. The single route below proves
-| the Laravel → Inertia → Vue → TypeScript → Tailwind → Vite chain is wired.
 */
 
-Route::get('/', function () {
-    return Inertia::render('Health', [
-        'application' => config('app.name'),
-        'laravel' => app()->version(),
-        'php' => PHP_VERSION,
-        'environment' => app()->environment(),
-    ]);
-})->name('bootstrap.health');
+/*
+| Public homepage (PGC-V1 / PD-G). Anonymous. Renders a real minimal career
+| portal landing page — fixed hero copy, quick pathways to filtered
+| `/lowongan`, up to six real latest PUBLISHED vacancies with a truthful empty
+| state, auth CTAs. No fabricated data, no public metrics, and NO environment
+| diagnostics (the former bootstrap Health page is gone; health lives only at
+| /health/live, /health/ready, /up).
+*/
+Route::get('/', [HomePageController::class, 'index'])->name('home');
 
 /*
 | Public Vacancy Discovery — browser-facing, Inertia SSR (ADR-017).
