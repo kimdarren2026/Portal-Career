@@ -171,10 +171,16 @@ final class VacancyScopeAndSurfaceTest extends VacancyTestCase
         // lifecycle namespace (CAMPUS_SCOPE activation, FSD §8.4) — a separate
         // Admin Kepegawaian surface, not the company vacancy surface — so it is
         // excluded from this company-surface count.
+        // External Apply Foundation (GAP-009) adds POST
+        // /vacancies/{vacancy}/external-apply/start — a candidate-action route
+        // (FR-EXT-001/002), not a vacancy authoring/lifecycle route — the same
+        // category as `applications`, and excluded from this count for the
+        // same reason.
         $this->assertSame(15, $registered->filter(
             static fn (string $r): bool => str_contains($r, 'vacanc')
                 && ! str_contains($r, 'api/v1/public')
                 && ! str_contains($r, 'applications')
+                && ! str_contains($r, 'external-apply')
                 && ! str_contains($r, 'stages')
                 && ! str_contains($r, 'kelola-lowongan')
                 && ! str_contains($r, 'moderasi-lowongan')

@@ -22,6 +22,7 @@ use App\Http\Controllers\Web\NotificationController;
 use App\Http\Controllers\Web\NotificationPageController;
 use App\Http\Controllers\Web\DashboardPageController;
 use App\Http\Controllers\Web\EvaluationController;
+use App\Http\Controllers\Web\ExternalApplyController;
 use App\Http\Controllers\Web\OfferController;
 use App\Http\Controllers\Web\PublicVacancyController;
 use App\Http\Controllers\Web\RecruiterApplicantPageController;
@@ -291,6 +292,22 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
         ->whereNumber('stage')->name('stages.selector-assignments.store');
     Route::post('/selector-assignments/{assignment}/revoke', [SelectorAssignmentController::class, 'revoke'])
         ->whereNumber('assignment')->name('selector-assignments.revoke');
+
+    /*
+    | External Apply runtime (API_CONTRACT.md Part VII · FR-EXT-001..004 ·
+    | INV-012, INV-024). Contract Surface VERSIONED_API, realized on the
+    | browser session-guard surface exactly as every other business domain.
+    | `start` requires a verified email (contract error AUTH_EMAIL_NOT_VERIFIED);
+    | `confirm` and the history read follow the moderation/transition pattern
+    | of "Authentication: Required" without an email gate. The EXTERNAL_APPLY
+    | recruitment-outcome path stays deferred (Part X item 46) — no route.
+    */
+    Route::post('/vacancies/{vacancy}/external-apply/start', [ExternalApplyController::class, 'start'])
+        ->whereNumber('vacancy')->middleware('verified.email')->name('vacancies.external-apply.start');
+    Route::post('/external-apply-events/{event}/confirm', [ExternalApplyController::class, 'confirm'])
+        ->whereNumber('event')->name('external-apply-events.confirm');
+    Route::get('/candidate/external-apply-events', [ExternalApplyController::class, 'events'])
+        ->name('candidate.external-apply-events.index');
 
     /*
     | Recruitment Frontend Vertical Slice v1 — Inertia page delivery only.

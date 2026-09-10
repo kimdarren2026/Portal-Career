@@ -80,6 +80,10 @@ use App\Domains\Vacancy\Exceptions\SelectionStageAssignmentNotFound;
 use App\Domains\Vacancy\Exceptions\SelectorAssignmentAlreadyActive;
 use App\Domains\Vacancy\Exceptions\SelectorAssignmentUserNotFound;
 use App\Domains\Vacancy\Exceptions\SelectorRoleRequired;
+use App\Domains\ExternalApply\Exceptions\ExternalApplyConfirmationForbidden;
+use App\Domains\ExternalApply\Exceptions\ExternalApplyEventAlreadyConfirmed;
+use App\Domains\ExternalApply\Exceptions\ExternalApplyEventNotFound;
+use App\Domains\ExternalApply\Exceptions\ExternalApplyInvalidMethod;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
@@ -191,7 +195,7 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->render(function (AuthenticationException $exception, Request $request) {
-            if (in_array($request->path(), ['me', 'me/password', 'auth/logout'], true) || $request->is('candidate/*') || $request->is('companies/*') || $request->is('companies') || $request->is('vacancies') || $request->is('vacancies/*') || $request->is('applications') || $request->is('applications/*') || $request->is('notifications') || $request->is('notifications/*') || $request->is('stages/*') || $request->is('selector-assignments/*')) {
+            if (in_array($request->path(), ['me', 'me/password', 'auth/logout'], true) || $request->is('candidate/*') || $request->is('companies/*') || $request->is('companies') || $request->is('vacancies') || $request->is('vacancies/*') || $request->is('applications') || $request->is('applications/*') || $request->is('notifications') || $request->is('notifications/*') || $request->is('stages/*') || $request->is('selector-assignments/*') || $request->is('external-apply-events/*')) {
                 return ContractResponse::error($request, 'UNAUTHENTICATED', 401, 'Sesi autentikasi diperlukan.');
             }
         });
@@ -281,6 +285,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(fn (SelectorAssignmentAlreadyActive $exception, Request $request) => ContractResponse::error($request, 'SELECTOR_ASSIGNMENT_ALREADY_ACTIVE', 409, 'Penugasan aktif untuk selektor dan tahap ini sudah ada.'));
         $exceptions->render(fn (SelectionStageAssignmentNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Penugasan selektor tidak ditemukan.'));
         $exceptions->render(fn (SelectorAssignmentUserNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Pengguna tidak ditemukan.'));
+        // External Apply runtime (FR-EXT-001..004, INV-012, INV-024).
+        $exceptions->render(fn (ExternalApplyInvalidMethod $exception, Request $request) => ContractResponse::error($request, 'EXTERNAL_APPLY_INVALID_METHOD', 422, 'Lowongan ini tidak menggunakan lamaran ATS eksternal.'));
+        $exceptions->render(fn (ExternalApplyEventNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Aktivitas lamaran eksternal tidak ditemukan.'));
+        $exceptions->render(fn (ExternalApplyEventAlreadyConfirmed $exception, Request $request) => ContractResponse::error($request, 'EXTERNAL_APPLY_EVENT_ALREADY_CONFIRMED', 409, 'Aktivitas lamaran eksternal ini sudah dikonfirmasi.'));
+        $exceptions->render(fn (ExternalApplyConfirmationForbidden $exception, Request $request) => ContractResponse::error($request, 'EXTERNAL_APPLY_CONFIRMATION_FORBIDDEN', 403, 'Anda bukan sumber konfirmasi yang sah.'));
         $exceptions->render(fn (CandidateCollectionNotFoundException $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Data tidak ditemukan.'));
         $exceptions->render(fn (CandidateDocumentNotOwnedException $exception, Request $request) => ContractResponse::error($request, 'DOCUMENT_NOT_OWNED', 403, 'Dokumen bukan milik kandidat ini.'));
         $exceptions->render(fn (CandidateDocumentUnsupportedMediaTypeException $exception, Request $request) => ContractResponse::error($request, 'UNSUPPORTED_MEDIA_TYPE', 415, 'Dokumen harus berupa PDF.'));
