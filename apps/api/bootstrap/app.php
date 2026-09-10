@@ -76,6 +76,10 @@ use App\Domains\Vacancy\Exceptions\VacancyNotFound;
 use App\Domains\Vacancy\Exceptions\VacancyNotProcessable;
 use App\Domains\Vacancy\Exceptions\VacancyNotPublic;
 use App\Domains\Vacancy\Exceptions\VacancyProfileIncomplete;
+use App\Domains\Vacancy\Exceptions\SelectionStageAssignmentNotFound;
+use App\Domains\Vacancy\Exceptions\SelectorAssignmentAlreadyActive;
+use App\Domains\Vacancy\Exceptions\SelectorAssignmentUserNotFound;
+use App\Domains\Vacancy\Exceptions\SelectorRoleRequired;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
@@ -187,7 +191,7 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->render(function (AuthenticationException $exception, Request $request) {
-            if (in_array($request->path(), ['me', 'me/password', 'auth/logout'], true) || $request->is('candidate/*') || $request->is('companies/*') || $request->is('companies') || $request->is('vacancies') || $request->is('vacancies/*') || $request->is('applications') || $request->is('applications/*') || $request->is('notifications') || $request->is('notifications/*')) {
+            if (in_array($request->path(), ['me', 'me/password', 'auth/logout'], true) || $request->is('candidate/*') || $request->is('companies/*') || $request->is('companies') || $request->is('vacancies') || $request->is('vacancies/*') || $request->is('applications') || $request->is('applications/*') || $request->is('notifications') || $request->is('notifications/*') || $request->is('stages/*') || $request->is('selector-assignments/*')) {
                 return ContractResponse::error($request, 'UNAUTHENTICATED', 401, 'Sesi autentikasi diperlukan.');
             }
         });
@@ -270,6 +274,13 @@ return Application::configure(basePath: dirname(__DIR__))
         // Recruitment Outcome Foundation v1 (OC-1, RC-2).
         $exceptions->render(fn (RecruitmentOutcomeNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Recruitment outcome tidak ditemukan.'));
         $exceptions->render(fn (OutcomeAlreadyRecorded $exception, Request $request) => ContractResponse::error($request, 'OUTCOME_ALREADY_RECORDED', 409, 'Outcome sudah pernah dicatat untuk lamaran ini.'));
+        // Selector stage assignment (FR-HR-006, INV-037). Out-of-scope / missing
+        // assignments and users answer as a plain NOT_FOUND — an actor may not
+        // learn a campus-only stage or another user exists by probing.
+        $exceptions->render(fn (SelectorRoleRequired $exception, Request $request) => ContractResponse::error($request, 'SELECTOR_ROLE_REQUIRED', 422, 'Pengguna tidak memiliki role SELECTOR aktif dan tidak dapat ditugaskan.'));
+        $exceptions->render(fn (SelectorAssignmentAlreadyActive $exception, Request $request) => ContractResponse::error($request, 'SELECTOR_ASSIGNMENT_ALREADY_ACTIVE', 409, 'Penugasan aktif untuk selektor dan tahap ini sudah ada.'));
+        $exceptions->render(fn (SelectionStageAssignmentNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Penugasan selektor tidak ditemukan.'));
+        $exceptions->render(fn (SelectorAssignmentUserNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Pengguna tidak ditemukan.'));
         $exceptions->render(fn (CandidateCollectionNotFoundException $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Data tidak ditemukan.'));
         $exceptions->render(fn (CandidateDocumentNotOwnedException $exception, Request $request) => ContractResponse::error($request, 'DOCUMENT_NOT_OWNED', 403, 'Dokumen bukan milik kandidat ini.'));
         $exceptions->render(fn (CandidateDocumentUnsupportedMediaTypeException $exception, Request $request) => ContractResponse::error($request, 'UNSUPPORTED_MEDIA_TYPE', 415, 'Dokumen harus berupa PDF.'));

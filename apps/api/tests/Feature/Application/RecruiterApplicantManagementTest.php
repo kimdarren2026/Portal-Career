@@ -101,7 +101,9 @@ final class RecruiterApplicantManagementTest extends VacancyTestCase
         $careerCenterManager = $this->moderator('ra-deny-ccm@example.test', RoleCode::CareerCenterManager);
         $selector = $this->moderator('ra-deny-selector@example.test', RoleCode::Selector);
 
-        foreach ([$careerCenter, $careerCenterManager, $selector] as $actor) {
+        // Career Center has no candidate-selection scope of any kind — a blanket
+        // 403 on read and on transition (FSD §3.3, matrix §4.6 footnote 13).
+        foreach ([$careerCenter, $careerCenterManager] as $actor) {
             $this->actingAs($actor)->getJson('/applications')
                 ->assertStatus(403)->assertJsonPath('error.code', 'AUTH_FORBIDDEN');
 
@@ -112,6 +114,20 @@ final class RecruiterApplicantManagementTest extends VacancyTestCase
                 'to_status' => 'UNDER_REVIEW', 'candidate_visibility' => 'VISIBLE',
             ])->assertStatus(403)->assertJsonPath('error.code', 'AUTH_FORBIDDEN');
         }
+
+        // SELECTOR is `S` (ASSIGNED_STAGE) on application reads, now wired
+        // (GAP-010). With NO active selection_stage_assignment its scope is
+        // empty: the list is query-scoped to nothing (200, no items) and a
+        // direct read is an enumeration-safe 404, never a 403 that would
+        // confirm the row exists. It still cannot transition — selectors
+        // evaluate, they never decide (matrix §4.6 footnote 18).
+        $this->actingAs($selector)->getJson('/applications')
+            ->assertOk()->assertJsonPath('data.items', []);
+        $this->actingAs($selector)->getJson("/applications/{$applicationId}")
+            ->assertStatus(404)->assertJsonPath('error.code', 'NOT_FOUND');
+        $this->actingAs($selector)->postJson("/applications/{$applicationId}/transition", [
+            'to_status' => 'UNDER_REVIEW', 'candidate_visibility' => 'VISIBLE',
+        ])->assertStatus(403)->assertJsonPath('error.code', 'AUTH_FORBIDDEN');
 
         self::assertSame('APPLIED', DB::table('applications')->where('id', $applicationId)->value('current_status'));
     }
@@ -135,7 +151,9 @@ final class RecruiterApplicantManagementTest extends VacancyTestCase
         $selector = $this->moderator('ra-deny-profile-selector@example.test', RoleCode::Selector);
         $this->giveCandidateProfile($selector);
 
-        foreach ([$careerCenter, $careerCenterManager, $selector] as $actor) {
+        // The core regression: denial is caused by lacking the capability,
+        // never by the incidental presence/absence of a candidate_profiles row.
+        foreach ([$careerCenter, $careerCenterManager] as $actor) {
             self::assertNotNull(DB::table('candidate_profiles')->where('user_id', $actor->id)->value('id'), 'Fixture must actually hold a candidate_profile.');
 
             $this->actingAs($actor)->getJson('/applications')
@@ -148,6 +166,19 @@ final class RecruiterApplicantManagementTest extends VacancyTestCase
                 'to_status' => 'UNDER_REVIEW', 'candidate_visibility' => 'VISIBLE',
             ])->assertStatus(403)->assertJsonPath('error.code', 'AUTH_FORBIDDEN');
         }
+
+        // A SELECTOR holding a candidate_profile still resolves to its own
+        // empty ASSIGNED_STAGE scope (GAP-010), not the candidate scope and
+        // not a 403: an unassigned selector simply sees nothing, and still
+        // cannot transition.
+        self::assertNotNull(DB::table('candidate_profiles')->where('user_id', $selector->id)->value('id'), 'Fixture must actually hold a candidate_profile.');
+        $this->actingAs($selector)->getJson('/applications')
+            ->assertOk()->assertJsonPath('data.items', []);
+        $this->actingAs($selector)->getJson("/applications/{$applicationId}")
+            ->assertStatus(404)->assertJsonPath('error.code', 'NOT_FOUND');
+        $this->actingAs($selector)->postJson("/applications/{$applicationId}/transition", [
+            'to_status' => 'UNDER_REVIEW', 'candidate_visibility' => 'VISIBLE',
+        ])->assertStatus(403)->assertJsonPath('error.code', 'AUTH_FORBIDDEN');
 
         self::assertSame('APPLIED', DB::table('applications')->where('id', $applicationId)->value('current_status'));
     }

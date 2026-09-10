@@ -31,6 +31,7 @@ use App\Http\Controllers\Web\RecruitmentOutcomePageController;
 use App\Http\Controllers\Web\RecruitmentStageController;
 use App\Http\Controllers\Web\SelectionScheduleController;
 use App\Http\Controllers\Web\SelectionSchedulePageController;
+use App\Http\Controllers\Web\SelectorAssignmentController;
 use App\Http\Controllers\Web\SmtpConfigurationController;
 use App\Http\Controllers\Web\SuperAdminPageController;
 use App\Http\Controllers\Web\VacancyController;
@@ -273,6 +274,23 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
         Route::post('/', [RecruitmentOutcomeController::class, 'store'])->name('store');
         Route::patch('/{outcome}', [RecruitmentOutcomeController::class, 'update'])->whereNumber('outcome')->name('update');
     });
+
+    /*
+    | Selector stage assignment (API_CONTRACT.md Part VIII · FR-HR-006 ·
+    | INV-037). Contract Surface INERTIA_WEB. `HR_ADMIN` (Admin Kepegawaian)
+    | and `SUPER_ADMIN` only, and only on stages of a CAMPUS vacancy
+    | (assignment is a campus-recruitment capability — matrix §4.8 footnote
+    | 23). A selector can never assign, extend, or revoke — including their
+    | own (footnote 24). Contracts state "Authentication: Required" without an
+    | email-verified gate, so none is added here, matching moderation and
+    | transition.
+    */
+    Route::get('/stages/{stage}/selector-assignments', [SelectorAssignmentController::class, 'index'])
+        ->whereNumber('stage')->name('stages.selector-assignments.index');
+    Route::post('/stages/{stage}/selector-assignments', [SelectorAssignmentController::class, 'store'])
+        ->whereNumber('stage')->name('stages.selector-assignments.store');
+    Route::post('/selector-assignments/{assignment}/revoke', [SelectorAssignmentController::class, 'revoke'])
+        ->whereNumber('assignment')->name('selector-assignments.revoke');
 
     /*
     | Recruitment Frontend Vertical Slice v1 — Inertia page delivery only.

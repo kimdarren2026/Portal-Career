@@ -33,7 +33,11 @@ final class RecruitmentStageAuthoringTest extends VacancyTestCase
         self::assertTrue($registered->contains('POST vacancies/{vacancy}/stages/reorder'));
 
         self::assertFalse($registered->contains(fn (string $r): bool => str_contains($r, 'DELETE') && str_contains($r, 'stages')));
-        self::assertFalse($registered->contains(fn (string $r): bool => str_contains($r, 'selector-assignment')));
+        // Selector assignment is now its own frozen family (API_CONTRACT.md
+        // Part VIII, shipped by GAP-010 / SelectorAssignmentTest). It is a
+        // stage-scoped selection route, not part of the stage-authoring
+        // surface asserted here, so it is no longer required to be absent.
+        self::assertTrue($registered->contains('POST stages/{stage}/selector-assignments'));
         // move-stage is now routed — Application Stage Movement Foundation v1
         // (MS-3, MS-4) — see ApplicationStageMovementTest for its own
         // route-existence assertion. It is an Application-domain route, not
