@@ -21,7 +21,7 @@ same release:
 
 Queue worker retry policy is driven by `smtp_configurations.max_attempts` /
 `retry_backoff_seconds`. The email-outbox delivery worker **has shipped**
-(Product Owner decision PGC-V1 / PD-D — supersedes the earlier `B-5` blocker
+(Product Owner decision PGC-V1 / PD-B — supersedes the earlier `B-5` blocker
 note; `docs/decisions/PRODUCT_OWNER_DECISIONS.md`): `App\Jobs\DeliverEmailOutboxMessage`
 is dispatched after each business transaction commits, and the scheduled
 `outbox:sweep` command re-drives any `PENDING` / `FAILED_RETRYABLE` row whose
@@ -41,7 +41,7 @@ platform secret manager, never the repository.
 | `APP_DEBUG` | required | `false` — an uncaught error renders the generic page, no stack trace / SQL / path / secret |
 | `APP_KEY` | required secret | `base64:…` from the secret manager, generated once, **stable** — see §8 |
 | `APP_URL` | required | `https://<host>` |
-| `TRUSTED_PROXIES` | required behind a proxy | proxy IP/CIDR list, or `*` if only reachable via the proxy |
+| `TRUSTED_PROXIES` | required behind a proxy | proxy IP/CIDR list. `compose.production.yaml` ships `*` as a bootstrap default (valid only while the app is reachable **only** through the Dokploy/Traefik ingress on the private compose network). **Target-server preflight MUST verify this and pin `TRUSTED_PROXIES` to the actual ingress address/subnet once that network is known** — `*` is not a final production value. |
 | `DB_USERNAME` / `DB_PASSWORD` | required secret | the **restricted** `portal_karir_app` role only (never the migration owner) |
 | `DB_SSLMODE` | required | `require` or stricter in production |
 | `SESSION_SECURE_COOKIE` | required | `true` |
