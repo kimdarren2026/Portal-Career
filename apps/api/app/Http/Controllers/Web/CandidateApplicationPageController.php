@@ -133,6 +133,15 @@ final class CandidateApplicationPageController extends CandidateController
             'vacancy' => array_merge($detail, ['id' => (int) $vacancy->getKey()]),
             'screening_questions' => $questions,
             'existing_application_id' => $existing !== null ? (int) $existing : null,
+            // PGC-V1 / PD-E — the exact ratified consent text and its version.
+            // The submit endpoint re-derives and persists the authoritative
+            // hash server-side regardless of what the client posts.
+            'consent' => [
+                'version' => \App\Domains\Application\Support\ApplicationConsentVersion::CURRENT,
+                'text' => \App\Domains\Application\Support\ApplicationConsentVersion::canonicalText(
+                    \App\Domains\Application\Support\ApplicationConsentVersion::CURRENT,
+                ),
+            ],
             'documents' => array_map(fn ($document): array => [
                 'id' => (int) $document->getKey(),
                 'display_name' => $document->display_name,
