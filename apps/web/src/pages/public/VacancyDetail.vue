@@ -9,7 +9,8 @@
  * absent.
  */
 import { Head, Link, usePage } from '@inertiajs/vue3'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import { authRequest, errorText, newIdempotencyKey } from '@/lib/auth'
 import { employmentTypeLabel, statusLabel, vacancyTypeLabel, workplaceModeLabel } from '@/lib/labels'
 
 interface CompanySummary {
@@ -33,6 +34,7 @@ interface Requirement {
 }
 
 interface VacancyDetail {
+    id?: number
     slug: string
     title: string
     vacancy_type: string
@@ -53,7 +55,10 @@ interface VacancyDetail {
     requirements: Requirement[]
 }
 
-const props = defineProps<{ vacancy: VacancyDetail }>()
+const props = defineProps<{
+    vacancy: VacancyDetail
+    external_apply?: { consent_version: string } | null
+}>()
 
 const audienceLabel: Record<string, string> = {
     PUBLIC: 'Publik',
@@ -68,6 +73,58 @@ const CANDIDATE_ROLES = ['CANDIDATE_EXTERNAL', 'CANDIDATE_STUDENT_FINAL_YEAR', '
 const page = usePage()
 const isAuthenticated = computed(() => !!(page.props as any).auth?.user)
 const isCandidate = computed(() => ((page.props as any).auth?.roles ?? []).some((r: string) => CANDIDATE_ROLES.includes(r)))
+
+// External Apply — a candidate leaving for the company ATS. The click always
+// flows through the tracked `external-apply/start` runtime: the server
+// validates candidate/vacancy/eligibility, records an external_apply_event,
+// and returns the ONLY destination we ever navigate to (the stored vacancy
+// URL). A client-supplied URL is never sent or honoured.
+const showExternalModal = ref(false)
+const externalSubmitting = ref(false)
+const externalError = ref('')
+
+function openExternalModal(): void {
+    externalError.value = ''
+    showExternalModal.value = true
+}
+
+function closeExternalModal(): void {
+    if (externalSubmitting.value) return
+    showExternalModal.value = false
+}
+
+async function confirmExternalApply(): Promise<void> {
+    const vacancyId = props.vacancy.id
+    const version = props.external_apply?.consent_version
+    if (!vacancyId || !version) {
+        externalError.value = 'Alur lamaran eksternal tidak tersedia untuk lowongan ini.'
+        return
+    }
+    externalSubmitting.value = true
+    externalError.value = ''
+    try {
+        const { response, payload } = await authRequest(
+            `/vacancies/${vacancyId}/external-apply/start`,
+            { consent: { consent_version: version, accepted: true } },
+            'POST',
+            { 'Idempotency-Key': newIdempotencyKey() },
+        )
+        const destination = (payload.data as Record<string, unknown> | undefined)?.destination_url
+        if (response.ok && typeof destination === 'string' && destination.length > 0) {
+            window.location.href = destination
+            return
+        }
+        if (response.status === 401) {
+            window.location.href = '/login'
+            return
+        }
+        externalError.value = errorText(payload)
+    } catch {
+        externalError.value = 'Permintaan tidak dapat diproses. Silakan coba kembali.'
+    } finally {
+        externalSubmitting.value = false
+    }
+}
 </script>
 
 <template>
@@ -137,6 +194,15 @@ const isCandidate = computed(() => ((page.props as any).auth?.roles ?? []).some(
                             </a>
                         </template>
 
+                        <template v-else>
+                            <button v-if="isAuthenticated && isCandidate" type="button" data-testid="external-apply-cta" class="mt-4 block w-full rounded-lg bg-[#0061a5] px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-[#004172]" @click="openExternalModal">
+                                Lamar di Situs Perusahaan
+                            </button>
+                            <a v-else-if="!isAuthenticated" href="/login" class="mt-4 block rounded-lg bg-[#0061a5] px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-[#004172]">
+                                Masuk untuk Melamar
+                            </a>
+                        </template>
+
                         <a :href="`/lowongan/${vacancy.slug}/laporkan`" class="mt-3 block text-center text-xs font-medium text-slate-500 hover:text-[#93000a] hover:underline">
                             Laporkan lowongan ini
                         </a>
@@ -147,6 +213,25 @@ const isCandidate = computed(() => ((page.props as any).auth?.roles ?? []).some(
                         <p class="mt-2 text-sm text-slate-700">{{ vacancy.company.name }}</p>
                     </div>
                 </aside>
+            </div>
+        </div>
+
+        <div v-if="showExternalModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 px-4" role="dialog" aria-modal="true" aria-labelledby="external-apply-title" @click.self="closeExternalModal">
+            <div class="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
+                <h2 id="external-apply-title" class="text-lg font-semibold text-slate-900">Lanjut ke Situs Perusahaan?</h2>
+                <p class="mt-3 text-sm text-slate-700">
+                    Proses lamaran untuk lowongan ini dilakukan melalui situs perusahaan.
+                    Aktivitas Anda akan dicatat di Portal Karir sebelum Anda melanjutkan.
+                </p>
+                <p v-if="externalError" class="mt-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-[#93000a]" role="alert" data-testid="external-apply-error">{{ externalError }}</p>
+                <div class="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                    <button type="button" class="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60" :disabled="externalSubmitting" @click="closeExternalModal">
+                        Batal
+                    </button>
+                    <button type="button" data-testid="external-apply-confirm" class="rounded-lg bg-[#0061a5] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#004172] disabled:opacity-60" :disabled="externalSubmitting" @click="confirmExternalApply">
+                        {{ externalSubmitting ? 'Memproses…' : 'Lanjutkan' }}
+                    </button>
+                </div>
             </div>
         </div>
     </main>

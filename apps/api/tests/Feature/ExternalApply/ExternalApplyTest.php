@@ -139,6 +139,18 @@ final class ExternalApplyTest extends VacancyTestCase
             ->assertUnauthorized()->assertJsonPath('error.code', 'UNAUTHENTICATED');
     }
 
+    public function test_a_non_candidate_persona_cannot_start_external_apply(): void
+    {
+        [$recruiter, , $vacancyId] = $this->externalVacancy('ext-persona@example.test');
+        // $recruiter is COMPANY_RECRUITER with no candidate_profiles row.
+
+        $this->actingAs($recruiter)->postJson("/vacancies/{$vacancyId}/external-apply/start", ['consent' => $this->consent()])
+            ->assertStatus(422)->assertJsonPath('error.code', 'CANDIDATE_PROFILE_REQUIRED');
+
+        self::assertSame(0, DB::table('external_apply_events')->where('vacancy_id', $vacancyId)->count());
+        self::assertSame(0, DB::table('applications')->where('vacancy_id', $vacancyId)->count());
+    }
+
     public function test_start_enforces_target_audience_eligibility(): void
     {
         [, , $vacancyId] = $this->externalVacancy('ext-elig@example.test', ['target_audience' => 'ALUMNI_ONLY']);
