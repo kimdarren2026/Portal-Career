@@ -38,6 +38,12 @@ use App\Domains\Candidate\Exceptions\CandidateDocumentStorageException;
 use App\Domains\Candidate\Exceptions\CandidateDocumentUnsupportedMediaTypeException;
 use App\Domains\Candidate\Exceptions\CandidateInvalidReferenceException;
 use App\Domains\Candidate\Exceptions\CandidateProfileRequiredException;
+use App\Domains\Company\Exceptions\CompanyDocumentNotDraft;
+use App\Domains\Company\Exceptions\CompanyDocumentNotFound;
+use App\Domains\Company\Exceptions\CompanyDocumentSupersedeInvalid;
+use App\Domains\Company\Exceptions\CompanyDocumentTooLarge;
+use App\Domains\Company\Exceptions\CompanyDocumentTypeInvalid;
+use App\Domains\Company\Exceptions\CompanyDocumentUnsupportedMediaType;
 use App\Domains\Company\Exceptions\CompanyMemberAlreadyActive;
 use App\Domains\Company\Exceptions\CompanyMemberNotFound;
 use App\Domains\Company\Exceptions\CompanyNotFound;
@@ -210,6 +216,13 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(fn (CandidateProfileRequiredException $exception, Request $request) => ContractResponse::error($request, 'CANDIDATE_PROFILE_REQUIRED', 422, 'Profil kandidat tidak tersedia.'));
         $exceptions->render(fn (LastCompanyAdmin $exception, Request $request) => ContractResponse::error($request, 'MEMBER_LAST_ADMIN', 409, 'Setidaknya satu Company Admin aktif harus dipertahankan.'));
         $exceptions->render(fn (CompanyMemberAlreadyActive $exception, Request $request) => ContractResponse::error($request, 'MEMBER_ALREADY_ACTIVE', 409, 'Anggota ini sudah aktif di perusahaan tersebut.'));
+        // PGC-V1 / PD-D — company legal documents.
+        $exceptions->render(fn (CompanyDocumentNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Dokumen legalitas tidak ditemukan.'));
+        $exceptions->render(fn (CompanyDocumentNotDraft $exception, Request $request) => ContractResponse::error($request, 'COMPANY_DOCUMENT_IS_VERIFICATION_EVIDENCE', 409, 'Dokumen yang sudah diajukan tidak dapat dihapus; gunakan penggantian dokumen.'));
+        $exceptions->render(fn (CompanyDocumentSupersedeInvalid $exception, Request $request) => ContractResponse::error($request, 'CONFLICT', 409, 'Penggantian dokumen tidak sah.'));
+        $exceptions->render(fn (CompanyDocumentTypeInvalid $exception, Request $request) => ContractResponse::error($request, 'VALIDATION_FAILED', 422, 'Jenis dokumen legalitas tidak dikenali.'));
+        $exceptions->render(fn (CompanyDocumentTooLarge $exception, Request $request) => ContractResponse::error($request, 'PAYLOAD_TOO_LARGE', 413, 'Ukuran berkas melebihi 10 MiB.'));
+        $exceptions->render(fn (CompanyDocumentUnsupportedMediaType $exception, Request $request) => ContractResponse::error($request, 'UNSUPPORTED_MEDIA_TYPE', 415, 'Berkas harus berupa PDF, JPEG, atau PNG.'));
         // Out of COMPANY_SCOPE and absent answer identically: 403 would confirm
         // the row exists to an actor who must not know it does (matrix §1).
         $exceptions->render(fn (CompanyNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Perusahaan tidak ditemukan.'));

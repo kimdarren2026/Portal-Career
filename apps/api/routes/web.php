@@ -14,6 +14,7 @@ use App\Http\Controllers\Web\CandidatePageController;
 use App\Http\Controllers\Web\CandidateProfileController;
 use App\Http\Controllers\Web\CareerCenterPageController;
 use App\Http\Controllers\Web\CompanyController;
+use App\Http\Controllers\Web\CompanyDocumentController;
 use App\Http\Controllers\Web\CompanyMemberController;
 use App\Http\Controllers\Web\CompanyMemberPageController;
 use App\Http\Controllers\Web\CompanyPageController;
@@ -140,9 +141,29 @@ Route::middleware(['auth', 'account.status'])->prefix('companies')->name('compan
     Route::post('/', [CompanyController::class, 'create'])->middleware('verified.email')->name('store');
     Route::get('/{company}', [CompanyController::class, 'show'])->name('show');
     Route::get('/{company}/members', [CompanyMemberController::class, 'index'])->name('members.index');
+
+    /*
+    | Company legal documents (FR-ONB-002, PGC-V1 / PD-D — closes API_CONTRACT.md
+    | Part X item 2 / adds item 65). Read (list, download) is CompanyPolicy::view
+    | (member, or global readers Career Center / Auditor / Super Admin); write
+    | (upload, draft delete, supersede) is CompanyPolicy::update (member or Super
+    | Admin - Career Center DENIED). Draft-only delete + supersede preserve the
+    | frozen Q-2 rule (INV-038).
+    */
+    Route::get('/{company}/documents', [CompanyDocumentController::class, 'index'])
+        ->whereNumber('company')->name('documents.index');
+    Route::get('/{company}/documents/{document}/download', [CompanyDocumentController::class, 'download'])
+        ->whereNumber('company')->whereNumber('document')->name('documents.download');
+
     Route::middleware('verified.email')->group(function (): void {
         Route::patch('/{company}', [CompanyController::class, 'update'])->name('update');
         Route::post('/{company}/submit-verification', [CompanyController::class, 'submit'])->name('submit');
+        Route::post('/{company}/documents', [CompanyDocumentController::class, 'store'])
+            ->whereNumber('company')->name('documents.store');
+        Route::delete('/{company}/documents/{document}', [CompanyDocumentController::class, 'destroy'])
+            ->whereNumber('company')->whereNumber('document')->name('documents.destroy');
+        Route::post('/{company}/documents/{document}/supersede', [CompanyDocumentController::class, 'supersede'])
+            ->whereNumber('company')->whereNumber('document')->name('documents.supersede');
         // FR-COMP-004 + closed D-1. The last active COMPANY_ADMIN can never be
         // demoted or revoked; leaving is the member's own act.
         Route::post('/{company}/members', [CompanyMemberController::class, 'store'])
