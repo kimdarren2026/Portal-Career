@@ -39,6 +39,7 @@ use App\Http\Controllers\Web\SelectorAssignmentController;
 use App\Http\Controllers\Web\SmtpConfigurationController;
 use App\Http\Controllers\Web\SuperAdminPageController;
 use App\Http\Controllers\Web\VacancyController;
+use App\Http\Controllers\Web\VacancyReportController;
 use App\Http\Controllers\Web\VacancyLifecycleController;
 use App\Http\Controllers\Web\VacancyScreeningQuestionController;
 use Illuminate\Support\Facades\Route;
@@ -76,6 +77,18 @@ Route::get('/', [HomePageController::class, 'index'])->name('home');
 Route::get('/lowongan', [PublicVacancyController::class, 'index'])->name('lowongan.index');
 Route::get('/lowongan/{slug}', [PublicVacancyController::class, 'show'])
     ->where('slug', '[a-z0-9-]+')->name('lowongan.show');
+
+/*
+| Laporkan Lowongan — public anti-fraud vacancy reporting (PGC-V1 / PD-C,
+| API_CONTRACT.md Part X item 64). Anonymous OR authenticated; an authenticated
+| reporter's id is attached server-side. CSRF applies (web group); `store` is
+| rate-limited (5/IP/hour anonymous, 10/account/day authenticated). A
+| non-public / non-existent slug is an enumeration-safe 404.
+*/
+Route::get('/lowongan/{vacancy}/laporkan', [VacancyReportController::class, 'create'])
+    ->where('vacancy', '[a-z0-9-]+')->name('vacancy-reports.create');
+Route::post('/lowongan/{vacancy}/laporkan', [VacancyReportController::class, 'store'])
+    ->where('vacancy', '[a-z0-9-]+')->middleware('vacancy-report-rate')->name('vacancy-reports.store');
 
 // Page delivery only: these routes do not consume a verification or reset token.
 Route::get('/login', [AuthPageController::class, 'login'])->name('auth.login.page');
@@ -442,6 +455,20 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
         ->name('pages.career-center.vacancies.index');
     Route::get('/moderasi-lowongan/{vacancy}', [CareerCenterPageController::class, 'vacancyShow'])
         ->whereNumber('vacancy')->name('pages.career-center.vacancies.show');
+
+    /*
+    | Laporkan Lowongan review queue (PGC-V1 / PD-C). Career Center owns the
+    | NEW -> UNDER_REVIEW -> ACTIONED|DISMISSED lifecycle; Super Admin may read
+    | the queue but not transition.
+    */
+    Route::get('/laporan-lowongan', [CareerCenterPageController::class, 'reportsIndex'])
+        ->name('pages.career-center.reports');
+    Route::get('/moderasi-lowongan/laporan/data', [VacancyReportController::class, 'index'])
+        ->name('vacancy-reports.index');
+    Route::post('/vacancy-reports/{report}/review', [VacancyReportController::class, 'startReview'])
+        ->whereNumber('report')->name('vacancy-reports.review');
+    Route::post('/vacancy-reports/{report}/{outcome}', [VacancyReportController::class, 'resolve'])
+        ->whereNumber('report')->where('outcome', 'action|dismiss')->name('vacancy-reports.resolve');
 
     /*
     | Career Center Frontend Slice v9 — activates the canonical "Data

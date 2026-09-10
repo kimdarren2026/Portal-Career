@@ -136,6 +136,10 @@ const isCandidate = computed(() => ((page.props as any).auth?.roles ?? []).some(
                                 Masuk untuk Melamar
                             </a>
                         </template>
+
+                        <a :href="`/lowongan/${vacancy.slug}/laporkan`" class="mt-3 block text-center text-xs font-medium text-slate-500 hover:text-[#93000a] hover:underline">
+                            Laporkan lowongan ini
+                        </a>
                     </div>
 
                     <div class="rounded-lg border border-slate-200 bg-white p-5">

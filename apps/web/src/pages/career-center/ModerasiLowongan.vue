@@ -52,7 +52,10 @@ function goToPage(page: number) {
 <template>
     <Head title="Moderasi Lowongan" />
     <AppShell persona="career-center" active="moderasi-lowongan" title="Moderasi Lowongan">
-        <h1 class="text-3xl font-bold tracking-tight text-[#002045]">Moderasi Lowongan</h1>
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <h1 class="text-3xl font-bold tracking-tight text-[#002045]">Moderasi Lowongan</h1>
+            <a href="/laporan-lowongan" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-[#0061a5] hover:border-[#0061a5]">Laporan dari pengguna &rarr;</a>
+        </div>
         <p class="mt-2 max-w-2xl text-slate-600">Tinjau lowongan dari perusahaan terverifikasi sebelum ditampilkan kepada kandidat.</p>
 
         <form class="mt-6 flex flex-wrap items-end gap-3" @submit.prevent="applyFilters">

@@ -131,6 +131,12 @@ final class InfrastructureConfigurationTest extends TestCase
             '2026_08_24_000700_create_user_roles_table.php',
             '2026_08_24_000701_revoke_append_only_table_mutations.php',
             '2026_08_26_000100_add_slug_to_companies_table.php',
+            // PGC-V1 / PD-D — additive nullable upload-metadata columns on
+            // company_documents so the frozen legal-document upload runtime can
+            // record what was uploaded; no invariant/constraint changed.
+            '2026_09_10_000100_add_upload_metadata_to_company_documents_table.php',
+            // PGC-V1 / PD-C — new `vacancy_reports` entity for Laporkan Lowongan.
+            '2026_09_10_000200_create_vacancy_reports_table.php',
         ];
 
         $this->assertSame($expected, $migrations->all());

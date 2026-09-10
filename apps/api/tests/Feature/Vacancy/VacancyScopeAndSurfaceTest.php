@@ -176,11 +176,17 @@ final class VacancyScopeAndSurfaceTest extends VacancyTestCase
         // (FR-EXT-001/002), not a vacancy authoring/lifecycle route — the same
         // category as `applications`, and excluded from this count for the
         // same reason.
+        // Laporkan Lowongan (PGC-V1 / PD-C) adds `GET|POST /lowongan/{vacancy}/laporkan`
+        // and `POST /vacancy-reports/{report}/…` — a public anti-fraud reporting
+        // surface, not vacancy authoring/lifecycle — same category as
+        // `applications` / `external-apply`, excluded for the same reason.
         $this->assertSame(15, $registered->filter(
             static fn (string $r): bool => str_contains($r, 'vacanc')
                 && ! str_contains($r, 'api/v1/public')
                 && ! str_contains($r, 'applications')
                 && ! str_contains($r, 'external-apply')
+                && ! str_contains($r, 'laporkan')
+                && ! str_contains($r, 'vacancy-reports')
                 && ! str_contains($r, 'stages')
                 && ! str_contains($r, 'kelola-lowongan')
                 && ! str_contains($r, 'moderasi-lowongan')

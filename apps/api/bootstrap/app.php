@@ -8,6 +8,7 @@ use App\Http\Middleware\EnsureVerifiedEmail;
 use App\Http\Middleware\EnforceCandidateDocumentUploadRateLimit;
 use App\Http\Middleware\EnforceCompanyMemberInviteRateLimit;
 use App\Http\Middleware\EnforcePublicDiscoveryRateLimit;
+use App\Http\Middleware\EnforceVacancyReportRateLimit;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Responses\ContractResponse;
 use Inertia\Inertia;
@@ -82,6 +83,10 @@ use App\Domains\Vacancy\Exceptions\SelectorAssignmentUserNotFound;
 use App\Domains\Vacancy\Exceptions\SelectorRoleRequired;
 use App\Domains\Application\Exceptions\ApplicationDocumentNotFound;
 use App\Domains\Notification\Exceptions\EmailOutboxMessageNotFound;
+use App\Domains\VacancyReport\Exceptions\VacancyReportInvalidTransition;
+use App\Domains\VacancyReport\Exceptions\VacancyReportNotFound;
+use App\Domains\VacancyReport\Exceptions\VacancyReportSelfReview;
+use App\Domains\VacancyReport\Exceptions\VacancyReportVacancyNotFound;
 use App\Domains\ExternalApply\Exceptions\ExternalApplyConfirmationForbidden;
 use App\Domains\ExternalApply\Exceptions\ExternalApplyEventAlreadyConfirmed;
 use App\Domains\ExternalApply\Exceptions\ExternalApplyEventNotFound;
@@ -159,6 +164,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'candidate.document-upload-rate' => EnforceCandidateDocumentUploadRateLimit::class,
             'company.member-invite-rate' => EnforceCompanyMemberInviteRateLimit::class,
             'public-discovery.rate-limit' => EnforcePublicDiscoveryRateLimit::class,
+            'vacancy-report-rate' => EnforceVacancyReportRateLimit::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
@@ -197,7 +203,7 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->render(function (AuthenticationException $exception, Request $request) {
-            if (in_array($request->path(), ['me', 'me/password', 'auth/logout'], true) || $request->is('candidate/*') || $request->is('companies/*') || $request->is('companies') || $request->is('vacancies') || $request->is('vacancies/*') || $request->is('applications') || $request->is('applications/*') || $request->is('notifications') || $request->is('notifications/*') || $request->is('stages/*') || $request->is('selector-assignments/*') || $request->is('external-apply-events/*') || $request->is('application-documents/*') || $request->is('admin/*')) {
+            if (in_array($request->path(), ['me', 'me/password', 'auth/logout'], true) || $request->is('candidate/*') || $request->is('companies/*') || $request->is('companies') || $request->is('vacancies') || $request->is('vacancies/*') || $request->is('applications') || $request->is('applications/*') || $request->is('notifications') || $request->is('notifications/*') || $request->is('stages/*') || $request->is('selector-assignments/*') || $request->is('external-apply-events/*') || $request->is('application-documents/*') || $request->is('admin/*') || $request->is('vacancy-reports/*')) {
                 return ContractResponse::error($request, 'UNAUTHENTICATED', 401, 'Sesi autentikasi diperlukan.');
             }
         });
@@ -297,6 +303,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(fn (ApplicationDocumentNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Dokumen lamaran tidak ditemukan.'));
         // PGC-V1 / PD-B — Super Admin email-outbox requeue.
         $exceptions->render(fn (EmailOutboxMessageNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Pesan email tidak ditemukan atau tidak dapat dikirim ulang.'));
+        // PGC-V1 / PD-C — Laporkan Lowongan.
+        $exceptions->render(fn (VacancyReportVacancyNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Lowongan tidak ditemukan.'));
+        $exceptions->render(fn (VacancyReportNotFound $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Laporan tidak ditemukan.'));
+        $exceptions->render(fn (VacancyReportInvalidTransition $exception, Request $request) => ContractResponse::error($request, 'CONFLICT', 409, 'Aksi tidak sah dari status laporan saat ini.'));
+        $exceptions->render(fn (VacancyReportSelfReview $exception, Request $request) => ContractResponse::error($request, 'AUTH_FORBIDDEN', 403, 'Anda tidak dapat meninjau laporan yang Anda kirim sendiri.'));
         $exceptions->render(fn (CandidateCollectionNotFoundException $exception, Request $request) => ContractResponse::error($request, 'NOT_FOUND', 404, 'Data tidak ditemukan.'));
         $exceptions->render(fn (CandidateDocumentNotOwnedException $exception, Request $request) => ContractResponse::error($request, 'DOCUMENT_NOT_OWNED', 403, 'Dokumen bukan milik kandidat ini.'));
         $exceptions->render(fn (CandidateDocumentUnsupportedMediaTypeException $exception, Request $request) => ContractResponse::error($request, 'UNSUPPORTED_MEDIA_TYPE', 415, 'Dokumen harus berupa PDF.'));
