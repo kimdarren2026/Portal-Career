@@ -220,12 +220,15 @@ final class SubmitApplication
             throw new ConsentVersionUnknown();
         }
 
-        $hash = trim((string) ($consent['consent_text_hash_reference'] ?? ''));
-        if ($hash === '') {
-            throw new ApplicationConsentRequired();
-        }
-
-        return ['consent_version' => $version, 'consent_text_hash_reference' => $hash];
+        // GAP-012 — the client no longer defines the authoritative consent
+        // hash. Whatever `consent_text_hash_reference` the request carried
+        // (the transport shape still requires the field) is discarded: the
+        // persisted reference is derived server-side from the known version,
+        // so an arbitrary client value can never become the trusted record.
+        return [
+            'consent_version' => $version,
+            'consent_text_hash_reference' => ApplicationConsentVersion::serverDerivedHash($version),
+        ];
     }
 
     /** @param list<mixed> $documentIds @return list<CandidateDocument> */

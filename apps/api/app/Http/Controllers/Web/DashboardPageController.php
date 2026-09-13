@@ -25,6 +25,13 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
  * `GET /dashboard` — landing page per persona (Frontend Vertical Slice v1;
  * recruiter operational snapshot added in v5).
  *
+ * Persona resolution is explicit and total: Career Center, Recruiter,
+ * Admin Kepegawaian (HR_ADMIN), Super Admin, Auditor and Candidate each
+ * resolve to their own authorized surface. There is no cross-persona
+ * fallback — an unsupported or role-less actor (a bare SELECTOR included,
+ * which has no frozen persona workspace) receives a 403, never another
+ * persona's page.
+ *
  * Every recruiter figure is a literal count over a scope already frozen
  * elsewhere — no conversion rate, success score, SLA, benchmark or
  * Time-to-Fill is derived here. The six figures map 1:1 to FR-REP-001
@@ -57,11 +64,26 @@ final class DashboardPageController extends CandidateController
             return Inertia::render('recruiter/Dashboard', $this->recruiterSnapshot($actor, $incompleteOutcomes));
         }
 
+        // Admin Kepegawaian (HR_ADMIN) has its own canonical workspace at
+        // `/kepegawaian/*` (Campus Recruitment Frontend v8). A pure HR_ADMIN
+        // landing on the shared `/dashboard` is sent there rather than falling
+        // through to a persona that is not theirs.
+        if ($actor->hasActiveRole(RoleCode::HrAdmin)) {
+            return redirect()->route('pages.hr.dashboard');
+        }
+
         // Super Admin Control Plane v10 — the canonical Super Admin navigation
         // has no "Dashboard" item (FSD §4.6). A pure Super Admin landing on the
         // shared `/dashboard` is redirected to the first ACTIVE canonical
         // Super Admin module rather than rendered a recruiter persona page.
         if (RecruiterApplicationScope::isSuperAdmin($actor)) {
+            return redirect()->route('pages.super-admin.audit-log');
+        }
+
+        // Auditor's only authorized workspace is the read-only Audit Log
+        // (AUTHORIZATION_MATRIX.md §4.9 — SUPER_ADMIN / AUDITOR, both
+        // READ_ONLY). The same page controller already gates the pair.
+        if ($actor->hasActiveRole(RoleCode::Auditor)) {
             return redirect()->route('pages.super-admin.audit-log');
         }
 
@@ -81,7 +103,12 @@ final class DashboardPageController extends CandidateController
             ]);
         }
 
-        return Inertia::render('candidate/Dashboard', ['counts' => []]);
+        // No cross-persona fallback. A SELECTOR has no frozen landing surface
+        // (its access is per-stage assignment, never a persona workspace — no
+        // Selector portal is invented here), and any other unsupported or
+        // role-less persona must not silently inherit the candidate UI. Both
+        // get a truthful 403, never another persona's page.
+        return Inertia::render('Error', ['status' => 403])->toResponse($request)->setStatusCode(403);
     }
 
     /**

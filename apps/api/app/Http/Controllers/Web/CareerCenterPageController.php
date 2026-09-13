@@ -255,6 +255,24 @@ final class CareerCenterPageController extends Controller
         return $now < $vacancy->open_at ? 'scheduled' : 'published';
     }
 
+    /**
+     * `GET /laporan-lowongan` — the Laporkan Lowongan review queue page
+     * (PGC-V1 / PD-C). Page shell only; the queue data and the transitions
+     * use the JSON `vacancy-reports.*` routes.
+     */
+    public function reportsIndex(Request $request): Response|JsonResponse|SymfonyResponse
+    {
+        $actor = $this->actor($request);
+        if (! $this->isCareerCenter($actor) && ! $actor->hasActiveRole(RoleCode::SuperAdmin)) {
+            return $this->forbidden($request);
+        }
+
+        return Inertia::render('career-center/LaporanLowongan', [
+            'reasons' => \App\Domains\VacancyReport\Support\VacancyReportVocabulary::reasonOptions(),
+            'can_transition' => $this->isCareerCenter($actor),
+        ]);
+    }
+
     private function isCareerCenter(User $actor): bool
     {
         return $actor->hasActiveRole(RoleCode::CareerCenterStaff)

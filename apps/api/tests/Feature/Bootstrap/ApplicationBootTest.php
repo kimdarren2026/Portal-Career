@@ -31,7 +31,13 @@ final class ApplicationBootTest extends TestCase
         $response->assertOk();
         // Inertia's root view carries the page payload in a data-page attribute.
         $response->assertSee('data-page', escape: false);
-        $response->assertSee('Health', escape: false);
+        // PGC-V1 / PD-G — `/` is the real public homepage, not the former
+        // bootstrap Health page. It must never leak environment diagnostics.
+        // The Inertia payload lives JSON-escaped in the data-page attribute.
+        $response->assertSee('public\/Home', escape: false);
+        $response->assertDontSee('Health', escape: false);
+        $response->assertDontSee(app()->version(), escape: false);
+        $response->assertDontSee(app()->environment(), escape: false);
     }
 
     public function test_correlation_id_is_returned_on_every_response(): void

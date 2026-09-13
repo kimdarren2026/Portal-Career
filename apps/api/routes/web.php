@@ -4,6 +4,9 @@ use App\Domains\Candidate\Support\CandidateCollectionRegistry;
 use App\Http\Controllers\Auth\AuthenticationController;
 use App\Http\Controllers\Auth\AuthPageController;
 use App\Http\Controllers\Web\AccountSettingsPageController;
+use App\Http\Controllers\Web\AdminEmailOutboxController;
+use App\Http\Controllers\Web\AdminUserController;
+use App\Http\Controllers\Web\AdminUserRoleController;
 use App\Http\Controllers\Web\ApplicationController;
 use App\Http\Controllers\Web\CandidateApplicationPageController;
 use App\Http\Controllers\Web\CandidateCollectionController;
@@ -12,6 +15,7 @@ use App\Http\Controllers\Web\CandidatePageController;
 use App\Http\Controllers\Web\CandidateProfileController;
 use App\Http\Controllers\Web\CareerCenterPageController;
 use App\Http\Controllers\Web\CompanyController;
+use App\Http\Controllers\Web\CompanyDocumentController;
 use App\Http\Controllers\Web\CompanyMemberController;
 use App\Http\Controllers\Web\CompanyMemberPageController;
 use App\Http\Controllers\Web\CompanyPageController;
@@ -20,7 +24,10 @@ use App\Http\Controllers\Web\HrVacancyController;
 use App\Http\Controllers\Web\NotificationController;
 use App\Http\Controllers\Web\NotificationPageController;
 use App\Http\Controllers\Web\DashboardPageController;
+use App\Http\Controllers\Web\ApplicationDocumentController;
 use App\Http\Controllers\Web\EvaluationController;
+use App\Http\Controllers\Web\HomePageController;
+use App\Http\Controllers\Web\ExternalApplyController;
 use App\Http\Controllers\Web\OfferController;
 use App\Http\Controllers\Web\PublicVacancyController;
 use App\Http\Controllers\Web\RecruiterApplicantPageController;
@@ -30,13 +37,14 @@ use App\Http\Controllers\Web\RecruitmentOutcomePageController;
 use App\Http\Controllers\Web\RecruitmentStageController;
 use App\Http\Controllers\Web\SelectionScheduleController;
 use App\Http\Controllers\Web\SelectionSchedulePageController;
+use App\Http\Controllers\Web\SelectorAssignmentController;
 use App\Http\Controllers\Web\SmtpConfigurationController;
 use App\Http\Controllers\Web\SuperAdminPageController;
 use App\Http\Controllers\Web\VacancyController;
+use App\Http\Controllers\Web\VacancyReportController;
 use App\Http\Controllers\Web\VacancyLifecycleController;
 use App\Http\Controllers\Web\VacancyScreeningQuestionController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,19 +54,17 @@ use Inertia\Inertia;
 | backward-compatibility promise. Behaviour for every operation is defined by
 | docs/api/API_CONTRACT.md regardless of surface, and both surfaces call the
 | same Actions and Policies — no business rule is ever implemented twice.
-|
-| BOOTSTRAP PHASE: no business route exists yet. The single route below proves
-| the Laravel → Inertia → Vue → TypeScript → Tailwind → Vite chain is wired.
 */
 
-Route::get('/', function () {
-    return Inertia::render('Health', [
-        'application' => config('app.name'),
-        'laravel' => app()->version(),
-        'php' => PHP_VERSION,
-        'environment' => app()->environment(),
-    ]);
-})->name('bootstrap.health');
+/*
+| Public homepage (PGC-V1 / PD-G). Anonymous. Renders a real minimal career
+| portal landing page — fixed hero copy, quick pathways to filtered
+| `/lowongan`, up to six real latest PUBLISHED vacancies with a truthful empty
+| state, auth CTAs. No fabricated data, no public metrics, and NO environment
+| diagnostics (the former bootstrap Health page is gone; health lives only at
+| /health/live, /health/ready, /up).
+*/
+Route::get('/', [HomePageController::class, 'index'])->name('home');
 
 /*
 | Public Vacancy Discovery — browser-facing, Inertia SSR (ADR-017).
@@ -73,6 +79,18 @@ Route::get('/', function () {
 Route::get('/lowongan', [PublicVacancyController::class, 'index'])->name('lowongan.index');
 Route::get('/lowongan/{slug}', [PublicVacancyController::class, 'show'])
     ->where('slug', '[a-z0-9-]+')->name('lowongan.show');
+
+/*
+| Laporkan Lowongan — public anti-fraud vacancy reporting (PGC-V1 / PD-C,
+| API_CONTRACT.md Part X item 64). Anonymous OR authenticated; an authenticated
+| reporter's id is attached server-side. CSRF applies (web group); `store` is
+| rate-limited (5/IP/hour anonymous, 10/account/day authenticated). A
+| non-public / non-existent slug is an enumeration-safe 404.
+*/
+Route::get('/lowongan/{vacancy}/laporkan', [VacancyReportController::class, 'create'])
+    ->where('vacancy', '[a-z0-9-]+')->name('vacancy-reports.create');
+Route::post('/lowongan/{vacancy}/laporkan', [VacancyReportController::class, 'store'])
+    ->where('vacancy', '[a-z0-9-]+')->middleware('vacancy-report-rate')->name('vacancy-reports.store');
 
 // Page delivery only: these routes do not consume a verification or reset token.
 Route::get('/login', [AuthPageController::class, 'login'])->name('auth.login.page');
@@ -124,9 +142,29 @@ Route::middleware(['auth', 'account.status'])->prefix('companies')->name('compan
     Route::post('/', [CompanyController::class, 'create'])->middleware('verified.email')->name('store');
     Route::get('/{company}', [CompanyController::class, 'show'])->name('show');
     Route::get('/{company}/members', [CompanyMemberController::class, 'index'])->name('members.index');
+
+    /*
+    | Company legal documents (FR-ONB-002, PGC-V1 / PD-D — closes API_CONTRACT.md
+    | Part X item 2 / adds item 65). Read (list, download) is CompanyPolicy::view
+    | (member, or global readers Career Center / Auditor / Super Admin); write
+    | (upload, draft delete, supersede) is CompanyPolicy::update (member or Super
+    | Admin - Career Center DENIED). Draft-only delete + supersede preserve the
+    | frozen Q-2 rule (INV-038).
+    */
+    Route::get('/{company}/documents', [CompanyDocumentController::class, 'index'])
+        ->whereNumber('company')->name('documents.index');
+    Route::get('/{company}/documents/{document}/download', [CompanyDocumentController::class, 'download'])
+        ->whereNumber('company')->whereNumber('document')->name('documents.download');
+
     Route::middleware('verified.email')->group(function (): void {
         Route::patch('/{company}', [CompanyController::class, 'update'])->name('update');
         Route::post('/{company}/submit-verification', [CompanyController::class, 'submit'])->name('submit');
+        Route::post('/{company}/documents', [CompanyDocumentController::class, 'store'])
+            ->whereNumber('company')->name('documents.store');
+        Route::delete('/{company}/documents/{document}', [CompanyDocumentController::class, 'destroy'])
+            ->whereNumber('company')->whereNumber('document')->name('documents.destroy');
+        Route::post('/{company}/documents/{document}/supersede', [CompanyDocumentController::class, 'supersede'])
+            ->whereNumber('company')->whereNumber('document')->name('documents.supersede');
         // FR-COMP-004 + closed D-1. The last active COMPANY_ADMIN can never be
         // demoted or revoked; leaving is the member's own act.
         Route::post('/{company}/members', [CompanyMemberController::class, 'store'])
@@ -274,6 +312,48 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
     });
 
     /*
+    | Selector stage assignment (API_CONTRACT.md Part VIII · FR-HR-006 ·
+    | INV-037). Contract Surface INERTIA_WEB. `HR_ADMIN` (Admin Kepegawaian)
+    | and `SUPER_ADMIN` only, and only on stages of a CAMPUS vacancy
+    | (assignment is a campus-recruitment capability — matrix §4.8 footnote
+    | 23). A selector can never assign, extend, or revoke — including their
+    | own (footnote 24). Contracts state "Authentication: Required" without an
+    | email-verified gate, so none is added here, matching moderation and
+    | transition.
+    */
+    Route::get('/stages/{stage}/selector-assignments', [SelectorAssignmentController::class, 'index'])
+        ->whereNumber('stage')->name('stages.selector-assignments.index');
+    Route::post('/stages/{stage}/selector-assignments', [SelectorAssignmentController::class, 'store'])
+        ->whereNumber('stage')->name('stages.selector-assignments.store');
+    Route::post('/selector-assignments/{assignment}/revoke', [SelectorAssignmentController::class, 'revoke'])
+        ->whereNumber('assignment')->name('selector-assignments.revoke');
+
+    /*
+    | External Apply runtime (API_CONTRACT.md Part VII · FR-EXT-001..004 ·
+    | INV-012, INV-024). Contract Surface VERSIONED_API, realized on the
+    | browser session-guard surface exactly as every other business domain.
+    | `start` requires a verified email (contract error AUTH_EMAIL_NOT_VERIFIED);
+    | `confirm` and the history read follow the moderation/transition pattern
+    | of "Authentication: Required" without an email gate. The EXTERNAL_APPLY
+    | recruitment-outcome path stays deferred (Part X item 46) — no route.
+    */
+    /*
+    | Application-shared document download (PGC-V1 / PD-A — supersedes RA-3
+    | for the download operation, API_CONTRACT.md Part X items 22 / 62).
+    | Streams the immutable application_documents snapshot; all authorization
+    | (matrix 4.6), auditing and the enumeration-safe 404 live in the Action.
+    */
+    Route::get('/application-documents/{applicationDocument}/download', [ApplicationDocumentController::class, 'download'])
+        ->whereNumber('applicationDocument')->name('application-documents.download');
+
+    Route::post('/vacancies/{vacancy}/external-apply/start', [ExternalApplyController::class, 'start'])
+        ->whereNumber('vacancy')->middleware('verified.email')->name('vacancies.external-apply.start');
+    Route::post('/external-apply-events/{event}/confirm', [ExternalApplyController::class, 'confirm'])
+        ->whereNumber('event')->name('external-apply-events.confirm');
+    Route::get('/candidate/external-apply-events', [ExternalApplyController::class, 'events'])
+        ->name('candidate.external-apply-events.index');
+
+    /*
     | Recruitment Frontend Vertical Slice v1 — Inertia page delivery only.
     | Every page controller here reuses the frozen Query/Scope/Presenter
     | classes above directly (never a loopback HTTP call) and mutates
@@ -399,6 +479,20 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
         ->whereNumber('vacancy')->name('pages.career-center.vacancies.show');
 
     /*
+    | Laporkan Lowongan review queue (PGC-V1 / PD-C). Career Center owns the
+    | NEW -> UNDER_REVIEW -> ACTIONED|DISMISSED lifecycle; Super Admin may read
+    | the queue but not transition.
+    */
+    Route::get('/laporan-lowongan', [CareerCenterPageController::class, 'reportsIndex'])
+        ->name('pages.career-center.reports');
+    Route::get('/moderasi-lowongan/laporan/data', [VacancyReportController::class, 'index'])
+        ->name('vacancy-reports.index');
+    Route::post('/vacancy-reports/{report}/review', [VacancyReportController::class, 'startReview'])
+        ->whereNumber('report')->name('vacancy-reports.review');
+    Route::post('/vacancy-reports/{report}/{outcome}', [VacancyReportController::class, 'resolve'])
+        ->whereNumber('report')->where('outcome', 'action|dismiss')->name('vacancy-reports.resolve');
+
+    /*
     | Career Center Frontend Slice v9 — activates the canonical "Data
     | Perusahaan" nav item (read-only company reference directory; Career
     | Center is a global reader in `CompanyScope`). "Dashboard" and
@@ -457,6 +551,72 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
         ->name('admin.smtp-configuration.update');
     Route::post('/admin/smtp-configuration/test', [SmtpConfigurationController::class, 'test'])
         ->name('admin.smtp-configuration.test');
+
+    /*
+    | Super Admin Full Activation — every FSD §4.6 navigation item now opens a
+    | real page. Menu/page activation is distinct from full CRUD availability:
+    | where a writable contract is unresolved the page is a READ_ONLY_REFERENCE
+    | or PARTIAL_FUNCTIONAL surface, never a dead "Segera hadir" entry. Each
+    | page controller gates SUPER_ADMIN and mutates nothing. Unresolved write /
+    | destructive operations remain unrouted.
+    |
+    | - Pengguna dan Role: PARTIAL_FUNCTIONAL — role catalogue + assign/revoke
+    |   (`POST /admin/users/{user}/roles` + revoke pair, frozen contract,
+    |   Idempotency-Key, 409 on active duplicate, audit `role_changed`,
+    |   affected user notified). No user directory (`GET /admin/users` has no
+    |   frozen field/filter/pagination contract); no suspend/restore/DISABLED.
+    | - Master Data / Unit Organisasi / Program Studi: READ_ONLY_REFERENCE over
+    |   `GET /admin/master-data/{collection}`; writes DEFERRED (DF-1).
+    | - Template Workflow / Template Notifikasi / Integrasi / Retensi Data /
+    |   Pengaturan Sistem: READ_ONLY_REFERENCE — truthful capability/policy
+    |   state, no invented schema, no fake values.
+    */
+    Route::get('/pengguna-role', [SuperAdminPageController::class, 'userRoleIndex'])
+        ->name('pages.super-admin.user-roles');
+    Route::post('/admin/users/{user}/roles', [AdminUserRoleController::class, 'assign'])
+        ->whereNumber('user')->name('admin.users.roles.assign');
+    Route::post('/admin/users/{user}/roles/{role}/revoke', [AdminUserRoleController::class, 'revoke'])
+        ->whereNumber('user')->name('admin.users.roles.revoke');
+
+    /*
+    | Super Admin user directory + account lifecycle (PGC-V1 / PD-F,
+    | API_CONTRACT.md Part X item 67). SUPER_ADMIN only. MVP lifecycle is
+    | ACTIVE <-> SUSPENDED only; DISABLED stays deferred. Suspension is
+    | immediate (server-side session rows cleared + OL-10 per-request check),
+    | never notifies the user, and is audited.
+    */
+    Route::get('/admin/users', [AdminUserController::class, 'index'])->name('admin.users.index');
+    Route::post('/admin/users/{user}/suspend', [AdminUserController::class, 'suspend'])
+        ->whereNumber('user')->name('admin.users.suspend');
+    Route::post('/admin/users/{user}/restore', [AdminUserController::class, 'restore'])
+        ->whereNumber('user')->name('admin.users.restore');
+
+    /*
+    | Transactional email outbox operations (PGC-V1 / PD-B). SUPER_ADMIN only.
+    | The delivery worker (DeliverEmailOutboxMessage) and the scheduled
+    | outbox:sweep run automatically; requeue re-drives a FAILED_RETRYABLE /
+    | DEAD_LETTER row.
+    */
+    Route::get('/admin/email-outbox', [AdminEmailOutboxController::class, 'index'])->name('admin.email-outbox.index');
+    Route::post('/admin/email-outbox/{message}/requeue', [AdminEmailOutboxController::class, 'requeue'])
+        ->whereNumber('message')->name('admin.email-outbox.requeue');
+
+    Route::get('/master-data', [SuperAdminPageController::class, 'masterDataIndex'])
+        ->name('pages.super-admin.master-data');
+    Route::get('/unit-organisasi', [SuperAdminPageController::class, 'organizationalUnitIndex'])
+        ->name('pages.super-admin.organizational-units');
+    Route::get('/program-studi', [SuperAdminPageController::class, 'studyProgramIndex'])
+        ->name('pages.super-admin.study-programs');
+    Route::get('/template-workflow', [SuperAdminPageController::class, 'templateWorkflowIndex'])
+        ->name('pages.super-admin.template-workflow');
+    Route::get('/template-notifikasi', [SuperAdminPageController::class, 'templateNotifikasiIndex'])
+        ->name('pages.super-admin.template-notifikasi');
+    Route::get('/integrasi', [SuperAdminPageController::class, 'integrationIndex'])
+        ->name('pages.super-admin.integrations');
+    Route::get('/retensi-data', [SuperAdminPageController::class, 'dataRetentionIndex'])
+        ->name('pages.super-admin.data-retention');
+    Route::get('/pengaturan-sistem', [SuperAdminPageController::class, 'systemSettingsIndex'])
+        ->name('pages.super-admin.system-settings');
 });
 
 /*

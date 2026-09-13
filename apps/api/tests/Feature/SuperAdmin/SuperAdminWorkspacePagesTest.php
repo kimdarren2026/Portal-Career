@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Feature\SuperAdmin;
 
+use App\Domains\Company\Enums\CompanyStatus;
 use App\Domains\Identity\Enums\RoleCode;
 use App\Domains\Identity\Enums\UserStatus;
 use App\Domains\Identity\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Inertia\Testing\AssertableInertia as Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Feature\Vacancy\VacancyTestCase;
 
 /**
@@ -183,6 +185,92 @@ final class SuperAdminWorkspacePagesTest extends VacancyTestCase
                 ->where('items.0.link', null),
         );
     }
+    /** @return array<string, array{0: string, 1: string}> */
+    public static function superAdminReferencePages(): array
+    {
+        return [
+            'pengguna dan role' => ['/pengguna-role', 'super-admin/PenggunaRole'],
+            'master data' => ['/master-data', 'super-admin/MasterData'],
+            'unit organisasi' => ['/unit-organisasi', 'super-admin/UnitOrganisasi'],
+            'program studi' => ['/program-studi', 'super-admin/ProgramStudi'],
+            'template workflow' => ['/template-workflow', 'super-admin/TemplateWorkflow'],
+            'template notifikasi' => ['/template-notifikasi', 'super-admin/TemplateNotifikasi'],
+            'integrasi' => ['/integrasi', 'super-admin/Integrasi'],
+            'retensi data' => ['/retensi-data', 'super-admin/RetensiData'],
+            'pengaturan sistem' => ['/pengaturan-sistem', 'super-admin/PengaturanSistem'],
+        ];
+    }
+
+    #[DataProvider('superAdminReferencePages')]
+    public function test_super_admin_reference_page_renders_for_super_admin(string $path, string $component): void
+    {
+        $admin = $this->superAdmin('activation-'.md5($path).'@example.test');
+
+        $this->actingAs($admin)->get($path)->assertOk()->assertInertia(
+            fn (Assert $page) => $page->component($component),
+        );
+    }
+
+    #[DataProvider('superAdminReferencePages')]
+    public function test_super_admin_reference_page_denied_to_every_other_persona(string $path): void
+    {
+        [$recruiter] = $this->companyWithRecruiter('act-recruiter-'.md5($path).'@example.test', CompanyStatus::Verified);
+        $candidate = $this->candidate('act-candidate-'.md5($path).'@example.test');
+        $hr = $this->hrAdmin('act-hr-'.md5($path).'@example.test');
+        $cc = $this->moderator('act-cc-'.md5($path).'@example.test');
+        $auditor = $this->auditor('act-auditor-'.md5($path).'@example.test');
+
+        foreach ([$recruiter, $candidate, $hr, $cc, $auditor] as $user) {
+            $this->actingAs($user)->get($path)->assertStatus(403);
+        }
+    }
+
+    #[DataProvider('superAdminReferencePages')]
+    public function test_super_admin_reference_page_has_no_mutation_route(string $path): void
+    {
+        $uri = ltrim($path, '/');
+
+        foreach (Route::getRoutes() as $route) {
+            if ($route->uri() === $uri) {
+                $this->assertSame(['GET', 'HEAD'], $route->methods());
+            }
+        }
+    }
+
+    public function test_master_data_page_exposes_only_frozen_collections(): void
+    {
+        $admin = $this->superAdmin('act-master-collections@example.test');
+
+        $this->actingAs($admin)->get('/master-data')->assertOk()->assertInertia(
+            fn (Assert $page) => $page->component('super-admin/MasterData')
+                ->where('collections', [
+                    'organizational-units', 'study-programs', 'industries',
+                    'organization-types', 'skills', 'geographic-areas',
+                ])
+                ->where('result.collection', 'organizational-units')
+                ->has('result.rows'),
+        );
+
+        // An unknown collection falls back to the first frozen collection.
+        $this->actingAs($admin)->get('/master-data?collection=made-up')->assertOk()->assertInertia(
+            fn (Assert $page) => $page->where('result.collection', 'organizational-units'),
+        );
+    }
+
+    public function test_system_settings_page_never_exposes_secrets(): void
+    {
+        $admin = $this->superAdmin('act-system-secrets@example.test');
+
+        $response = $this->actingAs($admin)->get('/pengaturan-sistem')->assertOk();
+        $body = $response->getContent() ?: '';
+
+        foreach ([config('app.key'), (string) config('database.connections.pgsql.password')] as $secret) {
+            if ($secret !== '') {
+                $this->assertStringNotContainsString($secret, $body);
+            }
+        }
+    }
+
 
     public function test_recruiter_and_career_center_dashboard_notifikasi_unchanged(): void
     {

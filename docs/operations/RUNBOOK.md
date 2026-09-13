@@ -20,9 +20,13 @@ same release:
 | **ssr** | `node bootstrap/ssr/ssr.js` (Node 22) | horizontal, small | **restart on every deploy**; no DB, no API |
 
 Queue worker retry policy is driven by `smtp_configurations.max_attempts` /
-`retry_backoff_seconds` once the email-outbox delivery worker ships (see §9 —
-it is a documented product blocker, B-5). Today no job class is dispatched, so
-the worker is idle; keep it deployed so it is ready.
+`retry_backoff_seconds`. The email-outbox delivery worker **has shipped**
+(Product Owner decision PGC-V1 / PD-B — supersedes the earlier `B-5` blocker
+note; `docs/decisions/PRODUCT_OWNER_DECISIONS.md`): `App\Jobs\DeliverEmailOutboxMessage`
+is dispatched after each business transaction commits, and the scheduled
+`outbox:sweep` command re-drives any `PENDING` / `FAILED_RETRYABLE` row whose
+`next_attempt_at` has elapsed. Keep the `mail` queue worker and the scheduler
+both running.
 
 ---
 
@@ -37,7 +41,7 @@ platform secret manager, never the repository.
 | `APP_DEBUG` | required | `false` — an uncaught error renders the generic page, no stack trace / SQL / path / secret |
 | `APP_KEY` | required secret | `base64:…` from the secret manager, generated once, **stable** — see §8 |
 | `APP_URL` | required | `https://<host>` |
-| `TRUSTED_PROXIES` | required behind a proxy | proxy IP/CIDR list, or `*` if only reachable via the proxy |
+| `TRUSTED_PROXIES` | required behind a proxy | proxy IP/CIDR list. `compose.production.yaml` ships `*` as a bootstrap default (valid only while the app is reachable **only** through the Dokploy/Traefik ingress on the private compose network). **Target-server preflight MUST verify this and pin `TRUSTED_PROXIES` to the actual ingress address/subnet once that network is known** — `*` is not a final production value. |
 | `DB_USERNAME` / `DB_PASSWORD` | required secret | the **restricted** `portal_karir_app` role only (never the migration owner) |
 | `DB_SSLMODE` | required | `require` or stricter in production |
 | `SESSION_SECURE_COOKIE` | required | `true` |
@@ -206,9 +210,10 @@ archiving makes a small RPO achievable — state the target explicitly.
 - **Stuck queue:** workers restart safely (`--max-time` bounded); a lost Redis
   queue DB is not a data-loss event — the outbox is the authority.
 - **`email_outbox`:** `PENDING` / `FAILED_RETRYABLE` rows are the source of
-  truth for undelivered transactional mail. Once the delivery worker ships
-  (B-5), it re-drives them; until then these rows accumulate and **no
-  transactional email is sent** — see §11.
+  truth for undelivered transactional mail. The delivery worker
+  (`DeliverEmailOutboxMessage`) and the scheduled `outbox:sweep` re-drive them
+  (PGC-V1 / PD-D). A `DEAD_LETTER` row has exhausted `max_attempts`; a Super
+  Admin can requeue it (`POST /admin/email-outbox/{message}/requeue`). See §11.
 
 ---
 

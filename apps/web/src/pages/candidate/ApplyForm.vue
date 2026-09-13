@@ -105,8 +105,9 @@ async function submit() {
         <p class="mt-1 text-slate-600">{{ vacancy.company.name }}</p>
 
         <div v-if="vacancy.applies_externally" class="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-6">
-            <p class="font-semibold text-amber-900">Lamaran eksternal belum tersedia melalui portal</p>
-            <p class="mt-2 text-sm text-amber-800">Lowongan ini menggunakan sistem penerimaan lamaran milik perusahaan (ATS eksternal). Alur konfirmasi lamaran eksternal belum diaktifkan pada portal ini.</p>
+            <p class="font-semibold text-amber-900">Lamaran diproses melalui situs perusahaan</p>
+            <p class="mt-2 text-sm text-amber-800">Lowongan ini menggunakan sistem penerimaan lamaran milik perusahaan (ATS eksternal). Lanjutkan dari halaman detail lowongan — aktivitas Anda dicatat di Portal Karir sebelum Anda diarahkan ke situs perusahaan.</p>
+            <Link :href="`/lowongan/${vacancy.slug}`" class="mt-4 inline-block rounded-lg bg-[#0061a5] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#004172]">Buka Detail Lowongan</Link>
         </div>
 
         <div v-else-if="existing_application_id" class="mt-6 rounded-2xl border border-sky-200 bg-sky-50 p-6">

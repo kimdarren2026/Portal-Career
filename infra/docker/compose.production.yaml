@@ -38,6 +38,12 @@ x-app-env: &app-env
   APP_KEY: ${APP_KEY:?APP_KEY is required — new production key, base64:...}
   APP_URL: ${APP_URL:?APP_URL is required — https://<production-host>}
   APP_TIMEZONE: UTC
+  # X-Forwarded-* is honoured only from these proxies (scheme -> secure-cookie,
+  # host -> absolute URLs, client IP -> rate-limit keys). `*` is a bootstrap
+  # default that assumes the app is reachable ONLY through the Dokploy/Traefik
+  # ingress on the private compose network. It MUST be verified and pinned to
+  # the actual ingress address/subnet during target-server preflight, once that
+  # network is known (RUNBOOK.md §2). Not a final production value.
   TRUSTED_PROXIES: ${TRUSTED_PROXIES:-*}
 
   LOG_CHANNEL: stderr
@@ -135,7 +141,9 @@ services:
       start_period: 15s
 
   # Queue worker — frozen command (RUNBOOK.md §1). May be scaled horizontally
-  # later. No email-outbox delivery worker exists yet (B-5 unresolved).
+  # later. The `mail` queue carries the transactional email-outbox delivery job
+  # (App\Jobs\DeliverEmailOutboxMessage — PGC-V1 / PD-B); the scheduled
+  # `outbox:sweep` (see the scheduler service) re-drives anything left behind.
   worker:
     <<: *app-common
     command:

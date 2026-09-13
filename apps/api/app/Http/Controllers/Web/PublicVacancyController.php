@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Web;
 
+use App\Domains\Application\Support\ApplicationConsentVersion;
 use App\Domains\Vacancy\Exceptions\VacancyNotPublic;
 use App\Domains\Vacancy\Queries\GetPublicVacancy;
 use App\Domains\Vacancy\Queries\ListPublicVacancies;
 use App\Domains\Vacancy\Support\PublicVacancyRequestFilters;
+use App\Domains\Vacancy\Support\PublicVacancyScope;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -62,6 +64,19 @@ final class PublicVacancyController extends Controller
             abort(404);
         }
 
-        return Inertia::render('public/VacancyDetail', ['vacancy' => $vacancy]);
+        $props = ['vacancy' => $vacancy];
+
+        // FR-EXT-001 — an EXTERNAL_ATS vacancy must offer a tracked apply path,
+        // never a bare crawlable link. The client needs the numeric vacancy id
+        // to POST the existing `external-apply/start` route and the current
+        // consent version to acknowledge; the destination URL itself is still
+        // withheld here (PublicVacancyPresenter omits it) and is only returned
+        // by the start response, from the server-stored value.
+        if (($vacancy['applies_externally'] ?? false) === true) {
+            $props['vacancy']['id'] = (int) PublicVacancyScope::query()->where('slug', $slug)->value('id');
+            $props['external_apply'] = ['consent_version' => ApplicationConsentVersion::CURRENT];
+        }
+
+        return Inertia::render('public/VacancyDetail', $props);
     }
 }

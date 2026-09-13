@@ -27,7 +27,7 @@ final class PhaseFiveDatabaseConstraintsTest extends TestCase
             "SELECT tablename FROM pg_tables WHERE schemaname = current_schema() ORDER BY tablename"
         ))->pluck('tablename')->all();
 
-        $this->assertCount(58, $tables);
+        $this->assertCount(59, $tables); // +1: vacancy_reports (PGC-V1 / PD-C)
         foreach (['notifications', 'email_outbox', 'audit_logs', 'smtp_configurations'] as $table) {
             $this->assertContains($table, $tables);
         }

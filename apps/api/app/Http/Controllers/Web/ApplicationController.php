@@ -19,6 +19,7 @@ use App\Domains\Application\Support\ApplicationPresenter;
 use App\Domains\Application\Support\ApplicationScope;
 use App\Domains\Application\Support\RecruiterApplicationPresenter;
 use App\Domains\Application\Support\RecruiterApplicationScope;
+use App\Domains\Application\Support\SelectorApplicationScope;
 use App\Domains\Candidate\Support\CandidateProfileResolver;
 use App\Domains\Identity\Models\User;
 use App\Domains\Shared\Support\IdempotencyGuard;
@@ -52,8 +53,10 @@ use Throwable;
  * `candidate_profiles`-driven side effect. Holding a candidate role
  * alongside an unrelated role does not remove candidate capability; the two
  * grants are independent (`CandidateProfilePolicy` already establishes this
- * precedent). `CAMPUS_SCOPE` and `ASSIGNED_STAGE` are not implemented — no
- * fallback exists for them.
+ * precedent). `CAMPUS_SCOPE` (HR_ADMIN) and `ASSIGNED_STAGE` (SELECTOR, via
+ * `SelectorApplicationScope` — read only, per §4.6; a selector never
+ * transitions or moves a stage) are both wired on `index`/`show`; no
+ * fallback grant exists for any other actor.
  *
  * `reopen` and `bulk-transition` remain deliberately absent: AD-2 stays OPEN
  * and deferred, and bulk/download are explicitly out of scope (RA-3 defers
@@ -105,6 +108,15 @@ final class ApplicationController extends CandidateController
                 $request->string('sort', 'first_applied_at')->toString(),
                 $request->string('direction', 'desc')->toString(),
             );
+        } elseif (SelectorApplicationScope::isSelectorActor($actor)) {
+            // ASSIGNED_STAGE (§4.6, INV-037): only applications currently on a
+            // stage this selector holds an active assignment for. Query-scoped
+            // via SelectorApplicationScope — an unassigned stage's candidates
+            // never appear, and no assignment at all yields an empty page.
+            $applications = SelectorApplicationScope::queryFor($actor)
+                ->orderByDesc('first_applied_at')->orderBy('id')
+                ->paginate(20)
+                ->through(fn ($application): array => RecruiterApplicationPresenter::summary($application));
         } else {
             return ContractResponse::error($request, 'AUTH_FORBIDDEN', 403, 'Anda tidak berhak melakukan tindakan ini.');
         }
@@ -131,6 +143,16 @@ final class ApplicationController extends CandidateController
         }
 
         if (! ApplicationScope::isCandidateActor($actor)) {
+            if (SelectorApplicationScope::isSelectorActor($actor)) {
+                // ASSIGNED_STAGE detail read — same detail shape as the
+                // company/recruiter view, but reachable only while the
+                // application sits on an actively-assigned stage. Out of scope
+                // is indistinguishable from not-found (no cross-stage leak).
+                $model = SelectorApplicationScope::findFor($actor, $application) ?? throw new ApplicationNotFound();
+
+                return ContractResponse::success($request, $companyQuery->execute($model));
+            }
+
             return ContractResponse::error($request, 'AUTH_FORBIDDEN', 403, 'Anda tidak berhak melakukan tindakan ini.');
         }
 

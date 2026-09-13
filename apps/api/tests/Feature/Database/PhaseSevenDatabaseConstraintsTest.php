@@ -28,8 +28,8 @@ final class PhaseSevenDatabaseConstraintsTest extends TestCase
             "SELECT tablename FROM pg_tables WHERE schemaname = current_schema() ORDER BY tablename"
         ))->pluck('tablename')->all();
 
-        $this->assertCount(58, $tables);
-        $this->assertCount(51, array_diff($tables, [
+        $this->assertCount(59, $tables); // +1: vacancy_reports (PGC-V1 / PD-C)
+        $this->assertCount(52, array_diff($tables, [
             'migrations', 'sessions', 'cache', 'cache_locks', 'failed_jobs',
             'idempotency_keys', 'export_jobs',
         ]));

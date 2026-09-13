@@ -49,7 +49,12 @@ final class EvaluationTest extends VacancyTestCase
         // frozen milestones that legitimately register their own routes
         // after this one. The remaining entries are still unshipped in any
         // milestone.
-        foreach (['bulk-evaluation', 'selector-assignment'] as $absent) {
+        // 'selector-assignment' is no longer listed here: GAP-010 ships the
+        // frozen Part VIII surface (`POST/GET /stages/{stage}/selector-assignments`,
+        // `POST /selector-assignments/{assignment}/revoke`) — see
+        // SelectorAssignmentTest. It is a separately frozen milestone, exactly
+        // like Offering / Recruitment Outcome above.
+        foreach (['bulk-evaluation'] as $absent) {
             self::assertFalse(
                 $registered->contains(fn (string $r): bool => str_contains($r, $absent)),
                 "No route may exist for {$absent} in this milestone.",

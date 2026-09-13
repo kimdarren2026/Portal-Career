@@ -247,6 +247,40 @@ final class PublicVacancySsrTest extends VacancyTestCase
         self::assertSame($applicationsBefore, DB::table('applications')->count());
     }
 
+    public function test_external_ats_detail_carries_an_actionable_start_path_and_in_portal_does_not(): void
+    {
+        [$recruiter, $company] = $this->verifiedCompanyWithRecruiter('ssr-ext-cta@example.test');
+        $close = Carbon::parse('2026-12-01T09:00:00+00:00');
+
+        $externalId = $this->publishedVacancy($recruiter, $company, $close, [
+            'application_method' => 'EXTERNAL_ATS', 'external_ats_url' => 'https://careers.example.test/job/7',
+        ]);
+        $externalSlug = DB::table('vacancies')->where('id', $externalId)->value('slug');
+
+        $inPortalId = $this->publishedVacancy($recruiter, $company, $close, ['application_method' => 'IN_PORTAL']);
+        $inPortalSlug = DB::table('vacancies')->where('id', $inPortalId)->value('slug');
+
+        Carbon::setTestNow($close->copy()->subDay());
+
+        // EXTERNAL_ATS: the numeric id (to POST the existing start route) and
+        // the current consent version are present; the raw destination is NOT.
+        $this->get("/lowongan/{$externalSlug}")
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('vacancy.id', $externalId)
+                ->where('vacancy.applies_externally', true)
+                ->missing('vacancy.external_ats_url')
+                ->where('external_apply.consent_version', \App\Domains\Application\Support\ApplicationConsentVersion::CURRENT));
+
+        // IN_PORTAL: no external-apply affordance at all.
+        $this->get("/lowongan/{$inPortalSlug}")
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('vacancy.applies_externally', false)
+                ->missing('external_apply')
+                ->missing('vacancy.id'));
+    }
+
     // ---------------------------------------------------------------
     // Filters
     // ---------------------------------------------------------------
