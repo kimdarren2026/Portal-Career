@@ -127,6 +127,19 @@ export const companyStatusLabel: Record<string, string> = {
     SUSPENDED: 'Ditangguhkan',
 }
 
+/**
+ * `company_documents.document_type` — the fixed MVP legal-document type
+ * vocabulary (`App\Domains\Company\Support\CompanyLegalDocumentPolicy::TYPES`,
+ * PGC-V1 / PD-D). Display only; the backend `Rule::in` list is unchanged.
+ */
+export const companyDocumentTypeLabel: Record<string, string> = {
+    NIB: 'NIB',
+    AKTA_PENDIRIAN: 'Akta Pendirian',
+    SK_KEMENKUMHAM: 'SK Kemenkumham',
+    IZIN_OPERASIONAL: 'Izin Operasional',
+    DOKUMEN_LEGALITAS_LAINNYA: 'Dokumen Legalitas Lainnya',
+}
+
 export const companyStatusBadgeClass: Record<string, string> = {
     DRAFT: 'bg-slate-100 text-slate-700',
     PENDING_VERIFICATION: 'bg-amber-100 text-amber-800',

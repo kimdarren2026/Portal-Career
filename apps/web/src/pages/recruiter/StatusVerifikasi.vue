@@ -105,6 +105,9 @@ const missingLabel: Record<string, string> = {
                     <li class="font-semibold">Lengkapi data berikut sebelum mengajukan:</li>
                     <li v-for="m in missing" :key="m" class="ml-4 list-disc">{{ missingLabel[m] ?? m }}</li>
                     <li class="mt-2"><Link href="/profil-perusahaan" class="font-semibold underline">Buka Profil Perusahaan</Link></li>
+                    <li v-if="missing.includes('company_documents')" class="mt-1">
+                        <Link href="/profil-perusahaan#dokumen-legalitas" class="font-semibold underline">Lengkapi Dokumen Legalitas</Link>
+                    </li>
                 </ul>
             </section>
 
