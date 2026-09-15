@@ -148,6 +148,28 @@ final class RecruitmentFrontendPagesTest extends VacancyTestCase
             ->assertInertia(fn (Assert $page) => $page->component('candidate/JadwalSeleksi'));
     }
 
+    /**
+     * `/jadwal-seleksi` paginates server-side for both personas; the payload
+     * must expose `pagination.page` / `pagination.last_page` and honour `?page`,
+     * so the page-navigation control the Vue pages render is functional.
+     */
+    public function test_jadwal_seleksi_pagination_is_honoured_for_both_personas(): void
+    {
+        [$admin] = $this->openVacancy('frontend-jadwal-pg@example.test');
+        $this->actingAs($admin)->get('/jadwal-seleksi?page=2')->assertOk()->assertInertia(
+            fn (Assert $page) => $page->component('recruiter/JadwalSeleksi')
+                ->has('pagination', fn (Assert $p) => $p->where('page', 2)->has('last_page')->etc())
+                ->etc(),
+        );
+
+        [$candidate] = $this->candidate('frontend-jadwal-pg-candidate@example.test');
+        $this->actingAs($candidate)->get('/jadwal-seleksi?page=2')->assertOk()->assertInertia(
+            fn (Assert $page) => $page->component('candidate/JadwalSeleksi')
+                ->has('pagination', fn (Assert $p) => $p->where('page', 2)->has('last_page')->etc())
+                ->etc(),
+        );
+    }
+
     public function test_pelamar_list_denies_candidate_and_scopes_by_company(): void
     {
         [$adminA, , $vacancyIdA] = $this->openVacancy('frontend-pelamar-a@example.test');

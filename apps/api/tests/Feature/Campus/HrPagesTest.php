@@ -72,6 +72,37 @@ final class HrPagesTest extends VacancyTestCase
         }
     }
 
+    /**
+     * The HR list pages paginate server-side; the Inertia payload must carry a
+     * `pagination` object with `page` / `last_page` and must honour `?page`, so
+     * the page-navigation control the Vue pages render can reach rows beyond the
+     * first page. Regression guard for the "pagination present in data but no
+     * navigation / page param ignored" defect.
+     */
+    public function test_admin_list_pages_expose_honoured_pagination(): void
+    {
+        $hr = $this->hrAdmin('hr-pages-pagination@example.test');
+        $this->campusVacancy($hr);
+
+        $paths = [
+            '/kepegawaian/jadwal-seleksi' => 'pagination',
+            '/kepegawaian/penilaian' => 'pagination',
+            '/kepegawaian/offering' => 'pagination',
+            '/kepegawaian/outcome-rekrutmen' => 'recorded.pagination',
+        ];
+
+        foreach ($paths as $path => $prop) {
+            $this->actingAs($hr)->get($path.'?page=2')->assertOk()->assertInertia(
+                fn (Assert $page) => $page
+                    ->has($prop, fn (Assert $p) => $p
+                        ->where('page', 2)
+                        ->has('last_page')
+                        ->etc())
+                    ->etc(),
+            );
+        }
+    }
+
     public function test_admin_pages_are_denied_to_other_personas(): void
     {
         $candidate = $this->makeUser('hr-pages-cand@example.test', UserStatus::Active);

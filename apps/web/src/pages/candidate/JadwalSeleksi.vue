@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /** Read-only candidate schedule list. Mirrors design/stitch/candidate/jadwal-seleksi's structure. */
-import { Head, Link } from '@inertiajs/vue3'
+import { Head, Link, router } from '@inertiajs/vue3'
 import AppShell from '@/layouts/AppShell.vue'
 import { formatDateTime, scheduleMethodLabel, scheduleStatusLabel, statusLabel } from '@/lib/labels'
 
@@ -18,6 +18,10 @@ interface ScheduleRow {
 }
 
 defineProps<{ items: ScheduleRow[]; pagination: { page: number; last_page: number } }>()
+
+function goToPage(page: number) {
+    router.get('/jadwal-seleksi', { page }, { preserveState: true, replace: true })
+}
 </script>
 
 <template>
@@ -45,5 +49,11 @@ defineProps<{ items: ScheduleRow[]; pagination: { page: number; last_page: numbe
                 </Link>
             </li>
         </ul>
+
+        <nav v-if="pagination.last_page > 1" class="mt-6 flex items-center justify-between text-sm" aria-label="Navigasi halaman">
+            <button type="button" :disabled="pagination.page <= 1" class="rounded-lg border border-slate-300 px-3 py-1.5 font-semibold text-slate-700 disabled:opacity-40" @click="goToPage(pagination.page - 1)">Sebelumnya</button>
+            <span class="text-slate-500">Halaman {{ pagination.page }} / {{ pagination.last_page }}</span>
+            <button type="button" :disabled="pagination.page >= pagination.last_page" class="rounded-lg border border-slate-300 px-3 py-1.5 font-semibold text-slate-700 disabled:opacity-40" @click="goToPage(pagination.page + 1)">Berikutnya</button>
+        </nav>
     </AppShell>
 </template>
