@@ -87,7 +87,7 @@ const adminKepegawaianNav: NavItem[] = [
     { label: 'Penilaian', href: '/kepegawaian/penilaian' },
     { label: 'Offering', href: '/kepegawaian/offering' },
     { label: 'Outcome Rekrutmen', href: '/kepegawaian/outcome-rekrutmen' },
-    { label: 'Laporan' },
+    { label: 'Laporan', href: '/kepegawaian/laporan' },
     { label: 'Notifikasi', href: '/kepegawaian/notifikasi' },
     { label: 'Pengaturan', href: '/kepegawaian/pengaturan' },
 ]

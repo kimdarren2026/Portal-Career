@@ -438,11 +438,13 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
     | reuses the frozen Query/Scope/Presenter classes (all now CAMPUS_SCOPE-
     | aware, SPEC-DOC-10). Mutations post to the frozen JSON routes
     | (`/hr/vacancies*`, `/applications/*`, `/schedules/*`, `/evaluations/*`,
-    | `/offers/*`, `/recruitment-outcomes`, `/notifications/*`). "Laporan"
-    | stays deferred (FR-REP-003 / GET /reports has no runtime).
+    | `/offers/*`, `/recruitment-outcomes`, `/notifications/*`). "Laporan" is a
+    | read-only, campus-scoped operational recap of literal grouped counts
+    | (FR-REP-003) — no rate, ranking, SLA, or fabricated benchmark.
     */
     Route::prefix('kepegawaian')->name('pages.hr.')->group(function (): void {
         Route::get('/dashboard', [HrPageController::class, 'dashboard'])->name('dashboard');
+        Route::get('/laporan', [HrPageController::class, 'report'])->name('report');
         Route::get('/lowongan-kampus', [HrPageController::class, 'vacancyIndex'])->name('vacancies.index');
         Route::get('/lowongan-kampus/baru', [HrPageController::class, 'vacancyCreate'])->name('vacancies.create');
         Route::get('/lowongan-kampus/{vacancy}', [HrPageController::class, 'vacancyShow'])
