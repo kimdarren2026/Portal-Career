@@ -77,8 +77,8 @@ const publishedVacancies = computed(() => props.vacancies_by_status?.PUBLISHED ?
         </section>
 
         <section class="mt-6 grid gap-6 xl:grid-cols-2">
-            <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-                <div class="flex items-center justify-between gap-4">
+            <article class="min-w-0 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                <div class="flex flex-wrap items-center justify-between gap-4">
                     <div>
                         <p class="page-eyebrow">Perusahaan</p>
                         <h2 class="mt-1 text-xl font-bold text-[#002045]">Status verifikasi perusahaan</h2>
@@ -94,8 +94,8 @@ const publishedVacancies = computed(() => props.vacancies_by_status?.PUBLISHED ?
                 </ul>
             </article>
 
-            <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-                <div class="flex items-center justify-between gap-4">
+            <article class="min-w-0 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                <div class="flex flex-wrap items-center justify-between gap-4">
                     <div>
                         <p class="page-eyebrow">Lowongan perusahaan</p>
                         <h2 class="mt-1 text-xl font-bold text-[#002045]">Status moderasi lowongan</h2>

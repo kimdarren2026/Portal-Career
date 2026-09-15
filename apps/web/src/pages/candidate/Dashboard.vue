@@ -75,8 +75,8 @@ const greetingName = computed(() => {
         </section>
 
         <section class="mt-6 grid gap-6 xl:grid-cols-2">
-            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-                <div class="flex items-center justify-between gap-4"><div><p class="page-eyebrow">Aktivitas</p><h2 class="mt-1 text-xl font-bold text-[#002045]">Lamaran terbaru</h2></div><Link href="/lamaran-saya" class="text-sm font-semibold text-[#0061a5] hover:underline">Lihat semua</Link></div>
+            <div class="min-w-0 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                <div class="flex flex-wrap items-center justify-between gap-4"><div><p class="page-eyebrow">Aktivitas</p><h2 class="mt-1 text-xl font-bold text-[#002045]">Lamaran terbaru</h2></div><Link href="/lamaran-saya" class="text-sm font-semibold text-[#0061a5] hover:underline">Lihat semua</Link></div>
                 <div v-if="!props.recent_applications.length" class="mt-5 rounded-xl border border-dashed border-slate-300 bg-slate-50 px-5 py-8 text-center">
                     <p class="font-semibold text-slate-700">Belum ada lamaran</p><p class="mt-1 text-sm text-slate-500">Mulai dari lowongan yang paling sesuai dengan minat Anda.</p>
                     <Link href="/lowongan" class="mt-4 inline-flex rounded-lg bg-[#0061a5] px-4 py-2 text-sm font-semibold text-white hover:bg-[#004172]">Cari Lowongan</Link>
@@ -88,8 +88,8 @@ const greetingName = computed(() => {
                 </ul>
             </div>
 
-            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-                <div class="flex items-center justify-between gap-4"><div><p class="page-eyebrow">Agenda</p><h2 class="mt-1 text-xl font-bold text-[#002045]">Seleksi berikutnya</h2></div><Link href="/jadwal-seleksi" class="text-sm font-semibold text-[#0061a5] hover:underline">Lihat semua</Link></div>
+            <div class="min-w-0 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                <div class="flex flex-wrap items-center justify-between gap-4"><div><p class="page-eyebrow">Agenda</p><h2 class="mt-1 text-xl font-bold text-[#002045]">Seleksi berikutnya</h2></div><Link href="/jadwal-seleksi" class="text-sm font-semibold text-[#0061a5] hover:underline">Lihat semua</Link></div>
                 <div v-if="!props.upcoming_schedules.length" class="mt-5 rounded-xl border border-dashed border-slate-300 bg-slate-50 px-5 py-8 text-center"><p class="font-semibold text-slate-700">Belum ada jadwal mendatang</p><p class="mt-1 text-sm text-slate-500">Jadwal dari perusahaan akan muncul otomatis di sini.</p></div>
                 <ul v-else class="mt-5 divide-y divide-slate-100">
                     <li v-for="schedule in props.upcoming_schedules" :key="schedule.id"><Link :href="`/jadwal-seleksi/${schedule.id}`" class="block py-4 first:pt-0 transition hover:rounded-lg hover:bg-slate-50 hover:px-3">
