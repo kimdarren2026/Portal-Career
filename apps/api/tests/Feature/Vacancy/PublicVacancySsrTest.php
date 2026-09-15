@@ -40,6 +40,18 @@ final class PublicVacancySsrTest extends VacancyTestCase
         $this->get("/lowongan/{$slug}")->assertOk();
     }
 
+    public function test_uppercase_slug_redirects_301_to_the_canonical_lowercase_url(): void
+    {
+        [, , , $slug] = $this->publicVacancy('ssr-canonical-slug@example.test');
+
+        $this->get('/lowongan/'.strtoupper($slug))
+            ->assertRedirect('/lowongan/'.$slug)
+            ->assertStatus(301);
+
+        // The canonical lowercase URL itself is unaffected.
+        $this->get("/lowongan/{$slug}")->assertOk();
+    }
+
     public function test_web_route_uses_inertia_public_components(): void
     {
         [, , , $slug] = $this->publicVacancy('ssr-components@example.test');

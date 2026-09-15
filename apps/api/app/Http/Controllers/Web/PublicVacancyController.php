@@ -11,7 +11,9 @@ use App\Domains\Vacancy\Queries\ListPublicVacancies;
 use App\Domains\Vacancy\Support\PublicVacancyRequestFilters;
 use App\Domains\Vacancy\Support\PublicVacancyScope;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -54,8 +56,15 @@ final class PublicVacancyController extends Controller
         ]);
     }
 
-    public function show(string $slug, GetPublicVacancy $query): Response
+    public function show(string $slug, GetPublicVacancy $query): Response|RedirectResponse
     {
+        // Slugs are generated lowercase. Redirect mistyped uppercase versions
+        // so every public vacancy has exactly one canonical URL.
+        $canonicalSlug = Str::lower($slug);
+        if ($slug !== $canonicalSlug) {
+            return redirect()->to('/lowongan/'.$canonicalSlug, 301);
+        }
+
         try {
             $vacancy = $query->execute($slug);
         } catch (VacancyNotPublic) {

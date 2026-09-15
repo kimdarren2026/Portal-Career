@@ -78,7 +78,7 @@ Route::get('/', [HomePageController::class, 'index'])->name('home');
 */
 Route::get('/lowongan', [PublicVacancyController::class, 'index'])->name('lowongan.index');
 Route::get('/lowongan/{slug}', [PublicVacancyController::class, 'show'])
-    ->where('slug', '[a-z0-9-]+')->name('lowongan.show');
+    ->where('slug', '[A-Za-z0-9-]+')->name('lowongan.show');
 
 /*
 | Laporkan Lowongan — public anti-fraud vacancy reporting (PGC-V1 / PD-C,
