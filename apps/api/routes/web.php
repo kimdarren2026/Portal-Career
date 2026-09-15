@@ -355,8 +355,8 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
     | reuses the frozen Query/Scope/Presenter classes (all now CAMPUS_SCOPE-
     | aware, SPEC-DOC-10). Mutations post to the frozen JSON routes
     | (`/hr/vacancies*`, `/applications/*`, `/schedules/*`, `/evaluations/*`,
-    | `/offers/*`, `/recruitment-outcomes`, `/notifications/*`). "Laporan"
-    | stays deferred (FR-REP-003 / GET /reports has no runtime).
+    | `/offers/*`, `/recruitment-outcomes`, `/notifications/*`). The report is
+    | a read-only recap built from the same campus-scoped queries.
     */
     Route::prefix('kepegawaian')->name('pages.hr.')->group(function (): void {
         Route::get('/dashboard', [HrPageController::class, 'dashboard'])->name('dashboard');
@@ -371,6 +371,7 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
         Route::get('/penilaian', [HrPageController::class, 'evaluationIndex'])->name('evaluations.index');
         Route::get('/offering', [HrPageController::class, 'offerIndex'])->name('offers.index');
         Route::get('/outcome-rekrutmen', [HrPageController::class, 'outcomeIndex'])->name('outcomes.index');
+        Route::get('/laporan', [HrPageController::class, 'report'])->name('report');
         Route::get('/notifikasi', [HrPageController::class, 'notifications'])->name('notifications');
         Route::get('/pengaturan', [HrPageController::class, 'settings'])->name('settings');
     });
@@ -400,14 +401,24 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
     | Perusahaan" nav item (read-only company reference directory; Career
     | Center is a global reader in `CompanyScope`). "Dashboard" and
     | "Notifikasi" for the Career Center persona are served by the shared
-    | `/dashboard` and `/notifikasi` controllers, persona-branched.
-    | Kemitraan, Alumni & Outcome, Laporan, Template Email and Pengaturan
-    | Moderasi remain deferred (no frozen runtime).
+    | `/dashboard` and `/notifikasi` controllers, persona-branched. The other
+    | canonical destinations below are safe read-only surfaces: no unapproved
+    | create/edit route or candidate-level Career Center access is introduced.
     */
     Route::get('/data-perusahaan', [CareerCenterPageController::class, 'companyDirectoryIndex'])
         ->name('pages.career-center.companies.directory');
     Route::get('/data-perusahaan/{company}', [CareerCenterPageController::class, 'companyDirectoryShow'])
         ->whereNumber('company')->name('pages.career-center.companies.directory-show');
+    Route::get('/laporan', [CareerCenterPageController::class, 'report'])
+        ->name('pages.career-center.report');
+    Route::get('/kemitraan', [CareerCenterPageController::class, 'partnershipIndex'])
+        ->name('pages.career-center.partnerships.index');
+    Route::get('/alumni-outcome', [CareerCenterPageController::class, 'alumniOutcome'])
+        ->name('pages.career-center.alumni-outcome');
+    Route::get('/template-email', [CareerCenterPageController::class, 'emailTemplateIndex'])
+        ->name('pages.career-center.email-templates.index');
+    Route::get('/pengaturan-moderasi', [CareerCenterPageController::class, 'moderationSettings'])
+        ->name('pages.career-center.moderation-settings');
 
     /*
     | Super Admin Control Plane Frontend Slice v10 — Inertia page delivery

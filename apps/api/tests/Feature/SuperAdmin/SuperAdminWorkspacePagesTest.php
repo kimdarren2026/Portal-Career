@@ -139,7 +139,7 @@ final class SuperAdminWorkspacePagesTest extends VacancyTestCase
 
     public function test_audit_log_denied_to_every_other_persona(): void
     {
-        [$recruiter] = $this->companyWithRecruiter('v10-audit-recruiter@example.test', \App\Domains\Company\Enums\CompanyStatus::Verified);
+        [$recruiter] = $this->companyWithRecruiter('v10-audit-recruiter@example.test', CompanyStatus::Verified);
         $candidate = $this->candidate('v10-audit-candidate@example.test');
         $hr = $this->hrAdmin('v10-audit-hr@example.test');
         $cc = $this->moderator('v10-audit-cc@example.test');
@@ -167,6 +167,13 @@ final class SuperAdminWorkspacePagesTest extends VacancyTestCase
         $this->actingAs($admin)->get('/dashboard')->assertRedirect('/audit-log');
     }
 
+    public function test_auditor_dashboard_redirects_to_the_read_only_audit_workspace(): void
+    {
+        $auditor = $this->auditor('v10-dash-auditor@example.test');
+
+        $this->actingAs($auditor)->get('/dashboard')->assertRedirect('/audit-log');
+    }
+
     public function test_super_admin_notifikasi_renders_super_admin_surface_own_scoped(): void
     {
         $admin = $this->superAdmin('v10-notif-admin@example.test');
@@ -185,6 +192,7 @@ final class SuperAdminWorkspacePagesTest extends VacancyTestCase
                 ->where('items.0.link', null),
         );
     }
+
     /** @return array<string, array{0: string, 1: string}> */
     public static function superAdminReferencePages(): array
     {
@@ -271,10 +279,9 @@ final class SuperAdminWorkspacePagesTest extends VacancyTestCase
         }
     }
 
-
     public function test_recruiter_and_career_center_dashboard_notifikasi_unchanged(): void
     {
-        [$recruiter] = $this->companyWithRecruiter('v10-reg-recruiter@example.test', \App\Domains\Company\Enums\CompanyStatus::Verified);
+        [$recruiter] = $this->companyWithRecruiter('v10-reg-recruiter@example.test', CompanyStatus::Verified);
         $cc = $this->moderator('v10-reg-cc@example.test');
 
         $this->actingAs($recruiter)->get('/dashboard')->assertOk()->assertInertia(

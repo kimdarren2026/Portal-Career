@@ -17,7 +17,10 @@ async function submit() {
     const { response, payload } = await authRequest('/auth/login', { email: email.value, password: password.value, remember: remember.value })
     loading.value = false
     if (!response.ok) { message.value = errorText(payload); return }
-    window.location.assign('/')
+    // `/dashboard` is the server-side landing gate for an authenticated
+    // persona. It renders the candidate/recruiter/Career Center dashboard or
+    // redirects HR, Auditor, and Super Admin accounts to their own workspace.
+    window.location.assign('/dashboard')
 }
 </script>
 

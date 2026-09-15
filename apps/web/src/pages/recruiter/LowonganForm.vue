@@ -184,14 +184,27 @@ async function closeVacancy() {
 <template>
     <Head :title="isCreate ? 'Buat Lowongan' : (vacancy?.title ?? 'Lowongan')" />
     <AppShell persona="recruiter" active="kelola-lowongan" :title="isCreate ? 'Buat Lowongan' : 'Detail Lowongan'">
-        <nav class="text-xs text-slate-500"><Link href="/kelola-lowongan" class="hover:underline">Daftar Lowongan</Link> <span class="mx-1">/</span> {{ isCreate ? 'Baru' : (vacancy?.title ?? '') }}</nav>
+        <nav class="text-xs text-slate-500"><Link href="/kelola-lowongan" class="font-medium text-[#1671bc] hover:underline">Daftar Lowongan</Link> <span class="mx-1">/</span> {{ isCreate ? 'Baru' : (vacancy?.title ?? '') }}</nav>
 
-        <div class="mt-2 flex flex-wrap items-start justify-between gap-3">
-            <h1 class="text-3xl font-bold tracking-tight text-[#002045]">{{ isCreate ? 'Buat Lowongan' : vacancy?.title }}</h1>
-            <span v-if="!isCreate" class="rounded-full px-3 py-1 text-xs font-semibold" :class="vacancyStatusBadgeClass[status] ?? 'bg-slate-100 text-slate-700'">
-                {{ statusLabel(vacancyStatusLabel, status) }}
-            </span>
-        </div>
+        <section class="mt-4 overflow-hidden rounded-2xl bg-gradient-to-br from-[#002b5b] via-[#064d87] to-[#1671bc] px-6 py-7 text-white shadow-lg shadow-blue-950/10 sm:px-8">
+            <div class="flex flex-wrap items-start justify-between gap-5">
+                <div class="max-w-2xl">
+                    <p class="text-xs font-bold uppercase tracking-[0.16em] text-blue-100">Ruang kerja recruiter</p>
+                    <h1 class="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">{{ isCreate ? 'Buat lowongan baru' : vacancy?.title }}</h1>
+                    <p class="mt-3 max-w-xl text-sm leading-6 text-blue-50/90">
+                        {{ isCreate ? 'Lengkapi informasi berikut agar kandidat memahami peran dan dapat melamar dengan tepat.' : 'Perbarui informasi lowongan Anda, lalu ajukan kembali saat sudah siap.' }}
+                    </p>
+                </div>
+                <span v-if="!isCreate" class="rounded-full border border-white/20 bg-white/15 px-3 py-1.5 text-xs font-bold backdrop-blur" :class="vacancyStatusBadgeClass[status] ?? 'text-white'">
+                    {{ statusLabel(vacancyStatusLabel, status) }}
+                </span>
+                <span v-else class="rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-semibold text-blue-50">Disimpan sebagai draf</span>
+            </div>
+            <div class="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-xs text-blue-100">
+                <span><span class="mr-1 text-white">•</span> Kolom bertanda <b class="text-white">*</b> wajib diisi</span>
+                <span><span class="mr-1 text-white">•</span> Draf dapat diperbarui sebelum diajukan</span>
+            </div>
+        </section>
 
         <p v-if="message" class="mt-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-[#93000a]" role="alert">{{ message }}</p>
         <p v-if="stale" class="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800" role="alert">
@@ -214,124 +227,161 @@ async function closeVacancy() {
             Lowongan hanya dapat diubah saat berstatus "Draf" atau "Perlu Perbaikan". Rincian di bawah bersifat baca-saja.
         </p>
 
-        <form class="mt-6 space-y-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm" @submit.prevent="save">
-            <fieldset :disabled="(!isCreate && !editable) || saving" class="space-y-5">
-                <label v-if="isCreate" class="block text-sm font-medium text-slate-700">Jenis Lowongan <span class="text-red-500">*</span>
-                    <select v-model="form.vacancy_type" class="mt-1 block w-full rounded-lg border-slate-300 focus:border-[#0061a5] focus:ring-[#0061a5]">
-                        <option v-for="t in authorable_types" :key="t" :value="t">{{ vacancyTypeLabel[t] ?? t }}</option>
-                    </select>
-                </label>
-                <p v-else class="text-sm text-slate-600">Jenis: <span class="font-medium">{{ statusLabel(vacancyTypeLabel, vacancy?.vacancy_type) }}</span></p>
+        <form class="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm" @submit.prevent="save">
+            <fieldset :disabled="(!isCreate && !editable) || saving" class="space-y-6 p-4 sm:p-6">
+                <section class="form-section">
+                    <div class="flex flex-wrap items-start justify-between gap-2">
+                        <div>
+                            <h2 class="text-base font-bold text-[#002b5b]">Informasi utama</h2>
+                            <p class="mt-1 text-sm text-slate-600">Buat judul yang spesifik dan jelaskan peran ini secara ringkas.</p>
+                        </div>
+                        <span class="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-[#075ea6]">Langkah 1</span>
+                    </div>
+                    <div class="mt-5 space-y-5">
+                        <label v-if="isCreate" class="form-label">Jenis lowongan <span class="text-red-500">*</span>
+                            <select v-model="form.vacancy_type" class="form-control mt-1.5">
+                                <option v-for="t in authorable_types" :key="t" :value="t">{{ vacancyTypeLabel[t] ?? t }}</option>
+                            </select>
+                        </label>
+                        <div v-else class="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">Jenis lowongan: <span class="font-semibold text-slate-800">{{ statusLabel(vacancyTypeLabel, vacancy?.vacancy_type) }}</span></div>
 
-                <label class="block text-sm font-medium text-slate-700">Judul <span class="text-red-500">*</span>
-                    <input v-model="form.title" required minlength="3" class="mt-1 block w-full rounded-lg border-slate-300 focus:border-[#0061a5] focus:ring-[#0061a5]" />
-                    <span v-if="fieldErrors.title" class="mt-1 block text-xs text-red-600">{{ fieldErrors.title[0] }}</span>
-                </label>
+                        <label class="form-label">Judul lowongan <span class="text-red-500">*</span>
+                            <input v-model="form.title" required minlength="3" placeholder="Contoh: Frontend Engineer" class="form-control mt-1.5" :aria-invalid="Boolean(fieldErrors.title)" />
+                            <span class="form-hint">Gunakan nama peran yang mudah dipahami kandidat.</span>
+                            <span v-if="fieldErrors.title" class="mt-1 block text-xs font-medium text-red-600">{{ fieldErrors.title[0] }}</span>
+                        </label>
 
-                <label class="block text-sm font-medium text-slate-700">Deskripsi <span class="text-red-500">*</span>
-                    <textarea v-model="form.description" required rows="5" class="mt-1 block w-full rounded-lg border-slate-300 focus:border-[#0061a5] focus:ring-[#0061a5]" />
-                    <span v-if="fieldErrors.description" class="mt-1 block text-xs text-red-600">{{ fieldErrors.description[0] }}</span>
-                </label>
+                        <label class="form-label">Deskripsi <span class="text-red-500">*</span>
+                            <textarea v-model="form.description" required rows="5" placeholder="Jelaskan tujuan peran, tim, dan dampak pekerjaan ini." class="form-control mt-1.5" :aria-invalid="Boolean(fieldErrors.description)" />
+                            <span class="form-hint">Kandidat akan melihat informasi ini sebelum melamar.</span>
+                            <span v-if="fieldErrors.description" class="mt-1 block text-xs font-medium text-red-600">{{ fieldErrors.description[0] }}</span>
+                        </label>
 
-                <label class="block text-sm font-medium text-slate-700">Tanggung Jawab / Kualifikasi
-                    <textarea v-model="form.responsibilities" rows="4" class="mt-1 block w-full rounded-lg border-slate-300 focus:border-[#0061a5] focus:ring-[#0061a5]" />
-                </label>
+                        <label class="form-label">Tanggung jawab dan kualifikasi
+                            <textarea v-model="form.responsibilities" rows="4" placeholder="Contoh: Mengembangkan fitur web, berkolaborasi dengan tim produk, dan menguasai Vue atau React." class="form-control mt-1.5" />
+                        </label>
+                    </div>
+                </section>
 
-                <div class="grid gap-5 md:grid-cols-3">
-                    <label class="block text-sm font-medium text-slate-700">Jenis Kerja <span class="text-red-500">*</span>
-                        <select v-model="form.employment_type" class="mt-1 block w-full rounded-lg border-slate-300 focus:border-[#0061a5] focus:ring-[#0061a5]">
-                            <option v-for="e in employmentTypeOptions" :key="e" :value="e">{{ employmentTypeLabel[e] }}</option>
-                        </select>
+                <section class="form-section">
+                    <div class="flex flex-wrap items-start justify-between gap-2">
+                        <div>
+                            <h2 class="text-base font-bold text-[#002b5b]">Pengaturan pekerjaan dan lamaran</h2>
+                            <p class="mt-1 text-sm text-slate-600">Tentukan bentuk kerja serta cara kandidat mengirim lamaran.</p>
+                        </div>
+                        <span class="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-[#075ea6]">Langkah 2</span>
+                    </div>
+                    <div class="mt-5 grid gap-5 md:grid-cols-3">
+                        <label class="form-label">Jenis kerja <span class="text-red-500">*</span>
+                            <select v-model="form.employment_type" class="form-control mt-1.5">
+                                <option v-for="e in employmentTypeOptions" :key="e" :value="e">{{ employmentTypeLabel[e] }}</option>
+                            </select>
+                        </label>
+                        <label class="form-label">Cara kerja
+                            <select v-model="form.workplace_mode" class="form-control mt-1.5">
+                                <option value="">Tidak ditentukan</option>
+                                <option v-for="w in workplaceModeOptions" :key="w" :value="w">{{ workplaceModeLabel[w] }}</option>
+                            </select>
+                        </label>
+                        <label class="form-label">Jumlah posisi <span class="text-red-500">*</span>
+                            <input v-model.number="form.openings_count" type="number" min="1" required class="form-control mt-1.5" />
+                        </label>
+                    </div>
+                    <div class="mt-5 grid gap-5 md:grid-cols-2">
+                        <label class="form-label">Target kandidat <span class="text-red-500">*</span>
+                            <select v-model="form.target_audience" class="form-control mt-1.5">
+                                <option v-for="a in targetAudienceOptions" :key="a" :value="a">{{ targetAudienceLabel[a] }}</option>
+                            </select>
+                        </label>
+                        <label class="form-label">Metode lamaran <span class="text-red-500">*</span>
+                            <select v-model="form.application_method" class="form-control mt-1.5">
+                                <option value="IN_PORTAL">{{ applicationMethodLabel.IN_PORTAL }}</option>
+                                <option value="EXTERNAL_ATS">{{ applicationMethodLabel.EXTERNAL_ATS }}</option>
+                            </select>
+                        </label>
+                    </div>
+                    <label v-if="form.application_method === 'EXTERNAL_ATS'" class="form-label mt-5">URL ATS eksternal (HTTPS) <span class="text-red-500">*</span>
+                        <input v-model="form.external_ats_url" type="url" placeholder="https://perusahaan.example/karier" class="form-control mt-1.5" :aria-invalid="Boolean(fieldErrors.external_ats_url)" />
+                        <span v-if="fieldErrors.external_ats_url" class="mt-1 block text-xs font-medium text-red-600">{{ fieldErrors.external_ats_url[0] }}</span>
                     </label>
-                    <label class="block text-sm font-medium text-slate-700">Cara Kerja
-                        <select v-model="form.workplace_mode" class="mt-1 block w-full rounded-lg border-slate-300 focus:border-[#0061a5] focus:ring-[#0061a5]">
-                            <option value="">Tidak ditentukan</option>
-                            <option v-for="w in workplaceModeOptions" :key="w" :value="w">{{ workplaceModeLabel[w] }}</option>
-                        </select>
-                    </label>
-                    <label class="block text-sm font-medium text-slate-700">Jumlah Posisi <span class="text-red-500">*</span>
-                        <input v-model.number="form.openings_count" type="number" min="1" required class="mt-1 block w-full rounded-lg border-slate-300 focus:border-[#0061a5] focus:ring-[#0061a5]" />
-                    </label>
-                </div>
+                </section>
 
-                <div class="grid gap-5 md:grid-cols-2">
-                    <label class="block text-sm font-medium text-slate-700">Target Kandidat <span class="text-red-500">*</span>
-                        <select v-model="form.target_audience" class="mt-1 block w-full rounded-lg border-slate-300 focus:border-[#0061a5] focus:ring-[#0061a5]">
-                            <option v-for="a in targetAudienceOptions" :key="a" :value="a">{{ targetAudienceLabel[a] }}</option>
-                        </select>
-                    </label>
-                    <label class="block text-sm font-medium text-slate-700">Metode Lamaran <span class="text-red-500">*</span>
-                        <select v-model="form.application_method" class="mt-1 block w-full rounded-lg border-slate-300 focus:border-[#0061a5] focus:ring-[#0061a5]">
-                            <option value="IN_PORTAL">{{ applicationMethodLabel.IN_PORTAL }}</option>
-                            <option value="EXTERNAL_ATS">{{ applicationMethodLabel.EXTERNAL_ATS }}</option>
-                        </select>
-                    </label>
-                </div>
+                <section class="form-section">
+                    <div class="flex flex-wrap items-start justify-between gap-2">
+                        <div>
+                            <h2 class="text-base font-bold text-[#002b5b]">Kualifikasi dan lokasi</h2>
+                            <p class="mt-1 text-sm text-slate-600">Informasi tambahan ini membantu kandidat menilai kecocokan mereka.</p>
+                        </div>
+                        <span class="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-[#075ea6]">Langkah 3</span>
+                    </div>
+                    <div class="mt-5 grid gap-5 md:grid-cols-2">
+                        <label class="form-label">Pendidikan minimum
+                            <input v-model="form.minimum_education" placeholder="Contoh: D3/S1 Teknik Informatika" class="form-control mt-1.5" />
+                        </label>
+                        <label class="form-label">Pengalaman
+                            <input v-model="form.experience_requirement" placeholder="Contoh: Minimal 2 tahun" class="form-control mt-1.5" />
+                        </label>
+                    </div>
+                    <div class="mt-5 grid gap-5 md:grid-cols-3">
+                        <label class="form-label">Provinsi
+                            <select v-model="form.province_geographic_area_id" class="form-control mt-1.5">
+                                <option :value="null">Pilih provinsi</option>
+                                <option v-for="p in provinces" :key="p.id" :value="p.id">{{ p.name }}</option>
+                            </select>
+                        </label>
+                        <label class="form-label">Kota / kabupaten
+                            <select v-model="form.city_geographic_area_id" class="form-control mt-1.5">
+                                <option :value="null">Pilih kota / kabupaten</option>
+                                <option v-for="c in cities" :key="c.id" :value="c.id">{{ c.name }}</option>
+                            </select>
+                        </label>
+                        <label class="form-label">Catatan lokasi
+                            <input v-model="form.location" placeholder="Contoh: Jakarta Selatan" class="form-control mt-1.5" />
+                        </label>
+                    </div>
+                </section>
 
-                <label v-if="form.application_method === 'EXTERNAL_ATS'" class="block text-sm font-medium text-slate-700">URL ATS Eksternal (HTTPS) <span class="text-red-500">*</span>
-                    <input v-model="form.external_ats_url" type="url" placeholder="https://" class="mt-1 block w-full rounded-lg border-slate-300 focus:border-[#0061a5] focus:ring-[#0061a5]" />
-                    <span v-if="fieldErrors.external_ats_url" class="mt-1 block text-xs text-red-600">{{ fieldErrors.external_ats_url[0] }}</span>
-                </label>
-
-                <div class="grid gap-5 md:grid-cols-2">
-                    <label class="block text-sm font-medium text-slate-700">Pendidikan Minimum
-                        <input v-model="form.minimum_education" class="mt-1 block w-full rounded-lg border-slate-300 focus:border-[#0061a5] focus:ring-[#0061a5]" />
-                    </label>
-                    <label class="block text-sm font-medium text-slate-700">Pengalaman
-                        <input v-model="form.experience_requirement" class="mt-1 block w-full rounded-lg border-slate-300 focus:border-[#0061a5] focus:ring-[#0061a5]" />
-                    </label>
-                </div>
-
-                <div class="grid gap-5 md:grid-cols-3">
-                    <label class="block text-sm font-medium text-slate-700">Provinsi
-                        <select v-model="form.province_geographic_area_id" class="mt-1 block w-full rounded-lg border-slate-300 focus:border-[#0061a5] focus:ring-[#0061a5]">
-                            <option :value="null">Pilih provinsi</option>
-                            <option v-for="p in provinces" :key="p.id" :value="p.id">{{ p.name }}</option>
-                        </select>
-                    </label>
-                    <label class="block text-sm font-medium text-slate-700">Kota / Kabupaten
-                        <select v-model="form.city_geographic_area_id" class="mt-1 block w-full rounded-lg border-slate-300 focus:border-[#0061a5] focus:ring-[#0061a5]">
-                            <option :value="null">Pilih kota / kabupaten</option>
-                            <option v-for="c in cities" :key="c.id" :value="c.id">{{ c.name }}</option>
-                        </select>
-                    </label>
-                    <label class="block text-sm font-medium text-slate-700">Catatan Lokasi (teks)
-                        <input v-model="form.location" class="mt-1 block w-full rounded-lg border-slate-300 focus:border-[#0061a5] focus:ring-[#0061a5]" />
-                    </label>
-                </div>
-
-                <div class="grid gap-5 md:grid-cols-3">
-                    <label class="block text-sm font-medium text-slate-700">Gaji Minimum
-                        <input v-model.number="form.salary_min" type="number" min="0" class="mt-1 block w-full rounded-lg border-slate-300 focus:border-[#0061a5] focus:ring-[#0061a5]" />
-                    </label>
-                    <label class="block text-sm font-medium text-slate-700">Gaji Maksimum
-                        <input v-model.number="form.salary_max" type="number" min="0" class="mt-1 block w-full rounded-lg border-slate-300 focus:border-[#0061a5] focus:ring-[#0061a5]" />
-                    </label>
-                    <label class="block text-sm font-medium text-slate-700">Mata Uang (3 huruf)
-                        <input v-model="form.salary_currency" maxlength="3" class="mt-1 block w-full rounded-lg border-slate-300 uppercase focus:border-[#0061a5] focus:ring-[#0061a5]" placeholder="IDR" />
-                    </label>
-                </div>
-
-                <div class="grid gap-5 md:grid-cols-2">
-                    <label class="block text-sm font-medium text-slate-700">Tanggal Buka
-                        <input v-model="form.open_at" type="date" class="mt-1 block w-full rounded-lg border-slate-300 focus:border-[#0061a5] focus:ring-[#0061a5]" />
-                    </label>
-                    <label class="block text-sm font-medium text-slate-700">Tanggal Tutup
-                        <input v-model="form.close_at" type="date" class="mt-1 block w-full rounded-lg border-slate-300 focus:border-[#0061a5] focus:ring-[#0061a5]" />
-                    </label>
-                </div>
+                <section class="form-section">
+                    <div class="flex flex-wrap items-start justify-between gap-2">
+                        <div>
+                            <h2 class="text-base font-bold text-[#002b5b]">Kompensasi dan periode</h2>
+                            <p class="mt-1 text-sm text-slate-600">Opsional, namun menambah kejelasan bagi kandidat.</p>
+                        </div>
+                        <span class="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-[#075ea6]">Langkah 4</span>
+                    </div>
+                    <div class="mt-5 grid gap-5 md:grid-cols-3">
+                        <label class="form-label">Gaji minimum
+                            <input v-model.number="form.salary_min" type="number" min="0" placeholder="Contoh: 7000000" class="form-control mt-1.5" />
+                        </label>
+                        <label class="form-label">Gaji maksimum
+                            <input v-model.number="form.salary_max" type="number" min="0" placeholder="Contoh: 10000000" class="form-control mt-1.5" />
+                        </label>
+                        <label class="form-label">Mata uang (3 huruf)
+                            <input v-model="form.salary_currency" maxlength="3" placeholder="IDR" class="form-control mt-1.5 uppercase" />
+                        </label>
+                    </div>
+                    <div class="mt-5 grid gap-5 md:grid-cols-2">
+                        <label class="form-label">Tanggal buka
+                            <input v-model="form.open_at" type="date" class="form-control mt-1.5" />
+                        </label>
+                        <label class="form-label">Tanggal tutup
+                            <input v-model="form.close_at" type="date" class="form-control mt-1.5" />
+                        </label>
+                    </div>
+                </section>
             </fieldset>
 
-            <div class="flex flex-wrap gap-3 pt-1">
+            <div class="flex flex-wrap items-center gap-3 border-t border-slate-200 bg-slate-50/80 px-4 py-4 sm:px-6">
+                <p v-if="isCreate" class="mr-auto text-xs leading-5 text-slate-500">Lowongan baru akan disimpan sebagai draf dan belum terlihat oleh kandidat.</p>
                 <button
                     v-if="isCreate || editable"
                     type="submit"
                     :disabled="saving"
-                    class="rounded-lg bg-[#0061a5] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#004172] disabled:opacity-60"
+                    class="rounded-xl bg-[#0061a5] px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#004172] focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                     {{ saving ? 'Menyimpan…' : (isCreate ? 'Simpan sebagai Draf' : 'Simpan Perubahan') }}
                 </button>
-                <Link href="/kelola-lowongan" class="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-medium hover:bg-slate-50">Kembali</Link>
+                <Link href="/kelola-lowongan" class="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">Kembali</Link>
             </div>
         </form>
 

@@ -13,12 +13,12 @@ import { computed } from 'vue'
 import { employmentTypeLabel, statusLabel, vacancyTypeLabel, workplaceModeLabel } from '@/lib/labels'
 
 interface CompanySummary {
-    company_id: number
-    name: string
-    logo_url: string | null
-    industry_id: number | null
-    city_geographic_area_id: number | null
-    mitra_kampus_active: boolean
+    company_id?: number
+    name?: string
+    logo_url?: string | null
+    industry_id?: number | null
+    city_geographic_area_id?: number | null
+    mitra_kampus_active?: boolean
 }
 
 interface Requirement {
@@ -43,7 +43,8 @@ interface VacancyDetail {
     application_method: string
     published_at: string | null
     close_at: string | null
-    company: CompanySummary
+    // Campus-owned vacancies have no associated company in the public API.
+    company: CompanySummary | null
     description: string
     responsibilities: string | null
     openings_count: number
@@ -64,6 +65,16 @@ const audienceLabel: Record<string, string> = {
 
 const metaDescription = props.vacancy.description.slice(0, 160)
 
+const publisherName = computed(() => {
+    const name = props.vacancy.company?.name?.trim()
+
+    if (name) return name
+
+    return props.vacancy.vacancy_type === 'CAMPUS_EMPLOYMENT' ? 'Instansi Kampus' : 'Penerbit Lowongan'
+})
+
+const publisherSectionLabel = computed(() => props.vacancy.company?.name ? 'Tentang Perusahaan' : 'Tentang Instansi')
+
 const CANDIDATE_ROLES = ['CANDIDATE_EXTERNAL', 'CANDIDATE_STUDENT_FINAL_YEAR', 'CANDIDATE_ALUMNI']
 const page = usePage()
 const isAuthenticated = computed(() => !!(page.props as any).auth?.user)
@@ -71,7 +82,7 @@ const isCandidate = computed(() => ((page.props as any).auth?.roles ?? []).some(
 </script>
 
 <template>
-    <Head :title="`${vacancy.title} — ${vacancy.company.name}`">
+    <Head :title="`${vacancy.title} — ${publisherName}`">
         <meta name="description" :content="metaDescription" />
     </Head>
     <main class="min-h-screen bg-[#f6f8fc] py-8 sm:py-12">
@@ -83,12 +94,12 @@ const isCandidate = computed(() => ((page.props as any).auth?.roles ?? []).some(
                     <div class="surface-card p-6 sm:p-8">
                         <p class="page-eyebrow">{{ statusLabel(vacancyTypeLabel, vacancy.vacancy_type) }}</p>
                         <h1 class="mt-3 text-3xl font-bold tracking-tight text-[#002045]">{{ vacancy.title }}</h1>
-                        <p class="mt-1 text-slate-600">{{ vacancy.company.name }}<span v-if="vacancy.location"> · {{ vacancy.location }}</span></p>
+                        <p class="mt-1 text-slate-600">{{ publisherName }}<span v-if="vacancy.location"> · {{ vacancy.location }}</span></p>
                         <div class="mt-3 flex flex-wrap gap-2 text-xs">
                             <span v-if="vacancy.employment_type" class="rounded-full bg-slate-100 px-2 py-1 text-slate-700">{{ statusLabel(employmentTypeLabel, vacancy.employment_type) }}</span>
                             <span v-if="vacancy.workplace_mode" class="rounded-full bg-slate-100 px-2 py-1 text-slate-700">{{ statusLabel(workplaceModeLabel, vacancy.workplace_mode) }}</span>
                             <span class="rounded-full bg-slate-100 px-2 py-1 text-slate-700">{{ audienceLabel[vacancy.target_audience] ?? vacancy.target_audience }}</span>
-                            <span v-if="vacancy.company.mitra_kampus_active" class="rounded-full bg-emerald-100 px-2 py-1 text-emerald-800">Mitra Kampus</span>
+                            <span v-if="vacancy.company?.mitra_kampus_active" class="rounded-full bg-emerald-100 px-2 py-1 text-emerald-800">Mitra Kampus</span>
                         </div>
 
                         <h2 class="mt-8 border-b border-slate-200 pb-3 text-lg font-bold text-[#002045]">Deskripsi Pekerjaan</h2>
@@ -140,8 +151,8 @@ const isCandidate = computed(() => ((page.props as any).auth?.roles ?? []).some(
                     </div>
 
                     <div class="surface-card p-5 sm:p-6">
-                        <h3 class="text-base font-bold text-[#002045]">Tentang Perusahaan</h3>
-                        <p class="mt-2 text-sm text-slate-700">{{ vacancy.company.name }}</p>
+                        <h3 class="text-base font-bold text-[#002045]">{{ publisherSectionLabel }}</h3>
+                        <p class="mt-2 text-sm text-slate-700">{{ publisherName }}</p>
                     </div>
                 </aside>
             </div>

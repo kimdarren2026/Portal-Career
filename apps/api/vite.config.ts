@@ -45,7 +45,12 @@ export default defineConfig({
         host: '127.0.0.1',
         origin: 'http://127.0.0.1:5173',
         cors: {
-            origin: ['http://127.0.0.1:8000', 'http://localhost:8000'],
+            origin: [
+                'http://127.0.0.1:8000',
+                'http://localhost:8000',
+                'http://127.0.0.1:8001',
+                'http://localhost:8001',
+            ],
         },
         fs: { allow: [path.resolve(here, '..')] },
     },

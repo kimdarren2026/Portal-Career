@@ -12,12 +12,12 @@ import { computed, reactive } from 'vue'
 import { employmentTypeLabel, statusLabel, vacancyTypeLabel, workplaceModeLabel } from '@/lib/labels'
 
 interface CompanySummary {
-    company_id: number
-    name: string
-    logo_url: string | null
-    industry_id: number | null
-    city_geographic_area_id: number | null
-    mitra_kampus_active: boolean
+    company_id?: number
+    name?: string
+    logo_url?: string | null
+    industry_id?: number | null
+    city_geographic_area_id?: number | null
+    mitra_kampus_active?: boolean
 }
 
 interface VacancyCard {
@@ -31,7 +31,10 @@ interface VacancyCard {
     application_method: string
     published_at: string | null
     close_at: string | null
-    company: CompanySummary
+    // Campus-owned vacancies have no company by design. The public API
+    // represents that as an empty object, so the page must not assume a
+    // company name exists for every public result.
+    company: CompanySummary | null
 }
 
 interface Pagination {
@@ -83,6 +86,18 @@ const audienceLabel: Record<string, string> = {
     ALUMNI_ONLY: 'Alumni',
     FINAL_YEAR_AND_ALUMNI: 'Mahasiswa Tingkat Akhir & Alumni',
     INTERNAL: 'Internal',
+}
+
+function publisherName(item: VacancyCard): string {
+    const name = item.company?.name?.trim()
+
+    if (name) return name
+
+    return item.vacancy_type === 'CAMPUS_EMPLOYMENT' ? 'Instansi Kampus' : 'Penerbit Lowongan'
+}
+
+function publisherInitials(item: VacancyCard): string {
+    return publisherName(item).slice(0, 2).toUpperCase()
 }
 
 function queryFromForm(page?: number) {
@@ -170,9 +185,9 @@ function resetFilters() {
             <ul class="mt-4 grid gap-4 md:grid-cols-2">
                 <li v-for="item in items" :key="item.slug" class="group surface-card overflow-hidden transition duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-lg">
                     <Link :href="`/lowongan/${item.slug}`" class="block p-5 sm:p-6">
-                        <div class="flex items-start justify-between gap-4"><div class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#002045]/8 text-sm font-bold text-[#002045]">{{ item.company.name.slice(0, 2).toUpperCase() }}</div><span v-if="item.company.mitra_kampus_active" class="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">Mitra Kampus</span></div>
+                        <div class="flex items-start justify-between gap-4"><div class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#002045]/8 text-sm font-bold text-[#002045]">{{ publisherInitials(item) }}</div><span v-if="item.company?.mitra_kampus_active" class="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">Mitra Kampus</span></div>
                         <h2 class="mt-5 text-lg font-bold text-[#002045] transition group-hover:text-[#0061a5]">{{ item.title }}</h2>
-                        <p class="mt-1 text-sm font-medium text-slate-600">{{ item.company.name }}</p>
+                        <p class="mt-1 text-sm font-medium text-slate-600">{{ publisherName(item) }}</p>
                         <p v-if="item.location" class="mt-4 text-sm text-slate-500">⌖ {{ item.location }}</p>
                         <div class="mt-4 flex flex-wrap gap-2 text-xs">
                             <span v-if="item.employment_type" class="rounded-full bg-slate-100 px-2.5 py-1 font-medium text-slate-700">{{ statusLabel(employmentTypeLabel, item.employment_type) }}</span>

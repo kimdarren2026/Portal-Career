@@ -50,8 +50,14 @@
     input:not([type='checkbox']):not([type='radio']),
     select,
     textarea {
+        /* A border colour alone has no visible width in Tailwind's reset.
+         * Keep every text control legible, including controls that do not add
+         * the `border` utility explicitly. */
+        border-width: 1px;
+        border-style: solid;
         border-color: #cbd5e1;
         background-color: #fff;
+        color: #172033;
         box-shadow: 0 1px 2px rgb(15 23 42 / 0.03);
     }
 
@@ -78,5 +84,71 @@
         letter-spacing: 0.12em;
         text-transform: uppercase;
         color: #1671bc;
+    }
+
+    /* Shared form primitives. They intentionally use CSS rather than relying
+     * on each page remembering a long sequence of Tailwind border utilities. */
+    .form-control {
+        display: block;
+        width: 100%;
+        min-height: 2.875rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.75rem;
+        background: #fff;
+        padding: 0.625rem 0.8125rem;
+        color: #172033;
+        line-height: 1.5;
+        box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
+        transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+    }
+
+    .form-control::placeholder {
+        color: #94a3b8;
+        opacity: 1;
+    }
+
+    .form-control:hover:not(:disabled) {
+        border-color: #94a3b8;
+    }
+
+    .form-control:focus {
+        border-color: #1671bc;
+        background: #fff;
+        box-shadow: 0 0 0 3px rgb(22 113 188 / 0.14);
+        outline: none;
+    }
+
+    .form-control:disabled {
+        cursor: not-allowed;
+        border-color: #e2e8f0;
+        background: #f8fafc;
+        color: #64748b;
+    }
+
+    textarea.form-control {
+        min-height: 8.5rem;
+        resize: vertical;
+    }
+
+    .form-section {
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        background: linear-gradient(135deg, rgb(248 250 252 / 0.95), rgb(255 255 255));
+        padding: 1.25rem;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 650;
+        color: #334155;
+    }
+
+    .form-hint {
+        margin-top: 0.3rem;
+        display: block;
+        font-size: 0.75rem;
+        line-height: 1.35;
+        color: #64748b;
     }
 }

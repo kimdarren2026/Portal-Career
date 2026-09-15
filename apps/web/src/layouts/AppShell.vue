@@ -1,10 +1,10 @@
 <script setup lang="ts">
 /**
- * Shared authenticated nav shell. Preserves the full canonical
- * candidate/recruiter menu — items this slice does not yet implement render
- * as a disabled "Segera hadir" entry rather than a dead link, per the
- * no-dead-link requirement. Visual structure follows design/stitch's sidebar
- * pattern (navy sidebar, active item highlighted); not a pixel reproduction.
+ * Shared authenticated nav shell. Candidate navigation contains only live
+ * destinations, while operational personas retain deferred entries as a
+ * disabled "Segera hadir" indicator rather than a dead link. Visual structure
+ * follows design/stitch's sidebar pattern (navy sidebar, active item
+ * highlighted); not a pixel reproduction.
  *
  * FE-2: below the `md` breakpoint the fixed sidebar is hidden and the same
  * menu is reached through an accessible slide-over drawer. The drawer renders
@@ -16,7 +16,7 @@ import { Link, usePage } from '@inertiajs/vue3'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { authRequest } from '@/lib/auth'
 
-type NavItem = { label: string; href?: string; active?: boolean }
+type NavItem = { label: string; href?: string; active?: boolean; fullReload?: boolean }
 
 const props = defineProps<{
     persona: 'candidate' | 'recruiter' | 'career-center' | 'admin-kepegawaian' | 'super-admin'
@@ -34,17 +34,12 @@ const candidateNav: NavItem[] = [
     { label: 'Cari Lowongan', href: '/lowongan' },
     { label: 'Lamaran Saya', href: '/lamaran-saya' },
     { label: 'Jadwal Seleksi', href: '/jadwal-seleksi' },
-    { label: 'Lowongan Tersimpan' },
-    { label: 'Notifikasi' },
-    { label: 'Pengaturan Akun' },
 ]
 
 const recruiterNav: NavItem[] = [
     { label: 'Dashboard', href: '/dashboard' },
     { label: 'Profil Perusahaan', href: '/profil-perusahaan' },
     { label: 'Status Verifikasi', href: '/status-verifikasi' },
-    { label: 'Dokumen Legalitas' },
-    { label: 'Kemitraan' },
     { label: 'Lowongan', href: '/kelola-lowongan' },
     { label: 'Pelamar', href: '/pelamar' },
     { label: 'Jadwal Seleksi', href: '/jadwal-seleksi' },
@@ -54,31 +49,25 @@ const recruiterNav: NavItem[] = [
     { label: 'Pengaturan Akun', href: '/pengaturan-akun' },
 ]
 
-// Career Center — exactly 10 canonical items. Frontend Vertical Slice v4
-// activates "Verifikasi Perusahaan" and "Moderasi Lowongan" only; the rest
-// stay deferred ("Segera hadir") per the no-dead-link rule.
-// Career Center — exactly 10 canonical items. v9 activates Dashboard, Data
-// Perusahaan and Notifikasi; Kemitraan, Alumni & Outcome, Laporan, Template
-// Email and Pengaturan Moderasi stay deferred ("Segera hadir") — no frozen
-// runtime (partnership lifecycle under-specified; alumni verification /
-// RC-2 not activated; FR-REP reporting deferred; no template/moderation
-// settings contract).
+// Career Center — exactly 10 canonical destinations. Modules without an
+// approved mutation runtime remain explicitly read-only; navigation still
+// opens a useful, honest view instead of rendering a dead entry.
 const careerCenterNav: NavItem[] = [
     { label: 'Dashboard', href: '/dashboard' },
     { label: 'Verifikasi Perusahaan', href: '/verifikasi-perusahaan' },
     { label: 'Moderasi Lowongan', href: '/moderasi-lowongan' },
     { label: 'Data Perusahaan', href: '/data-perusahaan' },
-    { label: 'Kemitraan' },
-    { label: 'Alumni & Outcome' },
-    { label: 'Laporan' },
+    { label: 'Kemitraan', href: '/kemitraan' },
+    { label: 'Alumni & Outcome', href: '/alumni-outcome' },
+    { label: 'Laporan', href: '/laporan' },
     { label: 'Notifikasi', href: '/notifikasi' },
-    { label: 'Template Email' },
-    { label: 'Pengaturan Moderasi' },
+    { label: 'Template Email', href: '/template-email' },
+    { label: 'Pengaturan Moderasi', href: '/pengaturan-moderasi' },
 ]
 
-// Admin Kepegawaian — exactly 10 canonical items (Campus Recruitment
-// Frontend v8). "Laporan" stays deferred ("Segera hadir") — FR-REP-003 /
-// GET /reports has no runtime.
+// Admin Kepegawaian — exactly 10 canonical items. Laporan is a read-only,
+// campus-scoped operational recap; every other entry here has an active
+// workspace route as well.
 const adminKepegawaianNav: NavItem[] = [
     { label: 'Dashboard', href: '/kepegawaian/dashboard' },
     { label: 'Lowongan Kampus', href: '/kepegawaian/lowongan-kampus' },
@@ -87,7 +76,10 @@ const adminKepegawaianNav: NavItem[] = [
     { label: 'Penilaian', href: '/kepegawaian/penilaian' },
     { label: 'Offering', href: '/kepegawaian/offering' },
     { label: 'Outcome Rekrutmen', href: '/kepegawaian/outcome-rekrutmen' },
-    { label: 'Laporan' },
+    // Report uses a normal document navigation. This lets a tab that was open
+    // before a Vite/Inertia asset update reach the new report immediately
+    // instead of waiting for an Inertia version-refresh cycle.
+    { label: 'Laporan', href: '/kepegawaian/laporan', fullReload: true },
     { label: 'Notifikasi', href: '/kepegawaian/notifikasi' },
     { label: 'Pengaturan', href: '/kepegawaian/pengaturan' },
 ]
@@ -257,8 +249,17 @@ onBeforeUnmount(() => {
                     </div>
                     <nav class="mt-8 flex-1 space-y-1 overflow-y-auto" aria-label="Navigasi utama">
                         <template v-for="item in items" :key="item.label">
+                            <a
+                                v-if="item.href && item.fullReload"
+                                :href="item.href"
+                                class="flex rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors"
+                                :class="isActive(item) ? 'bg-[#66affe] text-[#004172]' : 'text-white/80 hover:bg-white/10'"
+                                :aria-current="isActive(item) ? 'page' : undefined"
+                            >
+                                {{ item.label }}
+                            </a>
                             <Link
-                                v-if="item.href"
+                                v-else-if="item.href"
                                 :href="item.href"
                                 class="flex rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors"
                                 :class="isActive(item) ? 'bg-[#66affe] text-[#004172]' : 'text-white/80 hover:bg-white/10'"
@@ -294,8 +295,17 @@ onBeforeUnmount(() => {
             <p class="mt-7 text-xs font-semibold uppercase tracking-[0.14em] text-blue-200/80">{{ personaSubtitle }}</p>
             <nav class="mt-5 flex-1 space-y-1 overflow-y-auto pr-1" aria-label="Navigasi utama">
                 <template v-for="item in items" :key="item.label">
+                    <a
+                        v-if="item.href && item.fullReload"
+                        :href="item.href"
+                        class="flex rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-150"
+                        :class="isActive(item) ? 'bg-white text-[#06305b] shadow-sm' : 'text-white/80 hover:bg-white/10 hover:text-white'"
+                        :aria-current="isActive(item) ? 'page' : undefined"
+                    >
+                        {{ item.label }}
+                    </a>
                     <Link
-                        v-if="item.href"
+                        v-else-if="item.href"
                         :href="item.href"
                         class="flex rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-150"
                         :class="isActive(item) ? 'bg-white text-[#06305b] shadow-sm' : 'text-white/80 hover:bg-white/10 hover:text-white'"

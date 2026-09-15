@@ -61,6 +61,7 @@ final class HrPagesTest extends VacancyTestCase
             '/kepegawaian/penilaian' => 'admin-kepegawaian/Penilaian',
             '/kepegawaian/offering' => 'admin-kepegawaian/Offering',
             '/kepegawaian/outcome-rekrutmen' => 'admin-kepegawaian/OutcomeRekrutmen',
+            '/kepegawaian/laporan' => 'admin-kepegawaian/Laporan',
             '/kepegawaian/notifikasi' => 'admin-kepegawaian/Notifikasi',
             '/kepegawaian/pengaturan' => 'admin-kepegawaian/Pengaturan',
         ];
@@ -70,6 +71,13 @@ final class HrPagesTest extends VacancyTestCase
                 fn (Assert $page) => $page->component($component),
             );
         }
+    }
+
+    public function test_shared_dashboard_routes_hr_admin_to_the_campus_workspace(): void
+    {
+        $hr = $this->hrAdmin('hr-pages-dashboard-landing@example.test');
+
+        $this->actingAs($hr)->get('/dashboard')->assertRedirect('/kepegawaian/dashboard');
     }
 
     /**
@@ -109,7 +117,7 @@ final class HrPagesTest extends VacancyTestCase
         $this->assignRole($candidate, RoleCode::CandidateAlumni);
         [$recruiter] = $this->verifiedCompanyWithRecruiter('hr-pages-recruiter@example.test');
 
-        foreach (['/kepegawaian/dashboard', '/kepegawaian/lowongan-kampus', '/kepegawaian/pelamar', '/kepegawaian/outcome-rekrutmen'] as $path) {
+        foreach (['/kepegawaian/dashboard', '/kepegawaian/lowongan-kampus', '/kepegawaian/pelamar', '/kepegawaian/outcome-rekrutmen', '/kepegawaian/laporan'] as $path) {
             $this->actingAs($candidate)->get($path)->assertStatus(403);
             $this->actingAs($recruiter)->get($path)->assertStatus(403);
         }
@@ -130,6 +138,11 @@ final class HrPagesTest extends VacancyTestCase
         );
         $this->actingAs($hr)->get('/kepegawaian/dashboard')->assertOk()->assertInertia(
             fn (Assert $page) => $page->component('admin-kepegawaian/Dashboard')
+                ->where('vacancies_by_status.DRAFT', 1)
+                ->where('vacancies_by_status.PUBLISHED', 1),
+        );
+        $this->actingAs($hr)->get('/kepegawaian/laporan')->assertOk()->assertInertia(
+            fn (Assert $page) => $page->component('admin-kepegawaian/Laporan')
                 ->where('vacancies_by_status.DRAFT', 1)
                 ->where('vacancies_by_status.PUBLISHED', 1),
         );
