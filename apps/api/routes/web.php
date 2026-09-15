@@ -500,13 +500,24 @@ Route::middleware(['auth', 'account.status'])->group(function (): void {
     | Center is a global reader in `CompanyScope`). "Dashboard" and
     | "Notifikasi" for the Career Center persona are served by the shared
     | `/dashboard` and `/notifikasi` controllers, persona-branched.
-    | Kemitraan, Alumni & Outcome, Laporan, Template Email and Pengaturan
-    | Moderasi remain deferred (no frozen runtime).
+    | Laporan, Alumni & Outcome, Template Email and Pengaturan Moderasi are
+    | read-only reference/recap surfaces over existing scoped data — no new
+    | schema, no fabricated metric. Kemitraan remains deferred: the
+    | partnership lifecycle (who may create/edit a partnership) is an open
+    | business decision, not a runtime gap.
     */
     Route::get('/data-perusahaan', [CareerCenterPageController::class, 'companyDirectoryIndex'])
         ->name('pages.career-center.companies.directory');
     Route::get('/data-perusahaan/{company}', [CareerCenterPageController::class, 'companyDirectoryShow'])
         ->whereNumber('company')->name('pages.career-center.companies.directory-show');
+    Route::get('/laporan', [CareerCenterPageController::class, 'report'])
+        ->name('pages.career-center.report');
+    Route::get('/alumni-outcome', [CareerCenterPageController::class, 'alumniOutcome'])
+        ->name('pages.career-center.alumni-outcome');
+    Route::get('/template-email', [CareerCenterPageController::class, 'emailTemplateIndex'])
+        ->name('pages.career-center.email-templates.index');
+    Route::get('/pengaturan-moderasi', [CareerCenterPageController::class, 'moderationSettings'])
+        ->name('pages.career-center.moderation-settings');
 
     /*
     | Super Admin Control Plane Frontend Slice v10 — Inertia page delivery

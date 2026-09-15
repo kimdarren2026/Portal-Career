@@ -54,26 +54,25 @@ const recruiterNav: NavItem[] = [
     { label: 'Pengaturan Akun', href: '/pengaturan-akun' },
 ]
 
-// Career Center — exactly 10 canonical items. Frontend Vertical Slice v4
-// activates "Verifikasi Perusahaan" and "Moderasi Lowongan" only; the rest
-// stay deferred ("Segera hadir") per the no-dead-link rule.
-// Career Center — exactly 10 canonical items. v9 activates Dashboard, Data
-// Perusahaan and Notifikasi; Kemitraan, Alumni & Outcome, Laporan, Template
-// Email and Pengaturan Moderasi stay deferred ("Segera hadir") — no frozen
-// runtime (partnership lifecycle under-specified; alumni verification /
-// RC-2 not activated; FR-REP reporting deferred; no template/moderation
-// settings contract).
+// Career Center — exactly 10 canonical items. v9 activated Dashboard, Data
+// Perusahaan and Notifikasi; Alumni & Outcome, Laporan, Template Email and
+// Pengaturan Moderasi are now read-only reference/recap surfaces over
+// existing scoped data (no new schema, no fabricated metric). Kemitraan
+// stays deferred ("Segera hadir"): the partnership lifecycle (who may
+// create/edit a partnership) remains an open business decision, not a
+// runtime gap — the `partnerships` table and its read-only "Mitra Kampus
+// Aktif" badge already exist, but no create/edit Action does.
 const careerCenterNav: NavItem[] = [
     { label: 'Dashboard', href: '/dashboard' },
     { label: 'Verifikasi Perusahaan', href: '/verifikasi-perusahaan' },
     { label: 'Moderasi Lowongan', href: '/moderasi-lowongan' },
     { label: 'Data Perusahaan', href: '/data-perusahaan' },
     { label: 'Kemitraan' },
-    { label: 'Alumni & Outcome' },
-    { label: 'Laporan' },
+    { label: 'Alumni & Outcome', href: '/alumni-outcome' },
+    { label: 'Laporan', href: '/laporan' },
     { label: 'Notifikasi', href: '/notifikasi' },
-    { label: 'Template Email' },
-    { label: 'Pengaturan Moderasi' },
+    { label: 'Template Email', href: '/template-email' },
+    { label: 'Pengaturan Moderasi', href: '/pengaturan-moderasi' },
 ]
 
 // Admin Kepegawaian — exactly 10 canonical items (Campus Recruitment
