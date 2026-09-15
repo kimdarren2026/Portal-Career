@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Web;
 
+use App\Domains\Application\Models\Application;
+use App\Domains\Application\Support\ApplicationPresenter;
 use App\Domains\Application\Support\ApplicationScope;
+use App\Domains\Application\Support\RecruiterApplicationPresenter;
 use App\Domains\Application\Support\RecruiterApplicationScope;
 use App\Domains\Candidate\Support\CandidateProfileResolver;
 use App\Domains\Company\Enums\CompanyStatus;
@@ -13,7 +16,10 @@ use App\Domains\Identity\Enums\RoleCode;
 use App\Domains\Identity\Models\User;
 use App\Domains\Recruitment\Outcome\Queries\ListIncompleteRecruitmentOutcomes;
 use App\Domains\Recruitment\Outcome\Support\RecruitmentOutcomeScope;
+use App\Domains\Recruitment\SelectionSchedule\Enums\SelectionScheduleStatus;
+use App\Domains\Recruitment\SelectionSchedule\Presenters\SelectionSchedulePresenter;
 use App\Domains\Recruitment\SelectionSchedule\Support\SelectionScheduleScope;
+use App\Domains\Vacancy\Support\VacancyPresenter;
 use App\Domains\Vacancy\Support\VacancyScope;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -89,17 +95,31 @@ final class DashboardPageController extends CandidateController
 
         if (ApplicationScope::isCandidateActor($actor)) {
             $profile = $this->ownProfile($request);
+            $applications = Application::query()
+                ->where('candidate_profile_id', $profile->getKey());
+            $upcomingSchedules = SelectionScheduleScope::candidateQueryFor($profile)
+                ->where('status', SelectionScheduleStatus::Scheduled->value)
+                ->where('starts_at', '>=', now());
 
             return Inertia::render('candidate/Dashboard', [
                 'counts' => [
-                    'applications' => DB::table('applications')->where('candidate_profile_id', $profile->getKey())->count(),
-                    'schedules_upcoming' => DB::table('selection_schedules')
-                        ->join('applications', 'applications.id', '=', 'selection_schedules.application_id')
-                        ->where('applications.candidate_profile_id', $profile->getKey())
-                        ->where('selection_schedules.status', 'SCHEDULED')
-                        ->where('selection_schedules.starts_at', '>=', now())
-                        ->count(),
+                    'applications' => (clone $applications)->count(),
+                    'schedules_upcoming' => (clone $upcomingSchedules)->count(),
                 ],
+                // A concise, own-scoped activity feed makes the dashboard
+                // useful without duplicating the full list pages. Both data
+                // sets are queried at the ownership boundary; no collection
+                // is fetched globally and filtered in PHP.
+                'recent_applications' => (clone $applications)
+                    ->with('vacancy:id,title')
+                    ->orderByDesc('first_applied_at')->orderByDesc('id')->limit(3)->get()
+                    ->map(static fn (Application $application): array => ApplicationPresenter::summary($application) + [
+                        'vacancy_title' => $application->vacancy?->title,
+                    ])->values()->all(),
+                'upcoming_schedules' => (clone $upcomingSchedules)
+                    ->with('recruitmentStage:id,candidate_visible_label')
+                    ->orderBy('starts_at')->orderBy('id')->limit(3)->get()
+                    ->map(SelectionSchedulePresenter::candidate(...))->values()->all(),
             ]);
         }
 
@@ -192,6 +212,19 @@ final class DashboardPageController extends CandidateController
                     ->execute(RecruitmentOutcomeScope::incompleteQueryFor($actor))->total(),
             ],
             'vacancies_by_status' => $byStatus,
+            // The dashboard is a short operational view, not another full
+            // list page. Both panels are still restricted at query time to
+            // the recruiter's active company membership.
+            'priority_vacancies' => VacancyScope::queryFor($actor)
+                ->where('current_status', 'REVISION_REQUIRED')
+                ->orderByDesc('updated_at')->orderByDesc('id')->limit(3)->get()
+                ->map(VacancyPresenter::summary(...))->values()->all(),
+            'recent_applicants' => RecruiterApplicationScope::queryFor($actor)
+                ->with(['candidateProfile.user:id,name', 'vacancy:id,title'])
+                ->orderByDesc('first_applied_at')->orderByDesc('id')->limit(3)->get()
+                ->map(static fn (Application $application): array => RecruiterApplicationPresenter::summary($application) + [
+                    'vacancy_title' => $application->vacancy?->title,
+                ])->values()->all(),
         ];
     }
 
