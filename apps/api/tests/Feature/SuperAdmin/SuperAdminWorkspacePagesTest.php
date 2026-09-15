@@ -167,6 +167,13 @@ final class SuperAdminWorkspacePagesTest extends VacancyTestCase
         $this->actingAs($admin)->get('/dashboard')->assertRedirect('/audit-log');
     }
 
+    public function test_auditor_dashboard_redirects_to_the_read_only_audit_workspace(): void
+    {
+        $auditor = $this->auditor('v10-dash-auditor@example.test');
+
+        $this->actingAs($auditor)->get('/dashboard')->assertRedirect('/audit-log');
+    }
+
     public function test_super_admin_notifikasi_renders_super_admin_surface_own_scoped(): void
     {
         $admin = $this->superAdmin('v10-notif-admin@example.test');

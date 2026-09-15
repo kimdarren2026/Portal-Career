@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /** Admin Kepegawaian — campus recruitment outcomes (v8). Recorded + the H-5
  *  incomplete list. Outcomes are recorded explicitly (never automatically). */
-import { Head, Link } from '@inertiajs/vue3'
+import { Head, Link, router } from '@inertiajs/vue3'
 import AppShell from '@/layouts/AppShell.vue'
 import { formatDateTime } from '@/lib/labels'
 
@@ -12,7 +12,12 @@ interface Page<T> { items: T[]; pagination: { page: number; last_page: number } 
 const outcomeLabel: Record<string, string> = {
     HIRED: 'Diterima Bekerja', REJECTED: 'Tidak Lolos', WITHDRAWN: 'Mengundurkan Diri', NO_SHOW: 'Tidak Hadir',
 }
-defineProps<{ recorded: Page<OutcomeRow>; incomplete: Page<IncompleteRow>; filters: Record<string, string> }>()
+const props = defineProps<{ recorded: Page<OutcomeRow>; incomplete: Page<IncompleteRow>; filters: Record<string, string> }>()
+
+// Backend pages both lists off a single `?page` (matches the recruiter surface).
+function goToPage(page: number) {
+    router.get('/kepegawaian/outcome-rekrutmen', { ...props.filters, page }, { preserveState: true, replace: true })
+}
 </script>
 
 <template>
@@ -39,6 +44,11 @@ defineProps<{ recorded: Page<OutcomeRow>; incomplete: Page<IncompleteRow>; filte
                     </tbody>
                 </table>
             </div>
+            <div v-if="incomplete.pagination.last_page > 1" class="mt-3 flex items-center justify-between text-sm">
+                <button type="button" :disabled="incomplete.pagination.page <= 1" class="rounded-lg border border-slate-300 px-3 py-1.5 font-semibold disabled:opacity-40" @click="goToPage(incomplete.pagination.page - 1)">Sebelumnya</button>
+                <span class="text-slate-500">Halaman {{ incomplete.pagination.page }} / {{ incomplete.pagination.last_page }}</span>
+                <button type="button" :disabled="incomplete.pagination.page >= incomplete.pagination.last_page" class="rounded-lg border border-slate-300 px-3 py-1.5 font-semibold disabled:opacity-40" @click="goToPage(incomplete.pagination.page + 1)">Berikutnya</button>
+            </div>
         </section>
 
         <section class="mt-8">
@@ -59,6 +69,11 @@ defineProps<{ recorded: Page<OutcomeRow>; incomplete: Page<IncompleteRow>; filte
                         </tr>
                     </tbody>
                 </table>
+            </div>
+            <div v-if="recorded.pagination.last_page > 1" class="mt-3 flex items-center justify-between text-sm">
+                <button type="button" :disabled="recorded.pagination.page <= 1" class="rounded-lg border border-slate-300 px-3 py-1.5 font-semibold disabled:opacity-40" @click="goToPage(recorded.pagination.page - 1)">Sebelumnya</button>
+                <span class="text-slate-500">Halaman {{ recorded.pagination.page }} / {{ recorded.pagination.last_page }}</span>
+                <button type="button" :disabled="recorded.pagination.page >= recorded.pagination.last_page" class="rounded-lg border border-slate-300 px-3 py-1.5 font-semibold disabled:opacity-40" @click="goToPage(recorded.pagination.page + 1)">Berikutnya</button>
             </div>
         </section>
     </AppShell>

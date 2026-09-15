@@ -19,3 +19,64 @@
  * ADR-004: "Production compiles Tailwind locally."
  */
 @source './**/*.{vue,ts}';
+
+/*
+ * Global accessibility/polish base rules (reconciliation audit, safe local
+ * improvement — no design-system adoption, no override of any existing
+ * component-scoped utility class). `.page-eyebrow` is a component class
+ * already consumed by several pages; `.surface-card` was left out as unused.
+ */
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        html {
+            scroll-behavior: auto;
+        }
+    }
+
+    body {
+        min-width: 320px;
+        background: #f6f8fc;
+        color: #172033;
+        text-rendering: optimizeLegibility;
+    }
+
+    button:not(:disabled),
+    [role='button']:not([aria-disabled='true']) {
+        cursor: pointer;
+    }
+
+    :focus-visible {
+        outline: 3px solid rgb(37 99 235 / 0.42);
+        outline-offset: 3px;
+    }
+
+    input:not([type='checkbox']):not([type='radio']),
+    select,
+    textarea {
+        border-color: #cbd5e1;
+        background-color: #fff;
+        box-shadow: 0 1px 2px rgb(15 23 42 / 0.03);
+    }
+
+    input:not([type='checkbox']):not([type='radio']):focus,
+    select:focus,
+    textarea:focus {
+        border-color: #1671bc;
+        box-shadow: 0 0 0 3px rgb(22 113 188 / 0.13);
+        outline: none;
+    }
+}
+
+@layer components {
+    .page-eyebrow {
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #1671bc;
+    }
+}

@@ -162,6 +162,127 @@ final class CareerCenterPageController extends Controller
         ]);
     }
 
+    /**
+     * `GET /laporan` — read-only Career Center recap. The page deliberately
+     * exposes only literal grouped counts from the existing authorised
+     * company and company-vacancy scopes; it never loads applicant data.
+     */
+    public function report(Request $request): Response|JsonResponse|SymfonyResponse
+    {
+        $actor = $this->actor($request);
+        if (! $this->isCareerCenter($actor)) {
+            return $this->forbidden($request);
+        }
+
+        /** @var array<string, int> $companiesByStatus */
+        $companiesByStatus = CompanyScope::queryFor($actor)
+            ->select('verification_status', DB::raw('count(*) as aggregate'))
+            ->groupBy('verification_status')
+            ->pluck('aggregate', 'verification_status')
+            ->map(static fn ($count): int => (int) $count)
+            ->all();
+
+        /** @var array<string, int> $vacanciesByStatus */
+        $vacanciesByStatus = VacancyScope::queryFor($actor)
+            ->select('current_status', DB::raw('count(*) as aggregate'))
+            ->groupBy('current_status')
+            ->pluck('aggregate', 'current_status')
+            ->map(static fn ($count): int => (int) $count)
+            ->all();
+
+        return Inertia::render('career-center/Laporan', [
+            'companies_by_status' => $companiesByStatus,
+            'vacancies_by_status' => $vacanciesByStatus,
+        ]);
+    }
+
+    /**
+     * `GET /alumni-outcome` — aggregate-only external outcome monitoring.
+     * No candidate identity, application row, or campus vacancy is selected.
+     */
+    public function alumniOutcome(Request $request): Response|JsonResponse|SymfonyResponse
+    {
+        $actor = $this->actor($request);
+        if (! $this->isCareerCenter($actor)) {
+            return $this->forbidden($request);
+        }
+
+        $externalEvents = DB::table('external_apply_events')
+            ->join('vacancies', 'vacancies.id', '=', 'external_apply_events.vacancy_id')
+            ->where('vacancies.ownership_type', 'COMPANY');
+
+        /** @var array<string, int> $outcomesByType */
+        $outcomesByType = DB::table('recruitment_outcomes')
+            ->join('external_apply_events', 'external_apply_events.id', '=', 'recruitment_outcomes.external_apply_event_id')
+            ->join('vacancies', 'vacancies.id', '=', 'external_apply_events.vacancy_id')
+            ->where('recruitment_outcomes.source_type', 'EXTERNAL_APPLY')
+            ->where('vacancies.ownership_type', 'COMPANY')
+            ->select('recruitment_outcomes.outcome', DB::raw('count(*) as aggregate'))
+            ->groupBy('recruitment_outcomes.outcome')
+            ->pluck('aggregate', 'recruitment_outcomes.outcome')
+            ->map(static fn ($count): int => (int) $count)->all();
+
+        return Inertia::render('career-center/AlumniOutcome', [
+            'counts' => [
+                'external_apply_started' => (clone $externalEvents)->count(),
+                'external_apply_confirmed' => (clone $externalEvents)->whereNotNull('confirmed_at')->count(),
+                'outcomes_recorded' => array_sum($outcomesByType),
+            ],
+            'outcomes_by_type' => $outcomesByType,
+        ]);
+    }
+
+    /** `GET /template-email` — read-only catalogue of code-managed templates. */
+    public function emailTemplateIndex(Request $request): Response|JsonResponse|SymfonyResponse
+    {
+        $actor = $this->actor($request);
+        if (! $this->isCareerCenter($actor)) {
+            return $this->forbidden($request);
+        }
+
+        return Inertia::render('career-center/TemplateEmail', [
+            'groups' => [
+                ['name' => 'Akun', 'templates' => [
+                    'identity.email-verification', 'identity.password-reset',
+                    'identity.password-changed', 'identity.password-reset-completed',
+                    'identity.account-already-registered',
+                ]],
+                ['name' => 'Perusahaan dan lowongan', 'templates' => [
+                    'company.member.invited', 'company.verification.*',
+                    'vacancy.moderation.queue', 'vacancy.lifecycle.*',
+                ]],
+                ['name' => 'Rekrutmen', 'templates' => [
+                    'application.submitted.candidate', 'application.submitted.owner',
+                    'application.withdrawn.candidate', 'application.withdrawn.owner',
+                    'application.transitioned.candidate', 'application.stage_moved.candidate',
+                    'evaluation.submitted.owner', 'offer.sent.candidate',
+                    'offer.accepted.candidate', 'offer.accepted.owner', 'offer.rejected.owner',
+                ]],
+            ],
+            'mode' => 'CODE_MANAGED',
+        ]);
+    }
+
+    /** `GET /pengaturan-moderasi` — effective read-only moderation policy. */
+    public function moderationSettings(Request $request): Response|JsonResponse|SymfonyResponse
+    {
+        $actor = $this->actor($request);
+        if (! $this->isCareerCenter($actor)) {
+            return $this->forbidden($request);
+        }
+
+        return Inertia::render('career-center/PengaturanModerasi', [
+            'rules' => [
+                ['label' => 'Alasan tindakan merugikan', 'value' => 'Wajib'],
+                ['label' => 'Catatan yang terlihat recruiter', 'value' => 'Wajib'],
+                ['label' => 'Catatan internal moderator', 'value' => 'Opsional'],
+                ['label' => 'Konflik kepentingan', 'value' => 'Anggota aktif perusahaan tidak boleh mereview perusahaan tersebut'],
+                ['label' => 'Publikasi lowongan perusahaan', 'value' => 'Melalui persetujuan atau penjadwal sistem'],
+                ['label' => 'Moderasi lowongan kampus', 'value' => 'Tidak berlaku'],
+            ],
+        ]);
+    }
+
     /** `GET /moderasi-lowongan`. */
     public function vacancyIndex(Request $request, ListVacancies $query): Response|JsonResponse|SymfonyResponse
     {

@@ -51,8 +51,9 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
  * `/applications/*`, `/schedules/*`, `/evaluations/*`, `/offers/*`,
  * `/recruitment-outcomes`, `/notifications/*`).
  *
- * "Laporan" is deliberately absent — FR-REP-003 / `GET /reports` has no
- * runtime; the nav item renders "Segera hadir".
+ * The report page is a read-only, campus-scoped operational recap. It exposes
+ * literal status buckets from the same scoped queries used by the workspace;
+ * it deliberately derives no rate, ranking, SLA, or performance score.
  */
 final class HrPageController extends Controller
 {
@@ -80,6 +81,57 @@ final class HrPageController extends Controller
                     ->execute(RecruitmentOutcomeScope::incompleteQueryFor($actor))->total(),
             ],
             'vacancies_by_status' => $byStatus,
+        ]);
+    }
+
+    /**
+     * `GET /kepegawaian/laporan` — read-only, campus-scoped operational
+     * recap. Every number is a direct grouped count; there is no client-side
+     * filtering, fabricated benchmark, or cross-company data.
+     */
+    public function report(Request $request): Response|JsonResponse|SymfonyResponse
+    {
+        $actor = $this->guard($request);
+        if (! $actor instanceof User) {
+            return $actor;
+        }
+
+        /** @var array<string, int> $vacanciesByStatus */
+        $vacanciesByStatus = VacancyScope::queryFor($actor)
+            ->select('current_status', DB::raw('count(*) as aggregate'))
+            ->groupBy('current_status')->pluck('aggregate', 'current_status')
+            ->map(static fn ($count): int => (int) $count)->all();
+
+        /** @var array<string, int> $applicationsByStatus */
+        $applicationsByStatus = RecruiterApplicationScope::queryFor($actor)
+            ->select('current_status', DB::raw('count(*) as aggregate'))
+            ->groupBy('current_status')->pluck('aggregate', 'current_status')
+            ->map(static fn ($count): int => (int) $count)->all();
+
+        /** @var array<string, int> $schedulesByStatus */
+        $schedulesByStatus = SelectionScheduleScope::operationalQueryFor($actor)
+            ->select('status', DB::raw('count(*) as aggregate'))
+            ->groupBy('status')->pluck('aggregate', 'status')
+            ->map(static fn ($count): int => (int) $count)->all();
+
+        /** @var array<string, int> $offersByStatus */
+        $offersByStatus = OfferScope::operationalQueryFor($actor)
+            ->select('status', DB::raw('count(*) as aggregate'))
+            ->groupBy('status')->pluck('aggregate', 'status')
+            ->map(static fn ($count): int => (int) $count)->all();
+
+        /** @var array<string, int> $outcomesByType */
+        $outcomesByType = RecruitmentOutcomeScope::operationalQueryFor($actor)
+            ->select('outcome', DB::raw('count(*) as aggregate'))
+            ->groupBy('outcome')->pluck('aggregate', 'outcome')
+            ->map(static fn ($count): int => (int) $count)->all();
+
+        return Inertia::render('admin-kepegawaian/Laporan', [
+            'vacancies_by_status' => $vacanciesByStatus,
+            'applications_by_status' => $applicationsByStatus,
+            'schedules_by_status' => $schedulesByStatus,
+            'offers_by_status' => $offersByStatus,
+            'outcomes_by_type' => $outcomesByType,
         ]);
     }
 

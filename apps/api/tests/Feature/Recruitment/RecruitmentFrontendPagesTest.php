@@ -39,12 +39,45 @@ final class RecruitmentFrontendPagesTest extends VacancyTestCase
             ->assertInertia(fn (Assert $page) => $page->component('candidate/Dashboard')->has('counts'));
     }
 
+    public function test_candidate_dashboard_uses_only_own_live_applications_and_upcoming_schedules(): void
+    {
+        [$admin, , $vacancyId] = $this->openVacancy('frontend-dash-activity@example.test');
+        [$candidate] = $this->candidate('frontend-dash-activity-candidate@example.test');
+        [$otherCandidate] = $this->candidate('frontend-dash-activity-other@example.test');
+        $applicationId = $this->submitApplication($candidate, $vacancyId);
+        $this->submitApplication($otherCandidate, $vacancyId);
+        $stageId = $this->createStage($admin, $vacancyId, 'Wawancara', 0);
+
+        $this->actingAs($admin)->postJson("/applications/{$applicationId}/transition", [
+            'to_status' => 'UNDER_REVIEW', 'candidate_visibility' => 'VISIBLE',
+        ])->assertOk();
+        $this->actingAs($admin)->postJson("/applications/{$applicationId}/move-stage", [
+            'to_stage_id' => $stageId, 'candidate_visibility' => 'VISIBLE',
+        ])->assertOk();
+        $this->actingAs($admin)->postJson("/applications/{$applicationId}/schedules", [
+            'recruitment_stage_id' => $stageId, 'selection_type' => 'Wawancara HR',
+            'starts_at' => now()->addDays(3)->toIso8601String(), 'timezone' => 'Asia/Jakarta',
+            'method' => 'ONLINE', 'meeting_url' => 'https://meet.example.test/dashboard',
+        ])->assertCreated();
+
+        $this->actingAs($candidate)->get('/dashboard')->assertOk()->assertInertia(
+            fn (Assert $page) => $page->component('candidate/Dashboard')
+                ->where('counts.applications', 1)
+                ->where('counts.schedules_upcoming', 1)
+                ->has('recent_applications', 1)
+                ->where('recent_applications.0.id', $applicationId)
+                ->where('recent_applications.0.vacancy_title', DB::table('vacancies')->where('id', $vacancyId)->value('title'))
+                ->has('upcoming_schedules', 1)
+                ->where('upcoming_schedules.0.application_id', $applicationId),
+        );
+    }
+
     public function test_recruiter_dashboard_snapshot_is_company_scoped_and_source_backed(): void
     {
         // Actor's own company: one PENDING_REVIEW + one REVISION_REQUIRED vacancy.
         [$recruiter, $company] = $this->verifiedCompanyWithRecruiter('dash-snap-a@example.test');
         $this->vacancyAt($recruiter, $company, 'PENDING_REVIEW');
-        $this->vacancyAt($recruiter, $company, 'REVISION_REQUIRED');
+        $ownRevisionId = $this->vacancyAt($recruiter, $company, 'REVISION_REQUIRED');
 
         // A different company's vacancy must never bleed into the counts.
         [$otherRecruiter, $otherCompany] = $this->verifiedCompanyWithRecruiter('dash-snap-b@example.test');
@@ -59,7 +92,26 @@ final class RecruitmentFrontendPagesTest extends VacancyTestCase
                 ->where('counts.revision_requests', 1)
                 ->where('counts.incomplete_outcomes', 0)
                 ->has('counts.applicants')
-                ->has('counts.schedules_upcoming'),
+                ->has('counts.schedules_upcoming')
+                ->has('priority_vacancies', 1)
+                ->where('priority_vacancies.0.title', DB::table('vacancies')->where('id', $ownRevisionId)->value('title')),
+        );
+    }
+
+    public function test_recruiter_dashboard_recent_applicants_are_scoped_to_its_company(): void
+    {
+        [$recruiter, , $ownVacancy] = $this->openVacancy('frontend-dash-applicants-own@example.test');
+        [, , $otherVacancy] = $this->openVacancy('frontend-dash-applicants-other@example.test');
+        [$ownCandidate] = $this->candidate('frontend-dash-applicants-own-candidate@example.test');
+        [$otherCandidate] = $this->candidate('frontend-dash-applicants-other-candidate@example.test');
+        $ownApplication = $this->submitApplication($ownCandidate, $ownVacancy);
+        $this->submitApplication($otherCandidate, $otherVacancy);
+
+        $this->actingAs($recruiter)->get('/dashboard')->assertOk()->assertInertia(
+            fn (Assert $page) => $page->component('recruiter/Dashboard')
+                ->has('recent_applicants', 1)
+                ->where('recent_applicants.0.id', $ownApplication)
+                ->where('recent_applicants.0.vacancy_id', $ownVacancy),
         );
     }
 
@@ -146,6 +198,28 @@ final class RecruitmentFrontendPagesTest extends VacancyTestCase
         [$candidate] = $this->candidate('frontend-jadwal-candidate@example.test');
         $this->actingAs($candidate)->get('/jadwal-seleksi')->assertOk()
             ->assertInertia(fn (Assert $page) => $page->component('candidate/JadwalSeleksi'));
+    }
+
+    /**
+     * `/jadwal-seleksi` paginates server-side for both personas; the payload
+     * must expose `pagination.page` / `pagination.last_page` and honour `?page`,
+     * so the page-navigation control the Vue pages render is functional.
+     */
+    public function test_jadwal_seleksi_pagination_is_honoured_for_both_personas(): void
+    {
+        [$admin] = $this->openVacancy('frontend-jadwal-pg@example.test');
+        $this->actingAs($admin)->get('/jadwal-seleksi?page=2')->assertOk()->assertInertia(
+            fn (Assert $page) => $page->component('recruiter/JadwalSeleksi')
+                ->has('pagination', fn (Assert $p) => $p->where('page', 2)->has('last_page')->etc())
+                ->etc(),
+        );
+
+        [$candidate] = $this->candidate('frontend-jadwal-pg-candidate@example.test');
+        $this->actingAs($candidate)->get('/jadwal-seleksi?page=2')->assertOk()->assertInertia(
+            fn (Assert $page) => $page->component('candidate/JadwalSeleksi')
+                ->has('pagination', fn (Assert $p) => $p->where('page', 2)->has('last_page')->etc())
+                ->etc(),
+        );
     }
 
     public function test_pelamar_list_denies_candidate_and_scopes_by_company(): void
